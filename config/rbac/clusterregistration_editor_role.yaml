@@ -1,0 +1,24 @@
+# permissions for end users to edit clusterregistrations.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: clusterregistration-editor-role
+rules:
+- apiGroups:
+  - arlo.arlo.org
+  resources:
+  - clusterregistrations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - arlo.arlo.org
+  resources:
+  - clusterregistrations/status
+  verbs:
+  - get

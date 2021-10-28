@@ -1,0 +1,20 @@
+# permissions for end users to view clusterregistrations.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: clusterregistration-viewer-role
+rules:
+- apiGroups:
+  - arlo.arlo.org
+  resources:
+  - clusterregistrations
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - arlo.arlo.org
+  resources:
+  - clusterregistrations/status
+  verbs:
+  - get

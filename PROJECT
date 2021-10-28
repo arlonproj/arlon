@@ -1,0 +1,16 @@
+domain: arlo.org
+layout:
+- go.kubebuilder.io/v3
+projectName: arlo4
+repo: arlo.org/arlo
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: arlo.org
+  group: arlo
+  kind: ClusterRegistration
+  path: arlo.org/arlo/api/v1
+  version: v1
+version: "3"

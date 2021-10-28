@@ -1,0 +1,7 @@
+apiVersion: arlo.arlo.org/v1
+kind: ClusterRegistration
+metadata:
+  name: clusterregistration-sample
+spec:
+  # Add fields here
+  foo: bar
