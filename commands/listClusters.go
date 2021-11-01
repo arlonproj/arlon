@@ -1,0 +1,47 @@
+package commands
+
+import (
+	"context"
+	"fmt"
+	"github.com/argoproj/argo-cd/v2/pkg/apiclient"
+	argocdclient "github.com/argoproj/argo-cd/v2/pkg/apiclient"
+	clusterpkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/cluster"
+	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
+	"github.com/argoproj/argo-cd/v2/util/errors"
+	"github.com/argoproj/argo-cd/v2/util/io"
+	"github.com/argoproj/argo-cd/v2/util/localconfig"
+	"github.com/go-logr/logr"
+	"os"
+	"text/tabwriter"
+)
+
+func init() {
+
+}
+
+func ListClusters(log logr.Logger) {
+	defaultLocalConfigPath, err := localconfig.DefaultLocalConfigPath()
+	errors.CheckError(err)
+	var argocdCliOpts apiclient.ClientOptions
+	argocdCliOpts.ConfigPath = defaultLocalConfigPath
+	conn, clusterIf := argocdclient.NewClientOrDie(&argocdCliOpts).NewClusterClientOrDie()
+	defer io.Close(conn)
+	clusters, err := clusterIf.List(context.Background(), &clusterpkg.ClusterQuery{})
+	errors.CheckError(err)
+	printClusterTable(clusters.Items)
+}
+
+// Copied from argo-cd/cmd/argocd/commands/cluster.go
+// Print table of cluster information
+func printClusterTable(clusters []argoappv1.Cluster) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	_, _ = fmt.Fprintf(w, "SERVER\tNAME\tVERSION\tSTATUS\tMESSAGE\n")
+	for _, c := range clusters {
+		server := c.Server
+		if len(c.Namespaces) > 0 {
+			server = fmt.Sprintf("%s (%d namespaces)", c.Server, len(c.Namespaces))
+		}
+		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", server, c.Name, c.ServerVersion, c.ConnectionState.Status, c.ConnectionState.Message)
+	}
+	_ = w.Flush()
+}

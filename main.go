@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"arlo.org/arlo/commands"
 	"flag"
 	"os"
 
@@ -39,6 +40,7 @@ import (
 var (
 	scheme   = runtime.NewScheme()
 	setupLog = ctrl.Log.WithName("setup")
+	cmd string
 )
 
 func init() {
@@ -52,6 +54,7 @@ func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
+	flag.StringVar(&cmd, "cmd", "controller", "The command to execute.")
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
@@ -63,8 +66,22 @@ func main() {
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
 
-	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+	logger := zap.New(zap.UseFlagOptions(&opts))
+	ctrl.SetLogger(logger)
 
+	switch cmd {
+	case "listclusters":
+		{
+			commands.ListClusters(logger)
+		}
+	case "controller":
+		{
+			startController(metricsAddr, probeAddr, enableLeaderElection)
+		}
+	}
+}
+
+func startController(metricsAddr string, probeAddr string, enableLeaderElection bool) {
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
 		MetricsBindAddress:     metricsAddr,
