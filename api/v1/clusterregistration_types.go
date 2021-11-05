@@ -29,13 +29,16 @@ type ClusterRegistrationSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// Foo is an example field of ClusterRegistration. Edit clusterregistration_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	ApiEndpoint          string `json:"apiEndpoint,omitempty"`
+	KubeconfigSecretName string `json:"kubeconfigSecretName,omitempty"`
 }
 
 // ClusterRegistrationStatus defines the observed state of ClusterRegistration
 type ClusterRegistrationStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	State   string `json:"state"`   // "retrying", "error", or "complete"
+	Message string `json:"message"` // for "retrying" status
 }
 
 //+kubebuilder:object:root=true

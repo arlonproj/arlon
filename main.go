@@ -40,7 +40,7 @@ import (
 var (
 	scheme   = runtime.NewScheme()
 	setupLog = ctrl.Log.WithName("setup")
-	cmd string
+	cmd      string
 )
 
 func init() {
@@ -72,7 +72,7 @@ func main() {
 	switch cmd {
 	case "listclusters":
 		{
-			commands.ListClusters(logger)
+			commands.ListClusters()
 		}
 	case "controller":
 		{

@@ -1,16 +1,13 @@
 package commands
 
 import (
+	"arlo.org/arlo/pkg/argocd"
 	"context"
 	"fmt"
-	"github.com/argoproj/argo-cd/v2/pkg/apiclient"
-	argocdclient "github.com/argoproj/argo-cd/v2/pkg/apiclient"
 	clusterpkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/cluster"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/errors"
 	"github.com/argoproj/argo-cd/v2/util/io"
-	"github.com/argoproj/argo-cd/v2/util/localconfig"
-	"github.com/go-logr/logr"
 	"os"
 	"text/tabwriter"
 )
@@ -19,12 +16,8 @@ func init() {
 
 }
 
-func ListClusters(log logr.Logger) {
-	defaultLocalConfigPath, err := localconfig.DefaultLocalConfigPath()
-	errors.CheckError(err)
-	var argocdCliOpts apiclient.ClientOptions
-	argocdCliOpts.ConfigPath = defaultLocalConfigPath
-	conn, clusterIf := argocdclient.NewClientOrDie(&argocdCliOpts).NewClusterClientOrDie()
+func ListClusters() {
+	conn, clusterIf := argocd.NewArgocdClientOrDie().NewClusterClientOrDie()
 	defer io.Close(conn)
 	clusters, err := clusterIf.List(context.Background(), &clusterpkg.ClusterQuery{})
 	errors.CheckError(err)

@@ -17,15 +17,18 @@ limitations under the License.
 package controllers
 
 import (
+	arlov1 "arlo.org/arlo/api/v1"
+	"arlo.org/arlo/pkg/argocd"
 	"context"
-	"github.com/argoproj/argo-cd/v2/util/localconfig"
+	"github.com/argoproj/argo-cd/v2/pkg/apiclient"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
-
-	arlov1 "arlo.org/arlo/api/v1"
 )
+
+var argocdclient apiclient.Client
 
 // ClusterRegistrationReconciler reconciles a ClusterRegistration object
 type ClusterRegistrationReconciler struct {
@@ -47,14 +50,40 @@ type ClusterRegistrationReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
 func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	cfgPath, _ := localconfig.DefaultLocalConfigPath()
-	if cfgPath == "" {
+	log := log.FromContext(ctx).WithValues("clusterregistration", req.NamespacedName)
+	log.V(1).Info("arlo clusterregistration")
+	var cr arlov1.ClusterRegistration
+	// your logic here
+	if err := r.Get(ctx, req.NamespacedName, &cr); err != nil {
+		log.Error(err, "unable to get clusterregistration")
+		return ctrl.Result{}, err
+	}
+	if cr.Status.State == "complete" {
+		log.V(1).Info("clusterregistration is already complete")
 		return ctrl.Result{}, nil
 	}
-	_ = log.FromContext(ctx)
-
-	// your logic here
-
+	if cr.Status.State == "error" {
+		log.V(1).Info("clusterregistration is in error state")
+		return ctrl.Result{}, nil
+	}
+	if cr.Spec.ApiEndpoint == "" || cr.Spec.KubeconfigSecretName == "" {
+		msg := "clusterregistration has an invalid spec"
+		log.V(0).Info(msg)
+		cr.Status.State = "error"
+		cr.Status.Message = msg
+		if err := r.Status().Update(ctx, &cr); err != nil {
+			log.Error(err, "unable to update clusterregistration status")
+			return ctrl.Result{}, err
+		}
+		log.Info("set status to error")
+		return ctrl.Result{}, nil
+		//return ctrl.Result{RequeueAfter: 60*time.Second}, nil
+	}
+	var secret corev1.Secret
+	if err := r.Get(ctx, req.NamespacedName, &secret); err != nil {
+		log.Error(err, "unable to get secret")
+		return ctrl.Result{}, err
+	}
 	return ctrl.Result{}, nil
 }
 
@@ -63,4 +92,8 @@ func (r *ClusterRegistrationReconciler) SetupWithManager(mgr ctrl.Manager) error
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&arlov1.ClusterRegistration{}).
 		Complete(r)
+}
+
+func init() {
+	argocdclient = argocd.NewArgocdClientOrDie()
 }

@@ -4,4 +4,4 @@ metadata:
   name: clusterregistration-sample
 spec:
   # Add fields here
-  foo: bar
+  apiEndpoint: https://foo.bar:8443
