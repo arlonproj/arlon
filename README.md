@@ -5,7 +5,7 @@ A companion to ArgoCD for managing both kubernetes cluster lifecycle and configu
 
 Arlo introduces a few controllers and custom resources.
 
-![architecture](./docs/architecture.png)
+![architecture](./docs/architecture_diagram.png)
 
 * A ClusterWatch resource causes another resource representing a target Kubernetes cluster provisioned by an external system like Cluster API or Crossplane to be observed.
 * When the target cluster becomes ready, a ClusterRegistration containing the cluster's information and access credentials is created.
