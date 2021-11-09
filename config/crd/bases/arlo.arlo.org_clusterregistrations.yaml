@@ -41,6 +41,8 @@ spec:
                 description: Foo is an example field of ClusterRegistration. Edit
                   clusterregistration_types.go to remove/update
                 type: string
+              clusterName:
+                type: string
               kubeconfigSecretName:
                 type: string
             type: object

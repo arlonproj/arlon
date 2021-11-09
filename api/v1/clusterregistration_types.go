@@ -30,6 +30,7 @@ type ClusterRegistrationSpec struct {
 
 	// Foo is an example field of ClusterRegistration. Edit clusterregistration_types.go to remove/update
 	ApiEndpoint          string `json:"apiEndpoint,omitempty"`
+	ClusterName          string `json:"clusterName,omitempty"`
 	KubeconfigSecretName string `json:"kubeconfigSecretName,omitempty"`
 }
 
