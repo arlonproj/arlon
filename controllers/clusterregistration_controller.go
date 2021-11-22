@@ -91,25 +91,24 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 	}
 	conn, clusterIf := argocdclient.NewClusterClientOrDie()
 	defer io.Close(conn)
-	clquery := cluster.ClusterQuery{Name: cr.Name}
+	clquery := cluster.ClusterQuery{Name: cr.Spec.ClusterName}
 	clust, err := clusterIf.Get(ctx, &clquery)
 	if err == nil {
 		if clust.Server == cr.Spec.ApiEndpoint {
-			log.Info("cluster already exists -- ok")
+			log.Info(fmt.Sprintf("cluster %s already exists -- ok", cr.Spec.ClusterName))
 			cr.Status.State = "complete"
-			return ctrl.Result{}, nil
+		} else {
+			log.Info("cluster already exists but its API endpoint does not match")
+			cr.Status.State = "error"
 		}
-		msg := "cluster already exists but its API endpoint does not match"
-		cr.Status.State = "error"
-		log.Info(msg)
 		if err := r.Status().Update(ctx, &cr); err != nil {
 			log.Error(err, "unable to update clusterregistration status")
 			return ctrl.Result{}, err
 		}
-		log.Info("set status to error")
+		log.Info(fmt.Sprintf("successfully set status to %s", cr.Status.State))
 		return ctrl.Result{}, nil
 	}
-	log.Error(err, "failed to lookup existing cluster -- this is expected if new")
+	log.Info(fmt.Sprintf("failed to lookup existing cluster -- this is expected if new: %s", err))
 	var secret corev1.Secret
 	secretNamespacedName := types.NamespacedName{
 		Namespace: req.NamespacedName.Namespace,
