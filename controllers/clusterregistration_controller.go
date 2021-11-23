@@ -130,8 +130,8 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 			fmt.Sprintf("failed to get clientset from config: %s", err),
 			ctrl.Result{})
 	}
-	managerBearerToken, err := clusterauth.GetServiceAccountBearerToken(clientset,
-		"kube-system", clusterauth.ArgoCDManagerServiceAccount)
+	managerBearerToken, err := clusterauth.InstallClusterManagerRBAC(clientset,
+		"kube-system", []string{})
 	if err != nil {
 		return updateState(r, log, ctx, &cr, "retrying",
 			fmt.Sprintf("failed to install service account in destination cluster: '%s' ... retrying in 10 secs", err),
