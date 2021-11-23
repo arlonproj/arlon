@@ -43,8 +43,13 @@ spec:
                 type: string
               clusterName:
                 type: string
+              kubeconfigSecretKeyName:
+                type: string
               kubeconfigSecretName:
                 type: string
+            required:
+            - kubeconfigSecretKeyName
+            - kubeconfigSecretName
             type: object
           status:
             description: ClusterRegistrationStatus defines the observed state of ClusterRegistration

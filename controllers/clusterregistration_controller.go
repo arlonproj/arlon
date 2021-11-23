@@ -27,7 +27,9 @@ import (
 	clusterpkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/cluster"
 	"github.com/argoproj/argo-cd/v2/util/clusterauth"
 	"github.com/argoproj/argo-cd/v2/util/io"
+	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
@@ -63,7 +65,7 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 	log := log.FromContext(ctx).WithValues("clusterregistration", req.NamespacedName)
 	log.V(1).Info("arlo clusterregistration")
 	var cr arlov1.ClusterRegistration
-	// your logic here
+
 	if err := r.Get(ctx, req.NamespacedName, &cr); err != nil {
 		log.Error(err, "unable to get clusterregistration")
 		return ctrl.Result{}, err
@@ -76,84 +78,64 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 		log.V(1).Info("clusterregistration is already in error state")
 		return ctrl.Result{}, nil
 	}
-	if cr.Spec.ApiEndpoint == "" || cr.Spec.KubeconfigSecretName == "" {
-		msg := "clusterregistration has an invalid spec"
-		log.V(0).Info(msg)
-		cr.Status.State = "error"
-		cr.Status.Message = msg
-		if err := r.Status().Update(ctx, &cr); err != nil {
-			log.Error(err, "unable to update clusterregistration status")
-			return ctrl.Result{}, err
-		}
-		log.Info("set status to error")
-		return ctrl.Result{}, nil
-		//return ctrl.Result{RequeueAfter: 60*time.Second}, nil
+	if cr.Spec.ApiEndpoint == "" || cr.Spec.KubeconfigSecretName == "" || cr.Spec.KubeconfigSecretKeyName == "" {
+		return updateState(r, log, ctx, &cr, "error", "clusterregistration has an invalid spec", ctrl.Result{})
 	}
 	conn, clusterIf := argocdclient.NewClusterClientOrDie()
 	defer io.Close(conn)
 	clquery := cluster.ClusterQuery{Name: cr.Spec.ClusterName}
 	clust, err := clusterIf.Get(ctx, &clquery)
 	if err == nil {
+		var state string
+		var msg string
 		if clust.Server == cr.Spec.ApiEndpoint {
-			log.Info(fmt.Sprintf("cluster %s already exists -- ok", cr.Spec.ClusterName))
-			cr.Status.State = "complete"
+			msg = fmt.Sprintf("cluster %s already exists -- ok", cr.Spec.ClusterName)
+			state = "complete"
 		} else {
-			log.Info("cluster already exists but its API endpoint does not match")
-			cr.Status.State = "error"
+			msg = "cluster already exists but its API endpoint does not match"
+			state = "error"
 		}
-		if err := r.Status().Update(ctx, &cr); err != nil {
-			log.Error(err, "unable to update clusterregistration status")
-			return ctrl.Result{}, err
-		}
-		log.Info(fmt.Sprintf("successfully set status to %s", cr.Status.State))
-		return ctrl.Result{}, nil
+		return updateState(r, log, ctx, &cr, state, msg, ctrl.Result{})
 	}
-	log.Info(fmt.Sprintf("failed to lookup existing cluster -- this is expected if new: %s", err))
+	log.Info(fmt.Sprintf("failed to lookup existing cluster %s -- this is expected if new: %s", cr.Spec.ClusterName, err))
 	var secret corev1.Secret
 	secretNamespacedName := types.NamespacedName{
 		Namespace: req.NamespacedName.Namespace,
 		Name:      cr.Spec.KubeconfigSecretName,
 	}
 	if err := r.Get(ctx, secretNamespacedName, &secret); err != nil {
-		msg := fmt.Sprintf("failed to read secret: %s", err.Error())
-		cr.Status.State = "error"
-		cr.Status.Message = msg
-		log.Info(msg)
-		if err := r.Status().Update(ctx, &cr); err != nil {
-			log.Error(err, "unable to update clusterregistration status")
-			return ctrl.Result{}, err
+		if apierrors.IsNotFound(err) {
+			msg := fmt.Sprintf("kubeconfig secret %s does not exist yet, retrying in 10 seconds",
+				cr.Spec.KubeconfigSecretName)
+			return updateState(r, log, ctx, &cr, "retrying", msg, ctrl.Result{RequeueAfter: time.Second * 10})
 		}
-		log.Info("set status to error")
-		return ctrl.Result{}, nil
+		msg := fmt.Sprintf("failed to read secret: %s", err)
+		return updateState(r, log, ctx, &cr, "error", msg, ctrl.Result{})
 	}
-	conf, err := clientcmd.RESTConfigFromKubeConfig(secret.Data["kubeconfig"])
+	data := secret.Data[cr.Spec.KubeconfigSecretKeyName]
+	if data == nil {
+		return updateState(r, log, ctx, &cr, "error",
+			fmt.Sprintf("secret subkey %s does not exist",
+				cr.Spec.KubeconfigSecretKeyName), ctrl.Result{})
+	}
+	conf, err := clientcmd.RESTConfigFromKubeConfig(data)
 	if err != nil {
-		log.Error(err, "failed to read kubeconfig from secret")
-		return ctrl.Result{}, err
+		return updateState(r, log, ctx, &cr, "error",
+			fmt.Sprintf("failed to read kubeconfig from secret: %s", err),
+			ctrl.Result{})
 	}
 	clientset, err := kubernetes.NewForConfig(conf)
 	if err != nil {
-		log.Error(err, "failed to get clientset from config")
-		return ctrl.Result{}, err
-	}
-	cr.Status.State = "complete"
-	if err := r.Status().Update(ctx, &cr); err != nil {
-		log.Error(err, "unable to update clusterregistration status")
-		return ctrl.Result{}, err
+		return updateState(r, log, ctx, &cr, "error",
+			fmt.Sprintf("failed to get clientset from config: %s", err),
+			ctrl.Result{})
 	}
 	managerBearerToken, err := clusterauth.GetServiceAccountBearerToken(clientset,
 		"kube-system", clusterauth.ArgoCDManagerServiceAccount)
 	if err != nil {
-		msg := "failed to install service account in destination cluster"
-		log.Info(msg, "err", err)
-		cr.Status.State = "error"
-		log.Info(msg)
-		if err := r.Status().Update(ctx, &cr); err != nil {
-			log.Error(err, "unable to update clusterregistration status")
-			return ctrl.Result{}, err
-		}
-		log.Info("set status to error")
-		return ctrl.Result{}, nil
+		return updateState(r, log, ctx, &cr, "retrying",
+			fmt.Sprintf("failed to install service account in destination cluster: '%s' ... retrying in 10 secs", err),
+			ctrl.Result{RequeueAfter: time.Second * 10})
 	}
 	log.Info("adding cluster")
 	var namespaces []string
@@ -175,17 +157,11 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 	}
 	_, err = clusterIf.Create(context.Background(), &clstCreateReq)
 	if err != nil {
-		log.Info("failed to add cluster to argocd", "msg", err.Error())
-		cr.Status.State = "retrying"
-		if err := r.Status().Update(ctx, &cr); err != nil {
-			log.Error(err, "unable to update clusterregistration status")
-			return ctrl.Result{}, err
-		}
-		log.Info("set status to retrying")
-		return ctrl.Result{RequeueAfter: time.Second * 60}, nil
+		return updateState(r, log, ctx, &cr, "retrying",
+			fmt.Sprintf("failed to add cluster to argocd: '%s' ... retrying in 10 secs", err),
+			ctrl.Result{RequeueAfter: time.Second * 10})
 	}
-	log.Info("setting status to complete")
-	return ctrl.Result{}, nil
+	return updateState(r, log, ctx, &cr, "complete","successfully added cluster to argocd", ctrl.Result{})
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -197,4 +173,23 @@ func (r *ClusterRegistrationReconciler) SetupWithManager(mgr ctrl.Manager) error
 
 func init() {
 	argocdclient = argocd.NewArgocdClientOrDie()
+}
+
+func updateState(
+	r *ClusterRegistrationReconciler,
+	log logr.Logger,
+	ctx context.Context,
+	cr * arlov1.ClusterRegistration,
+	state string,
+	msg string,
+	result ctrl.Result,
+) (ctrl.Result, error) {
+	cr.Status.State = state
+	cr.Status.Message = msg
+	log.Info(fmt.Sprintf("%s ... setting state to '%s'", msg, cr.Status.State))
+	if err := r.Status().Update(ctx, cr); err != nil {
+		log.Error(err, "unable to update clusterregistration status")
+		return ctrl.Result{}, err
+	}
+	return result, nil
 }

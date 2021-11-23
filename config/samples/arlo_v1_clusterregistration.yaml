@@ -6,4 +6,4 @@ spec:
   apiEndpoint: https://9A1844089566B476DE0C8D7F90E140B1.gr7.us-west-2.eks.amazonaws.com
   clusterName: leb@leb-eks-clust-2.us-west-2.eksctl.io
   kubeconfigSecretName: kubeconfig
-
+  kubeconfigSecretKeyName: kubeconfig

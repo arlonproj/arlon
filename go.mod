@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/argoproj/argo-cd/v2 v2.0.5
+	github.com/go-logr/logr v0.4.0
 	github.com/onsi/ginkgo v1.14.2
 	github.com/onsi/gomega v1.10.3
 	k8s.io/api v0.20.4
