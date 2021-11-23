@@ -1,0 +1,9 @@
+apiVersion: arlo.arlo.org/v1
+kind: ClusterRegistration
+metadata:
+  name: capi-quickstart
+spec:
+  clusterName: capi-quickstart
+  kubeconfigSecretName: capi-quickstart-kubeconfig
+  kubeconfigSecretKeyName: value
+

@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: capi-quickstart
+  namespace: argocd
+spec:
+  destination:
+    name: capi-quickstart
+    namespace: default
+  project: default
+  source:
+    path: config/samples/capi-example/profile
+    repoURL: https://github.com/platform9-incubator/arlo.git
+    targetRevision: HEAD
+
