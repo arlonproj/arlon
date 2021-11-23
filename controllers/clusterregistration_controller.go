@@ -78,24 +78,16 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 		log.V(1).Info("clusterregistration is already in error state")
 		return ctrl.Result{}, nil
 	}
-	if cr.Spec.ApiEndpoint == "" || cr.Spec.KubeconfigSecretName == "" || cr.Spec.KubeconfigSecretKeyName == "" {
+	if cr.Spec.KubeconfigSecretName == "" || cr.Spec.KubeconfigSecretKeyName == "" {
 		return updateState(r, log, ctx, &cr, "error", "clusterregistration has an invalid spec", ctrl.Result{})
 	}
 	conn, clusterIf := argocdclient.NewClusterClientOrDie()
 	defer io.Close(conn)
 	clquery := cluster.ClusterQuery{Name: cr.Spec.ClusterName}
-	clust, err := clusterIf.Get(ctx, &clquery)
+	_, err := clusterIf.Get(ctx, &clquery)
 	if err == nil {
-		var state string
-		var msg string
-		if clust.Server == cr.Spec.ApiEndpoint {
-			msg = fmt.Sprintf("cluster %s already exists -- ok", cr.Spec.ClusterName)
-			state = "complete"
-		} else {
-			msg = "cluster already exists but its API endpoint does not match"
-			state = "error"
-		}
-		return updateState(r, log, ctx, &cr, state, msg, ctrl.Result{})
+		msg := fmt.Sprintf("cluster %s already exists -- ok", cr.Spec.ClusterName)
+		return updateState(r, log, ctx, &cr, "complete", msg, ctrl.Result{})
 	}
 	log.Info(fmt.Sprintf("failed to lookup existing cluster %s -- this is expected if new: %s", cr.Spec.ClusterName, err))
 	var secret corev1.Secret
