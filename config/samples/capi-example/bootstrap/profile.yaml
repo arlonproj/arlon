@@ -4,6 +4,9 @@ metadata:
   name: capi-quickstart
   namespace: argocd
 spec:
+  syncPolicy:
+    automated:
+      prune: true
   destination:
     name: capi-quickstart
     namespace: default
