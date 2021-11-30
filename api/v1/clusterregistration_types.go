@@ -63,6 +63,10 @@ type ClusterRegistrationList struct {
 	Items           []ClusterRegistration `json:"items"`
 }
 
+const (
+	ClusterRegistrationFinalizer = "clusterregistration.arlo.org"
+)
+
 func init() {
 	SchemeBuilder.Register(&ClusterRegistration{}, &ClusterRegistrationList{})
 }

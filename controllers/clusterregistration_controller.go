@@ -34,8 +34,10 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	"sigs.k8s.io/cluster-api/util/patch"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"time"
 )
@@ -67,8 +69,22 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 	var cr arlov1.ClusterRegistration
 
 	if err := r.Get(ctx, req.NamespacedName, &cr); err != nil {
-		log.Error(err, "unable to get clusterregistration")
-		return ctrl.Result{}, err
+		if apierrors.IsNotFound(err) {
+			log.Info("clusterregistration is gone -- ok")
+			return ctrl.Result{}, nil
+		}
+		log.Info(fmt.Sprintf("unable to get clusterregistration (%s) ... requeuing", err))
+		return ctrl.Result{Requeue: true}, nil
+	}
+	// Initialize the patch helper. It stores a "before" copy of the current object.
+	patchHelper, err := patch.NewHelper(&cr, r.Client)
+	if err != nil {
+		log.Error(err, "Failed to configure the patch helper")
+		return ctrl.Result{Requeue: true}, nil
+	}
+	if !cr.ObjectMeta.DeletionTimestamp.IsZero() {
+		// Handle deletion reconciliation loop.
+		return reconcileDelete(ctx, log, &cr, patchHelper)
 	}
 	if cr.Status.State == "complete" {
 		log.V(1).Info("clusterregistration is already complete")
@@ -81,15 +97,30 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 	if cr.Spec.KubeconfigSecretName == "" || cr.Spec.KubeconfigSecretKeyName == "" {
 		return updateState(r, log, ctx, &cr, "error", "clusterregistration has an invalid spec", ctrl.Result{})
 	}
+	// Add finalizer first if not exist to avoid the race condition between init and delete
+	if !controllerutil.ContainsFinalizer(&cr, arlov1.ClusterRegistrationFinalizer) {
+		controllerutil.AddFinalizer(&cr, arlov1.ClusterRegistrationFinalizer)
+		// patch and return right away instead of reusing the main defer,
+		// because the main defer may take too much time to get cluster status
+		// Patch ObservedGeneration only if the reconciliation completed successfully
+		patchOpts := []patch.Option{patch.WithStatusObservedGeneration{}}
+		if err := patchHelper.Patch(ctx, &cr, patchOpts...); err != nil {
+			log.Error(err, "Failed to patch ClusterRegistration to add finalizer")
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{}, nil
+	}
 	conn, clusterIf := argocdclient.NewClusterClientOrDie()
 	defer io.Close(conn)
 	clquery := cluster.ClusterQuery{Name: cr.Spec.ClusterName}
-	_, err := clusterIf.Get(ctx, &clquery)
+
+	_, err = clusterIf.Get(ctx, &clquery)
 	if err == nil {
 		msg := fmt.Sprintf("cluster %s already exists -- ok", cr.Spec.ClusterName)
 		return updateState(r, log, ctx, &cr, "complete", msg, ctrl.Result{})
 	}
 	log.Info(fmt.Sprintf("failed to lookup existing cluster %s -- this is expected if new: %s", cr.Spec.ClusterName, err))
+
 	var secret corev1.Secret
 	secretNamespacedName := types.NamespacedName{
 		Namespace: req.NamespacedName.Namespace,
@@ -138,10 +169,13 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 	clst := cmdutil.NewCluster(
 		clusterName,
 		namespaces,
+		false,
 		conf,
 		managerBearerToken,
 		nil, // awsAuthConf
 		nil, // execProviderConf
+		nil, // labels
+		nil, // annotations
 	)
 	clstCreateReq := clusterpkg.ClusterCreateRequest{
 		Cluster: clst,
@@ -184,4 +218,37 @@ func updateState(
 		return ctrl.Result{}, err
 	}
 	return result, nil
+}
+
+func reconcileDelete(
+	ctx context.Context,
+	log logr.Logger,
+	cr *arlov1.ClusterRegistration,
+	patchHelper *patch.Helper,
+) (ctrl.Result, error) {
+	conn, clusterIf := argocdclient.NewClusterClientOrDie()
+	defer io.Close(conn)
+	clquery := cluster.ClusterQuery{Name: cr.Spec.ClusterName}
+	log.Info(fmt.Sprintf("reconciling deletion of clusterregistration '%s' with cluster name '%s'",
+		cr.Name, cr.Spec.ClusterName))
+	clust, err := clusterIf.Get(ctx, &clquery);
+	if err != nil {
+		log.Info(fmt.Sprintf("cluster '%s' does not exist or could not be queried (%s) -- ignoring",
+			cr.Spec.ClusterName, err))
+	} else {
+		clquery.Server = clust.Server
+		if _, err := clusterIf.Delete(ctx, &clquery); err != nil {
+			log.Info(fmt.Sprintf("cluster '%s' could not be deleted from argocd (%s) -- requeuing in 10 secs",
+				clquery.Name, err))
+			return ctrl.Result{RequeueAfter: time.Second * 10}, nil
+		}
+	}
+	controllerutil.RemoveFinalizer(cr, arlov1.ClusterRegistrationFinalizer)
+	if err := patchHelper.Patch(ctx, cr); err != nil {
+		log.Info(fmt.Sprintf("failed to patch clusterregistration: %s", err))
+		return ctrl.Result{}, err
+	}
+	log.Info(fmt.Sprintf("removed finalizer from clusterregistration '%s'",
+		cr.Spec.ClusterName))
+	return ctrl.Result{}, nil
 }
