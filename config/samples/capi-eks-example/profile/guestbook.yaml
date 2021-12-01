@@ -19,15 +19,3 @@ spec:
           name: guestbook-ui
           ports:
             - containerPort: 80
----
-# Source: https://raw.githubusercontent.com/argoproj/argocd-example-apps/master/guestbook/guestbook-ui-svc.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: guestbook-ui
-spec:
-  ports:
-    - port: 80
-      targetPort: 80
-  selector:
-    app: guestbook-ui
