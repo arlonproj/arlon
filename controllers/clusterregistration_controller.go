@@ -95,7 +95,7 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 		return ctrl.Result{}, nil
 	}
 	if cr.Spec.KubeconfigSecretName == "" || cr.Spec.KubeconfigSecretKeyName == "" {
-		return updateState(r, log, ctx, &cr, "error", "clusterregistration has an invalid spec", ctrl.Result{})
+		return updateState(r, log, &cr, "error", "clusterregistration has an invalid spec", ctrl.Result{})
 	}
 	// Add finalizer first if not exist to avoid the race condition between init and delete
 	if !controllerutil.ContainsFinalizer(&cr, arlov1.ClusterRegistrationFinalizer) {
@@ -117,7 +117,7 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 	_, err = clusterIf.Get(ctx, &clquery)
 	if err == nil {
 		msg := fmt.Sprintf("cluster %s already exists -- ok", cr.Spec.ClusterName)
-		return updateState(r, log, ctx, &cr, "complete", msg, ctrl.Result{})
+		return updateState(r, log, &cr, "complete", msg, ctrl.Result{})
 	}
 	log.Info(fmt.Sprintf("failed to lookup existing cluster %s -- this is expected if new: %s", cr.Spec.ClusterName, err))
 
@@ -130,33 +130,33 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 		if apierrors.IsNotFound(err) {
 			msg := fmt.Sprintf("kubeconfig secret %s does not exist yet, retrying in 10 seconds",
 				cr.Spec.KubeconfigSecretName)
-			return updateState(r, log, ctx, &cr, "retrying", msg, ctrl.Result{RequeueAfter: time.Second * 10})
+			return updateState(r, log, &cr, "retrying", msg, ctrl.Result{RequeueAfter: time.Second * 10})
 		}
 		msg := fmt.Sprintf("failed to read secret: %s", err)
-		return updateState(r, log, ctx, &cr, "error", msg, ctrl.Result{})
+		return updateState(r, log, &cr, "error", msg, ctrl.Result{})
 	}
 	data := secret.Data[cr.Spec.KubeconfigSecretKeyName]
 	if data == nil {
-		return updateState(r, log, ctx, &cr, "error",
+		return updateState(r, log, &cr, "error",
 			fmt.Sprintf("secret subkey %s does not exist",
 				cr.Spec.KubeconfigSecretKeyName), ctrl.Result{})
 	}
 	conf, err := clientcmd.RESTConfigFromKubeConfig(data)
 	if err != nil {
-		return updateState(r, log, ctx, &cr, "error",
+		return updateState(r, log, &cr, "error",
 			fmt.Sprintf("failed to read kubeconfig from secret: %s", err),
 			ctrl.Result{})
 	}
 	clientset, err := kubernetes.NewForConfig(conf)
 	if err != nil {
-		return updateState(r, log, ctx, &cr, "error",
+		return updateState(r, log, &cr, "error",
 			fmt.Sprintf("failed to get clientset from config: %s", err),
 			ctrl.Result{})
 	}
 	managerBearerToken, err := clusterauth.InstallClusterManagerRBAC(clientset,
 		"kube-system", []string{})
 	if err != nil {
-		return updateState(r, log, ctx, &cr, "retrying",
+		return updateState(r, log, &cr, "retrying",
 			fmt.Sprintf("failed to install service account in destination cluster: '%s' ... retrying in 10 secs", err),
 			ctrl.Result{RequeueAfter: time.Second * 10})
 	}
@@ -183,11 +183,11 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 	}
 	_, err = clusterIf.Create(context.Background(), &clstCreateReq)
 	if err != nil {
-		return updateState(r, log, ctx, &cr, "retrying",
+		return updateState(r, log, &cr, "retrying",
 			fmt.Sprintf("failed to add cluster to argocd: '%s' ... retrying in 10 secs", err),
 			ctrl.Result{RequeueAfter: time.Second * 10})
 	}
-	return updateState(r, log, ctx, &cr, "complete","successfully added cluster to argocd", ctrl.Result{})
+	return updateState(r, log, &cr, "complete","successfully added cluster to argocd", ctrl.Result{})
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -204,7 +204,6 @@ func init() {
 func updateState(
 	r *ClusterRegistrationReconciler,
 	log logr.Logger,
-	ctx context.Context,
 	cr * arlov1.ClusterRegistration,
 	state string,
 	msg string,
@@ -213,7 +212,7 @@ func updateState(
 	cr.Status.State = state
 	cr.Status.Message = msg
 	log.Info(fmt.Sprintf("%s ... setting state to '%s'", msg, cr.Status.State))
-	if err := r.Status().Update(ctx, cr); err != nil {
+	if err := r.Status().Update(context.Background(), cr); err != nil {
 		log.Error(err, "unable to update clusterregistration status")
 		return ctrl.Result{}, err
 	}
