@@ -20,20 +20,21 @@ import (
 	"arlo.org/arlo/commands"
 	"flag"
 	"os"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
+	arlov1 "arlo.org/arlo/api/v1"
+	"arlo.org/arlo/controllers"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-
-	arlov1 "arlo.org/arlo/api/v1"
-	"arlo.org/arlo/controllers"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -89,6 +90,13 @@ func startController(metricsAddr string, probeAddr string, enableLeaderElection 
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "d4242dee.arlo.org",
+		// Disable caching for secret objects, because the controller reads them
+		// in a particular namespace. Caching requires RBAC to be setup for
+		// cluster-wide List access, as opposed to the more secure
+		// namespace-scoped access.
+		ClientDisableCacheFor: []client.Object{
+			&corev1.Secret{},
+		},
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
