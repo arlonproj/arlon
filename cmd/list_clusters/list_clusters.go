@@ -1,4 +1,4 @@
-package commands
+package list_clusters
 
 import (
 	"arlon.io/arlon/pkg/argocd"
@@ -8,15 +8,25 @@ import (
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/errors"
 	"github.com/argoproj/argo-cd/v2/util/io"
+	"github.com/spf13/cobra"
 	"os"
 	"text/tabwriter"
 )
 
-func init() {
-
+func NewCommand() *cobra.Command {
+	command := &cobra.Command{
+		Use:               "listclusters",
+		Short:             "List the clusters registered with ArgoCD",
+		Long:              "List the clusters registered with ArgoCD",
+		DisableAutoGenTag: true,
+		Run: func(c *cobra.Command, args []string) {
+			listClusters()
+		},
+	}
+	return command
 }
 
-func ListClusters() {
+func listClusters() {
 	conn, clusterIf := argocd.NewArgocdClientOrDie().NewClusterClientOrDie()
 	defer io.Close(conn)
 	clusters, err := clusterIf.List(context.Background(), &clusterpkg.ClusterQuery{})
