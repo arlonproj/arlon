@@ -1,4 +1,4 @@
-apiVersion: arlo.arlo.org/v1
+apiVersion: arlon.org/v1
 kind: ClusterRegistration
 metadata:
   name: clusterregistration-sample

@@ -7,7 +7,7 @@ metadata:
   name: arlo
 rules:
 - apiGroups:
-  - arlo.arlo.org
+  - arlon.org
   resources:
   - clusterregistrations
   verbs:
@@ -19,13 +19,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - arlo.arlo.org
+  - arlon.org
   resources:
   - clusterregistrations/finalizers
   verbs:
   - update
 - apiGroups:
-  - arlo.arlo.org
+  - arlon.org
   resources:
   - clusterregistrations/status
   verbs:

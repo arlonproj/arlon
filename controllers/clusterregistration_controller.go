@@ -17,8 +17,8 @@ limitations under the License.
 package controllers
 
 import (
-	arlov1 "arlo.org/arlo/api/v1"
-	"arlo.org/arlo/pkg/argocd"
+	arlonv1 "arlon.org/arlo/api/v1"
+	"arlon.org/arlo/pkg/argocd"
 	"context"
 	"fmt"
 	cmdutil "github.com/argoproj/argo-cd/v2/cmd/util"
@@ -50,9 +50,9 @@ type ClusterRegistrationReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=arlo.arlo.org,resources=clusterregistrations,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=arlo.arlo.org,resources=clusterregistrations/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=arlo.arlo.org,resources=clusterregistrations/finalizers,verbs=update
+//+kubebuilder:rbac:groups=arlon.org,resources=clusterregistrations,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=arlon.org,resources=clusterregistrations/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=arlon.org,resources=clusterregistrations/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -66,7 +66,7 @@ type ClusterRegistrationReconciler struct {
 func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx).WithValues("clusterregistration", req.NamespacedName)
 	log.V(1).Info("arlo clusterregistration")
-	var cr arlov1.ClusterRegistration
+	var cr arlonv1.ClusterRegistration
 
 	if err := r.Get(ctx, req.NamespacedName, &cr); err != nil {
 		if apierrors.IsNotFound(err) {
@@ -98,8 +98,8 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 		return updateState(r, log, &cr, "error", "clusterregistration has an invalid spec", ctrl.Result{})
 	}
 	// Add finalizer first if not exist to avoid the race condition between init and delete
-	if !controllerutil.ContainsFinalizer(&cr, arlov1.ClusterRegistrationFinalizer) {
-		controllerutil.AddFinalizer(&cr, arlov1.ClusterRegistrationFinalizer)
+	if !controllerutil.ContainsFinalizer(&cr, arlonv1.ClusterRegistrationFinalizer) {
+		controllerutil.AddFinalizer(&cr, arlonv1.ClusterRegistrationFinalizer)
 		// patch and return right away instead of reusing the main defer,
 		// because the main defer may take too much time to get cluster status
 		// Patch ObservedGeneration only if the reconciliation completed successfully
@@ -193,7 +193,7 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 // SetupWithManager sets up the controller with the Manager.
 func (r *ClusterRegistrationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&arlov1.ClusterRegistration{}).
+		For(&arlonv1.ClusterRegistration{}).
 		Complete(r)
 }
 
@@ -204,7 +204,7 @@ func init() {
 func updateState(
 	r *ClusterRegistrationReconciler,
 	log logr.Logger,
-	cr * arlov1.ClusterRegistration,
+	cr * arlonv1.ClusterRegistration,
 	state string,
 	msg string,
 	result ctrl.Result,
@@ -222,7 +222,7 @@ func updateState(
 func reconcileDelete(
 	ctx context.Context,
 	log logr.Logger,
-	cr *arlov1.ClusterRegistration,
+	cr *arlonv1.ClusterRegistration,
 	patchHelper *patch.Helper,
 ) (ctrl.Result, error) {
 	conn, clusterIf := argocdclient.NewClusterClientOrDie()
@@ -242,7 +242,7 @@ func reconcileDelete(
 			return ctrl.Result{RequeueAfter: time.Second * 10}, nil
 		}
 	}
-	controllerutil.RemoveFinalizer(cr, arlov1.ClusterRegistrationFinalizer)
+	controllerutil.RemoveFinalizer(cr, arlonv1.ClusterRegistrationFinalizer)
 	if err := patchHelper.Patch(ctx, cr); err != nil {
 		log.Info(fmt.Sprintf("failed to patch clusterregistration: %s", err))
 		return ctrl.Result{}, err

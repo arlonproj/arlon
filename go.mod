@@ -1,4 +1,4 @@
-module arlo.org/arlo
+module arlon.org/arlon
 
 go 1.16
 

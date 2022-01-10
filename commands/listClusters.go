@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"arlo.org/arlo/pkg/argocd"
+	"arlon.org/arlo/pkg/argocd"
 	"context"
 	"fmt"
 	clusterpkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/cluster"

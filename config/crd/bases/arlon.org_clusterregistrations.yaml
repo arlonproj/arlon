@@ -6,9 +6,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: clusterregistrations.arlo.arlo.org
+  name: clusterregistrations.arlon.org
 spec:
-  group: arlo.arlo.org
+  group: arlon.org
   names:
     kind: ClusterRegistration
     listKind: ClusterRegistrationList

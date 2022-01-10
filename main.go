@@ -17,7 +17,7 @@ limitations under the License.
 package main
 
 import (
-	"arlo.org/arlo/commands"
+	"arlon.org/arlo/commands"
 	"flag"
 	"os"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -26,8 +26,8 @@ import (
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	arlov1 "arlo.org/arlo/api/v1"
-	"arlo.org/arlo/controllers"
+	arlonv1 "arlon.org/arlo/api/v1"
+	"arlon.org/arlo/controllers"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -47,7 +47,7 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
-	utilruntime.Must(arlov1.AddToScheme(scheme))
+	utilruntime.Must(arlonv1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -89,7 +89,7 @@ func startController(metricsAddr string, probeAddr string, enableLeaderElection 
 		Port:                   9443,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "d4242dee.arlo.org",
+		LeaderElectionID:       "d4242dee.arlon.org",
 		// Disable caching for secret objects, because the controller reads them
 		// in a particular namespace. Caching requires RBAC to be setup for
 		// cluster-wide List access, as opposed to the more secure
