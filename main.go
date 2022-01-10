@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"arlon.io/arlon/cmd/bundle"
 	"arlon.io/arlon/cmd/controller"
 	"arlon.io/arlon/cmd/list_clusters"
 	"fmt"
@@ -45,6 +46,7 @@ func main() {
 
 	command.AddCommand(controller.NewCommand())
 	command.AddCommand(list_clusters.NewCommand())
+	command.AddCommand(bundle.NewCommand())
 
 	/*
 	opts.BindFlags(flag.CommandLine)
