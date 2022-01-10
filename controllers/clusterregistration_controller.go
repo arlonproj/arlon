@@ -17,8 +17,8 @@ limitations under the License.
 package controllers
 
 import (
-	arlonv1 "arlon.org/arlo/api/v1"
-	"arlon.org/arlo/pkg/argocd"
+	arlonv1 "arlon.io/arlon/api/v1"
+	"arlon.io/arlon/pkg/argocd"
 	"context"
 	"fmt"
 	cmdutil "github.com/argoproj/argo-cd/v2/cmd/util"
@@ -50,9 +50,9 @@ type ClusterRegistrationReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=arlon.org,resources=clusterregistrations,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=arlon.org,resources=clusterregistrations/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=arlon.org,resources=clusterregistrations/finalizers,verbs=update
+//+kubebuilder:rbac:groups=arlon.io,resources=clusterregistrations,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=arlon.io,resources=clusterregistrations/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=arlon.io,resources=clusterregistrations/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.

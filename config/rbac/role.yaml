@@ -4,10 +4,10 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   creationTimestamp: null
-  name: arlo
+  name: manager-role
 rules:
 - apiGroups:
-  - arlon.org
+  - arlon.io
   resources:
   - clusterregistrations
   verbs:
@@ -19,19 +19,16 @@ rules:
   - update
   - watch
 - apiGroups:
-  - arlon.org
+  - arlon.io
   resources:
   - clusterregistrations/finalizers
   verbs:
   - update
 - apiGroups:
-  - arlon.org
+  - arlon.io
   resources:
   - clusterregistrations/status
   verbs:
   - get
   - patch
   - update
-#- apiGroups: [""]
-#  resources: ["secrets"]
-#  verbs: ["get", "watch", "list"]

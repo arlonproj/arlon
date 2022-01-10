@@ -30,7 +30,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	arlonv1 "arlon.org/arlo/api/v1"
+	arlonv1 "arlon.io/arlon/api/v1"
 	//+kubebuilder:scaffold:imports
 )
 
