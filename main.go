@@ -20,6 +20,7 @@ import (
 	"arlon.io/arlon/cmd/bundle"
 	"arlon.io/arlon/cmd/controller"
 	"arlon.io/arlon/cmd/list_clusters"
+	"arlon.io/arlon/cmd/profile"
 	"fmt"
 	"github.com/spf13/cobra"
 	"os"
@@ -47,6 +48,7 @@ func main() {
 	command.AddCommand(controller.NewCommand())
 	command.AddCommand(list_clusters.NewCommand())
 	command.AddCommand(bundle.NewCommand())
+	command.AddCommand(profile.NewCommand())
 
 	/*
 	opts.BindFlags(flag.CommandLine)
