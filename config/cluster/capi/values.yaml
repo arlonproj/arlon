@@ -1,0 +1,11 @@
+# Default values for chart1.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+clusterName: clusterA
+region: us-west-2
+sshKeyName: leb
+kubernetesVersion: v1.18.16
+podCidrBlock: 192.168.0.0/16
+initialNodeCount: 2
+nodeInstanceType: t3.large

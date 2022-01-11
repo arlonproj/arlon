@@ -1,0 +1,10 @@
+apiVersion: arlon.io/v1
+kind: ClusterRegistration
+metadata:
+  name: {{ .Values.clusterName }}
+  namespace: {{ .Values.clusterName }}
+spec:
+  clusterName: {{ .Values.clusterName }}
+  kubeconfigSecretName: {{ .Values.clusterName }}-kubeconfig
+  kubeconfigSecretKeyName: value
+

@@ -1,0 +1,72 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: {{ .Values.clusterName }}
+  namespace: {{ .Values.clusterName }}
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+      - {{ .Values.podCidrBlock }}
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: AWSManagedControlPlane
+    name: {{ .Values.clusterName }}-control-plane
+  infrastructureRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: AWSManagedControlPlane
+    name: {{ .Values.clusterName }}-control-plane
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: AWSManagedControlPlane
+metadata:
+  name: {{ .Values.clusterName }}-control-plane
+  namespace: {{ .Values.clusterName }}
+spec:
+  region: {{ .Values.region }}
+  sshKeyName: {{ .Values.sshKeyName }}
+  version: {{ .Values.kubernetesVersion }}
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: {{ .Values.clusterName }}-md-0
+  namespace: {{ .Values.clusterName }}
+spec:
+  clusterName: {{ .Values.clusterName }}
+  replicas: {{ .Values.initialNodeCount }}
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: EKSConfigTemplate
+          name: {{ .Values.clusterName }}-md-0
+      clusterName: {{ .Values.clusterName }}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AWSMachineTemplate
+        name: {{ .Values.clusterName }}-md-0
+      version: {{ .Values.kubernetesVersion }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AWSMachineTemplate
+metadata:
+  name: {{ .Values.clusterName }}-md-0
+  namespace: {{ .Values.clusterName }}
+spec:
+  template:
+    spec:
+      iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
+      instanceType: {{ .Values.nodeInstanceType }}
+      sshKeyName: {{ .Values.sshKeyName }}
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: EKSConfigTemplate
+metadata:
+  name: {{ .Values.clusterName }}-md-0
+  namespace: {{ .Values.clusterName }}
+spec:
+  template: {}
