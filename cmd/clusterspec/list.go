@@ -3,6 +3,7 @@ package clusterspec
 import (
 	"context"
 	"fmt"
+	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -12,7 +13,6 @@ import (
 	"text/tabwriter"
 )
 
-import "github.com/argoproj/argo-cd/v2/util/cli"
 
 func listClusterspecsCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
