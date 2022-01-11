@@ -2,6 +2,8 @@ package cluster
 
 import (
 	"context"
+	"embed"
+	_ "embed"
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	gogit "github.com/go-git/go-git/v5"
@@ -15,7 +17,6 @@ import (
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
-	_ "embed"
 	"path"
 	"path/filepath"
 	"strings"
@@ -24,6 +25,10 @@ import (
 
 //go:embed manifests/Chart.yaml
 var chartYaml string
+
+//go:embed manifests/*
+var content embed.FS
+
 
 func deployClusterCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
@@ -108,11 +113,15 @@ func deployCluster(config *restclient.Config, ns string, clusterName string, rep
 		return fmt.Errorf("failed to clone repository: %s", err)
 	}
 	mgmtPath := path.Join(basePath, clusterName, "mgmt")
-	chartPath := path.Join(mgmtPath, "Chart.yaml")
 	wt, err := repo.Worktree()
 	if err != nil {
 		return fmt.Errorf("failed to get repo worktree: %s", err)
 	}
+	err = copyContent(wt, ".", mgmtPath)
+	if err != nil {
+		return fmt.Errorf("failed to copy embedded content: %s", err)
+	}
+	/*
 	f, err := wt.Filesystem.Create(chartPath)
 	if err != nil {
 		return err
@@ -122,6 +131,7 @@ func deployCluster(config *restclient.Config, ns string, clusterName string, rep
 	if err != nil {
 		return fmt.Errorf("failed to copy chart YAML to worktree: %s", err)
 	}
+	*/
 	status, err := wt.Status()
 	if err != nil {
 		return fmt.Errorf("failed to get worktree status: %s", err)
@@ -176,6 +186,43 @@ func deployCluster(config *restclient.Config, ns string, clusterName string, rep
 	if err != nil {
 		return fmt.Errorf("failed to push to remote repository: %s", err)
 	}
+	fmt.Println("succesfully pushed working tree", tmpDir)
 	return nil
 }
 
+func copyContent(wt *gogit.Worktree, root string, mgmtPath string) error {
+	items, err := content.ReadDir(root)
+	if err != nil {
+		return fmt.Errorf("failed to read embedded directory: %s", err)
+	}
+	for _, item := range items {
+		filePath := path.Join(root, item.Name())
+		if item.IsDir() {
+			if err := copyContent(wt, filePath, mgmtPath); err != nil {
+				return err
+			}
+		} else {
+			src, err := content.Open(filePath)
+			if err != nil {
+				return fmt.Errorf("failed to open embedded file %s: %s", filePath, err)
+			}
+			// remove manifests/ prefix
+			components := strings.Split(filePath, "/")
+			dstPath := path.Join(components[1:]...)
+			dstPath = path.Join(mgmtPath, dstPath)
+			dst, err := wt.Filesystem.Create(dstPath)
+			if err != nil {
+				_ = src.Close()
+				return fmt.Errorf("failed to create destination file %s: %s", dstPath, err)
+			}
+			_, err = io.Copy(dst, src)
+			_ = src.Close()
+			_ = dst.Close()
+			if err != nil {
+				return fmt.Errorf("failed to copy embedded file: %s", err)
+			}
+			fmt.Printf("copied embedded file to %s\n", dstPath)
+		}
+	}
+	return nil
+}
