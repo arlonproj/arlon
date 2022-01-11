@@ -51,14 +51,15 @@ func listBundles(config *restclient.Config, ns string) error {
 		return nil
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintf(w, "NAME\tTYPE\tDESCRIPTION\n")
+	_, _ = fmt.Fprintf(w, "NAME\tTYPE\tTAGS\tDESCRIPTION\n")
 	for _, secret := range secrets.Items {
 		bundleType := secret.Labels["bundle-type"]
 		if bundleType == "" {
 			bundleType = "(undefined)"
 		}
+		tags := string(secret.Data["tags"])
 		desc := string(secret.Data["description"])
-		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\n", secret.Name, bundleType, desc)
+		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", secret.Name, bundleType, tags, desc)
 	}
 	_ = w.Flush()
 	return nil
