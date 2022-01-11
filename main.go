@@ -18,6 +18,7 @@ package main
 
 import (
 	"arlon.io/arlon/cmd/bundle"
+	"arlon.io/arlon/cmd/clusterspec"
 	"arlon.io/arlon/cmd/controller"
 	"arlon.io/arlon/cmd/list_clusters"
 	"arlon.io/arlon/cmd/profile"
@@ -49,6 +50,7 @@ func main() {
 	command.AddCommand(list_clusters.NewCommand())
 	command.AddCommand(bundle.NewCommand())
 	command.AddCommand(profile.NewCommand())
+	command.AddCommand(clusterspec.NewCommand())
 
 	/*
 	opts.BindFlags(flag.CommandLine)
