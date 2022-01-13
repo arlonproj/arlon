@@ -19,6 +19,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"text/template"
 )
 
 //go:embed manifests/*
@@ -71,7 +72,7 @@ func Deploy(
 		}
 	}
 	if creds == nil {
-		return fmt.Errorf("did not find secret matching repo url: %s", repoUrl)
+		return fmt.Errorf("did not find argocd repository matching %s (did you register it?)", repoUrl)
 	}
 
 	inlineBundles, err := getInlineBundles(profileName, corev1, arlonNs)
@@ -100,6 +101,7 @@ func Deploy(
 		return fmt.Errorf("failed to clone repository: %s", err)
 	}
 	mgmtPath := path.Join(basePath, clusterName, "mgmt")
+	workloadPath := path.Join(basePath, clusterName, "workload")
 	wt, err := repo.Worktree()
 	if err != nil {
 		return fmt.Errorf("failed to get repo worktree: %s", err)
@@ -108,8 +110,7 @@ func Deploy(
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}
-	workloadPath := path.Join(basePath, clusterName, "workload")
-	err = copyInlineBundles(wt, workloadPath, inlineBundles)
+	err = copyInlineBundles(wt, clusterName, repoUrl, mgmtPath, workloadPath, inlineBundles)
 	if err != nil {
 		return fmt.Errorf("failed to copy inline bundles: %s", err)
 	}
@@ -219,9 +220,48 @@ func getInlineBundles(
 
 // -----------------------------------------------------------------------------
 
-func copyInlineBundles(wt *gogit.Worktree, workloadPath string, bundles []inlineBundle) error {
+const appTmpl = `
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{.ClusterName}}-{{.BundleName}}
+  namespace: {{.AppNamespace}}
+spec:
+  syncPolicy:
+    automated:
+      prune: true
+  destination:
+    name: {{.ClusterName}}
+    namespace: {{.DestinationNamespace}}
+  project: default
+  source:
+    repoURL: {{.RepoUrl}}
+    path: {{.ClusterName}}/workload/{{.BundleName}}
+    targetRevision: HEAD
+`
+
+type AppSettings struct {
+	ClusterName string
+	BundleName string
+	AppNamespace string
+	DestinationNamespace string
+	RepoUrl string
+}
+
+func copyInlineBundles(
+	wt *gogit.Worktree,
+	clusterName string,
+	repoUrl string,
+	mgmtPath string,
+	workloadPath string,
+	bundles []inlineBundle,
+) error {
 	if len(bundles) == 0 {
 		return nil
+	}
+	tmpl, err := template.New("app").Parse(appTmpl)
+	if err != nil {
+		return fmt.Errorf("failed to create app template: %s", err)
 	}
 	for _, bundle := range bundles {
 		dirPath := path.Join(workloadPath, bundle.name)
@@ -230,8 +270,8 @@ func copyInlineBundles(wt *gogit.Worktree, workloadPath string, bundles []inline
 			return fmt.Errorf("failed to create directory in working tree: %s", err)
 		}
 		bundleFileName := fmt.Sprintf("%s.yaml", bundle.name)
-		path := path.Join(dirPath, bundleFileName)
-		dst, err := wt.Filesystem.Create(path)
+		bundlePath := path.Join(dirPath, bundleFileName)
+		dst, err := wt.Filesystem.Create(bundlePath)
 		if err != nil {
 			return fmt.Errorf("failed to create file in working tree: %s", err)
 		}
@@ -242,6 +282,19 @@ func copyInlineBundles(wt *gogit.Worktree, workloadPath string, bundles []inline
 		if err != nil {
 			dst.Close()
 			return fmt.Errorf("failed to copy inline bundle %s: %s", bundle.name, err)
+		}
+		dst.Close()
+		appPath := path.Join(mgmtPath, "templates", bundleFileName)
+		dst, err = wt.Filesystem.Create(appPath)
+		if err != nil {
+			return fmt.Errorf("failed to create application file %s: %s", appPath, err)
+		}
+		app := AppSettings{ClusterName: clusterName, BundleName: bundle.name,
+			AppNamespace: "argocd", DestinationNamespace: "default", RepoUrl: repoUrl}
+		err = tmpl.Execute(dst, &app)
+		if err != nil {
+			dst.Close()
+			return fmt.Errorf("failed to render application template %s: %s", appPath, err)
 		}
 		dst.Close()
 	}
