@@ -123,7 +123,7 @@ func Deploy(
 		return fmt.Errorf("failed to commit changes: %s", err)
 	}
 	if !changed {
-		log.Info("no changed files, skipping commit")
+		log.Info("no changed files, skipping commit & push")
 		return nil
 	}
 	err = repo.Push(&gogit.PushOptions{
@@ -171,7 +171,7 @@ func copyContent(wt *gogit.Worktree, root string, mgmtPath string) error {
 			if err != nil {
 				return fmt.Errorf("failed to copy embedded file: %s", err)
 			}
-			log.V(2).Info("copied embedded file", "destination", dstPath)
+			log.V(1).Info("copied embedded file", "destination", dstPath)
 		}
 	}
 	return nil

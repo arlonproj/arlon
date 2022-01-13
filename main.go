@@ -23,6 +23,7 @@ import (
 	"arlon.io/arlon/cmd/controller"
 	"arlon.io/arlon/cmd/list_clusters"
 	"arlon.io/arlon/cmd/profile"
+	"flag"
 	"fmt"
 	"github.com/spf13/cobra"
 	"os"
@@ -52,16 +53,17 @@ func main() {
 	command.AddCommand(clusterspec.NewCommand())
 	command.AddCommand(cluster.NewCommand())
 
-	/*
-	opts.BindFlags(flag.CommandLine)
-	flag.Parse()
-	*/
-
 	opts := zap.Options{
 		Development: true,
 	}
+	opts.BindFlags(flag.CommandLine)
+	// override default log level, which is initially set to 'debug'
+	flag.Set("zap-log-level", "info")
+	flag.Parse()
 	logger := zap.New(zap.UseFlagOptions(&opts))
 	ctrl.SetLogger(logger)
+	args := flag.Args()
+	command.SetArgs(args)
 	if err := command.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
