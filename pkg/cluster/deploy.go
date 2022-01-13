@@ -3,6 +3,7 @@ package cluster
 import (
 	"arlon.io/arlon/pkg/gitutils"
 	"arlon.io/arlon/pkg/log"
+	"bytes"
 	"context"
 	"embed"
 	"fmt"
@@ -10,8 +11,10 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"io"
+	"io/fs"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	corev1types "k8s.io/client-go/kubernetes/typed/core/v1"
 	restclient "k8s.io/client-go/rest"
 	"os"
 	"path"
@@ -26,6 +29,13 @@ type RepoCreds struct {
 	Username string
 	Password string
 }
+
+type inlineBundle struct {
+	name string
+	data []byte
+}
+
+// -----------------------------------------------------------------------------
 
 func Deploy(
 	config *restclient.Config,
@@ -64,30 +74,10 @@ func Deploy(
 		return fmt.Errorf("did not find secret matching repo url: %s", repoUrl)
 	}
 
-	//var bundleData [][]byte
-	if profileName != "" {
-		configMapsApi := corev1.ConfigMaps(arlonNs)
-		profileConfigMap, err := configMapsApi.Get(context.Background(), profileName, metav1.GetOptions{})
-		if err != nil {
-			return fmt.Errorf("failed to get profile configmap: %s", err)
-		}
-		if profileConfigMap.Labels["arlon-type"] != "profile" {
-			return fmt.Errorf("profile configmap does not have expected label")
-		}
-		bundles := profileConfigMap.Data["bundles"]
-		if bundles == "" {
-			return fmt.Errorf("profile has no bundles")
-		}
-		bundleItems := strings.Split(bundles, ",")
-		secretsApi = corev1.Secrets(arlonNs)
-		for _, bundleName := range bundleItems {
-			_, err := secretsApi.Get(context.Background(), bundleName, metav1.GetOptions{})
-			if err != nil {
-				return fmt.Errorf("failed to get bundle secret %s: %s", bundleName, err)
-			}
-		}
+	inlineBundles, err := getInlineBundles(profileName, corev1, arlonNs)
+	if err != nil {
+		return fmt.Errorf("failed to get inline bundles: %s", err)
 	}
-
 	tmpDir, err := os.MkdirTemp("", "arlon-")
 	branchRef := plumbing.NewBranchReferenceName(repoBranch)
 	auth := &http.BasicAuth{
@@ -114,9 +104,14 @@ func Deploy(
 	if err != nil {
 		return fmt.Errorf("failed to get repo worktree: %s", err)
 	}
-	err = copyContent(wt, ".", mgmtPath)
+	err = copyManifests(wt, ".", mgmtPath)
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded content: %s", err)
+	}
+	workloadPath := path.Join(basePath, clusterName, "workload")
+	err = copyInlineBundles(wt, workloadPath, inlineBundles)
+	if err != nil {
+		return fmt.Errorf("failed to copy inline bundles: %s", err)
 	}
 	changed, err := gitutils.CommitChanges(tmpDir, wt)
 	if err != nil {
@@ -139,7 +134,9 @@ func Deploy(
 	return nil
 }
 
-func copyContent(wt *gogit.Worktree, root string, mgmtPath string) error {
+// -----------------------------------------------------------------------------
+
+func copyManifests(wt *gogit.Worktree, root string, mgmtPath string) error {
 	log := log.GetLogger()
 	items, err := content.ReadDir(root)
 	if err != nil {
@@ -148,7 +145,7 @@ func copyContent(wt *gogit.Worktree, root string, mgmtPath string) error {
 	for _, item := range items {
 		filePath := path.Join(root, item.Name())
 		if item.IsDir() {
-			if err := copyContent(wt, filePath, mgmtPath); err != nil {
+			if err := copyManifests(wt, filePath, mgmtPath); err != nil {
 				return err
 			}
 		} else {
@@ -177,3 +174,76 @@ func copyContent(wt *gogit.Worktree, root string, mgmtPath string) error {
 	return nil
 }
 
+// -----------------------------------------------------------------------------
+
+func getInlineBundles(
+	profileName string,
+	corev1 corev1types.CoreV1Interface,
+	arlonNs string,
+) (inlineBundles []inlineBundle, err error) {
+
+	log := log.GetLogger()
+	if profileName == "" {
+		return
+	}
+	configMapsApi := corev1.ConfigMaps(arlonNs)
+	secretsApi := corev1.Secrets(arlonNs)
+	profileConfigMap, err := configMapsApi.Get(context.Background(), profileName, metav1.GetOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get profile configmap: %s", err)
+	}
+	if profileConfigMap.Labels["arlon-type"] != "profile" {
+		return nil, fmt.Errorf("profile configmap does not have expected label")
+	}
+	bundles := profileConfigMap.Data["bundles"]
+	if bundles == "" {
+		return nil, fmt.Errorf("profile has no bundles")
+	}
+	bundleItems := strings.Split(bundles, ",")
+	for _, bundleName := range bundleItems {
+		secr, err := secretsApi.Get(context.Background(), bundleName, metav1.GetOptions{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to get bundle secret %s: %s", bundleName, err)
+		}
+		if secr.Labels["bundle-type"] != "inline" {
+			continue
+		}
+		inlineBundles = append(inlineBundles, inlineBundle{
+			name: bundleName,
+			data: secr.Data["data"],
+		})
+		log.V(1).Info("adding inline bundle", "bundleName", bundleName)
+	}
+	return
+}
+
+// -----------------------------------------------------------------------------
+
+func copyInlineBundles(wt *gogit.Worktree, workloadPath string, bundles []inlineBundle) error {
+	if len(bundles) == 0 {
+		return nil
+	}
+	for _, bundle := range bundles {
+		dirPath := path.Join(workloadPath, bundle.name)
+		err := wt.Filesystem.MkdirAll(dirPath, fs.ModeDir | 0700)
+		if err != nil {
+			return fmt.Errorf("failed to create directory in working tree: %s", err)
+		}
+		bundleFileName := fmt.Sprintf("%s.yaml", bundle.name)
+		path := path.Join(dirPath, bundleFileName)
+		dst, err := wt.Filesystem.Create(path)
+		if err != nil {
+			return fmt.Errorf("failed to create file in working tree: %s", err)
+		}
+		if bundle.data == nil {
+			return fmt.Errorf("inline bundle %s has no data", bundle.name)
+		}
+		_, err = io.Copy(dst, bytes.NewReader(bundle.data))
+		if err != nil {
+			dst.Close()
+			return fmt.Errorf("failed to copy inline bundle %s: %s", bundle.name, err)
+		}
+		dst.Close()
+	}
+	return nil
+}
