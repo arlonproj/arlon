@@ -236,13 +236,14 @@ spec:
   project: default
   source:
     repoURL: {{.RepoUrl}}
-    path: {{.ClusterName}}/workload/{{.BundleName}}
+    path: {{.WorkloadPath}}/{{.BundleName}}
     targetRevision: HEAD
 `
 
 type AppSettings struct {
 	ClusterName string
 	BundleName string
+	WorkloadPath string
 	AppNamespace string
 	DestinationNamespace string
 	RepoUrl string
@@ -290,7 +291,8 @@ func copyInlineBundles(
 			return fmt.Errorf("failed to create application file %s: %s", appPath, err)
 		}
 		app := AppSettings{ClusterName: clusterName, BundleName: bundle.name,
-			AppNamespace: "argocd", DestinationNamespace: "default", RepoUrl: repoUrl}
+			WorkloadPath: workloadPath, AppNamespace: "argocd",
+			DestinationNamespace: "default", RepoUrl: repoUrl}
 		err = tmpl.Execute(dst, &app)
 		if err != nil {
 			dst.Close()
