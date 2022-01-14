@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -30,7 +31,20 @@ func deployClusterCommand() *cobra.Command {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
 			kubeClient := kubernetes.NewForConfigOrDie(config)
-			return cluster.DeployToGit(kubeClient, argocdNs, arlonNs, clusterName, repoUrl, repoBranch, basePath, profileName)
+			rootApp, err := cluster.ConstructRootApp(kubeClient, argocdNs, arlonNs, clusterName, repoUrl, repoBranch, basePath, clusterSpecName)
+			if err != nil {
+				return fmt.Errorf("failed to construct roop app: %s", err)
+			}
+			err = cluster.DeployToGit(kubeClient, argocdNs, arlonNs, clusterName, repoUrl, repoBranch, basePath, profileName)
+			if err != nil {
+				return fmt.Errorf("failed to deploy git tree: %s", err)
+			}
+			buf, err := yaml.Marshal(rootApp)
+			if err != nil {
+				return fmt.Errorf("failed to marshal yaml from root app: %s", err)
+			}
+			fmt.Println(string(buf))
+			return nil
 		},
 	}
 	clientConfig = cli.AddKubectlFlagsToCmd(command)

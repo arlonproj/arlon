@@ -34,7 +34,7 @@ metadata:
   namespace: {{ .Values.clusterName }}
 spec:
   clusterName: {{ .Values.clusterName }}
-  replicas: {{ .Values.initialNodeCount }}
+  replicas: {{ .Values.nodeCount }}
   selector:
     matchLabels: null
   template:
@@ -60,7 +60,7 @@ spec:
   template:
     spec:
       iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
-      instanceType: {{ .Values.nodeInstanceType }}
+      instanceType: {{ .Values.nodeType }}
       sshKeyName: {{ .Values.sshKeyName }}
 ---
 apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
