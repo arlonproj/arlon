@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/spf13/cobra"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -21,14 +22,15 @@ func deployClusterCommand() *cobra.Command {
 	var profileName string
 	command := &cobra.Command{
 		Use:               "deploy",
-		Short:             "Deploy cluster",
-		Long:              "Deploy cluster",
+		Short:             "DeployToGit cluster",
+		Long:              "DeployToGit cluster",
 		RunE: func(c *cobra.Command, args []string) error {
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
-			return cluster.Deploy(config, argocdNs, arlonNs, clusterName, repoUrl, repoBranch, basePath, clusterSpecName, profileName)
+			kubeClient := kubernetes.NewForConfigOrDie(config)
+			return cluster.DeployToGit(kubeClient, argocdNs, arlonNs, clusterName, repoUrl, repoBranch, basePath, profileName)
 		},
 	}
 	clientConfig = cli.AddKubectlFlagsToCmd(command)
