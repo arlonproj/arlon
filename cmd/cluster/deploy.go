@@ -1,10 +1,13 @@
 package cluster
 
 import (
+	"arlon.io/arlon/pkg/argocd"
 	"arlon.io/arlon/pkg/cluster"
+	"context"
 	_ "embed"
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
+	applicationpkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -24,6 +27,7 @@ func deployClusterCommand() *cobra.Command {
 	var clusterName string
 	var clusterSpecName string
 	var profileName string
+	var outputYaml bool
 	command := &cobra.Command{
 		Use:               "deploy",
 		Short:             "DeployToGit cluster",
@@ -42,18 +46,31 @@ func deployClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to deploy git tree: %s", err)
 			}
-			scheme := runtime.NewScheme()
-			v1alpha1.AddToScheme(scheme)
-			s := json.NewSerializerWithOptions(json.DefaultMetaFactory, scheme, scheme, json.SerializerOptions{
-				Yaml:   true,
-				Pretty: true,
-				Strict: false,
-			})
-			err = s.Encode(rootApp, os.Stdout)
-			if err != nil {
-				return fmt.Errorf("failed to serialize app resource: %s", err)
+			if outputYaml {
+				scheme := runtime.NewScheme()
+				v1alpha1.AddToScheme(scheme)
+				s := json.NewSerializerWithOptions(json.DefaultMetaFactory, scheme, scheme, json.SerializerOptions{
+					Yaml:   true,
+					Pretty: true,
+					Strict: false,
+				})
+				err = s.Encode(rootApp, os.Stdout)
+				if err != nil {
+					return fmt.Errorf("failed to serialize app resource: %s", err)
+				}
+				return nil
+			} else {
+				conn, appIf := argocd.NewArgocdClientOrDie().NewApplicationClientOrDie()
+				defer conn.Close()
+				appCreateRequest := applicationpkg.ApplicationCreateRequest{
+					Application: *rootApp,
+				}
+				_, err := appIf.Create(context.Background(), &appCreateRequest)
+				if err != nil {
+					return fmt.Errorf("failed to create ArgoCD root application: %s", err)
+				}
+				return nil
 			}
-			return nil
 		},
 	}
 	clientConfig = cli.AddKubectlFlagsToCmd(command)
@@ -65,6 +82,7 @@ func deployClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&profileName, "profile", "", "the configuration profile to use")
 	command.Flags().StringVar(&clusterSpecName, "cluster-spec", "", "the clusterspec to use")
 	command.Flags().StringVar(&basePath, "path", "arlon", "the git repository base path")
+	command.Flags().BoolVar(&outputYaml, "output-yaml", false, "output root application YAML instead of deploying to ArgoCD")
 	command.MarkFlagRequired("repo-url")
 	command.MarkFlagRequired("cluster-name")
 	return command
