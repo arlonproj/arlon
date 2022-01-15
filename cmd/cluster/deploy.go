@@ -40,7 +40,7 @@ func deployClusterCommand() *cobra.Command {
 			kubeClient := kubernetes.NewForConfigOrDie(config)
 			rootApp, err := cluster.ConstructRootApp(kubeClient, argocdNs, arlonNs, clusterName, repoUrl, repoBranch, basePath, clusterSpecName)
 			if err != nil {
-				return fmt.Errorf("failed to construct roop app: %s", err)
+				return fmt.Errorf("failed to construct root app: %s", err)
 			}
 			err = cluster.DeployToGit(kubeClient, argocdNs, arlonNs, clusterName, repoUrl, repoBranch, basePath, profileName)
 			if err != nil {

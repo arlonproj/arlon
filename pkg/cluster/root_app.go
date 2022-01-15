@@ -67,5 +67,16 @@ func ConstructRootApp(
 		},
 		SyncOptions: []string{"Prune=true"},
 	}
+	// Ignore CAPI EKS control plane's spec.version because the AWS controller(s)
+	// appear to update it with a value that is less precise than the requested
+	// one, for e.g. the spec might specify v1.18.16, and get updated with v1.18,
+	// causing ArgoCD to report the resource as OutOfSync
+	app.Spec.IgnoreDifferences = []argoappv1.ResourceIgnoreDifferences{
+		{
+			Group: "controlplane.cluster.x-k8s.io",
+			Kind: "AWSManagedControlPlane",
+			JSONPointers: []string{"/spec/version"},
+		},
+	}
 	return app, nil
 }
