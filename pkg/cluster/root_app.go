@@ -40,7 +40,12 @@ func ConstructRootApp(
 	keys := []string{
 		"region", "sshKeyName", "kubernetesVersion", "podCidrBlock", "nodeCount", "nodeType",
 	}
-	var helmParams [] argoappv1.HelmParameter
+	helmParams := [] argoappv1.HelmParameter{
+		{
+			Name:  "clusterName",
+			Value: clusterName,
+		},
+	}
 	for _, key := range keys {
 		val := cm.Data[key]
 		if val != "" {
@@ -55,7 +60,7 @@ func ConstructRootApp(
 	app.Spec.Source.TargetRevision = repoBranch
 	app.Spec.Source.Path = path.Join(basePath, clusterName, "mgmt")
 	app.Spec.Destination.Server = "https://kubernetes.default.svc"
-	app.Spec.Destination.Namespace = argocdNs
+	app.Spec.Destination.Namespace = "default"
 	app.Spec.SyncPolicy = &argoappv1.SyncPolicy{
 		Automated: &argoappv1.SyncPolicyAutomated{
 			Prune: true,

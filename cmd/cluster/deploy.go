@@ -4,11 +4,14 @@ import (
 	"arlon.io/arlon/pkg/cluster"
 	_ "embed"
 	"fmt"
+	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v2"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	"os"
 )
 
 func deployClusterCommand() *cobra.Command {
@@ -39,11 +42,17 @@ func deployClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to deploy git tree: %s", err)
 			}
-			buf, err := yaml.Marshal(rootApp)
+			scheme := runtime.NewScheme()
+			v1alpha1.AddToScheme(scheme)
+			s := json.NewSerializerWithOptions(json.DefaultMetaFactory, scheme, scheme, json.SerializerOptions{
+				Yaml:   true,
+				Pretty: true,
+				Strict: false,
+			})
+			err = s.Encode(rootApp, os.Stdout)
 			if err != nil {
-				return fmt.Errorf("failed to marshal yaml from root app: %s", err)
+				return fmt.Errorf("failed to serialize app resource: %s", err)
 			}
-			fmt.Println(string(buf))
 			return nil
 		},
 	}
