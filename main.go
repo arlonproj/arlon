@@ -24,7 +24,6 @@ import (
 	"arlon.io/arlon/cmd/list_clusters"
 	"arlon.io/arlon/cmd/profile"
 	"flag"
-	"fmt"
 	"github.com/spf13/cobra"
 	"os"
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -43,9 +42,11 @@ func main() {
 		Long:              "Run the Arlon program",
 		DisableAutoGenTag: true,
 		Run: func(c *cobra.Command, args []string) {
+			c.Println(c.UsageString())
 		},
 	}
-
+	// don't display usage upon error
+	command.SilenceUsage = true
 	command.AddCommand(controller.NewCommand())
 	command.AddCommand(list_clusters.NewCommand())
 	command.AddCommand(bundle.NewCommand())
@@ -65,7 +66,6 @@ func main() {
 	args := flag.Args()
 	command.SetArgs(args)
 	if err := command.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
 }

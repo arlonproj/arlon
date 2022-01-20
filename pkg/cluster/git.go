@@ -88,7 +88,6 @@ func DeployToGit(
 		RemoteName:    gogit.DefaultRemoteName,
 		ReferenceName: branchRef,
 		SingleBranch:  true,
-
 		NoCheckout: false,
 		Progress:   nil,
 		Tags:       gogit.NoTags,
