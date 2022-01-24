@@ -13,6 +13,7 @@ func NewCommand() *cobra.Command {
 	}
 	command.AddCommand(listBundlesCommand())
 	command.AddCommand(dumpBundleCommand())
+	command.AddCommand(createBundleCommand())
 	return command
 }
 

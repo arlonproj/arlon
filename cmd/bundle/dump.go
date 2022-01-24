@@ -54,7 +54,7 @@ func dumpBundle(config *restclient.Config, ns string, bundleName string) error {
 	if secret.Data["data"] == nil {
 		return fmt.Errorf("bundle has no data")
 	}
-	n, err := io.Copy(os.Stdout, bytes.NewReader(secret.Data["data"]))
+	_, err = io.Copy(os.Stdout, bytes.NewReader(secret.Data["data"]))
 	if err != nil {
 		return fmt.Errorf("failed to copy secret data: %s", err)
 	}
