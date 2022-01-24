@@ -51,15 +51,16 @@ func listProfiles(config *restclient.Config, ns string) error {
 		return nil
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintf(w, "NAME\tTYPE\tBUNDLES\tDESCRIPTION\n")
+	_, _ = fmt.Fprintf(w, "NAME\tTYPE\tBUNDLES\tTAGS\tDESCRIPTION\n")
 	for _, configMap := range configMaps.Items {
 		profileType := configMap.Labels["profile-type"]
 		if profileType == "" {
 			profileType = "(undefined)"
 		}
 		bundles := configMap.Data["bundles"]
+		tags := string(configMap.Data["tags"])
 		desc := string(configMap.Data["description"])
-		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", configMap.Name, profileType, bundles, desc)
+		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", configMap.Name, profileType, bundles, tags, desc)
 	}
 	_ = w.Flush()
 	return nil
