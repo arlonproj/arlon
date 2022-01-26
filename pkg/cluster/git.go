@@ -1,6 +1,7 @@
 package cluster
 
 import (
+	"arlon.io/arlon/pkg/common"
 	"arlon.io/arlon/pkg/gitutils"
 	"arlon.io/arlon/pkg/log"
 	"bytes"
@@ -211,7 +212,7 @@ func getBundles(
 	log := log.GetLogger()
 	bundleList := profileConfigMap.Data["bundles"]
 	if bundleList == "" {
-		return
+		return nil, fmt.Errorf("profile has no bundles")
 	}
 	bundleItems := strings.Split(bundleList, ",")
 	for _, bundleName := range bundleItems {
@@ -222,8 +223,8 @@ func getBundles(
 		bundles = append(bundles, bundle{
 			name: bundleName,
 			data: secr.Data["data"],
-			repoUrl: string(secr.Annotations["arlon.io/repo-url"]),
-			repoPath: string(secr.Annotations["arlon.io/repo-path"]),
+			repoUrl: string(secr.Annotations[common.RepoUrlAnnotationKey]),
+			repoPath: string(secr.Annotations[common.RepoPathAnnotationKey]),
 		})
 		log.V(1).Info("adding bundle", "bundleName", bundleName)
 	}

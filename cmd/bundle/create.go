@@ -1,6 +1,7 @@
 package bundle
 
 import (
+	"arlon.io/arlon/pkg/common"
 	"context"
 	"fmt"
 	"github.com/spf13/cobra"
@@ -84,8 +85,8 @@ func createBundle(config *restclient.Config, ns string, bundleName string, fromF
 		secr.Data["data"] = data
 	} else if repoUrl != "" {
 		secr.Labels["bundle-type"] = "reference"
-		secr.ObjectMeta.Annotations["arlon.io/repo-url"] = repoUrl
-		secr.ObjectMeta.Annotations["arlon.io/repo-path"] = repoPath
+		secr.ObjectMeta.Annotations[common.RepoUrlAnnotationKey] = repoUrl
+		secr.ObjectMeta.Annotations[common.RepoPathAnnotationKey] = repoPath
 	} else {
 		return fmt.Errorf("the bundle must be created from a file or repo URL")
 	}

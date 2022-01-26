@@ -1,6 +1,7 @@
 package bundle
 
 import (
+	"arlon.io/arlon/pkg/common"
 	"context"
 	"fmt"
 	"github.com/spf13/cobra"
@@ -57,8 +58,8 @@ func listBundles(config *restclient.Config, ns string) error {
 		if bundleType == "" {
 			bundleType = "(undefined)"
 		}
-		repoUrl := secret.Annotations["arlon.io/repo-url"]
-		repoPath := secret.Annotations["arlon.io/repo-path"]
+		repoUrl := secret.Annotations[common.RepoUrlAnnotationKey]
+		repoPath := secret.Annotations[common.RepoPathAnnotationKey]
 		if bundleType != "reference" {
 			repoUrl = "(N/A)"
 			repoPath = "(N/A)"
