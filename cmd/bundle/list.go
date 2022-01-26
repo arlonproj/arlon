@@ -1,6 +1,7 @@
 package bundle
 
 import (
+	"arlon.io/arlon/pkg/common"
 	"context"
 	"fmt"
 	"github.com/spf13/cobra"
@@ -51,15 +52,21 @@ func listBundles(config *restclient.Config, ns string) error {
 		return nil
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintf(w, "NAME\tTYPE\tTAGS\tDESCRIPTION\n")
+	_, _ = fmt.Fprintf(w, "NAME\tTYPE\tTAGS\tREPO-URL\tREPO-PATH\tDESCRIPTION\n")
 	for _, secret := range secrets.Items {
 		bundleType := secret.Labels["bundle-type"]
 		if bundleType == "" {
 			bundleType = "(undefined)"
 		}
+		repoUrl := secret.Annotations[common.RepoUrlAnnotationKey]
+		repoPath := secret.Annotations[common.RepoPathAnnotationKey]
+		if bundleType != "reference" {
+			repoUrl = "(N/A)"
+			repoPath = "(N/A)"
+		}
 		tags := string(secret.Data["tags"])
 		desc := string(secret.Data["description"])
-		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", secret.Name, bundleType, tags, desc)
+		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\n", secret.Name, bundleType, tags, repoUrl, repoPath, desc)
 	}
 	_ = w.Flush()
 	return nil
