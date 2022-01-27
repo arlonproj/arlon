@@ -1,6 +1,7 @@
 package cluster
 
 import (
+	"arlon.io/arlon/pkg/argocd"
 	"arlon.io/arlon/pkg/common"
 	"arlon.io/arlon/pkg/gitutils"
 	"arlon.io/arlon/pkg/log"
@@ -9,15 +10,12 @@ import (
 	"embed"
 	"fmt"
 	gogit "github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"io"
 	"io/fs"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	corev1types "k8s.io/client-go/kubernetes/typed/core/v1"
-	"os"
 	"path"
 	"strings"
 	"text/template"
@@ -25,12 +23,6 @@ import (
 
 //go:embed manifests/*
 var content embed.FS
-
-type RepoCreds struct {
-	Url string
-	Username string
-	Password string
-}
 
 type bundle struct {
 	name string
@@ -54,29 +46,6 @@ func DeployToGit(
 ) error {
 	log := log.GetLogger()
 	corev1 := kubeClient.CoreV1()
-	secretsApi := corev1.Secrets(argocdNs)
-	opts := metav1.ListOptions{
-		LabelSelector: "argocd.argoproj.io/secret-type=repository",
-	}
-	secrets, err := secretsApi.List(context.Background(), opts)
-	if err != nil {
-		return fmt.Errorf("failed to list secrets: %s", err)
-	}
-	var creds *RepoCreds
-	for _, repoSecret := range secrets.Items {
-		if strings.Compare(repoUrl, string(repoSecret.Data["url"])) == 0 {
-			creds = &RepoCreds{
-				Url: string(repoSecret.Data["url"]),
-				Username: string(repoSecret.Data["username"]),
-				Password: string(repoSecret.Data["password"]),
-			}
-			break
-		}
-	}
-	if creds == nil {
-		return fmt.Errorf("did not find argocd repository matching %s (did you register it?)", repoUrl)
-	}
-
 	prof, err := getProfileConfigMap(profileName, corev1, arlonNs)
 	if err != nil {
 		return fmt.Errorf("failed to get profile: %s", err)
@@ -85,25 +54,10 @@ func DeployToGit(
 	if err != nil {
 		return fmt.Errorf("failed to get bundles: %s", err)
 	}
-	tmpDir, err := os.MkdirTemp("", "arlon-")
-	branchRef := plumbing.NewBranchReferenceName(repoBranch)
-	auth := &http.BasicAuth{
-		Username: creds.Username,
-		Password: creds.Password,
-	}
-	repo, err := gogit.PlainCloneContext(context.Background(), tmpDir, false, &gogit.CloneOptions{
-		URL:           repoUrl,
-		Auth:          auth,
-		RemoteName:    gogit.DefaultRemoteName,
-		ReferenceName: branchRef,
-		SingleBranch:  true,
-		NoCheckout: false,
-		Progress:   nil,
-		Tags:       gogit.NoTags,
-		CABundle:   nil,
-	})
+	repo, tmpDir, auth, err := argocd.CloneRepo(kubeClient, argocdNs,
+		repoUrl, repoBranch)
 	if err != nil {
-		return fmt.Errorf("failed to clone repository: %s", err)
+		return fmt.Errorf("failed to clone repo: %s", err)
 	}
 	mgmtPath := path.Join(basePath, clusterName, "mgmt")
 	repoPath := path.Join(basePath, clusterName, "workload")
