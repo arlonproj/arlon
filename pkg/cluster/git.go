@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"arlon.io/arlon/pkg/argocd"
+	"arlon.io/arlon/pkg/bundle"
 	"arlon.io/arlon/pkg/common"
 	"arlon.io/arlon/pkg/gitutils"
 	"arlon.io/arlon/pkg/log"
@@ -23,14 +24,6 @@ import (
 
 //go:embed manifests/*
 var content embed.FS
-
-type bundle struct {
-	name string
-	data []byte
-	// The following are only set on reference type bundles
-	repoUrl string
-	repoPath string
-}
 
 // -----------------------------------------------------------------------------
 
@@ -161,7 +154,7 @@ func getBundles(
 	profileConfigMap *v1.ConfigMap,
 	corev1 corev1types.CoreV1Interface,
 	arlonNs string,
-) (bundles []bundle, err error) {
+) (bundles []bundle.Bundle, err error) {
 	secretsApi := corev1.Secrets(arlonNs)
 	log := log.GetLogger()
 	bundleList := profileConfigMap.Data["bundles"]
@@ -174,11 +167,11 @@ func getBundles(
 		if err != nil {
 			return nil, fmt.Errorf("failed to get bundle secret %s: %s", bundleName, err)
 		}
-		bundles = append(bundles, bundle{
-			name: bundleName,
-			data: secr.Data["data"],
-			repoUrl: string(secr.Annotations[common.RepoUrlAnnotationKey]),
-			repoPath: string(secr.Annotations[common.RepoPathAnnotationKey]),
+		bundles = append(bundles, bundle.Bundle{
+			Name: bundleName,
+			Data: secr.Data["data"],
+			RepoUrl: string(secr.Annotations[common.RepoUrlAnnotationKey]),
+			RepoPath: string(secr.Annotations[common.RepoPathAnnotationKey]),
 		})
 		log.V(1).Info("adding bundle", "bundleName", bundleName)
 	}
@@ -222,7 +215,7 @@ func processBundles(
 	repoUrl string,
 	mgmtPath string,
 	repoPath string,
-	bundles []bundle,
+	bundles []bundle.Bundle,
 ) error {
 	if len(bundles) == 0 {
 		return nil
@@ -231,26 +224,26 @@ func processBundles(
 	if err != nil {
 		return fmt.Errorf("failed to create app template: %s", err)
 	}
-	for _, bundle := range bundles {
-		bundleFileName := fmt.Sprintf("%s.yaml", bundle.name)
+	for _, b := range bundles {
+		bundleFileName := fmt.Sprintf("%s.yaml", b.Name)
 		app := AppSettings{
 			ClusterName: clusterName,
-			AppName: fmt.Sprintf("%s-%s", clusterName, bundle.name),
+			AppName: fmt.Sprintf("%s-%s", clusterName, b.Name),
 			AppNamespace: "argocd",
 			DestinationNamespace: "default", // FIXME: make configurable
 		}
-		if bundle.data == nil {
-			// reference type bundle
-			if bundle.repoUrl == "" {
-				return fmt.Errorf("bundle %s is neither inline nor reference type", bundle.name)
+		if b.Data == nil {
+			// reference type b
+			if b.RepoUrl == "" {
+				return fmt.Errorf("b %s is neither inline nor reference type", b.Name)
 			}
-			app.RepoUrl = bundle.repoUrl
-			app.RepoPath = bundle.repoPath
-		} else if bundle.repoUrl != "" {
-			return fmt.Errorf("bundle %s has both data and repoUrl set", bundle.name)
+			app.RepoUrl = b.RepoUrl
+			app.RepoPath = b.RepoPath
+		} else if b.RepoUrl != "" {
+			return fmt.Errorf("b %s has both data and repoUrl set", b.Name)
 		} else {
 			// inline bundle
-			dirPath := path.Join(repoPath, bundle.name)
+			dirPath := path.Join(repoPath, b.Name)
 			err := wt.Filesystem.MkdirAll(dirPath, fs.ModeDir | 0700)
 			if err != nil {
 				return fmt.Errorf("failed to create directory in working tree: %s", err)
@@ -260,13 +253,13 @@ func processBundles(
 			if err != nil {
 				return fmt.Errorf("failed to create file in working tree: %s", err)
 			}
-			_, err = io.Copy(dst, bytes.NewReader(bundle.data))
+			_, err = io.Copy(dst, bytes.NewReader(b.Data))
 			_ = dst.Close()
 			if err != nil {
-				return fmt.Errorf("failed to copy inline bundle %s: %s", bundle.name, err)
+				return fmt.Errorf("failed to copy inline b %s: %s", b.Name, err)
 			}
 			app.RepoUrl = repoUrl
-			app.RepoPath = path.Join(repoPath, bundle.name)
+			app.RepoPath = path.Join(repoPath, b.Name)
 		}
 		appPath := path.Join(mgmtPath, "templates", bundleFileName)
 		dst, err := wt.Filesystem.Create(appPath)
