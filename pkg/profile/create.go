@@ -11,15 +11,18 @@ import (
 
 func Create(
 	kubeClient *kubernetes.Clientset,
-	ns string, profileName string,
+	argocdNs string,
+	arlonNs string,
+	profileName string,
 	repoUrl string,
 	repoPath string,
+	repoBranch string,
 	bundles string,
 	desc string,
 	tags string,
 ) error {
 	corev1 := kubeClient.CoreV1()
-	configMapApi := corev1.ConfigMaps(ns)
+	configMapApi := corev1.ConfigMaps(arlonNs)
 	_, err := configMapApi.Get(context.Background(), profileName, metav1.GetOptions{})
 	if err == nil {
 		return fmt.Errorf("a profile with that name already exists")
@@ -43,6 +46,13 @@ func Create(
 			"repo-url": repoUrl,
 			"repo-path": repoPath,
 		},
+	}
+	if repoUrl != "" {
+		err = createInGit(kubeClient, &cm, argocdNs, arlonNs,
+			repoUrl, repoPath, repoBranch)
+		if err != nil {
+			return fmt.Errorf("failed to create dynamic profile in git: %s", err)
+		}
 	}
 	_, err = configMapApi.Create(context.Background(), &cm, metav1.CreateOptions{})
 	if err != nil {
