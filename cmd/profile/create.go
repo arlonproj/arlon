@@ -18,7 +18,7 @@ func createProfileCommand() *cobra.Command {
 	var bundles string
 	var tags string
 	var repoUrl string
-	var repoPath string
+	var repoBasePath string
 	var repoBranch string
 	command := &cobra.Command{
 		Use:               "create",
@@ -32,7 +32,7 @@ func createProfileCommand() *cobra.Command {
 			}
 			kubeClient := kubernetes.NewForConfigOrDie(config)
 			return profile.Create(kubeClient, argocdNs, arlonNs, args[0], repoUrl,
-				repoPath, repoBranch, bundles, desc, tags)
+				repoBasePath, repoBranch, bundles, desc, tags)
 		},
 	}
 	clientConfig = cli.AddKubectlFlagsToCmd(command)
@@ -42,7 +42,7 @@ func createProfileCommand() *cobra.Command {
 	command.Flags().StringVar(&bundles, "bundles", "", "comma separated list of bundles")
 	command.Flags().StringVar(&tags, "tags", "", "comma separated list of tags")
 	command.Flags().StringVar(&repoUrl, "repo-url", "", "create a dynamic profile and store in specified git repository")
-	command.Flags().StringVar(&repoPath, "repo-path", "", "optional git base path for dynamic profile. The profile directory will be created under this.")
+	command.Flags().StringVar(&repoBasePath, "repo-base-path", "profiles", "optional git base path for dynamic profile. The profile directory will be created under this.")
 	command.Flags().StringVar(&repoBranch, "repo-branch", "main", "optional git branch for dynamic profile (requires --repo-url)")
 	command.MarkFlagRequired("bundles")
 	return command

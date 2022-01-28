@@ -7,6 +7,7 @@ import (
 	apierr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"path"
 )
 
 func Create(
@@ -15,7 +16,7 @@ func Create(
 	arlonNs string,
 	profileName string,
 	repoUrl string,
-	repoPath string,
+	repoBasePath string,
 	repoBranch string,
 	bundles string,
 	desc string,
@@ -30,13 +31,13 @@ func Create(
 	if !apierr.IsNotFound(err) {
 		return fmt.Errorf("failed to check for existence of profile: %s", err)
 	}
+	repoPath := path.Join(repoBasePath, profileName)
 	cm := v1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: profileName,
 			Labels: map[string]string{
 				"managed-by": "arlon",
 				"arlon-type": "profile",
-				"profile-type": "configuration",
 			},
 		},
 		Data: map[string]string{
