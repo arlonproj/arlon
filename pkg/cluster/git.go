@@ -235,13 +235,14 @@ func ProcessDynamicProfile(
 	if err != nil {
 		return fmt.Errorf("failed to create app template: %s", err)
 	}
+	mgmtPath := path.Join(repoPath, "mgmt")
 	app := AppSettings{
 		ClusterName: clusterName,
 		AppName: fmt.Sprintf("%s-profile-%s", clusterName, profileName),
 		AppNamespace: argocdNs,
 		DestinationNamespace: argocdNs,
 		RepoUrl: repoUrl,
-		RepoPath: repoPath,
+		RepoPath: mgmtPath,
 	}
 	dst, err := wt.Filesystem.Create(appPath)
 	if err != nil {

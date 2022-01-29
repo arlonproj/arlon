@@ -41,13 +41,14 @@ func createInGit(
 	if err != nil {
 		return fmt.Errorf("failed to get repo worktree: %s", err)
 	}
-	err = cluster.CopyManifests(wt, content, ".", repoPath)
+	mgmtPath := path.Join(repoPath, "mgmt")
+	err = cluster.CopyManifests(wt, content, ".", mgmtPath)
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}
-	templatesPath := path.Join(repoPath, "templates")
+	workloadPath := path.Join(repoPath, "workload")
 	err = cluster.ProcessBundles(wt, "{{ .Values.clusterName }}", repoUrl,
-		repoPath, templatesPath, bundles)
+		mgmtPath, workloadPath, bundles)
 	if err != nil {
 		return fmt.Errorf("failed to process bundles: %s", err)
 	}
