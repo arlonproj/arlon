@@ -61,9 +61,23 @@ func DeployToGit(
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}
-	err = ProcessBundles(wt, clusterName, repoUrl, mgmtPath, workloadPath, bundles)
-	if err != nil {
-		return fmt.Errorf("failed to process bundles: %s", err)
+	profRepoUrl := prof.Data["repo-url"]
+	if profRepoUrl != "" {
+		// dynamic profile: bundles not included in root app.
+		// create an Application for the profile.
+		profRepoPath := prof.Data["repo-path"]
+		appPath := path.Join(mgmtPath, "templates", "profile.yaml")
+		err = ProcessDynamicProfile(wt, clusterName, profileName, argocdNs,
+			profRepoUrl, profRepoPath, appPath)
+		if err != nil {
+			return fmt.Errorf("failed to process dynamic profile: %s", err)
+		}
+	} else {
+		// static profile: include bundles as individual Applications now
+		err = ProcessBundles(wt, clusterName, repoUrl, mgmtPath, workloadPath, bundles)
+		if err != nil {
+			return fmt.Errorf("failed to process bundles: %s", err)
+		}
 	}
 	changed, err := gitutils.CommitChanges(tmpDir, wt)
 	if err != nil {
@@ -169,6 +183,34 @@ spec:
     targetRevision: HEAD
 `
 
+// This is used for a dynamic profile, which is an Application containing
+// other Applications (one for each bundle), so the destination must always
+// be the management cluster. Additionally, since the profile application
+// is a Helm chart, clusterName is passed as a Helm parameter.
+const dynProfTmpl = `
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{.AppName}}
+  namespace: {{.AppNamespace}}
+spec:
+  syncPolicy:
+    automated:
+      prune: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{.DestinationNamespace}}
+  project: default
+  source:
+    repoURL: {{.RepoUrl}}
+    path: {{.RepoPath}}
+    targetRevision: HEAD
+    helm:
+      parameters:
+      - name: clusterName
+        value: {{.ClusterName}}
+`
+
 type AppSettings struct {
 	AppName string
 	ClusterName string
@@ -177,6 +219,43 @@ type AppSettings struct {
 	AppNamespace string
 	DestinationNamespace string
 }
+
+// -----------------------------------------------------------------------------
+
+func ProcessDynamicProfile(
+	wt *gogit.Worktree,
+	clusterName string,
+	profileName string,
+	argocdNs string,
+	repoUrl string,
+	repoPath string,
+	appPath string,
+) error {
+	tmpl, err := template.New("app").Parse(dynProfTmpl)
+	if err != nil {
+		return fmt.Errorf("failed to create app template: %s", err)
+	}
+	app := AppSettings{
+		ClusterName: clusterName,
+		AppName: fmt.Sprintf("%s-profile-%s", clusterName, profileName),
+		AppNamespace: argocdNs,
+		DestinationNamespace: argocdNs,
+		RepoUrl: repoUrl,
+		RepoPath: repoPath,
+	}
+	dst, err := wt.Filesystem.Create(appPath)
+	if err != nil {
+		return fmt.Errorf("failed to create application file %s: %s", appPath, err)
+	}
+	err = tmpl.Execute(dst, &app)
+	_ = dst.Close()
+	if err != nil {
+		return fmt.Errorf("failed to render application template %s: %s", appPath, err)
+	}
+	return nil
+}
+
+// -----------------------------------------------------------------------------
 
 func ProcessBundles(
 	wt *gogit.Worktree,
@@ -244,3 +323,6 @@ func ProcessBundles(
 	}
 	return nil
 }
+
+// -----------------------------------------------------------------------------
+

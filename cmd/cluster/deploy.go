@@ -38,7 +38,8 @@ func deployClusterCommand() *cobra.Command {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
 			kubeClient := kubernetes.NewForConfigOrDie(config)
-			rootApp, err := cluster.ConstructRootApp(kubeClient, argocdNs, arlonNs, clusterName, repoUrl, repoBranch, basePath, clusterSpecName)
+			rootApp, err := cluster.ConstructRootApp(kubeClient, argocdNs, arlonNs,
+				clusterName, repoUrl, repoBranch, basePath, clusterSpecName)
 			if err != nil {
 				return fmt.Errorf("failed to construct root app: %s", err)
 			}
