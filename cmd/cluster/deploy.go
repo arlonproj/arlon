@@ -10,6 +10,8 @@ import (
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/spf13/cobra"
+	grpcstatus "google.golang.org/grpc/status"
+	grpccodes "google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/client-go/kubernetes"
@@ -33,6 +35,20 @@ func deployClusterCommand() *cobra.Command {
 		Short:             "DeployToGit cluster",
 		Long:              "DeployToGit cluster",
 		RunE: func(c *cobra.Command, args []string) error {
+			conn, appIf := argocd.NewArgocdClientOrDie().NewApplicationClientOrDie()
+			defer conn.Close()
+			_, err := appIf.Get(context.Background(),
+				&applicationpkg.ApplicationQuery{Name: &clusterName})
+			if err == nil {
+				return fmt.Errorf("arlon cluster already exists")
+			}
+			grpcStatus, ok := grpcstatus.FromError(err)
+			if !ok {
+				return fmt.Errorf("failed to get grpc status from error")
+			}
+			if grpcStatus.Code() != grpccodes.NotFound {
+				return fmt.Errorf("unexpected cluster application error code: %d", grpcStatus.Code())
+			}
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
@@ -61,8 +77,6 @@ func deployClusterCommand() *cobra.Command {
 				}
 				return nil
 			} else {
-				conn, appIf := argocd.NewArgocdClientOrDie().NewApplicationClientOrDie()
-				defer conn.Close()
 				appCreateRequest := applicationpkg.ApplicationCreateRequest{
 					Application: *rootApp,
 				}
@@ -82,7 +96,7 @@ func deployClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&clusterName, "cluster-name", "", "the cluster name")
 	command.Flags().StringVar(&profileName, "profile", "", "the configuration profile to use")
 	command.Flags().StringVar(&clusterSpecName, "cluster-spec", "", "the clusterspec to use")
-	command.Flags().StringVar(&basePath, "repo-path", "arlon", "the git repository base path")
+	command.Flags().StringVar(&basePath, "repo-path", "clusters", "the git repository base path (cluster subdirectory will be created under this)")
 	command.Flags().BoolVar(&outputYaml, "output-yaml", false, "output root application YAML instead of deploying to ArgoCD")
 	command.MarkFlagRequired("repo-url")
 	command.MarkFlagRequired("cluster-name")

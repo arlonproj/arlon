@@ -59,9 +59,15 @@ func DeployToGit(
 		return fmt.Errorf("failed to get repo worktree: %s", err)
 	}
 	// remove old data, we'll regenerate everything
-	_, err = wt.Remove(clusterPath)
-	if err != nil {
-		return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
+	fileInfo, err := wt.Filesystem.Lstat(clusterPath)
+	if err == nil {
+		if !fileInfo.IsDir() {
+			return fmt.Errorf("unexpected file type for %s", clusterPath)
+		}
+		_, err = wt.Remove(clusterPath)
+		if err != nil {
+			return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
+		}
 	}
 	err = CopyManifests(wt, content, ".", mgmtPath)
 	if err != nil {
