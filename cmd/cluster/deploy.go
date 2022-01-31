@@ -38,7 +38,8 @@ func deployClusterCommand() *cobra.Command {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
 			kubeClient := kubernetes.NewForConfigOrDie(config)
-			rootApp, err := cluster.ConstructRootApp(kubeClient, argocdNs, arlonNs, clusterName, repoUrl, repoBranch, basePath, clusterSpecName)
+			rootApp, err := cluster.ConstructRootApp(kubeClient, argocdNs, arlonNs,
+				clusterName, repoUrl, repoBranch, basePath, clusterSpecName)
 			if err != nil {
 				return fmt.Errorf("failed to construct root app: %s", err)
 			}
@@ -81,7 +82,7 @@ func deployClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&clusterName, "cluster-name", "", "the cluster name")
 	command.Flags().StringVar(&profileName, "profile", "", "the configuration profile to use")
 	command.Flags().StringVar(&clusterSpecName, "cluster-spec", "", "the clusterspec to use")
-	command.Flags().StringVar(&basePath, "path", "arlon", "the git repository base path")
+	command.Flags().StringVar(&basePath, "repo-path", "arlon", "the git repository base path")
 	command.Flags().BoolVar(&outputYaml, "output-yaml", false, "output root application YAML instead of deploying to ArgoCD")
 	command.MarkFlagRequired("repo-url")
 	command.MarkFlagRequired("cluster-name")

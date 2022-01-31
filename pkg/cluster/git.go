@@ -1,7 +1,8 @@
 package cluster
 
 import (
-	"arlon.io/arlon/pkg/common"
+	"arlon.io/arlon/pkg/argocd"
+	"arlon.io/arlon/pkg/bundle"
 	"arlon.io/arlon/pkg/gitutils"
 	"arlon.io/arlon/pkg/log"
 	"bytes"
@@ -9,15 +10,12 @@ import (
 	"embed"
 	"fmt"
 	gogit "github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"io"
 	"io/fs"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	corev1types "k8s.io/client-go/kubernetes/typed/core/v1"
-	"os"
 	"path"
 	"strings"
 	"text/template"
@@ -25,20 +23,6 @@ import (
 
 //go:embed manifests/*
 var content embed.FS
-
-type RepoCreds struct {
-	Url string
-	Username string
-	Password string
-}
-
-type bundle struct {
-	name string
-	data []byte
-	// The following are only set on reference type bundles
-	repoUrl string
-	repoPath string
-}
 
 // -----------------------------------------------------------------------------
 
@@ -54,70 +38,46 @@ func DeployToGit(
 ) error {
 	log := log.GetLogger()
 	corev1 := kubeClient.CoreV1()
-	secretsApi := corev1.Secrets(argocdNs)
-	opts := metav1.ListOptions{
-		LabelSelector: "argocd.argoproj.io/secret-type=repository",
-	}
-	secrets, err := secretsApi.List(context.Background(), opts)
-	if err != nil {
-		return fmt.Errorf("failed to list secrets: %s", err)
-	}
-	var creds *RepoCreds
-	for _, repoSecret := range secrets.Items {
-		if strings.Compare(repoUrl, string(repoSecret.Data["url"])) == 0 {
-			creds = &RepoCreds{
-				Url: string(repoSecret.Data["url"]),
-				Username: string(repoSecret.Data["username"]),
-				Password: string(repoSecret.Data["password"]),
-			}
-			break
-		}
-	}
-	if creds == nil {
-		return fmt.Errorf("did not find argocd repository matching %s (did you register it?)", repoUrl)
-	}
-
 	prof, err := getProfileConfigMap(profileName, corev1, arlonNs)
 	if err != nil {
 		return fmt.Errorf("failed to get profile: %s", err)
 	}
-	bundles, err := getBundles(prof, corev1, arlonNs)
+	bundles, err := bundle.GetBundlesFromProfile(prof, corev1, arlonNs)
 	if err != nil {
 		return fmt.Errorf("failed to get bundles: %s", err)
 	}
-	tmpDir, err := os.MkdirTemp("", "arlon-")
-	branchRef := plumbing.NewBranchReferenceName(repoBranch)
-	auth := &http.BasicAuth{
-		Username: creds.Username,
-		Password: creds.Password,
-	}
-	repo, err := gogit.PlainCloneContext(context.Background(), tmpDir, false, &gogit.CloneOptions{
-		URL:           repoUrl,
-		Auth:          auth,
-		RemoteName:    gogit.DefaultRemoteName,
-		ReferenceName: branchRef,
-		SingleBranch:  true,
-		NoCheckout: false,
-		Progress:   nil,
-		Tags:       gogit.NoTags,
-		CABundle:   nil,
-	})
+	repo, tmpDir, auth, err := argocd.CloneRepo(kubeClient, argocdNs,
+		repoUrl, repoBranch)
 	if err != nil {
-		return fmt.Errorf("failed to clone repository: %s", err)
+		return fmt.Errorf("failed to clone repo: %s", err)
 	}
 	mgmtPath := path.Join(basePath, clusterName, "mgmt")
-	repoPath := path.Join(basePath, clusterName, "workload")
+	workloadPath := path.Join(basePath, clusterName, "workload")
 	wt, err := repo.Worktree()
 	if err != nil {
 		return fmt.Errorf("failed to get repo worktree: %s", err)
 	}
-	err = copyManifests(wt, ".", mgmtPath)
+	err = CopyManifests(wt, content, ".", mgmtPath)
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}
-	err = processBundles(wt, clusterName, repoUrl, mgmtPath, repoPath, bundles)
-	if err != nil {
-		return fmt.Errorf("failed to copy inline bundles: %s", err)
+	profRepoUrl := prof.Data["repo-url"]
+	if profRepoUrl != "" {
+		// dynamic profile: bundles not included in root app.
+		// create an Application for the profile.
+		profRepoPath := prof.Data["repo-path"]
+		appPath := path.Join(mgmtPath, "templates", "profile.yaml")
+		err = ProcessDynamicProfile(wt, clusterName, profileName, argocdNs,
+			profRepoUrl, profRepoPath, appPath)
+		if err != nil {
+			return fmt.Errorf("failed to process dynamic profile: %s", err)
+		}
+	} else {
+		// static profile: include bundles as individual Applications now
+		err = ProcessBundles(wt, clusterName, repoUrl, mgmtPath, workloadPath, bundles)
+		if err != nil {
+			return fmt.Errorf("failed to process bundles: %s", err)
+		}
 	}
 	changed, err := gitutils.CommitChanges(tmpDir, wt)
 	if err != nil {
@@ -142,20 +102,20 @@ func DeployToGit(
 
 // -----------------------------------------------------------------------------
 
-func copyManifests(wt *gogit.Worktree, root string, mgmtPath string) error {
+func CopyManifests(wt *gogit.Worktree, fs embed.FS, root string, mgmtPath string) error {
 	log := log.GetLogger()
-	items, err := content.ReadDir(root)
+	items, err := fs.ReadDir(root)
 	if err != nil {
 		return fmt.Errorf("failed to read embedded directory: %s", err)
 	}
 	for _, item := range items {
 		filePath := path.Join(root, item.Name())
 		if item.IsDir() {
-			if err := copyManifests(wt, filePath, mgmtPath); err != nil {
+			if err := CopyManifests(wt, fs, filePath, mgmtPath); err != nil {
 				return err
 			}
 		} else {
-			src, err := content.Open(filePath)
+			src, err := fs.Open(filePath)
 			if err != nil {
 				return fmt.Errorf("failed to open embedded file %s: %s", filePath, err)
 			}
@@ -203,36 +163,6 @@ func getProfileConfigMap(
 
 // -----------------------------------------------------------------------------
 
-func getBundles(
-	profileConfigMap *v1.ConfigMap,
-	corev1 corev1types.CoreV1Interface,
-	arlonNs string,
-) (bundles []bundle, err error) {
-	secretsApi := corev1.Secrets(arlonNs)
-	log := log.GetLogger()
-	bundleList := profileConfigMap.Data["bundles"]
-	if bundleList == "" {
-		return nil, fmt.Errorf("profile has no bundles")
-	}
-	bundleItems := strings.Split(bundleList, ",")
-	for _, bundleName := range bundleItems {
-		secr, err := secretsApi.Get(context.Background(), bundleName, metav1.GetOptions{})
-		if err != nil {
-			return nil, fmt.Errorf("failed to get bundle secret %s: %s", bundleName, err)
-		}
-		bundles = append(bundles, bundle{
-			name: bundleName,
-			data: secr.Data["data"],
-			repoUrl: string(secr.Annotations[common.RepoUrlAnnotationKey]),
-			repoPath: string(secr.Annotations[common.RepoPathAnnotationKey]),
-		})
-		log.V(1).Info("adding bundle", "bundleName", bundleName)
-	}
-	return
-}
-
-// -----------------------------------------------------------------------------
-
 const appTmpl = `
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -253,6 +183,34 @@ spec:
     targetRevision: HEAD
 `
 
+// This is used for a dynamic profile, which is an Application containing
+// other Applications (one for each bundle), so the destination must always
+// be the management cluster. Additionally, since the profile application
+// is a Helm chart, clusterName is passed as a Helm parameter.
+const dynProfTmpl = `
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{.AppName}}
+  namespace: {{.AppNamespace}}
+spec:
+  syncPolicy:
+    automated:
+      prune: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{.DestinationNamespace}}
+  project: default
+  source:
+    repoURL: {{.RepoUrl}}
+    path: {{.RepoPath}}
+    targetRevision: HEAD
+    helm:
+      parameters:
+      - name: clusterName
+        value: {{.ClusterName}}
+`
+
 type AppSettings struct {
 	AppName string
 	ClusterName string
@@ -262,13 +220,51 @@ type AppSettings struct {
 	DestinationNamespace string
 }
 
-func processBundles(
+// -----------------------------------------------------------------------------
+
+func ProcessDynamicProfile(
+	wt *gogit.Worktree,
+	clusterName string,
+	profileName string,
+	argocdNs string,
+	repoUrl string,
+	repoPath string,
+	appPath string,
+) error {
+	tmpl, err := template.New("app").Parse(dynProfTmpl)
+	if err != nil {
+		return fmt.Errorf("failed to create app template: %s", err)
+	}
+	mgmtPath := path.Join(repoPath, "mgmt")
+	app := AppSettings{
+		ClusterName: clusterName,
+		AppName: fmt.Sprintf("%s-profile-%s", clusterName, profileName),
+		AppNamespace: argocdNs,
+		DestinationNamespace: argocdNs,
+		RepoUrl: repoUrl,
+		RepoPath: mgmtPath,
+	}
+	dst, err := wt.Filesystem.Create(appPath)
+	if err != nil {
+		return fmt.Errorf("failed to create application file %s: %s", appPath, err)
+	}
+	err = tmpl.Execute(dst, &app)
+	_ = dst.Close()
+	if err != nil {
+		return fmt.Errorf("failed to render application template %s: %s", appPath, err)
+	}
+	return nil
+}
+
+// -----------------------------------------------------------------------------
+
+func ProcessBundles(
 	wt *gogit.Worktree,
 	clusterName string,
 	repoUrl string,
 	mgmtPath string,
-	repoPath string,
-	bundles []bundle,
+	workloadPath string,
+	bundles []bundle.Bundle,
 ) error {
 	if len(bundles) == 0 {
 		return nil
@@ -277,26 +273,26 @@ func processBundles(
 	if err != nil {
 		return fmt.Errorf("failed to create app template: %s", err)
 	}
-	for _, bundle := range bundles {
-		bundleFileName := fmt.Sprintf("%s.yaml", bundle.name)
+	for _, b := range bundles {
+		bundleFileName := fmt.Sprintf("%s.yaml", b.Name)
 		app := AppSettings{
 			ClusterName: clusterName,
-			AppName: fmt.Sprintf("%s-%s", clusterName, bundle.name),
+			AppName: fmt.Sprintf("%s-%s", clusterName, b.Name),
 			AppNamespace: "argocd",
 			DestinationNamespace: "default", // FIXME: make configurable
 		}
-		if bundle.data == nil {
-			// reference type bundle
-			if bundle.repoUrl == "" {
-				return fmt.Errorf("bundle %s is neither inline nor reference type", bundle.name)
+		if b.Data == nil {
+			// reference type b
+			if b.RepoUrl == "" {
+				return fmt.Errorf("b %s is neither inline nor reference type", b.Name)
 			}
-			app.RepoUrl = bundle.repoUrl
-			app.RepoPath = bundle.repoPath
-		} else if bundle.repoUrl != "" {
-			return fmt.Errorf("bundle %s has both data and repoUrl set", bundle.name)
+			app.RepoUrl = b.RepoUrl
+			app.RepoPath = b.RepoPath
+		} else if b.RepoUrl != "" {
+			return fmt.Errorf("b %s has both data and repoUrl set", b.Name)
 		} else {
 			// inline bundle
-			dirPath := path.Join(repoPath, bundle.name)
+			dirPath := path.Join(workloadPath, b.Name)
 			err := wt.Filesystem.MkdirAll(dirPath, fs.ModeDir | 0700)
 			if err != nil {
 				return fmt.Errorf("failed to create directory in working tree: %s", err)
@@ -306,13 +302,13 @@ func processBundles(
 			if err != nil {
 				return fmt.Errorf("failed to create file in working tree: %s", err)
 			}
-			_, err = io.Copy(dst, bytes.NewReader(bundle.data))
+			_, err = io.Copy(dst, bytes.NewReader(b.Data))
 			_ = dst.Close()
 			if err != nil {
-				return fmt.Errorf("failed to copy inline bundle %s: %s", bundle.name, err)
+				return fmt.Errorf("failed to copy inline b %s: %s", b.Name, err)
 			}
 			app.RepoUrl = repoUrl
-			app.RepoPath = path.Join(repoPath, bundle.name)
+			app.RepoPath = path.Join(workloadPath, b.Name)
 		}
 		appPath := path.Join(mgmtPath, "templates", bundleFileName)
 		dst, err := wt.Filesystem.Create(appPath)
@@ -328,3 +324,6 @@ func processBundles(
 	}
 	return nil
 }
+
+// -----------------------------------------------------------------------------
+
