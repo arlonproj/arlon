@@ -21,7 +21,10 @@ func CommitChanges(tmpDir string, wt *gogit.Worktree) (changed bool, err error) 
 	// whereby it thinks broken symlinks to absolute paths are
 	// modified. There's no circumstance in which we want to commit a
 	// change to a broken symlink: so, detect and skip those.
-	for file, _ := range status {
+	for file, sts := range status {
+		if sts.Staging == gogit.Deleted {
+			continue
+		}
 		abspath := filepath.Join(tmpDir, file)
 		info, err := os.Lstat(abspath)
 		if err != nil {

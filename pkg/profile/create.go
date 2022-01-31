@@ -46,6 +46,7 @@ func Create(
 			"tags": tags,
 			"repo-url": repoUrl,
 			"repo-path": repoPath,
+			"repo-branch": repoBranch,
 		},
 	}
 	if repoUrl != "" {

@@ -51,11 +51,17 @@ func DeployToGit(
 	if err != nil {
 		return fmt.Errorf("failed to clone repo: %s", err)
 	}
-	mgmtPath := path.Join(basePath, clusterName, "mgmt")
-	workloadPath := path.Join(basePath, clusterName, "workload")
+	clusterPath := path.Join(basePath, clusterName)
+	mgmtPath := path.Join(clusterPath, "mgmt")
+	workloadPath := path.Join(clusterPath, "workload")
 	wt, err := repo.Worktree()
 	if err != nil {
 		return fmt.Errorf("failed to get repo worktree: %s", err)
+	}
+	// remove old data, we'll regenerate everything
+	_, err = wt.Remove(clusterPath)
+	if err != nil {
+		return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
 	}
 	err = CopyManifests(wt, content, ".", mgmtPath)
 	if err != nil {

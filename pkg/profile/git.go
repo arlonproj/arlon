@@ -41,6 +41,11 @@ func createInGit(
 	if err != nil {
 		return fmt.Errorf("failed to get repo worktree: %s", err)
 	}
+	// remove old data, we'll regenerate everything
+	_, err = wt.Remove(repoPath)
+	if err != nil {
+		return fmt.Errorf("failed to recursively delete repository path: %s", err)
+	}
 	mgmtPath := path.Join(repoPath, "mgmt")
 	err = cluster.CopyManifests(wt, content, ".", mgmtPath)
 	if err != nil {
