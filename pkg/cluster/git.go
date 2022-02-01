@@ -108,7 +108,7 @@ func DeployToGit(
 	if err != nil {
 		return fmt.Errorf("failed to push to remote repository: %s", err)
 	}
-	log.Info("succesfully pushed working tree", "tmpDir", tmpDir)
+	log.V(1).Info("succesfully pushed working tree", "tmpDir", tmpDir)
 	return nil
 }
 
