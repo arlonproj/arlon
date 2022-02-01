@@ -58,7 +58,7 @@ func DeployToGit(
 	if err != nil {
 		return fmt.Errorf("failed to get repo worktree: %s", err)
 	}
-	// remove old data, we'll regenerate everything
+	// remove old data if directory exists, we'll regenerate everything
 	fileInfo, err := wt.Filesystem.Lstat(clusterPath)
 	if err == nil {
 		if !fileInfo.IsDir() {
