@@ -12,6 +12,7 @@ func NewCommand() *cobra.Command {
 		},
 	}
 	command.AddCommand(deployClusterCommand())
+	command.AddCommand(listClustersCommand())
 	return command
 }
 

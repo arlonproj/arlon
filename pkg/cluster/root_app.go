@@ -1,6 +1,7 @@
 package cluster
 
 import (
+	"arlon.io/arlon/pkg/common"
 	"context"
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application"
@@ -35,6 +36,8 @@ func ConstructRootApp(
 		ObjectMeta: v1.ObjectMeta{
 			Name: clusterName,
 			Namespace: argocdNs,
+			Labels: map[string]string{"managed-by": "arlon","arlon-type":"cluster"},
+			Annotations: map[string]string{common.ClusterSpecAnnotationKey: clusterSpecName},
 		},
 	}
 	keys := []string{

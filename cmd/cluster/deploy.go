@@ -3,6 +3,7 @@ package cluster
 import (
 	"arlon.io/arlon/pkg/argocd"
 	"arlon.io/arlon/pkg/cluster"
+	"arlon.io/arlon/pkg/common"
 	"context"
 	_ "embed"
 	"fmt"
@@ -10,8 +11,8 @@ import (
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/spf13/cobra"
-	grpcstatus "google.golang.org/grpc/status"
 	grpccodes "google.golang.org/grpc/codes"
+	grpcstatus "google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/client-go/kubernetes"
@@ -59,6 +60,7 @@ func deployClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to construct root app: %s", err)
 			}
+			rootApp.ObjectMeta.Annotations[common.ProfileAnnotationKey] = profileName
 			err = cluster.DeployToGit(kubeClient, argocdNs, arlonNs, clusterName, repoUrl, repoBranch, basePath, profileName)
 			if err != nil {
 				return fmt.Errorf("failed to deploy git tree: %s", err)
