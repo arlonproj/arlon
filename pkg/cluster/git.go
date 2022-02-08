@@ -181,6 +181,9 @@ kind: Application
 metadata:
   name: {{.AppName}}
   namespace: {{.AppNamespace}}
+  finalizers:
+  # This solves issue #17
+  - resources-finalizer.argocd.argoproj.io/foreground
 spec:
   syncPolicy:
     automated:
@@ -205,6 +208,9 @@ kind: Application
 metadata:
   name: {{.AppName}}
   namespace: {{.AppNamespace}}
+  finalizers:
+  # This solves issue #17
+  - resources-finalizer.argocd.argoproj.io/foreground
 spec:
   syncPolicy:
     automated:

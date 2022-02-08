@@ -38,6 +38,7 @@ func ConstructRootApp(
 			Namespace: argocdNs,
 			Labels: map[string]string{"managed-by": "arlon","arlon-type":"cluster"},
 			Annotations: map[string]string{common.ClusterSpecAnnotationKey: clusterSpecName},
+			Finalizers: []string{argoappv1.ForegroundPropagationPolicyFinalizer},
 		},
 	}
 	keys := []string{
