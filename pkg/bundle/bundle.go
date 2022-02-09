@@ -29,7 +29,7 @@ func GetBundlesFromProfile(
 	secretsApi := corev1.Secrets(arlonNs)
 	bundleList := profileConfigMap.Data["bundles"]
 	if bundleList == "" {
-		return nil, fmt.Errorf("profile has no bundles")
+		return nil, nil
 	}
 	bundleItems := strings.Split(bundleList, ",")
 	for _, bundleName := range bundleItems {

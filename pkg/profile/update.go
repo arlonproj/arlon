@@ -7,12 +7,15 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+// Updates a profile to the specified set of bundles. Tags and description
+// may also be updated.
+// A bundles value of nil means to change the profile to an empty set.
 func Update(
 	kubeClient *kubernetes.Clientset,
 	argocdNs string,
 	arlonNs string,
 	profileName string,
-	bundles string,
+	bundlesPtr *string,
 	desc string,
 	tags string,
 ) (dirty bool, err error) {
@@ -30,11 +33,19 @@ func Update(
 		cm.Data["tags"] = tags
 		dirty = true
 	}
-	if bundles != "" && bundles != cm.Data["bundles"] {
+	bundles := ""
+	if bundlesPtr != nil {
+		bundles = *bundlesPtr
+		if bundles == "" {
+			return false, fmt.Errorf("bundles set cannot be empty")
+		}
+	}
+	if bundles != cm.Data["bundles"] {
 		cm.Data["bundles"] = bundles
 		repoUrl := cm.Data["repo-url"]
 		dirty = true
 		if repoUrl != "" {
+			// Dynamic profile
 			err = createInGit(kubeClient, cm, argocdNs, arlonNs,
 				repoUrl, cm.Data["repo-path"], cm.Data["repo-branch"])
 			if err != nil {

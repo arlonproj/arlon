@@ -1,0 +1,14 @@
+# This dummy configmap solves the "auto sync would wipe out all resources"
+# problem in argocd when an updated Helm chart produces no resources. This
+# use case occurs when a dynamic profile is updated to be empty (no bundles),
+# which is sometimes useful, especially for testing.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    arlon-type: placeholder
+    managed-by: arlon
+  name: placeholder-{{ .Values.profileAppName }}
+  namespace: arlon
+data:
+  profileName: {{ .Values.profileAppName }}

@@ -17,6 +17,7 @@ func updateProfileCommand() *cobra.Command {
 	var desc string
 	var bundles string
 	var tags string
+	var clear bool
 	command := &cobra.Command{
 		Use:               "update",
 		Short:             "Update profile",
@@ -28,8 +29,17 @@ func updateProfileCommand() *cobra.Command {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
 			kubeClient := kubernetes.NewForConfigOrDie(config)
+			bundlesPtr := &bundles
+			if clear {
+				if bundles != "" {
+					return fmt.Errorf("bundles must not be specified when using --clear")
+				}
+				bundlesPtr = nil // change profile to empty bundle set
+			} else if bundles == "" {
+				return fmt.Errorf("bundles must be specified unless using --clear")
+			}
 			modified, err := profile.Update(kubeClient, argocdNs, arlonNs, args[0],
-				bundles, desc, tags)
+				bundlesPtr, desc, tags)
 			if err != nil {
 				return err
 			}
@@ -45,7 +55,7 @@ func updateProfileCommand() *cobra.Command {
 	command.Flags().StringVar(&desc, "desc", "", "description")
 	command.Flags().StringVar(&bundles, "bundles", "", "comma separated list of bundles")
 	command.Flags().StringVar(&tags, "tags", "", "comma separated list of tags")
-	command.MarkFlagRequired("bundles")
+	command.Flags().BoolVar(&clear, "clear", false, "set the bundle list to the empty set")
 	return command
 }
 

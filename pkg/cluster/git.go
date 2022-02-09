@@ -227,6 +227,8 @@ spec:
       parameters:
       - name: clusterName
         value: {{.ClusterName}}
+      - name: profileAppName
+        value: {{.AppName}}
 `
 
 type AppSettings struct {
