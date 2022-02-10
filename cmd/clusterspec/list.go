@@ -1,6 +1,7 @@
 package clusterspec
 
 import (
+	"arlon.io/arlon/pkg/clusterspec"
 	"context"
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/util/cli"
@@ -53,17 +54,15 @@ func listClusterspecs(config *restclient.Config, ns string) error {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	_, _ = fmt.Fprintf(w, "NAME\tAPIPROV\tCLOUDPROV\tTYPE\tKUBEVERSION\tNODETYPE\tNODECOUNT\tTAGS\tDESCRIPTION\n")
 	for _, configMap := range configMaps.Items {
-		apiProvider := configMap.Data["apiProvider"]
-		cloudProvider := configMap.Data["cloudProvider"]
-		clusterType := configMap.Data["type"]
-		kubernetesVersion := configMap.Data["kubernetesVersion"]
-		nodeType := configMap.Data["nodeType"]
-		nodeCount := configMap.Data["nodeCount"]
-		tags := configMap.Data["tags"]
-		desc := string(configMap.Data["description"])
-		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", configMap.Name,
-			apiProvider, cloudProvider,
-			clusterType, kubernetesVersion, nodeType, nodeCount, tags, desc)
+		cs, err := clusterspec.FromConfigMap(&configMap)
+		if err != nil {
+			fmt.Fprintf(w, "%s\t(corrupt data)\n", configMap.Name)
+			continue
+		}
+		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\n",
+			cs.Name, cs.ApiProvider, cs.CloudProvider,
+			cs.Type, cs.KubernetesVersion, cs.NodeType, cs.NodeCount,
+			cs.Tags, cs.Description)
 	}
 	_ = w.Flush()
 	return nil
