@@ -29,9 +29,7 @@ func Create(
 	if err := ValidCloudProviderAndClusterType(cloudProvider, clusterType); err != nil {
 		return err
 	}
-	corev1 := kubeClient.CoreV1()
-	configMapApi := corev1.ConfigMaps(arlonNs)
-	_, err := configMapApi.Get(context.Background(), specName, metav1.GetOptions{})
+	_, err := Get(kubeClient, arlonNs, specName)
 	if err == nil {
 		return fmt.Errorf("a profile with that name already exists")
 	}
@@ -57,6 +55,8 @@ func Create(
 			"nodeCount": strconv.Itoa(nodeCount),
 		},
 	}
+	corev1 := kubeClient.CoreV1()
+	configMapApi := corev1.ConfigMaps(arlonNs)
 	_, err = configMapApi.Create(context.Background(), &cm, metav1.CreateOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to create clusterspec configmap: %s", err)
