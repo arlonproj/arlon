@@ -63,3 +63,41 @@ func FromConfigMap(cm *corev1.ConfigMap) (*ClusterSpec, error) {
 	}
 	return cs, nil
 }
+
+func ToConfigMap(
+	name string,
+	apiProvider string,
+	cloudProvider string,
+	clusterType string,
+	kubernetesVersion string,
+	nodeType string,
+	nodeCount int,
+	region string,
+	podCidrBlock string,
+	sshKeyName string,
+	tags string,
+	description string,
+) *corev1.ConfigMap {
+	return &corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: name,
+			Labels: map[string]string{
+				"managed-by": "arlon",
+				"arlon-type": "clusterspec",
+			},
+		},
+		Data: map[string]string{
+			"apiProvider": apiProvider,
+			"cloudProvider": cloudProvider,
+			"type": clusterType,
+			"kubernetesVersion": kubernetesVersion,
+			"nodeType": nodeType,
+			"nodeCount": strconv.Itoa(nodeCount),
+			"region": region,
+			"podCidrBlock": podCidrBlock,
+			"sshKeyName": sshKeyName,
+			"tags": tags,
+			"description": description,
+		},
+	}
+}
