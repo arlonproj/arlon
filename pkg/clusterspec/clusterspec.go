@@ -24,6 +24,20 @@ type ClusterSpec struct {
 	Description string
 }
 
+const (
+	ApiProviderKey = "apiProvider"
+	CloudProviderKey = "cloudProvider"
+	NodeTypeKey = "nodeType"
+	ClusterTypeKey = "type"
+	KubernetesVersionKey = "kubernetesVersion"
+	NodeCountKey = "nodeCount"
+	RegionKey = "region"
+	PodCidrBlockKey = "podCidrBlock"
+	SshKeyNameKey = "sshKeyName"
+	TagsKey = "tags"
+	DescriptionKey = "description"
+)
+
 func Get(
 	kubeClient *kubernetes.Clientset,
 	arlonNs string,
@@ -45,19 +59,19 @@ func Get(
 func FromConfigMap(cm *corev1.ConfigMap) (*ClusterSpec, error) {
 	cs := &ClusterSpec{
 		Name: cm.Name,
-		ApiProvider: cm.Data["apiProvider"],
-		CloudProvider: cm.Data["cloudProvider"],
-		Type: cm.Data["type"],
-		KubernetesVersion: cm.Data["kubernetesVersion"],
-		NodeType: cm.Data["nodeType"],
-		Region: cm.Data["region"],
-		PodCidrBlock: cm.Data["podCidrBlock"],
-		SshKeyName: cm.Data["sshKeyName"],
-		Tags: cm.Data["tags"],
-		Description: cm.Data["description"],
+		ApiProvider: cm.Data[ApiProviderKey],
+		CloudProvider: cm.Data[CloudProviderKey],
+		Type: cm.Data[ClusterTypeKey],
+		KubernetesVersion: cm.Data[KubernetesVersionKey],
+		NodeType: cm.Data[NodeTypeKey],
+		Region: cm.Data[RegionKey],
+		PodCidrBlock: cm.Data[PodCidrBlockKey],
+		SshKeyName: cm.Data[SshKeyNameKey],
+		Tags: cm.Data[TagsKey],
+		Description: cm.Data[DescriptionKey],
 	}
 	var err error
-	cs.NodeCount, err = strconv.Atoi(cm.Data["nodeCount"])
+	cs.NodeCount, err = strconv.Atoi(cm.Data[NodeCountKey])
 	if err != nil {
 		return nil, fmt.Errorf("could not parse clusterspec nodeCount: %s", err)
 	}
@@ -87,17 +101,17 @@ func ToConfigMap(
 			},
 		},
 		Data: map[string]string{
-			"apiProvider": apiProvider,
-			"cloudProvider": cloudProvider,
-			"type": clusterType,
-			"kubernetesVersion": kubernetesVersion,
-			"nodeType": nodeType,
-			"nodeCount": strconv.Itoa(nodeCount),
-			"region": region,
-			"podCidrBlock": podCidrBlock,
-			"sshKeyName": sshKeyName,
-			"tags": tags,
-			"description": description,
+			ApiProviderKey: apiProvider,
+			CloudProviderKey: cloudProvider,
+			ClusterTypeKey: clusterType,
+			KubernetesVersionKey: kubernetesVersion,
+			NodeTypeKey: nodeType,
+			NodeCountKey: strconv.Itoa(nodeCount),
+			RegionKey: region,
+			PodCidrBlockKey: podCidrBlock,
+			SshKeyNameKey: sshKeyName,
+			TagsKey: tags,
+			DescriptionKey: description,
 		},
 	}
 }

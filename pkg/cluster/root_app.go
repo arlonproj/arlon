@@ -1,6 +1,7 @@
 package cluster
 
 import (
+	"arlon.io/arlon/pkg/clusterspec"
 	"arlon.io/arlon/pkg/common"
 	"context"
 	"fmt"
@@ -41,8 +42,13 @@ func ConstructRootApp(
 			Finalizers: []string{argoappv1.ForegroundPropagationPolicyFinalizer},
 		},
 	}
-	keys := []string{
-		"region", "sshKeyName", "kubernetesVersion", "podCidrBlock", "nodeCount", "nodeType",
+	validHelmParamKeys := []string{
+		clusterspec.RegionKey,
+		clusterspec.SshKeyNameKey,
+		clusterspec.KubernetesVersionKey,
+		clusterspec.PodCidrBlockKey,
+		clusterspec.NodeCountKey,
+		clusterspec.NodeTypeKey,
 	}
 	helmParams := [] argoappv1.HelmParameter{
 		{
@@ -50,7 +56,7 @@ func ConstructRootApp(
 			Value: clusterName,
 		},
 	}
-	for _, key := range keys {
+	for _, key := range validHelmParamKeys {
 		val := cm.Data[key]
 		if val != "" {
 			helmParams = append(helmParams, argoappv1.HelmParameter{
