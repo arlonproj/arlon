@@ -42,21 +42,13 @@ func ConstructRootApp(
 			Finalizers: []string{argoappv1.ForegroundPropagationPolicyFinalizer},
 		},
 	}
-	validHelmParamKeys := []string{
-		clusterspec.RegionKey,
-		clusterspec.SshKeyNameKey,
-		clusterspec.KubernetesVersionKey,
-		clusterspec.PodCidrBlockKey,
-		clusterspec.NodeCountKey,
-		clusterspec.NodeTypeKey,
-	}
 	helmParams := [] argoappv1.HelmParameter{
 		{
 			Name:  "clusterName",
 			Value: clusterName,
 		},
 	}
-	for _, key := range validHelmParamKeys {
+	for _, key := range clusterspec.ValidHelmParamKeys {
 		val := cm.Data[key]
 		if val != "" {
 			helmParams = append(helmParams, argoappv1.HelmParameter{

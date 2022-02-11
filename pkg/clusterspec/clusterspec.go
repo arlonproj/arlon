@@ -38,6 +38,17 @@ const (
 	DescriptionKey = "description"
 )
 
+var (
+	ValidHelmParamKeys = []string{
+		RegionKey,
+		SshKeyNameKey,
+		KubernetesVersionKey,
+		PodCidrBlockKey,
+		NodeCountKey,
+		NodeTypeKey,
+	}
+)
+
 func Get(
 	kubeClient *kubernetes.Clientset,
 	arlonNs string,
