@@ -1,0 +1,72 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: {{ .Values.global.clusterName }}
+  namespace: {{ .Values.global.clusterName }}
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+      - {{ .Values.global.podCidrBlock }}
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: AWSManagedControlPlane
+    name: {{ .Values.global.clusterName }}-control-plane
+  infrastructureRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: AWSManagedControlPlane
+    name: {{ .Values.global.clusterName }}-control-plane
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: AWSManagedControlPlane
+metadata:
+  name: {{ .Values.global.clusterName }}-control-plane
+  namespace: {{ .Values.global.clusterName }}
+spec:
+  region: {{ .Values.global.region }}
+  sshKeyName: {{ .Values.global.sshKeyName }}
+  version: {{ .Values.global.kubernetesVersion }}
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: {{ .Values.global.clusterName }}-md-0
+  namespace: {{ .Values.global.clusterName }}
+spec:
+  clusterName: {{ .Values.global.clusterName }}
+  replicas: {{ .Values.global.nodeCount }}
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: EKSConfigTemplate
+          name: {{ .Values.global.clusterName }}-md-0
+      clusterName: {{ .Values.global.clusterName }}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AWSMachineTemplate
+        name: {{ .Values.global.clusterName }}-md-0
+      version: {{ .Values.global.kubernetesVersion }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AWSMachineTemplate
+metadata:
+  name: {{ .Values.global.clusterName }}-md-0
+  namespace: {{ .Values.global.clusterName }}
+spec:
+  template:
+    spec:
+      iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
+      instanceType: {{ .Values.global.nodeType }}
+      sshKeyName: {{ .Values.global.sshKeyName }}
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: EKSConfigTemplate
+metadata:
+  name: {{ .Values.global.clusterName }}-md-0
+  namespace: {{ .Values.global.clusterName }}
+spec:
+  template: {}

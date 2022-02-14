@@ -44,7 +44,7 @@ func ConstructRootApp(
 	}
 	helmParams := [] argoappv1.HelmParameter{
 		{
-			Name:  "clusterName",
+			Name:  "global.clusterName",
 			Value: clusterName,
 		},
 	}
@@ -52,11 +52,19 @@ func ConstructRootApp(
 		val := cm.Data[key]
 		if val != "" {
 			helmParams = append(helmParams, argoappv1.HelmParameter{
-				Name: key,
+				Name: fmt.Sprintf("global.%s", key),
 				Value: val,
 			})
 		}
 	}
+	subchartName, err := clusterspec.SubchartName(cm)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve subchart name: %s", err)
+	}
+	helmParams = append(helmParams, argoappv1.HelmParameter{
+		Name: fmt.Sprintf("tags.%s", subchartName),
+		Value: "true",
+	})
 	app.Spec.Source.Helm = &argoappv1.ApplicationSourceHelm{Parameters: helmParams}
 	app.Spec.Source.RepoURL = repoUrl
 	app.Spec.Source.TargetRevision = repoBranch

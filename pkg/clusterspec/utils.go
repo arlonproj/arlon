@@ -23,10 +23,11 @@ func ValidValues(vals map[string]bool) string {
 	var ret string
 	var i int
 	for val, _ := range vals {
-		ret = ret + val
+		var sep string
 		if i > 0 {
-			ret = ret + "|"
+			sep = "|"
 		}
+		ret = ret + sep + val
 		i = i + 1
 	}
 	return ret

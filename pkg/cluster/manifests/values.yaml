@@ -2,10 +2,16 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-clusterName: clusterA
-region: us-west-2
-sshKeyName: leb
-kubernetesVersion: v1.18.16
-podCidrBlock: 192.168.0.0/16
-nodeCount: 2
-nodeType: t3.large
+global:
+  clusterName: clusterA
+  region: us-west-2
+  sshKeyName: leb
+  kubernetesVersion: v1.18.16
+  podCidrBlock: 192.168.0.0/16
+  nodeCount: 2
+  nodeType: t3.large
+
+tags:
+  capi-aws-eks: false
+  capi-aws-kubeadm: false
+

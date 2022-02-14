@@ -126,3 +126,18 @@ func ToConfigMap(
 		},
 	}
 }
+
+func SubchartName(cm *corev1.ConfigMap) (string, error) {
+	cs, err := FromConfigMap(cm)
+	if err != nil {
+		return "", err
+	}
+	if err = ValidApiProvider(cs.ApiProvider); err != nil {
+		return "", err
+	}
+	if err = ValidCloudProviderAndClusterType(cs.CloudProvider, cs.Type); err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s-%s-%s", cs.ApiProvider,
+		cs.CloudProvider, cs.Type), nil
+}
