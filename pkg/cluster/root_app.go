@@ -42,10 +42,18 @@ func ConstructRootApp(
 			Finalizers: []string{argoappv1.ForegroundPropagationPolicyFinalizer},
 		},
 	}
+	cs, err := clusterspec.FromConfigMap(cm)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read clusterspec from configmap: %s", err)
+	}
 	helmParams := [] argoappv1.HelmParameter{
 		{
 			Name:  "global.clusterName",
 			Value: clusterName,
+		},
+		{
+			Name: "global.kubeconfigSecretKeyName",
+			Value: clusterspec.KubeconfigSecretKeyNameByApiProvider[cs.ApiProvider],
 		},
 	}
 	for _, key := range clusterspec.ValidHelmParamKeys {

@@ -6,5 +6,5 @@ metadata:
 spec:
   clusterName: {{ .Values.global.clusterName }}
   kubeconfigSecretName: {{ .Values.global.clusterName }}-kubeconfig
-  kubeconfigSecretKeyName: value
+  kubeconfigSecretKeyName: {{ .Values.global.kubeconfigSecretKeyName }}
 

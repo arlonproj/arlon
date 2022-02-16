@@ -1,0 +1,9 @@
+apiVersion: aws.platformref.crossplane.io/v1alpha1
+kind: Network
+metadata:
+  name: {{ .Values.global.clusterName }}
+  namespace: {{ .Values.global.clusterName }}
+spec:
+  id: {{ .Values.global.clusterName }}
+  clusterRef:
+    id: {{ .Values.global.clusterName }}

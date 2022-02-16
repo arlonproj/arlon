@@ -17,6 +17,10 @@ var (
 		"gcp": {"kubeadm": true, "gke": true},
 		"azure": {"kubeadm": true, "aks": true},
 	}
+	KubeconfigSecretKeyNameByApiProvider = map[string]string {
+		"capi": "value",
+		"xplane": "kubeconfig",
+	}
 )
 
 func ValidValues(vals map[string]bool) string {

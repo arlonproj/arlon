@@ -1,0 +1,17 @@
+apiVersion: aws.platformref.crossplane.io/v1alpha1
+kind: Cluster
+metadata:
+  name: {{ .Values.global.clusterName }}
+  namespace: {{ .Values.global.clusterName }}
+spec:
+  id: {{ .Values.global.clusterName }}
+  parameters:
+    nodes:
+      count: {{ .Values.global.nodeCount }}
+      size: {{ .Values.global.nodeType }}
+    networkRef:
+      id: {{ .Values.global.clusterName }}
+  writeConnectionSecretToRef:
+    name: {{ .Values.global.clusterName }}-kubeconfig
+
+
