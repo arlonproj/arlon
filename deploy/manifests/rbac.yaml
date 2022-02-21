@@ -1,0 +1,26 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  # "namespace" omitted since ClusterRoles are not namespaced
+  name: clusterregistration-updater
+rules:
+  - apiGroups: ["arlon.io"]
+    #
+    # at the HTTP level, the name of the resource for accessing Secret
+    # objects is "secrets"
+    resources: ["clusterregistrations", "clusterregistrations/status"]
+    verbs: ["get", "watch", "list", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+# This cluster role binding allows anyone in the "manager" group to read secrets in any namespace.
+kind: ClusterRoleBinding
+metadata:
+  name: arlon-clusterregistration-writer
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: arlon
+roleRef:
+  kind: ClusterRole
+  name: clusterregistration-updater
+  apiGroup: rbac.authorization.k8s.io

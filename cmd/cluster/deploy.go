@@ -32,11 +32,11 @@ func deployClusterCommand() *cobra.Command {
 	var profileName string
 	var outputYaml bool
 	command := &cobra.Command{
-		Use:               "deploy",
-		Short:             "DeployToGit cluster",
-		Long:              "DeployToGit cluster",
+		Use:   "deploy",
+		Short: "DeployToGit cluster",
+		Long:  "DeployToGit cluster",
 		RunE: func(c *cobra.Command, args []string) error {
-			conn, appIf := argocd.NewArgocdClientOrDie().NewApplicationClientOrDie()
+			conn, appIf := argocd.NewArgocdClientOrDie("").NewApplicationClientOrDie()
 			defer conn.Close()
 			_, err := appIf.Get(context.Background(),
 				&applicationpkg.ApplicationQuery{Name: &clusterName})
@@ -104,4 +104,3 @@ func deployClusterCommand() *cobra.Command {
 	command.MarkFlagRequired("cluster-name")
 	return command
 }
-

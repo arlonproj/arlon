@@ -35,24 +35,24 @@ func ConstructRootApp(
 			APIVersion: application.Group + "/v1alpha1",
 		},
 		ObjectMeta: v1.ObjectMeta{
-			Name: clusterName,
-			Namespace: argocdNs,
-			Labels: map[string]string{"managed-by": "arlon","arlon-type":"cluster"},
+			Name:        clusterName,
+			Namespace:   argocdNs,
+			Labels:      map[string]string{"managed-by": "arlon", "arlon-type": "cluster"},
 			Annotations: map[string]string{common.ClusterSpecAnnotationKey: clusterSpecName},
-			Finalizers: []string{argoappv1.ForegroundPropagationPolicyFinalizer},
+			Finalizers:  []string{argoappv1.ForegroundPropagationPolicyFinalizer},
 		},
 	}
 	cs, err := clusterspec.FromConfigMap(cm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read clusterspec from configmap: %s", err)
 	}
-	helmParams := [] argoappv1.HelmParameter{
+	helmParams := []argoappv1.HelmParameter{
 		{
 			Name:  "global.clusterName",
 			Value: clusterName,
 		},
 		{
-			Name: "global.kubeconfigSecretKeyName",
+			Name:  "global.kubeconfigSecretKeyName",
 			Value: clusterspec.KubeconfigSecretKeyNameByApiProvider[cs.ApiProvider],
 		},
 	}
@@ -60,7 +60,7 @@ func ConstructRootApp(
 		val := cm.Data[key]
 		if val != "" {
 			helmParams = append(helmParams, argoappv1.HelmParameter{
-				Name: fmt.Sprintf("global.%s", key),
+				Name:  fmt.Sprintf("global.%s", key),
 				Value: val,
 			})
 		}
@@ -70,7 +70,7 @@ func ConstructRootApp(
 		return nil, fmt.Errorf("failed to retrieve subchart name: %s", err)
 	}
 	helmParams = append(helmParams, argoappv1.HelmParameter{
-		Name: fmt.Sprintf("tags.%s", subchartName),
+		Name:  fmt.Sprintf("tags.%s", subchartName),
 		Value: "true",
 	})
 	app.Spec.Source.Helm = &argoappv1.ApplicationSourceHelm{Parameters: helmParams}
@@ -91,8 +91,8 @@ func ConstructRootApp(
 	// causing ArgoCD to report the resource as OutOfSync
 	app.Spec.IgnoreDifferences = []argoappv1.ResourceIgnoreDifferences{
 		{
-			Group: "controlplane.cluster.x-k8s.io",
-			Kind: "AWSManagedControlPlane",
+			Group:        "controlplane.cluster.x-k8s.io",
+			Kind:         "AWSManagedControlPlane",
 			JSONPointers: []string{"/spec/version"},
 		},
 	}

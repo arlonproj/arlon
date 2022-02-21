@@ -27,7 +27,7 @@ func NewCommand() *cobra.Command {
 }
 
 func listClusters() {
-	conn, clusterIf := argocd.NewArgocdClientOrDie().NewClusterClientOrDie()
+	conn, clusterIf := argocd.NewArgocdClientOrDie("").NewClusterClientOrDie()
 	defer io.Close(conn)
 	clusters, err := clusterIf.List(context.Background(), &clusterpkg.ClusterQuery{})
 	errors.CheckError(err)

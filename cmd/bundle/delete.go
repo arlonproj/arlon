@@ -16,10 +16,10 @@ func deleteBundleCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
 	var ns string
 	command := &cobra.Command{
-		Use:               "delete",
-		Short:             "Delete configuration bundle",
-		Long:              "Delete configuration bundle",
-		Args: cobra.ExactArgs(1),
+		Use:   "delete",
+		Short: "Delete configuration bundle",
+		Long:  "Delete configuration bundle",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
@@ -33,7 +33,6 @@ func deleteBundleCommand() *cobra.Command {
 	return command
 }
 
-
 func deleteBundle(config *restclient.Config, ns string, bundleName string) error {
 	kubeClient := kubernetes.NewForConfigOrDie(config)
 	corev1 := kubeClient.CoreV1()
@@ -44,5 +43,3 @@ func deleteBundle(config *restclient.Config, ns string, bundleName string) error
 	}
 	return nil
 }
-
-

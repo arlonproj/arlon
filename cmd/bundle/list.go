@@ -19,9 +19,9 @@ func listBundlesCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
 	var ns string
 	command := &cobra.Command{
-		Use:               "list",
-		Short:             "List configuration bundles",
-		Long:              "List configuration bundles",
+		Use:   "list",
+		Short: "List configuration bundles",
+		Long:  "List configuration bundles",
 		RunE: func(c *cobra.Command, args []string) error {
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
@@ -34,7 +34,6 @@ func listBundlesCommand() *cobra.Command {
 	command.Flags().StringVar(&ns, "ns", "arlon", "the arlon namespace")
 	return command
 }
-
 
 func listBundles(config *restclient.Config, ns string) error {
 	kubeClient := kubernetes.NewForConfigOrDie(config)
@@ -71,4 +70,3 @@ func listBundles(config *restclient.Config, ns string) error {
 	_ = w.Flush()
 	return nil
 }
-

@@ -232,11 +232,11 @@ spec:
 `
 
 type AppSettings struct {
-	AppName string
-	ClusterName string
-	RepoUrl string
-	RepoPath string
-	AppNamespace string
+	AppName              string
+	ClusterName          string
+	RepoUrl              string
+	RepoPath             string
+	AppNamespace         string
 	DestinationNamespace string
 }
 
@@ -257,12 +257,12 @@ func ProcessDynamicProfile(
 	}
 	mgmtPath := path.Join(repoPath, "mgmt")
 	app := AppSettings{
-		ClusterName: clusterName,
-		AppName: fmt.Sprintf("%s-profile-%s", clusterName, profileName),
-		AppNamespace: argocdNs,
+		ClusterName:          clusterName,
+		AppName:              fmt.Sprintf("%s-profile-%s", clusterName, profileName),
+		AppNamespace:         argocdNs,
 		DestinationNamespace: argocdNs,
-		RepoUrl: repoUrl,
-		RepoPath: mgmtPath,
+		RepoUrl:              repoUrl,
+		RepoPath:             mgmtPath,
 	}
 	dst, err := wt.Filesystem.Create(appPath)
 	if err != nil {
@@ -296,9 +296,9 @@ func ProcessBundles(
 	for _, b := range bundles {
 		bundleFileName := fmt.Sprintf("%s.yaml", b.Name)
 		app := AppSettings{
-			ClusterName: clusterName,
-			AppName: fmt.Sprintf("%s-%s", clusterName, b.Name),
-			AppNamespace: "argocd",
+			ClusterName:          clusterName,
+			AppName:              fmt.Sprintf("%s-%s", clusterName, b.Name),
+			AppNamespace:         "argocd",
 			DestinationNamespace: "default", // FIXME: make configurable
 		}
 		if b.Data == nil {
@@ -313,7 +313,7 @@ func ProcessBundles(
 		} else {
 			// inline bundle
 			dirPath := path.Join(workloadPath, b.Name)
-			err := wt.Filesystem.MkdirAll(dirPath, fs.ModeDir | 0700)
+			err := wt.Filesystem.MkdirAll(dirPath, fs.ModeDir|0700)
 			if err != nil {
 				return fmt.Errorf("failed to create directory in working tree: %s", err)
 			}
@@ -346,4 +346,3 @@ func ProcessBundles(
 }
 
 // -----------------------------------------------------------------------------
-

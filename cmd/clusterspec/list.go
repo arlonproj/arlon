@@ -14,14 +14,13 @@ import (
 	"text/tabwriter"
 )
 
-
 func listClusterspecsCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
 	var ns string
 	command := &cobra.Command{
-		Use:               "list",
-		Short:             "List configuration clusterspecs",
-		Long:              "List configuration clusterspecs",
+		Use:   "list",
+		Short: "List configuration clusterspecs",
+		Long:  "List configuration clusterspecs",
 		RunE: func(c *cobra.Command, args []string) error {
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
@@ -34,7 +33,6 @@ func listClusterspecsCommand() *cobra.Command {
 	command.Flags().StringVar(&ns, "ns", "arlon", "the arlon namespace")
 	return command
 }
-
 
 func listClusterspecs(config *restclient.Config, ns string) error {
 	kubeClient := kubernetes.NewForConfigOrDie(config)
@@ -67,4 +65,3 @@ func listClusterspecs(config *restclient.Config, ns string) error {
 	_ = w.Flush()
 	return nil
 }
-

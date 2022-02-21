@@ -15,4 +15,3 @@ func NewCommand() *cobra.Command {
 	command.AddCommand(createClusterspecCommand())
 	return command
 }
-

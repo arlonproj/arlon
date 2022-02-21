@@ -40,7 +40,7 @@ func Create(
 		},
 		Data: map[string][]byte{
 			"description": []byte(desc),
-			"tags": []byte(tags),
+			"tags":        []byte(tags),
 		},
 	}
 	if fromFile != "" && repoUrl != "" {
@@ -66,4 +66,3 @@ func Create(
 	}
 	return nil
 }
-

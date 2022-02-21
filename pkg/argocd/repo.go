@@ -13,7 +13,7 @@ import (
 )
 
 type RepoCreds struct {
-	Url string
+	Url      string
 	Username string
 	Password string
 }
@@ -43,10 +43,10 @@ func CloneRepo(
 		RemoteName:    gogit.DefaultRemoteName,
 		ReferenceName: branchRef,
 		SingleBranch:  true,
-		NoCheckout: false,
-		Progress:   nil,
-		Tags:       gogit.NoTags,
-		CABundle:   nil,
+		NoCheckout:    false,
+		Progress:      nil,
+		Tags:          gogit.NoTags,
+		CABundle:      nil,
 	})
 	if err != nil {
 		return nil, "", nil, fmt.Errorf("failed to clone repository: %s", err)
@@ -73,7 +73,7 @@ func getRepoCreds(
 	for _, repoSecret := range secrets.Items {
 		if strings.Compare(repoUrl, string(repoSecret.Data["url"])) == 0 {
 			creds = &RepoCreds{
-				Url: string(repoSecret.Data["url"]),
+				Url:      string(repoSecret.Data["url"]),
 				Username: string(repoSecret.Data["username"]),
 				Password: string(repoSecret.Data["password"]),
 			}

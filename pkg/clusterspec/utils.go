@@ -3,22 +3,22 @@ package clusterspec
 import "fmt"
 
 var (
-	ValidApiProviders = map[string]bool {
-		"capi": true,
+	ValidApiProviders = map[string]bool{
+		"capi":   true,
 		"xplane": true,
 	}
-	ValidCloudProviders = map[string]bool {
-		"aws": true,
-		"gcp": true,
+	ValidCloudProviders = map[string]bool{
+		"aws":   true,
+		"gcp":   true,
 		"azure": true,
 	}
-	ValidClusterTypesByCloud = map[string]map[string]bool {
-		"aws": {"kubeadm": true, "eks": true},
-		"gcp": {"kubeadm": true, "gke": true},
+	ValidClusterTypesByCloud = map[string]map[string]bool{
+		"aws":   {"kubeadm": true, "eks": true},
+		"gcp":   {"kubeadm": true, "gke": true},
 		"azure": {"kubeadm": true, "aks": true},
 	}
-	KubeconfigSecretKeyNameByApiProvider = map[string]string {
-		"capi": "value",
+	KubeconfigSecretKeyNameByApiProvider = map[string]string{
+		"capi":   "value",
 		"xplane": "kubeconfig",
 	}
 )
@@ -56,4 +56,3 @@ func ValidCloudProviderAndClusterType(cloudProvider string, clusterType string) 
 	}
 	return nil
 }
-

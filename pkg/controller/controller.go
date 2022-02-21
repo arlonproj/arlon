@@ -3,6 +3,7 @@ package controller
 import (
 	arlonv1 "arlon.io/arlon/api/v1"
 	"arlon.io/arlon/controllers"
+	"arlon.io/arlon/pkg/argocd"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -25,7 +26,8 @@ func init() {
 	//+kubebuilder:scaffold:scheme
 }
 
-func StartController(metricsAddr string, probeAddr string, enableLeaderElection bool) {
+func StartController(argocdConfigPath string, metricsAddr string, probeAddr string, enableLeaderElection bool) {
+	argocdClient := argocd.NewArgocdClientOrDie(argocdConfigPath)
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
 		MetricsBindAddress:     metricsAddr,
@@ -49,6 +51,7 @@ func StartController(metricsAddr string, probeAddr string, enableLeaderElection 
 	if err = (&controllers.ClusterRegistrationReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
+		ArgocdClient: argocdClient,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "ClusterRegistration")
 		os.Exit(1)
@@ -70,4 +73,3 @@ func StartController(metricsAddr string, probeAddr string, enableLeaderElection 
 		os.Exit(1)
 	}
 }
-

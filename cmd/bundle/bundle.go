@@ -6,7 +6,7 @@ func NewCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:               "bundle",
 		Short:             "Manage configuration bundles",
-		Long:             "Manage configuration bundles",
+		Long:              "Manage configuration bundles",
 		DisableAutoGenTag: true,
 		Run: func(c *cobra.Command, args []string) {
 		},
@@ -17,4 +17,3 @@ func NewCommand() *cobra.Command {
 	command.AddCommand(deleteBundleCommand())
 	return command
 }
-

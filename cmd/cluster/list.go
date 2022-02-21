@@ -28,7 +28,7 @@ func listClustersCommand() *cobra.Command {
 }
 
 func listClusters() {
-	conn, appIf := argocd.NewArgocdClientOrDie().NewApplicationClientOrDie()
+	conn, appIf := argocd.NewArgocdClientOrDie("").NewApplicationClientOrDie()
 	defer io.Close(conn)
 	apps, err := appIf.List(context.Background(),
 		&apppkg.ApplicationQuery{Selector: "managed-by=arlon,arlon-type=cluster"})

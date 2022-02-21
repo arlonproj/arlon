@@ -42,10 +42,10 @@ func Create(
 		},
 		Data: map[string]string{
 			"description": desc,
-			"bundles": bundles,
-			"tags": tags,
-			"repo-url": repoUrl,
-			"repo-path": repoPath,
+			"bundles":     bundles,
+			"tags":        tags,
+			"repo-url":    repoUrl,
+			"repo-path":   repoPath,
 			"repo-branch": repoBranch,
 		},
 	}
@@ -62,4 +62,3 @@ func Create(
 	}
 	return nil
 }
-

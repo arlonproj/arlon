@@ -1,6 +1,8 @@
-
+VERSION ?= 0.1.0
+REPO_SERVER ?= ghcr.io
+REPO_NAME ?= platform9-incubator
 # Image URL to use all building/pushing image targets
-IMG ?= controller:latest
+IMG ?= $(REPO_SERVER)/$(REPO_NAME)/arlon/controller:$(VERSION)
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
 
@@ -64,6 +66,9 @@ run: manifests generate fmt vet ## Run a controller from your host.
 	go run ./main.go
 
 docker-build: test ## Build docker image with the manager.
+	docker build -t ${IMG} .
+
+docker-build-notest:
 	docker build -t ${IMG} .
 
 docker-push: ## Push docker image with the manager.

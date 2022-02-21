@@ -19,10 +19,10 @@ func dumpBundleCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
 	var ns string
 	command := &cobra.Command{
-		Use:               "dump",
-		Short:             "Dump content of inline configuration bundle",
-		Long:              "Dump content of inline configuration bundle",
-		Args: cobra.ExactArgs(1),
+		Use:   "dump",
+		Short: "Dump content of inline configuration bundle",
+		Long:  "Dump content of inline configuration bundle",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
@@ -35,7 +35,6 @@ func dumpBundleCommand() *cobra.Command {
 	command.Flags().StringVar(&ns, "ns", "arlon", "the arlon namespace")
 	return command
 }
-
 
 func dumpBundle(config *restclient.Config, ns string, bundleName string) error {
 	kubeClient := kubernetes.NewForConfigOrDie(config)
@@ -60,4 +59,3 @@ func dumpBundle(config *restclient.Config, ns string, bundleName string) error {
 	}
 	return nil
 }
-

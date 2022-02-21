@@ -21,10 +21,10 @@ func createProfileCommand() *cobra.Command {
 	var repoBasePath string
 	var repoBranch string
 	command := &cobra.Command{
-		Use:               "create",
-		Short:             "Create profile",
-		Long:              "Create profile",
-		Args: cobra.ExactArgs(1),
+		Use:   "create",
+		Short: "Create profile",
+		Long:  "Create profile",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
@@ -47,5 +47,3 @@ func createProfileCommand() *cobra.Command {
 	command.MarkFlagRequired("bundles")
 	return command
 }
-
-

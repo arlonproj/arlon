@@ -22,10 +22,10 @@ func createClusterspecCommand() *cobra.Command {
 	var nodeType string
 	var nodeCount int
 	command := &cobra.Command{
-		Use:               "create",
-		Short:             "Create clusterspec",
-		Long:              "Create clusterspec",
-		Args: cobra.ExactArgs(1),
+		Use:   "create",
+		Short: "Create clusterspec",
+		Long:  "Create clusterspec",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
@@ -49,5 +49,3 @@ func createClusterspecCommand() *cobra.Command {
 	command.Flags().IntVar(&nodeCount, "nodecount", 2, "the number of nodes")
 	return command
 }
-
-

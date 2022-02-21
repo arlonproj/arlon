@@ -19,10 +19,10 @@ func updateProfileCommand() *cobra.Command {
 	var tags string
 	var clear bool
 	command := &cobra.Command{
-		Use:               "update",
-		Short:             "Update profile",
-		Long:              "Update profile",
-		Args: cobra.ExactArgs(1),
+		Use:   "update",
+		Short: "Update profile",
+		Long:  "Update profile",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
@@ -58,5 +58,3 @@ func updateProfileCommand() *cobra.Command {
 	command.Flags().BoolVar(&clear, "clear", false, "set the bundle list to the empty set")
 	return command
 }
-
-

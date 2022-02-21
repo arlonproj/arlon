@@ -17,4 +17,3 @@ func NewCommand() *cobra.Command {
 	command.AddCommand(updateProfileCommand())
 	return command
 }
-

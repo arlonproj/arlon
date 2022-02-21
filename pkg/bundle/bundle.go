@@ -14,10 +14,9 @@ type Bundle struct {
 	Name string
 	Data []byte
 	// The following are only set on reference type bundles
-	RepoUrl string
+	RepoUrl  string
 	RepoPath string
 }
-
 
 // -----------------------------------------------------------------------------
 
@@ -38,9 +37,9 @@ func GetBundlesFromProfile(
 			return nil, fmt.Errorf("failed to get bundle secret %s: %s", bundleName, err)
 		}
 		bundles = append(bundles, Bundle{
-			Name: bundleName,
-			Data: secr.Data["data"],
-			RepoUrl: string(secr.Annotations[common.RepoUrlAnnotationKey]),
+			Name:     bundleName,
+			Data:     secr.Data["data"],
+			RepoUrl:  string(secr.Annotations[common.RepoUrlAnnotationKey]),
 			RepoPath: string(secr.Annotations[common.RepoPathAnnotationKey]),
 		})
 	}

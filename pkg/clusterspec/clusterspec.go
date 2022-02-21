@@ -10,32 +10,32 @@ import (
 )
 
 type ClusterSpec struct {
-	Name string
-	ApiProvider string
-	CloudProvider string
-	Type string
+	Name              string
+	ApiProvider       string
+	CloudProvider     string
+	Type              string
 	KubernetesVersion string
-	NodeType string
-	NodeCount int
-	Region string
-	PodCidrBlock string
-	SshKeyName string
-	Tags string
-	Description string
+	NodeType          string
+	NodeCount         int
+	Region            string
+	PodCidrBlock      string
+	SshKeyName        string
+	Tags              string
+	Description       string
 }
 
 const (
-	ApiProviderKey = "apiProvider"
-	CloudProviderKey = "cloudProvider"
-	NodeTypeKey = "nodeType"
-	ClusterTypeKey = "type"
+	ApiProviderKey       = "apiProvider"
+	CloudProviderKey     = "cloudProvider"
+	NodeTypeKey          = "nodeType"
+	ClusterTypeKey       = "type"
 	KubernetesVersionKey = "kubernetesVersion"
-	NodeCountKey = "nodeCount"
-	RegionKey = "region"
-	PodCidrBlockKey = "podCidrBlock"
-	SshKeyNameKey = "sshKeyName"
-	TagsKey = "tags"
-	DescriptionKey = "description"
+	NodeCountKey         = "nodeCount"
+	RegionKey            = "region"
+	PodCidrBlockKey      = "podCidrBlock"
+	SshKeyNameKey        = "sshKeyName"
+	TagsKey              = "tags"
+	DescriptionKey       = "description"
 )
 
 var (
@@ -69,17 +69,17 @@ func Get(
 
 func FromConfigMap(cm *corev1.ConfigMap) (*ClusterSpec, error) {
 	cs := &ClusterSpec{
-		Name: cm.Name,
-		ApiProvider: cm.Data[ApiProviderKey],
-		CloudProvider: cm.Data[CloudProviderKey],
-		Type: cm.Data[ClusterTypeKey],
+		Name:              cm.Name,
+		ApiProvider:       cm.Data[ApiProviderKey],
+		CloudProvider:     cm.Data[CloudProviderKey],
+		Type:              cm.Data[ClusterTypeKey],
 		KubernetesVersion: cm.Data[KubernetesVersionKey],
-		NodeType: cm.Data[NodeTypeKey],
-		Region: cm.Data[RegionKey],
-		PodCidrBlock: cm.Data[PodCidrBlockKey],
-		SshKeyName: cm.Data[SshKeyNameKey],
-		Tags: cm.Data[TagsKey],
-		Description: cm.Data[DescriptionKey],
+		NodeType:          cm.Data[NodeTypeKey],
+		Region:            cm.Data[RegionKey],
+		PodCidrBlock:      cm.Data[PodCidrBlockKey],
+		SshKeyName:        cm.Data[SshKeyNameKey],
+		Tags:              cm.Data[TagsKey],
+		Description:       cm.Data[DescriptionKey],
 	}
 	var err error
 	cs.NodeCount, err = strconv.Atoi(cm.Data[NodeCountKey])
@@ -112,17 +112,17 @@ func ToConfigMap(
 			},
 		},
 		Data: map[string]string{
-			ApiProviderKey: apiProvider,
-			CloudProviderKey: cloudProvider,
-			ClusterTypeKey: clusterType,
+			ApiProviderKey:       apiProvider,
+			CloudProviderKey:     cloudProvider,
+			ClusterTypeKey:       clusterType,
 			KubernetesVersionKey: kubernetesVersion,
-			NodeTypeKey: nodeType,
-			NodeCountKey: strconv.Itoa(nodeCount),
-			RegionKey: region,
-			PodCidrBlockKey: podCidrBlock,
-			SshKeyNameKey: sshKeyName,
-			TagsKey: tags,
-			DescriptionKey: description,
+			NodeTypeKey:          nodeType,
+			NodeCountKey:         strconv.Itoa(nodeCount),
+			RegionKey:            region,
+			PodCidrBlockKey:      podCidrBlock,
+			SshKeyNameKey:        sshKeyName,
+			TagsKey:              tags,
+			DescriptionKey:       description,
 		},
 	}
 }

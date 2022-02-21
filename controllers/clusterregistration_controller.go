@@ -18,7 +18,6 @@ package controllers
 
 import (
 	arlonv1 "arlon.io/arlon/api/v1"
-	"arlon.io/arlon/pkg/argocd"
 	"context"
 	"fmt"
 	cmdutil "github.com/argoproj/argo-cd/v2/cmd/util"
@@ -42,12 +41,11 @@ import (
 	"time"
 )
 
-var argocdclient apiclient.Client
-
 // ClusterRegistrationReconciler reconciles a ClusterRegistration object
 type ClusterRegistrationReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	ArgocdClient apiclient.Client
 }
 
 //+kubebuilder:rbac:groups=arlon.io,resources=clusterregistrations,verbs=get;list;watch;create;update;patch;delete
@@ -84,7 +82,7 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 	}
 	if !cr.ObjectMeta.DeletionTimestamp.IsZero() {
 		// Handle deletion reconciliation loop.
-		return reconcileDelete(ctx, log, &cr, patchHelper)
+		return reconcileDelete(r.ArgocdClient, ctx, log, &cr, patchHelper)
 	}
 	if cr.Status.State == "complete" {
 		log.V(1).Info("clusterregistration is already complete")
@@ -110,7 +108,7 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 		}
 		return ctrl.Result{}, nil
 	}
-	conn, clusterIf := argocdclient.NewClusterClientOrDie()
+	conn, clusterIf := r.ArgocdClient.NewClusterClientOrDie()
 	defer io.Close(conn)
 	clquery := cluster.ClusterQuery{Name: cr.Spec.ClusterName}
 
@@ -187,7 +185,7 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 			fmt.Sprintf("failed to add cluster to argocd: '%s' ... retrying in 10 secs", err),
 			ctrl.Result{RequeueAfter: time.Second * 10})
 	}
-	return updateState(r, log, &cr, "complete","successfully added cluster to argocd", ctrl.Result{})
+	return updateState(r, log, &cr, "complete", "successfully added cluster to argocd", ctrl.Result{})
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -197,14 +195,10 @@ func (r *ClusterRegistrationReconciler) SetupWithManager(mgr ctrl.Manager) error
 		Complete(r)
 }
 
-func init() {
-	argocdclient = argocd.NewArgocdClientOrDie()
-}
-
 func updateState(
 	r *ClusterRegistrationReconciler,
 	log logr.Logger,
-	cr * arlonv1.ClusterRegistration,
+	cr *arlonv1.ClusterRegistration,
 	state string,
 	msg string,
 	result ctrl.Result,
@@ -220,6 +214,7 @@ func updateState(
 }
 
 func reconcileDelete(
+	argocdclient apiclient.Client,
 	ctx context.Context,
 	log logr.Logger,
 	cr *arlonv1.ClusterRegistration,
@@ -230,7 +225,7 @@ func reconcileDelete(
 	clquery := cluster.ClusterQuery{Name: cr.Spec.ClusterName}
 	log.Info(fmt.Sprintf("reconciling deletion of clusterregistration '%s' with cluster name '%s'",
 		cr.Name, cr.Spec.ClusterName))
-	clust, err := clusterIf.Get(ctx, &clquery);
+	clust, err := clusterIf.Get(ctx, &clquery)
 	if err != nil {
 		log.Info(fmt.Sprintf("cluster '%s' does not exist or could not be queried (%s) -- ignoring",
 			cr.Spec.ClusterName, err))

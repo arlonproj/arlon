@@ -16,10 +16,10 @@ func deleteProfileCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
 	var ns string
 	command := &cobra.Command{
-		Use:               "delete",
-		Short:             "Delete profile",
-		Long:              "Delete profile",
-		Args: cobra.ExactArgs(1),
+		Use:   "delete",
+		Short: "Delete profile",
+		Long:  "Delete profile",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
@@ -33,7 +33,6 @@ func deleteProfileCommand() *cobra.Command {
 	return command
 }
 
-
 func deleteProfile(config *restclient.Config, ns string, profileName string) error {
 	kubeClient := kubernetes.NewForConfigOrDie(config)
 	corev1 := kubeClient.CoreV1()
@@ -44,5 +43,3 @@ func deleteProfile(config *restclient.Config, ns string, profileName string) err
 	}
 	return nil
 }
-
-

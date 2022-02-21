@@ -18,9 +18,9 @@ func listProfilesCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
 	var ns string
 	command := &cobra.Command{
-		Use:               "list",
-		Short:             "List configuration profiles",
-		Long:              "List configuration profiles",
+		Use:   "list",
+		Short: "List configuration profiles",
+		Long:  "List configuration profiles",
 		RunE: func(c *cobra.Command, args []string) error {
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
@@ -33,7 +33,6 @@ func listProfilesCommand() *cobra.Command {
 	command.Flags().StringVar(&ns, "ns", "arlon", "the arlon namespace")
 	return command
 }
-
 
 func listProfiles(config *restclient.Config, ns string) error {
 	kubeClient := kubernetes.NewForConfigOrDie(config)
@@ -72,4 +71,3 @@ func listProfiles(config *restclient.Config, ns string) error {
 	_ = w.Flush()
 	return nil
 }
-
