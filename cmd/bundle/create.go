@@ -34,8 +34,8 @@ func createBundleCommand() *cobra.Command {
 	}
 	clientConfig = cli.AddKubectlFlagsToCmd(command)
 	command.Flags().StringVar(&ns, "ns", "arlon", "the arlon namespace")
-	command.Flags().StringVar(&fromFile, "from-file", "", "create inline bundle from this file")
-	command.Flags().StringVar(&repoUrl, "repo-url", "", "create a reference bundle from this repo URL")
+	command.Flags().StringVar(&fromFile, "from-file", "", "create static bundle from this file")
+	command.Flags().StringVar(&repoUrl, "repo-url", "", "create a dynamic bundle from this repo URL")
 	command.Flags().StringVar(&repoPath, "repo-path", "", "optional path in repo specified by --from-repo")
 	command.Flags().StringVar(&desc, "desc", "", "description")
 	command.Flags().StringVar(&tags, "tags", "", "comma separated list of tags")

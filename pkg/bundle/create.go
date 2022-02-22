@@ -51,10 +51,10 @@ func Create(
 		if err != nil {
 			return fmt.Errorf("failed to read file: %s", err)
 		}
-		secr.Labels["bundle-type"] = "inline"
+		secr.Labels["bundle-type"] = "static"
 		secr.Data["data"] = data
 	} else if repoUrl != "" {
-		secr.Labels["bundle-type"] = "reference"
+		secr.Labels["bundle-type"] = "dynamic"
 		secr.ObjectMeta.Annotations[common.RepoUrlAnnotationKey] = repoUrl
 		secr.ObjectMeta.Annotations[common.RepoPathAnnotationKey] = repoPath
 	} else {

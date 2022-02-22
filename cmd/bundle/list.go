@@ -59,7 +59,7 @@ func listBundles(config *restclient.Config, ns string) error {
 		}
 		repoUrl := secret.Annotations[common.RepoUrlAnnotationKey]
 		repoPath := secret.Annotations[common.RepoPathAnnotationKey]
-		if bundleType != "reference" {
+		if bundleType != "dynamic" {
 			repoUrl = "(N/A)"
 			repoPath = "(N/A)"
 		}

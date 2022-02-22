@@ -13,7 +13,7 @@ import (
 type Bundle struct {
 	Name string
 	Data []byte
-	// The following are only set on reference type bundles
+	// The following are only set on dynamic bundles
 	RepoUrl  string
 	RepoPath string
 }

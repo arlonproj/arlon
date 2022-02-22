@@ -20,8 +20,8 @@ func dumpBundleCommand() *cobra.Command {
 	var ns string
 	command := &cobra.Command{
 		Use:   "dump",
-		Short: "Dump content of inline configuration bundle",
-		Long:  "Dump content of inline configuration bundle",
+		Short: "Dump content of static configuration bundle",
+		Long:  "Dump content of static configuration bundle",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			config, err := clientConfig.ClientConfig()
@@ -47,8 +47,8 @@ func dumpBundle(config *restclient.Config, ns string, bundleName string) error {
 	if secret.Labels["arlon-type"] != "config-bundle" {
 		return fmt.Errorf("secret is missing expected label")
 	}
-	if secret.Labels["bundle-type"] != "inline" {
-		return fmt.Errorf("bundle is not of inline type")
+	if secret.Labels["bundle-type"] != "static" {
+		return fmt.Errorf("bundle is not of static type")
 	}
 	if secret.Data["data"] == nil {
 		return fmt.Errorf("bundle has no data")

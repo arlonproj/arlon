@@ -16,8 +16,8 @@ produce a set of Kubernetes manifests via a *tool*. This closely follows ArgoCD'
 definition of *tool types*. Consequently, the list of supported bundle
 types mirrors ArgoCD's supported set of manifest-producing tools.
 Each bundle is defined using a Kubernetes ConfigMap resource in the arlo namespace.
-Additionally, a bundle can embed the data itself ("inline"), or contain a reference
-to the data ("ref"). A reference can be a URL, github location, or Helm repo location.
+Additionally, a bundle can embed the data itself ("static bundle"), or contain a reference
+to the data ("dynamic bundle"). A reference can be a URL, github location, or Helm repo location.
 The current list of supported bundle types is:
 
 * manifest_inline: a single manifest yaml file embedded in the resource

@@ -304,14 +304,14 @@ func ProcessBundles(
 		if b.Data == nil {
 			// reference type b
 			if b.RepoUrl == "" {
-				return fmt.Errorf("b %s is neither inline nor reference type", b.Name)
+				return fmt.Errorf("b %s is neither static nor dynamic type", b.Name)
 			}
 			app.RepoUrl = b.RepoUrl
 			app.RepoPath = b.RepoPath
 		} else if b.RepoUrl != "" {
 			return fmt.Errorf("b %s has both data and repoUrl set", b.Name)
 		} else {
-			// inline bundle
+			// static bundle
 			dirPath := path.Join(workloadPath, b.Name)
 			err := wt.Filesystem.MkdirAll(dirPath, fs.ModeDir|0700)
 			if err != nil {
@@ -325,7 +325,7 @@ func ProcessBundles(
 			_, err = io.Copy(dst, bytes.NewReader(b.Data))
 			_ = dst.Close()
 			if err != nil {
-				return fmt.Errorf("failed to copy inline b %s: %s", b.Name, err)
+				return fmt.Errorf("failed to copy static b %s: %s", b.Name, err)
 			}
 			app.RepoUrl = repoUrl
 			app.RepoPath = path.Join(workloadPath, b.Name)
