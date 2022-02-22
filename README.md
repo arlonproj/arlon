@@ -14,7 +14,7 @@ e.g. Kubernetes version, cloud provider, cluster type, node instance type.
 - *Profile*: a grouping of configuration bundles which will be installed into the cluster
 - *Configuration bundle*: a unit of configuration which contains (or references) one or
 more Kubernetes manifests. A bundle can encapsulate anything that can be deployed onto a cluster:
-an RBAC ruleset, an add-on, an applications, etc... 
+an RBAC ruleset, an add-on, an application, etc... 
 
 # Architecture
 
@@ -35,7 +35,7 @@ needed by Arlon, including:
 The user is responsible for supplying the management cluster, and to have
 a access to a kubeconfig granting administrator permissions on the cluster.
 
-##Controller
+## Controller
 
 The Arlon controller observes and responds to changes in `clusterregistration`
 custom resources. The Arlon library creates a `clusterregistration` at the
@@ -44,14 +44,14 @@ causing the controller to wait for the cluster's kubeconfig
 to become available, at which point it registers the cluster with ArgoCD to
 enable manifests described by bundles to be deployed to the cluster.
 
-##Library
+## Library
 The Arlon library is a Go module that contains the functions that communicate
 with the Management Cluster to manipulate the Arlon state (bundles, profiles, clusterspecs)
 and transforms them into git directory structures to drive ArgoCD's gitops engine. Initially, the
 library is exposed via a CLI utility. In the future, it may also be encapsulated
 into the 
 
-##Workspace repository
+## Workspace repository
 As mentioned earlier, Arlon creates and maintains directory structures in a git
 repository to drive ArgoCD. The user is responsible for supplying the git repository
 (and base paths) hosting those structures.
