@@ -61,6 +61,17 @@ register the workspace registry in ArgoCD before referencing it from Arlon data 
 
 # Concepts
 
+## Cluster spec
+
+A cluster spec contains desired settings when creating a new cluster.
+They currently include:
+- API Provider: the cluster orchestration technology. Supported values are `CAPI` (Cluster API) and `xplane` (Crossplane)
+- Cloud Provider: the infrastructure cloud provider. The currently supported values is `aws`, with `gcp` and `azure` support coming later.
+- Type: the cluster type. Some API providers support more than one type. On `aws` cloud, Cluster API supports `kubeadm` and `eks`, whereas Crossplane only supports `eks`.
+- The (worker) node instance type
+- The initial (worker) node count
+- The Kubernetes version
+
 ## Configuration bundle
 
 A configuration bundle (or just "bundle") is grouping of data files that
@@ -88,23 +99,12 @@ A bundle can also have a comma-separated list of tags, and a description.
 Tags can be useful for classifying bundles, for e.g. by type
 ("addon", "cni", "rbac", "app").
 
-## Cluster specification
-
-A cluster specification contains desired settings when creating a new cluster.
-They currently include:
-- API Provider: the cluster orchestration technology. Supported values are `CAPI` (Cluster API) and `xplane` (Crossplane)
-- Cloud Provider: the infrastructure cloud provider. The currently supported values is `aws`, with `gcp` and `azure` support coming later.
-- Type: the cluster type. Some API providers support more than one type. On `aws` cloud, Cluster API supports `kubeadm` and `eks`, whereas Crossplane only supports `eks`.
-- The (worker) node instance type
-- The initial (worker) node count
-- The Kubernetes version
-
 ## Profile
 
 A profile expresses a desired configuration for a Kubernetes cluster.
 It is just a set of references to bundles (static, dynamic, or a combination).
 
-A profile can be static or dynamic. When a cluster consumes at static profile
+A profile can be static or dynamic. When a cluster consumes a static profile
 at creation time, the set of bundles for the cluster is fixed at that time
 and does not change over time even when the static bundle is updated.
 (Note: the contents of some of those bundles referenced by the static
@@ -120,6 +120,12 @@ When a user updates the composition of a dynamic profile, meaning redefines its
 bundle set, the Arlon library updates the compiled component. Any cluster
 consuming that dynamic profile will be affected by the change, meaning it may lose
 or acquire new bundles in real time.
+
+# Tutorial
+
+(Under construction)
+
+# Implementation details
 
 ## Cluster chart
 
