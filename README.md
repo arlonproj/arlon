@@ -48,8 +48,8 @@ enable manifests described by bundles to be deployed to the cluster.
 The Arlon library is a Go module that contains the functions that communicate
 with the Management Cluster to manipulate the Arlon state (bundles, profiles, clusterspecs)
 and transforms them into git directory structures to drive ArgoCD's gitops engine. Initially, the
-library is exposed via a CLI utility. In the future, it may also be encapsulated
-into the 
+library is exposed via a CLI utility. In the future, it may also be embodied
+into a server an exposed via a network API.
 
 ## Workspace repository
 As mentioned earlier, Arlon creates and maintains directory structures in a git
