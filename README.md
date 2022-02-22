@@ -23,7 +23,7 @@ functions as commands. In the future, an API server may be built from
 the library as well. 
 
 ## Management cluster
-The management server is a Kubernetes cluster hosting all the components
+The management cluster is a Kubernetes cluster hosting all the components
 needed by Arlon, including:
 - The ArgoCD server
 - The Arlon "database" (implemented as Kubernetes secrets and configmaps)
@@ -53,8 +53,11 @@ into a server an exposed via a network API.
 
 ## Workspace repository
 As mentioned earlier, Arlon creates and maintains directory structures in a git
-repository to drive ArgoCD. The user is responsible for supplying the git repository
-(and base paths) hosting those structures.
+repository to drive ArgoCD *sync* operations.
+The user is responsible for supplying
+this *workspace repository* (and base paths) hosting those structures.
+Arlon relies on ArgoCD for repository registration, therefore the user should
+register the workspace registry in ArgoCD before referencing it from Arlon data types.
 
 # Concepts
 
@@ -65,52 +68,58 @@ produce a set of Kubernetes manifests via a *tool*. This closely follows ArgoCD'
 definition of *tool types*. Consequently, the list of supported bundle
 types mirrors ArgoCD's supported set of manifest-producing tools.
 Each bundle is defined using a Kubernetes ConfigMap resource in the arlon namespace.
-Additionally, a bundle can embed the data itself ("static bundle"), or contain a reference
-to the data ("dynamic bundle"). A reference can be a URL, github location, or Helm repo location.
-The current list of supported bundle types is:
+A bundle can embed the manifest data itself ("static bundle"), or contain a reference
+to the data stored in git ("dynamic bundle"). A dynamic bundle is distinguished
+by having these fields set to non-empty values:
+- git URL of the repo
+- Directory path within the repo
 
-* manifest_static: a single manifest yaml file embedded in the resource
-* manifest_dynamic: a reference to a single manifest yaml file
-* dir_static: an embedded tarball that expands to a directory of YAML files
-* helm_static: an embedded Helm chart package
-* helm_dynamic: an external reference to a Helm chart
+The git URL must be registered in ArgoCD as a valid repository. The content of
+the specified directory can contain manifests in any of the *tool* formats supported
+by ArgoCD, including plain YAML, Helm and Kustomize.
 
-### Bundle purpose
+When a dynamic bundle is updated in git, all clusters consuming that bundle
+(through a profile specified at cluster creation time) will acquire the change.
+In contrast, a cluster consuming a static bundle will always have a snapshot copy of
+the bundle at the time the cluster was created, and is not affected by subsequent
+changes to the bundle.
 
-Bundles can specify an optional *purpose* to help classify and organize them.
-In the future, Arlon may order bundle installation by purpose order (for e.g.
-install bundles with purpose=*networking* before others) but that is not the
-case today. The currenty *suggested* purpose values are:
-- networking
-- add-on
-- data-service
-- application
-
+A bundle can also have a comma-separated list of tags, and a description.
+Tags can be useful for classifying bundles, for e.g. by type
+("addon", "cni", "rbac", "app").
 
 ## Cluster specification
 
 A cluster specification contains desired settings when creating a new cluster.
 They currently include:
-- Stack: the cluster provisioning stack, for e.g. *cluster-api* or *crossplane*
-- Provider: the specific cluster management provider under that stack,
-  if applicable. Example:
-  for *cluster-api*, the possible values are *eks* and *kubeadm*
-- Other settings that specify the "shape" of the cluster, such as the size of
-  the control plane and the initial number of nodes of the data plane.
-- The pod networking technology (under discussion: this may be moved to a
-  bundle because most if not all CNI providers can be installed as manifests)
+- API Provider: the cluster orchestration technology. Supported values are `CAPI` (Cluster API) and `xplane` (Crossplane)
+- Cloud Provider: the infrastructure cloud provider. The currently supported values is `aws`, with `gcp` and `azure` support coming later.
+- Type: the cluster type. Some API providers support more than one type. On `aws` cloud, Cluster API supports `kubeadm` and `eks`, whereas Crossplane only supports `eks`.
+- The (worker) node instance type
+- The initial (worker) node count
+- The Kubernetes version
 
 ## Profile
 
 A profile expresses a desired configuration for a Kubernetes cluster.
-It is composed of
-- An optional Cluster Specification. If specified, it allows the profile
-  to be used to create new clusters.
-  If absent, the profile can only be applied to existing clusters.
-- A list of bundles specifying the configuration to apply onto the cluster
-  once it is operational
-- An optional list of `value.yaml` settings for any Helm Chart type bundle
-  in the bundle list
+It is just a set of references to bundles (static, dynamic, or a combination).
+
+A profile can be static or dynamic. When a cluster consumes at static profile
+at creation time, the set of bundles for the cluster is fixed at that time
+and does not change over time even when the static bundle is updated.
+(Note: the contents of some of those bundles referenced by the static
+profile may however change over time if they are dynamic).
+A static profile is stored as an item
+in the Arlon database (specifically, as a configmap in the Management Cluster).
+
+A dynamic profile, on the other hand, has two components: the specification
+stored in the Arlon database, and a *compiled* component living in a git
+repo+path specified by the user. The compiled component is essentially a
+Helm chart of multiple ArgoCD app resources, each one pointing to a bundle.
+When a user updates the composition of a dynamic profile, meaning redefines its
+bundle set, the Arlon library updates the compiled component. Any cluster
+consuming that dynamic profile will be affected by the change, meaning it may lose
+or acquire new bundles in real time.
 
 ## Cluster chart
 
@@ -126,7 +135,7 @@ Here is a summary of the kinds of resources generated and deployed by the chart:
 - A unique namespace with a name based on the cluster's name. All subsequent
   resources below are created inside of that namespace.
 - The stack-specific resources to create the cluster (for e.g. Cluster API resources)
-- A ClusterRegistration to automatically register the cluster with ArgoCD
+- A `clusterregistration` to automatically register the cluster with ArgoCD
 - A GitRepoDir to automatically create a git repo and/or directory to host a copy
   of the expanded bundles. Every bundle referenced by the profile is
   copied/unpacked into its own subdirectory.
