@@ -16,6 +16,5 @@ func NewArgocdClientOrDie(argocdConfigPath string) apiclient.Client {
 	}
 	var argocdCliOpts apiclient.ClientOptions
 	argocdCliOpts.ConfigPath = argocdConfigPath
-	fmt.Println("Using", argocdConfigPath)
 	return argocdclient.NewClientOrDie(&argocdCliOpts)
 }
