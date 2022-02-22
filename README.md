@@ -1,26 +1,62 @@
 # Arlon
-A companion to ArgoCD for managing both kubernetes cluster lifecycle and configuration in a declarative & gitops way.
+
+Arlon is a lifecycle management and configuration tool for Kubernetes clusters.
+It allows an administrator to compose, deploy and configure a large number of
+*workload clusters* in a structured, predictable way.
+Arlon takes advantage of multiple declarative cluster management API providers for the
+actual cluster orchestration: the first two supported API providers are
+Cluster API and Crossplane.
+Arlon uses ArgoCD as the underlying Kubernetes manifest deployment
+and enforcement engine.
+A workload cluster is composed from the following constructs:
+- *Cluster spec*: a description of the infrastructure and external settings of a cluster,
+e.g. Kubernetes version, cloud provider, cluster type, node instance type.
+- *Profile*: a grouping of configuration bundles which will be installed into the cluster
+- *Configuration bundle*: a unit of configuration which contains (or references) one or
+more Kubernetes manifests. A bundle can encapsulate anything that can be deployed onto a cluster:
+an RBAC ruleset, an add-on, an applications, etc... 
 
 # Architecture
 
-Arlon introduces a few controllers and custom resources.
-
-![architecture](./docs/architecture_diagram.png)
-
-* A ClusterWatch resource causes another resource representing a target Kubernetes cluster provisioned by an external system like Cluster API or Crossplane to be observed.
-* When the target cluster becomes ready, a ClusterRegistration containing the cluster's information and access credentials is created.
-* The arlon controller uses the information in ClusterRegistration to add the cluster to ArgoCD, then sets the resource's state to **complete**.
-
-# Concepts
+Arlon is composed of a controller, a library, and a CLI that exposes the library's
+functions as commands. In the future, an API server may be built from
+the library as well. 
 
 ## Management cluster
+The management server is a Kubernetes cluster hosting all the components
+needed by Arlon, including:
+- The ArgoCD server
+- The Arlon "database" (implemented as Kubernetes secrets and configmaps)
+- The Arlon controller
+- Cluster management API providers: Cluster API or Crossplane
+- Custom resources (CRs) that drive the involved providers and controllers
+- Custom resource definitions (CRDs) for all of the involved CRs
 
-This kubernetes cluster hosts the following components:
-- ArgoCD
-- Arlon
-- Cluster management stacks e.g. Cluster API and/or Crossplane
+The user is responsible for supplying the management cluster, and to have
+a access to a kubeconfig granting administrator permissions on the cluster.
 
-The Arlon state and controllers reside in the arlon namespace.
+##Controller
+
+The Arlon controller observes and responds to changes in `clusterregistration`
+custom resources. The Arlon library creates a `clusterregistration` at the
+beginning of workload cluster creation,
+causing the controller to wait for the cluster's kubeconfig
+to become available, at which point it registers the cluster with ArgoCD to
+enable manifests described by bundles to be deployed to the cluster.
+
+##Library
+The Arlon library is a Go module that contains the functions that communicate
+with the Management Cluster to manipulate the Arlon state (bundles, profiles, clusterspecs)
+and transforms them into git directory structures to drive ArgoCD's gitops engine. Initially, the
+library is exposed via a CLI utility. In the future, it may also be encapsulated
+into the 
+
+##Workspace repository
+As mentioned earlier, Arlon creates and maintains directory structures in a git
+repository to drive ArgoCD. The user is responsible for supplying the git repository
+(and base paths) hosting those structures.
+
+# Concepts
 
 ## Configuration bundle
 
