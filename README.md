@@ -256,7 +256,7 @@ $ arlon clusterspec list
 NAME                APIPROV  CLOUDPROV  TYPE     KUBEVERSION  NODETYPE   NODECOUNT  TAGS          DESCRIPTION
 capi-eks-2node      capi     aws        eks      v1.18.16     t2.large   2          staging       2 node eks for general purpose
 capi-kubeadm-3node  capi     aws        kubeadm  v1.18.16     t2.medium  3          devel,test    3 node kubeadm for dev/test
-xplane-eks-3node    xplane     aws        eks      v1.18.16     t2.small   4          experimental  4 node eks managed by crossplane
+xplane-eks-3node    xplane   aws        eks      v1.18.16     t2.small   4          experimental  4 node eks managed by crossplane
 ```
 
 # Implementation details
