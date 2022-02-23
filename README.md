@@ -225,7 +225,7 @@ as reference, complete these steps:
 - [Install the platform configuration](https://github.com/upbound/platform-ref-aws#install-the-platform-configuration)
 - [Configure the cloud provider credentials](https://github.com/upbound/platform-ref-aws#configure-providers-in-your-platform)
 
-You do not go any further, but you're welcome to try the Network Fabric example.
+You do not need to go any further, but you're welcome to try the Network Fabric example.
 
 FYI: *we noticed the dozens/hundreds of CRDs that Crossplane installs in the management
 cluster can noticeably slow down kubectl, and you may see a warning that looks like*:
