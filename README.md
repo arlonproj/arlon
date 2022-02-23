@@ -143,7 +143,7 @@ the workspace repository.
 
 (Under construction)
 
-# Setup & Tutorial
+# Installation
 
 We plan to add a CLI command to simplify initial setup. Until then, please
 follow these manual instructions.
@@ -189,6 +189,46 @@ kind: ConfigMap
 - Create the `clusterregistrations` CRD: `kubectl apply -f config/crd/bases/arlon.io_clusterregistrations.yaml`
 - Deploy the controller: `kubectl apply -f deploy/manifests/`
 - Ensure the controller eventually enters the Running state: `watch kubectl -n arlon get pod`
+
+## Arlon CLI
+- From the top directory, run `make build`
+- Optionally create a symlink from a directory
+  (e.g. `/usr/local/bin`) included in your ${PATH} to the `bin/arlon` binary
+  to make it easy to invoke the command.
+
+## Cluster orchestration API providers
+
+Arlon currently supports Cluster API on AWS cloud. It also has experimental
+support for Crossplane on AWS.
+
+### Cluster API
+Using the [Cluster API Quickstart Guide](https://cluster-api.sigs.k8s.io/user/quick-start.html)
+as reference, complete these steps:
+- Install `clusterctl`
+- Initialize the management cluster.
+  In particular, follow instructions for your specific cloud provider (AWS in this example)
+  Ensure `clusterctl init` completes successfully and produces the expected output.
+
+### Crossplane (experimental)
+
+Using the [Upbound AWS Reference Platform Quickstart Guide](https://github.com/upbound/platform-ref-aws#quick-start)
+as reference, complete these steps:
+- [Install UXP on your management cluster](https://github.com/upbound/platform-ref-aws#installing-uxp-on-a-kubernetes-cluster)
+- [Install Crossplane kubectl extension](https://github.com/upbound/platform-ref-aws#install-the-crossplane-kubectl-extension-for-convenience)
+- [Install the platform configuration](https://github.com/upbound/platform-ref-aws#install-the-platform-configuration)
+- [Configure the cloud provider credentials](https://github.com/upbound/platform-ref-aws#configure-providers-in-your-platform)
+
+You do not go any further, but you're welcome to try the Network Fabric example.
+
+FYI: *we noticed the dozens/hundreds of CRDs that Crossplane installs in the management
+cluster can noticeably slow down kubectl, and you may see a warning that looks like*:
+```
+I0222 17:31:14.112689   27922 request.go:668] Waited for 1.046146023s due to client-side throttling, not priority and fairness, request: GET:https://AA61XXXXXXXXXXX.gr7.us-west-2.eks.amazonaws.com/apis/servicediscovery.aws.crossplane.io/v1alpha1?timeout=32s
+``` 
+
+# Tutorial
+
+(under construction)
 
 # Implementation details
 

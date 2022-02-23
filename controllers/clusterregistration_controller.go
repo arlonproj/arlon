@@ -44,7 +44,7 @@ import (
 // ClusterRegistrationReconciler reconciles a ClusterRegistration object
 type ClusterRegistrationReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme       *runtime.Scheme
 	ArgocdClient apiclient.Client
 }
 

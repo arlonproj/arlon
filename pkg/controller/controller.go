@@ -49,8 +49,8 @@ func StartController(argocdConfigPath string, metricsAddr string, probeAddr stri
 	}
 
 	if err = (&controllers.ClusterRegistrationReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:       mgr.GetClient(),
+		Scheme:       mgr.GetScheme(),
 		ArgocdClient: argocdClient,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "ClusterRegistration")
