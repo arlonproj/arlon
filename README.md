@@ -145,6 +145,9 @@ the workspace repository.
 
 # Setup & Tutorial
 
+We plan to add a CLI command to simplify initial setup. Until then, please
+follow these manual instructions.
+
 ## Management cluster
 
 You can use any Kubernetes cluster that you have admin access to. Ensure:
@@ -154,16 +157,15 @@ You can use any Kubernetes cluster that you have admin access to. Ensure:
 ## ArgoCD
 
 - Follow steps 1-4 of the [ArgoCD installation guide](https://argo-cd.readthedocs.io/en/stable/getting_started/) to install ArgoCD onto your management cluster.
-After this step, you should be logged in as `admin` and a config file was created at `$(HOME)/.argocd/config`
-- Create your workspace repository in your git provider if necessary, then register it:
+After this step, you should be logged in as `admin` and a config file was created at `${HOME}/.argocd/config`
+- Create your workspace repository in your git provider if necessary, then register it.
   Example: `argocd repo add https://github.com/myname/arlon --username myname --password secret`.
   Note: type `argocd repo add --help` to see all available options.
 - [Create a local user](https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/) named `arlon` with the `apiKey` capability.
   This involves editing the `argocd-cm` ConfigMap using `kubectl`.
 - Adjust the RBAC settings to grant admin permissions to the `arlon` user.
-  This involves ensuring the `argocd-rbac-cm` ConfigMap contains the entry
-  `g, arlon, role:admin`
-  under the `policy.csv` section. Example:
+  This involves editing the `argocd-rbac-cm` ConfigMap to add the entry
+  `g, arlon, role:admin` under the `policy.csv` section. Example:
 ```
 apiVersion: v1
 data:
@@ -174,19 +176,20 @@ kind: ConfigMap
 ```
 - Generate an account token: `argocd account generate-token --account arlon`
 - Make a temporary copy of the config file: `cp ${HOME}/.argocd/config /tmp` then
-  edit it to replace the value of `auth-token` property with the token from
+  edit it to replace the value of `auth-token` with the token from
   the previous step. Save changes. This file will be used to configure the Arlon
-  controller's credentials to log into ArgoCD.
+  controller's ArgoCD credentials during the next steps.
 
 ## Arlon controller
 - Create the arlon namespace: `kubectl create ns arlon`
-- Create the secret holding ArgoCD credentials from the temporary config file:
+- Create the ArgoCD credentials secret from the temporary config file:
   `kubectl -n arlon create secret generic argocd-creds --from-file /tmp/config`
+- Delete the temporary config file
 - Clone the arlon git repo and cd to its top directory
-- Create the CRD: `kubectl apply -f config/crd/bases/arlon.io_clusterregistrations.yaml`
+- Create the `clusterregistrations` CRD: `kubectl apply -f config/crd/bases/arlon.io_clusterregistrations.yaml`
 - Deploy the controller: `kubectl apply -f deploy/manifests/`
-- Ensure the controller is running by repeatedly typing: `kubectl -n arlon get pod`
-  until the pod state enters the Running state.
+- Ensure the controller eventually enters the Running state: `watch kubectl -n arlon get pod`
+
 # Implementation details
 
 
