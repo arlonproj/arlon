@@ -29,10 +29,10 @@ func Create(
 	}
 	_, err := Get(kubeClient, arlonNs, specName)
 	if err == nil {
-		return fmt.Errorf("a profile with that name already exists")
+		return fmt.Errorf("a clusterspec with that name already exists")
 	}
 	if !apierr.IsNotFound(err) {
-		return fmt.Errorf("failed to check for existence of profile: %s", err)
+		return fmt.Errorf("failed to check for existence of clusterspec: %s", err)
 	}
 	cm := ToConfigMap(specName, apiProvider, cloudProvider, clusterType,
 		kubernetesVersion, nodeType, nodeCount, "", "", "",
