@@ -235,7 +235,29 @@ I0222 17:31:14.112689   27922 request.go:668] Waited for 1.046146023s due to cli
 
 # Tutorial
 
-(under construction)
+This assumes that you plan to deploy workload clusters on AWS cloud, with
+Cluster API ("CAPI") as the cluster orchestration API provider.
+
+## Cluster specs
+
+We first create a few cluster specs with different combinations of API providers
+and cluster types (kubeadm vs EKS).
+One of the cluster specs is for an unconfigured API provider (Crossplane);
+this is for illustrative purposes, since we will not use it in this tutorial.
+
+```
+arlon clusterspec create capi-kubeadm-3node --api capi --cloud aws --type kubeadm --kubeversion v1.18.16 --nodecount 3 --nodetype t2.medium --tags devel,test --desc "3 node kubeadm for dev/test"
+arlon clusterspec create capi-eks-2node --api capi --cloud aws --type eks --kubeversion v1.18.16 --nodecount 2 --nodetype t2.large --tags staging --desc "2 node eks for general purpose"
+arlon clusterspec create xplane-eks-3node --api capi --cloud aws --type eks --kubeversion v1.18.16 --nodecount 4 --nodetype t2.small --tags experimental --desc "4 node eks managed by crossplane"
+```
+Ensure you can now list the cluster specs:
+```
+$ arlon clusterspec list
+NAME                APIPROV  CLOUDPROV  TYPE     KUBEVERSION  NODETYPE   NODECOUNT  TAGS          DESCRIPTION
+capi-eks-2node      capi     aws        eks      v1.18.16     t2.large   2          staging       2 node eks for general purpose
+capi-kubeadm-3node  capi     aws        kubeadm  v1.18.16     t2.medium  3          devel,test    3 node kubeadm for dev/test
+xplane-eks-3node    capi     aws        eks      v1.18.16     t2.small   4          experimental  4 node eks managed by crossplane
+```
 
 # Implementation details
 
