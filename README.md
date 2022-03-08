@@ -312,7 +312,17 @@ curl https://docs.projectcalico.org/v3.21/manifests/calico.yaml -O > bundles/cal
 git add bundles/calico
 git commit -m "add calico"
 git push origin main
-arlon bundle create calico --tags cni,infra,networking --desc "calico CNI" --repo-url https://github.com/argoproj/argocd-example-apps.git --repo-path bundles/guestbook
+arlon bundle create calico --tags networking,cni --desc "Calico CNI" --repo-url https://github.com/argoproj/argocd-example-apps.git --repo-path bundles/guestbook
+```
+
+List your bundles to verify they were correctly entered:
+```
+$ arlon bundle list
+NAME               TYPE     TAGS                 REPO-URL                                             REPO-PATH              DESCRIPTION
+calico             dynamic  networking,cni       ${WORKSPACE_REPO_URL}                                bundles/calico         Calico CNI
+guestbook-dynamic  dynamic  applications         ${WORKSPACE_REPO_URL}                                bundles/guestbook      guestbook app (dynamic)
+guestbook-static   static   applications         (N/A)                                                (N/A)                  guestbook app
+xenial-static      static   applications         (N/A)                                                (N/A)                  ubuntu pod in infinite sleep loop
 ```
 
 # Implementation details
