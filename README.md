@@ -242,7 +242,8 @@ and it is registered as a git repo in ArgoCD. The tutorial will assume
 the existence of these environment variables:
 - `${ARLON_REPO}`: where the arlon repo is locally checked out
 - `${WORKSPACE_REPO}`: where the workspace repo is locally checked out
-- `${WORKSPACE_REPO_URL}`: the workspace repo's git URL
+- `${WORKSPACE_REPO_URL}`: the workspace repo's git URL. It typically looks 
+like `https://github.com/${username}/${reponame}.git`
 
 ## Cluster specs
 
@@ -323,6 +324,53 @@ calico             dynamic  networking,cni       ${WORKSPACE_REPO_URL}          
 guestbook-dynamic  dynamic  applications         ${WORKSPACE_REPO_URL}                                bundles/guestbook      guestbook app (dynamic)
 guestbook-static   static   applications         (N/A)                                                (N/A)                  guestbook app
 xenial-static      static   applications         (N/A)                                                (N/A)                  ubuntu pod in infinite sleep loop
+```
+
+## Profiles
+We can now create profiles to group bundles into useful, deployable sets.
+First, create a static profile containing bundles xenial-static and guestbook-dynamic:
+
+```
+arlon profile create static-1 --bundles guestbook-dynamic,xenial --desc "static profile 1" --tags examples
+```
+
+Secondly, create a dynamic version of the same profile. We'll store the compiled
+form of the profile in the `profiles/dynamic-1` directory of the workspace repo. We don't create
+it manually; instead, the arlon CLI will create it for us, and it will push
+the change to git:
+```
+arlon profile create dynamic-1 --repo-url ${WORKSPACE_REPO_URL} --repo-base-path profiles --bundles guestbook-dynamic,xenial --desc "dynamic test 1" --tags examples
+```
+_Note: the `--repo-base-path profiles` option tells arlon to create the profile
+under a base directory `profiles/` (to be created if it doesn't exist). That
+is in fact the default value of that option, so it is not necessary to specify
+it in this case._
+
+To verify that the compiled profile was created correctly:
+```
+$ cd ${WORKSPACE_REPO}
+$ git pull
+$ tree profiles
+profiles
+├── dynamic-1
+│   ├── mgmt
+│   │   ├── Chart.yaml
+│   │   └── templates
+│   │       ├── guestbook-dynamic.yaml
+│   │       ├── placeholder_configmap.yaml
+│   │       └── xenial.yaml
+│   └── workload
+│       └── xenial
+│           └── xenial.yaml
+[...]
+```
+Since `xenial` is a static bundle, a copy of its YAML was stored in `workload/xenial/xenial.yaml`.
+This is not done for `guestbook-dynamic` because it is dynamic.
+
+Finally, we create another variant of the same profile, with the only difference
+being the addition of Calico bundle. It'll be used on clusters that need a CNI provider:
+```
+arlon profile create dynamic-2-calico --repo-url ${WORKSPACE_REPO_URL} --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial --desc "dynamic test 1" --tags examples
 ```
 
 # Implementation details
