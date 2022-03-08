@@ -237,6 +237,12 @@ I0222 17:31:14.112689   27922 request.go:668] Waited for 1.046146023s due to cli
 
 This assumes that you plan to deploy workload clusters on AWS cloud, with
 Cluster API ("CAPI") as the cluster orchestration API provider.
+Also ensure you have set up a [workspace repository](#workspace-repository)
+and it is registered as a git repo in ArgoCD. The tutorial will assume
+the existence of these environment variables:
+- `${ARLON_REPO}`: where the arlon repo is locally checked out
+- `${WORKSPACE_REPO}`: where the workspace repo is locally checked out
+- `${WORKSPACE_REPO_URL}`: the workspace repo's git URL
 
 ## Cluster specs
 
@@ -257,6 +263,56 @@ NAME                APIPROV  CLOUDPROV  TYPE     KUBEVERSION  NODETYPE   NODECOU
 capi-eks-2node      capi     aws        eks      v1.18.16     t2.large   2          staging       2 node eks for general purpose
 capi-kubeadm-3node  capi     aws        kubeadm  v1.18.16     t2.medium  3          devel,test    3 node kubeadm for dev/test
 xplane-eks-3node    xplane   aws        eks      v1.18.16     t2.small   4          experimental  4 node eks managed by crossplane
+```
+
+## Bundles
+
+First create a static bundle containing raw YAML for the `guestbook`
+sample application from this example file:
+```
+cd ${ARLON_REPO}
+arlon bundle create guestbook-static --tags applications --desc "guestbook app" --from-file examples/bundles/guestbook.yaml
+```
+(_Note: the YAML is simply a concatenation of the files found in the
+[ArgoCD Example Apps repo](https://github.com/argoproj/argocd-example-apps/tree/master/guestbook)_)
+
+To illustrate the difference between static and dynamic bundles, we create
+a dynamic version of the same application, this time using a reference to a
+git directory containing the YAML. We could point it directly to the copy in the
+[ArgoCD Example Apps repo](https://github.com/argoproj/argocd-example-apps/tree/master/guestbook),
+but we'll want to make modifications to it, so we instead create a new directory
+to host our own copy in our workspace directory:
+```
+cd ${WORKSPACE_REPO}
+mkdir -p bundles/guestbook
+cp ${ARLON_REPO}/examples/bundles/guestbook.yaml bundles/guestbook
+git add bundles/guestbook
+git commit -m "add guestbook"
+git push origin main
+arlon bundle create guestbook-dynamic --tags applications --desc "guestbook app (dynamic)" --repo-url ${WORKSPACE_REPO_URL} --repo-path bundles/guestbook
+```
+
+Next, we create a static bundle for another "dummy" application,
+an Ubuntu pod (OS version: "Xenial") that does nothing but print the date-time
+in an infinite sleep loop:
+```
+cd ${ARLON_REPO}
+arlon bundle create xenial-static --tags applications --desc "xenial pod" --from-file examples/bundles/xenial.yaml
+```
+Finally, we create a bundle for the Calico CNI, which provides pod networking.
+Some types of clusters (e.g. kubeadm) require a CNI provider to be installed
+onto a newly created cluster, so encapsulating the provider as a bundle will
+give us a flexible way to install it. We download a known copy from the
+authoritative source and store it the workspace repo in order to create a
+dynamic bundle from it:
+```
+cd ${WORKSPACE_REPO}
+mkdir -p bundles/calico
+curl https://docs.projectcalico.org/v3.21/manifests/calico.yaml -O > bundles/calico/calico.yaml
+git add bundles/calico
+git commit -m "add calico"
+git push origin main
+arlon bundle create calico --tags cni,infra,networking --desc "calico CNI" --repo-url https://github.com/argoproj/argocd-example-apps.git --repo-path bundles/guestbook
 ```
 
 # Implementation details
