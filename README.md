@@ -328,10 +328,10 @@ xenial-static      static   applications         (N/A)                          
 
 ## Profiles
 We can now create profiles to group bundles into useful, deployable sets.
-First, create a static profile containing bundles xenial-static and guestbook-dynamic:
+First, create a static profile containing bundles xenial-static and guestbook-static:
 
 ```
-arlon profile create static-1 --bundles guestbook-dynamic,xenial --desc "static profile 1" --tags examples
+arlon profile create static-1 --bundles guestbook-static,xenial --desc "static profile 1" --tags examples
 ```
 
 Secondly, create a dynamic version of the same profile. We'll store the compiled
@@ -339,7 +339,7 @@ form of the profile in the `profiles/dynamic-1` directory of the workspace repo.
 it manually; instead, the arlon CLI will create it for us, and it will push
 the change to git:
 ```
-arlon profile create dynamic-1 --repo-url ${WORKSPACE_REPO_URL} --repo-base-path profiles --bundles guestbook-dynamic,xenial --desc "dynamic test 1" --tags examples
+arlon profile create dynamic-1 --repo-url ${WORKSPACE_REPO_URL} --repo-base-path profiles --bundles guestbook-static,xenial --desc "dynamic test 1" --tags examples
 ```
 _Note: the `--repo-base-path profiles` option tells arlon to create the profile
 under a base directory `profiles/` (to be created if it doesn't exist). That
@@ -372,6 +372,111 @@ being the addition of Calico bundle. It'll be used on clusters that need a CNI p
 ```
 arlon profile create dynamic-2-calico --repo-url ${WORKSPACE_REPO_URL} --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial --desc "dynamic test 1" --tags examples
 ```
+Listing the profiles should show:
+```
+$ arlon profile list
+NAME              TYPE     BUNDLES                          REPO-URL               REPO-PATH                  TAGS         DESCRIPTION
+dynamic-1         dynamic  guestbook-static,xenial          ${WORKSPACE_REPO_URL}  profiles/dynamic-1         examples     dynamic test 1
+dynamic-2-calico  dynamic  calico,guestbook-static,xenial   ${WORKSPACE_REPO_URL}  profiles/dynamic-2-calico  examples     dynamic test 1
+static-1          static   guestbook-dynamic,xenial         (N/A)                  (N/A)                      examples     static profile 1
+```
+
+## Clusters
+
+We are now ready to deploy our first cluster. It will be of type EKS. Since
+EKS clusters come configured with pod networking out of the box, we choose
+a profile that does not include Calico: `dynamic-1`.
+When deploying a cluster, arlon creates in git a Helm chart containing
+the manifests for creating and bootstrapping the cluster.
+Arlon then creates an ArgoCD App referencing the chart, thereby relying
+on ArgoCD to orchestrate the whole process of deploying and configuring the cluster.
+The arlon `deploy` command
+accepts a git URL and path for this git location. Any git repo can be used (so long
+as it's registered with ArgoCD), but we'll use the workspace cluster for
+convenience:
+```
+arlon cluster deploy --repo-url ${WORKSPACE_REPO_URL} --cluster-name eks-1 --profile dynamic-1 --cluster-spec general-purpose-eks
+```
+The git directory hosting the cluster Helm chart is created as a subdirectory
+of a base path in the repo. The base path can be specified with `--base-path`, but
+we'll leave it unspecified in order to use the default value of `clusters`.
+Consequently, this example produces the directory `clusters/eks-1/` in the repo.
+To verify its presence:
+```
+$ cd ${WORKSPACE_REPO}
+$ git pull
+$ tree clusters/eks-1
+clusters/eks-1
+└── mgmt
+    ├── charts
+    │   ├── capi-aws-eks
+    │   │   ├── Chart.yaml
+    │   │   └── templates
+    │   │       └── cluster.yaml
+    │   ├── capi-aws-kubeadm
+    │   │   ├── Chart.yaml
+    │   │   └── templates
+    │   │       └── cluster.yaml
+    │   └── xplane-aws-eks
+    │       ├── Chart.yaml
+    │       └── templates
+    │           ├── cluster.yaml
+    │           └── network.yaml
+    ├── Chart.yaml
+    ├── templates
+    │   ├── clusterregistration.yaml
+    │   ├── ns.yaml
+    │   ├── profile.yaml
+    │   └── rbac.yaml
+    └── values.yaml
+```
+The chart contains several subcharts under `mgmt/charts/`,
+one for each supported type of cluster. Only one of them will be enabled,
+in this case `capi-aws-eks` (Cluster API on AWS with type EKS).
+
+At this point, the cluster is provisioning and can be seen in arlon and AWS EKS:
+```
+$ arlon cluster list
+NAME       CLUSTERSPEC          PROFILE  
+eks-1      general-purpose-eks  dynamic-1
+
+$ aws eks list-clusters
+{
+    "clusters": [
+        "eks-1_eks-1-control-plane",
+    ]
+}
+```
+Eventually, it will also be seen as a registered cluster in argocd, but this
+won't be visible for a while, because the cluster is not registered until
+its control plane (the Kubernetes API) is ready:
+```
+$ argocd cluster list
+SERVER                                                                    NAME        VERSION  STATUS      MESSAGE
+https://9F07DC211252C6F7686F90FA5B8B8447.gr7.us-west-2.eks.amazonaws.com  eks-1       1.18+    Successful  
+https://kubernetes.default.svc                                            in-cluster  1.20+    Successful  
+```
+
+To monitor the progress of the cluster deployment, check the status of
+the ArgoCD app of the same name:
+```
+$ argocd app list
+NAME                         CLUSTER                         NAMESPACE  PROJECT  STATUS  HEALTH   SYNCPOLICY  CONDITIONS  REPO                                     PATH                                          TARGET
+eks-1                        https://kubernetes.default.svc  default    default  Synced  Healthy  Auto-Prune  <none>      https://github.com/bcle/fleet-infra.git  clusters/eks-1/mgmt                           main
+eks-1-guestbook-static                                       default    default  Synced  Healthy  Auto-Prune  <none>      https://github.com/bcle/fleet-infra.git  profiles/dynamic-1/workload/guestbook-static  HEAD
+eks-1-profile-dynamic-1      https://kubernetes.default.svc  argocd     default  Synced  Healthy  Auto-Prune  <none>      https://github.com/bcle/fleet-infra.git  profiles/dynamic-1/mgmt                       HEAD
+eks-1-xenial                                                 default    default  Synced  Healthy  Auto-Prune  <none>      https://github.com/bcle/fleet-infra.git  profiles/dynamic-1/workload/xenial            HEAD
+```
+The top-level app `eks-1` is the root of all argocd apps that make up the
+cluster and its configuration contents. The next level app `eks-1-profile-dynamic-1`
+represents the profile, and its children apps `eks-1-guestbook-static` and `eks-1-xenial`
+correspond to the bundles.
+
+_Note: The overall tree-like organization of the apps and their health status
+can be visually observed in the ArgoCD web user interface._
+
+The cluster is fully deployed once those apps are all `Synced` and `Healthy`.
+An EKS cluster typically takes 10-15 minutes to finish deploying.
 
 # Implementation details
 
