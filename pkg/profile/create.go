@@ -31,7 +31,12 @@ func Create(
 	if !apierr.IsNotFound(err) {
 		return fmt.Errorf("failed to check for existence of profile: %s", err)
 	}
-	repoPath := path.Join(repoBasePath, profileName)
+	var repoPath string
+	if repoUrl == "" {
+		repoBranch = ""
+	} else {
+		repoPath = path.Join(repoBasePath, profileName)
+	}
 	cm := v1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: profileName,
