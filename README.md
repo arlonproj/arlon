@@ -461,11 +461,11 @@ To monitor the progress of the cluster deployment, check the status of
 the ArgoCD app of the same name:
 ```
 $ argocd app list
-NAME                         CLUSTER                         NAMESPACE  PROJECT  STATUS  HEALTH   SYNCPOLICY  CONDITIONS  REPO                                     PATH                                          TARGET
-eks-1                        https://kubernetes.default.svc  default    default  Synced  Healthy  Auto-Prune  <none>      https://github.com/bcle/fleet-infra.git  clusters/eks-1/mgmt                           main
-eks-1-guestbook-static                                       default    default  Synced  Healthy  Auto-Prune  <none>      https://github.com/bcle/fleet-infra.git  profiles/dynamic-1/workload/guestbook-static  HEAD
-eks-1-profile-dynamic-1      https://kubernetes.default.svc  argocd     default  Synced  Healthy  Auto-Prune  <none>      https://github.com/bcle/fleet-infra.git  profiles/dynamic-1/mgmt                       HEAD
-eks-1-xenial                                                 default    default  Synced  Healthy  Auto-Prune  <none>      https://github.com/bcle/fleet-infra.git  profiles/dynamic-1/workload/xenial            HEAD
+NAME                         CLUSTER                         NAMESPACE  PROJECT  STATUS  HEALTH   SYNCPOLICY  CONDITIONS  REPO                   PATH                                          TARGET
+eks-1                        https://kubernetes.default.svc  default    default  Synced  Healthy  Auto-Prune  <none>      ${WORKSPACE_REPO_URL}  clusters/eks-1/mgmt                           main
+eks-1-guestbook-static                                       default    default  Synced  Healthy  Auto-Prune  <none>      ${WORKSPACE_REPO_URL}  profiles/dynamic-1/workload/guestbook-static  HEAD
+eks-1-profile-dynamic-1      https://kubernetes.default.svc  argocd     default  Synced  Healthy  Auto-Prune  <none>      ${WORKSPACE_REPO_URL}  profiles/dynamic-1/mgmt                       HEAD
+eks-1-xenial                                                 default    default  Synced  Healthy  Auto-Prune  <none>      ${WORKSPACE_REPO_URL}  profiles/dynamic-1/workload/xenial            HEAD
 ```
 The top-level app `eks-1` is the root of all argocd apps that make up the
 cluster and its configuration contents. The next level app `eks-1-profile-dynamic-1`
