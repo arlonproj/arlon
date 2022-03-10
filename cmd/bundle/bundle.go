@@ -15,5 +15,6 @@ func NewCommand() *cobra.Command {
 	command.AddCommand(dumpBundleCommand())
 	command.AddCommand(createBundleCommand())
 	command.AddCommand(deleteBundleCommand())
+	command.AddCommand(updateBundleCommand())
 	return command
 }
