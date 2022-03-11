@@ -484,7 +484,7 @@ can be visually observed in the ArgoCD web user interface._
 The cluster is fully deployed once those apps are all `Synced` and `Healthy`.
 An EKS cluster typically takes 10-15 minutes to finish deploying.
 
-##Understanding static vs dynamic bundles & profiles
+##Behavioral differences between static and dynamic bundles & profiles
 
 **Static bundle**
 
