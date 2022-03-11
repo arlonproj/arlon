@@ -168,6 +168,10 @@ After this step, you should be logged in as `admin` and a config file was create
 - Create your workspace repository in your git provider if necessary, then register it.
   Example: `argocd repo add https://github.com/myname/arlon --username myname --password secret`.
   Note: type `argocd repo add --help` to see all available options.
+- Highly recommended: [configure a webhook](https://argo-cd.readthedocs.io/en/stable/operator-manual/webhook/)
+  to immediately notify ArgoCD of changes to the repo. This will be especially useful
+  during the tutorial. Without a webhook, repo changes may take up to 3 minutes
+  to be detected, delaying cluster configuration updates. 
 - [Create a local user](https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/) named `arlon` with the `apiKey` capability.
   This involves editing the `argocd-cm` ConfigMap using `kubectl`.
 - Adjust the RBAC settings to grant admin permissions to the `arlon` user.
@@ -245,6 +249,8 @@ the existence of these environment variables:
 - `${WORKSPACE_REPO_URL}`: the workspace repo's git URL. It typically looks 
 like `https://github.com/${username}/${reponame}.git`
 
+_Note: for the best experience, make sure your workspace repo is configured
+to send change notifications to ArgoCD via a webhook. See the Installation section for details._
 ## Cluster specs
 
 We first create a few cluster specs with different combinations of API providers
@@ -477,6 +483,79 @@ can be visually observed in the ArgoCD web user interface._
 
 The cluster is fully deployed once those apps are all `Synced` and `Healthy`.
 An EKS cluster typically takes 10-15 minutes to finish deploying.
+
+##Understanding static vs dynamic bundles & profiles
+
+**Static bundle**
+
+A change to a static bundle does not affect existing clusters using that bundle
+(through a profile). To illustrate this, bring up the ArgoCD UI and
+open the detailed view of the `eks-1-guestbook-static` application,
+which applies the `guestbook-static` bundle to the `eks-1` cluster.
+Note that there is only one `guestbook-ui` pod.
+
+Next, update the `guestbook-static` bundle to have 3 replicas of the pod:
+```
+arlon bundle update guestbook-static --from-file examples/bundles/guestbook-3replicas.yaml
+```
+Note that the UI continues to show one pod. Only new clusters consuming
+this bundle will have the 3 replicas.
+
+**Dynamic profile**
+
+Before discussing dynamic bundles, we take a small detour to introduce
+dynamic profiles, since this will help understand the relationship between
+profiles and bundles.
+To illustrate how a profile can be updated, we remove `guestbook-static` bundle
+from `dynamic-1` by specifying a new bundle set:
+```
+arlon profile update dynamic-1 --bundles xenial
+```
+Since the old bundle set was `guestbook-static,xenial`, that command resulted
+in the removal of `guestbook-static` from the profile.
+In the UI, observe the `eks-1-profile-dynamic-1` app going through Sync
+and Progressing phases, eventually reaching the healthy (green) state.
+And most importantly, the `eks-1-guestbook-static` app is gone. The reason
+this real-time change to the cluster was possible is that the `dynamic-1`
+profile is dynamic, meaning any change to its composition results in arlon
+updating the corresponding compiled Helm chart in git. ArgoCD detects this
+git change and propagates the app / configuration updates to the cluster.
+
+If the profile were of the static type, a change in its composition (the
+set of bundles) would _not_ have affected existing clusters using that profile.
+It would only affect new clusters created with the profile.
+
+**Dynamic bundle**
+
+To illustrate the defining characteristic of a dynamic bundle, we first add
+`guestbook-dynamic` to `dynamic-1`:
+```
+arlon profile update dynamic-1 --bundles xenial,guestbook-dynamic
+```
+Observe the re-appearance of the guestbook application, which is managed
+by the `eks-1-guestbook-dynamic` ArgoCD app. A detailed view of the app
+shows 1 guestbook-ui pod. Remember that a dynamic bundle's
+manifest content is stored in git. Use these commands to change the number
+of pod replicas to 3:
+```
+cd ${WORKSPACE_REPO}
+git pull # to get all latest changes pushed by arlon
+vim bundles/guestbook/guestbook.yaml # edit to change deployment's replicas to 3
+git commit -am "increase guestbook replicas"
+git push origin main
+```
+Observe the number of pods increasing to 3 in the UI. Any existing cluster
+consuming this dynamic bundle will be updated similarly, regardless of whether
+the bundle is consumed via a dynamic or static profile.
+
+**Static profile**
+
+Finally, a profile can be static. It means that it has no corresponding
+"compiled" component (a Helm chart) living in git. When a cluster is
+deployed using a static profile, the set of bundles (whether static or
+dynamic) it receives is determined by the bundle set defined by the profile at deployment
+time, and will not change in the future, even if the profile is updated to
+a new set at a later time.
 
 # Implementation details
 
