@@ -3,16 +3,11 @@ package cluster
 import (
 	"arlon.io/arlon/pkg/argocd"
 	"arlon.io/arlon/pkg/cluster"
-	"arlon.io/arlon/pkg/common"
-	"context"
 	_ "embed"
 	"fmt"
-	applicationpkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/spf13/cobra"
-	grpccodes "google.golang.org/grpc/codes"
-	grpcstatus "google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/client-go/kubernetes"
@@ -38,37 +33,22 @@ func deployClusterCommand() *cobra.Command {
 		RunE: func(c *cobra.Command, args []string) error {
 			conn, appIf := argocd.NewArgocdClientOrDie("").NewApplicationClientOrDie()
 			defer conn.Close()
-			_, err := appIf.Get(context.Background(),
-				&applicationpkg.ApplicationQuery{Name: &clusterName})
-			if err == nil {
-				return fmt.Errorf("arlon cluster already exists")
-			}
-			grpcStatus, ok := grpcstatus.FromError(err)
-			if !ok {
-				return fmt.Errorf("failed to get grpc status from error")
-			}
-			if grpcStatus.Code() != grpccodes.NotFound {
-				return fmt.Errorf("unexpected cluster application error code: %d", grpcStatus.Code())
-			}
 			config, err := clientConfig.ClientConfig()
-			if err != nil {
-				return fmt.Errorf("failed to get k8s client config: %s", err)
-			}
 			kubeClient := kubernetes.NewForConfigOrDie(config)
-			rootApp, err := cluster.ConstructRootApp(kubeClient, argocdNs, arlonNs,
-				clusterName, repoUrl, repoBranch, basePath, clusterSpecName)
+			createInArgoCd := !outputYaml
+			rootApp, err := cluster.Create(appIf, kubeClient, argocdNs, arlonNs,
+				clusterName, repoUrl, repoBranch, basePath, clusterSpecName,
+				profileName, createInArgoCd)
 			if err != nil {
-				return fmt.Errorf("failed to construct root app: %s", err)
-			}
-			rootApp.ObjectMeta.Annotations[common.ProfileAnnotationKey] = profileName
-			err = cluster.DeployToGit(kubeClient, argocdNs, arlonNs, clusterName, repoUrl, repoBranch, basePath, profileName)
-			if err != nil {
-				return fmt.Errorf("failed to deploy git tree: %s", err)
+				return fmt.Errorf("failed to create cluster: %s", err)
 			}
 			if outputYaml {
 				scheme := runtime.NewScheme()
-				v1alpha1.AddToScheme(scheme)
-				s := json.NewSerializerWithOptions(json.DefaultMetaFactory, scheme, scheme, json.SerializerOptions{
+				if err := v1alpha1.AddToScheme(scheme); err != nil {
+					return fmt.Errorf("failed to add scheme: %s", err)
+				}
+				s := json.NewSerializerWithOptions(json.DefaultMetaFactory,
+					scheme, scheme, json.SerializerOptions{
 					Yaml:   true,
 					Pretty: true,
 					Strict: false,
@@ -77,17 +57,8 @@ func deployClusterCommand() *cobra.Command {
 				if err != nil {
 					return fmt.Errorf("failed to serialize app resource: %s", err)
 				}
-				return nil
-			} else {
-				appCreateRequest := applicationpkg.ApplicationCreateRequest{
-					Application: *rootApp,
-				}
-				_, err := appIf.Create(context.Background(), &appCreateRequest)
-				if err != nil {
-					return fmt.Errorf("failed to create ArgoCD root application: %s", err)
-				}
-				return nil
 			}
+			return nil
 		},
 	}
 	clientConfig = cli.AddKubectlFlagsToCmd(command)
