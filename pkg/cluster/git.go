@@ -51,9 +51,9 @@ func DeployToGit(
 	if err != nil {
 		return fmt.Errorf("failed to clone repo: %s", err)
 	}
-	clusterPath := path.Join(basePath, clusterName)
-	mgmtPath := path.Join(clusterPath, "mgmt")
-	workloadPath := path.Join(clusterPath, "workload")
+	clusterPath := clusterPathFromBasePath(basePath, clusterName)
+	mgmtPath := mgmtPathFromClusterPath(clusterPath)
+	workloadPath := workloadPathFromClusterPath(clusterPath)
 	wt, err := repo.Worktree()
 	if err != nil {
 		return fmt.Errorf("failed to get repo worktree: %s", err)

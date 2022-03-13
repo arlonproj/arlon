@@ -1,13 +1,13 @@
 package cluster
 
 import (
-	"arlon.io/arlon/pkg/common"
 	"context"
 	"fmt"
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	grpccodes "google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -40,12 +40,18 @@ func Create(
 	if err != nil {
 		return nil, fmt.Errorf("failed to get k8s client config: %s", err)
 	}
-	rootApp, err := ConstructRootApp(kubeClient, argocdNs, arlonNs,
-		clusterName, repoUrl, repoBranch, basePath, clusterSpecName)
+	corev1 := kubeClient.CoreV1()
+	configMapsApi := corev1.ConfigMaps(arlonNs)
+	cm, err := configMapsApi.Get(context.Background(), clusterSpecName, metav1.GetOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get clusterspec configmap: %s", err)
+	}
+	repoPath := mgmtPathFromBasePath(basePath, clusterName)
+	rootApp, err := ConstructRootApp(argocdNs, clusterName, repoUrl, repoBranch,
+		repoPath, clusterSpecName, cm, profileName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct root app: %s", err)
 	}
-	rootApp.ObjectMeta.Annotations[common.ProfileAnnotationKey] = profileName
 	err = DeployToGit(kubeClient, argocdNs, arlonNs, clusterName,
 		repoUrl, repoBranch, basePath, profileName)
 	if err != nil {
