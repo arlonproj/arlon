@@ -13,5 +13,6 @@ func NewCommand() *cobra.Command {
 	}
 	command.AddCommand(listClusterspecsCommand())
 	command.AddCommand(createClusterspecCommand())
+	command.AddCommand(updateClusterspecCommand())
 	return command
 }

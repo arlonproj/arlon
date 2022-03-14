@@ -260,14 +260,14 @@ this is for illustrative purposes, since we will not use it in this tutorial.
 
 ```
 arlon clusterspec create capi-kubeadm-3node --api capi --cloud aws --type kubeadm --kubeversion v1.18.16 --nodecount 3 --nodetype t2.medium --tags devel,test --desc "3 node kubeadm for dev/test"
-arlon clusterspec create capi-eks-2node --api capi --cloud aws --type eks --kubeversion v1.18.16 --nodecount 2 --nodetype t2.large --tags staging --desc "2 node eks for general purpose"
+arlon clusterspec create capi-eks --api capi --cloud aws --type eks --kubeversion v1.18.16 --nodecount 2 --nodetype t2.large --tags staging --desc "2 node eks for general purpose"
 arlon clusterspec create xplane-eks-3node --api xplane --cloud aws --type eks --kubeversion v1.18.16 --nodecount 4 --nodetype t2.small --tags experimental --desc "4 node eks managed by crossplane"
 ```
 Ensure you can now list the cluster specs:
 ```
 $ arlon clusterspec list
 NAME                APIPROV  CLOUDPROV  TYPE     KUBEVERSION  NODETYPE   NODECOUNT  TAGS          DESCRIPTION
-capi-eks-2node      capi     aws        eks      v1.18.16     t2.large   2          staging       2 node eks for general purpose
+capi-eks            capi     aws        eks      v1.18.16     t2.large   2          staging       2 node eks for general purpose
 capi-kubeadm-3node  capi     aws        kubeadm  v1.18.16     t2.medium  3          devel,test    3 node kubeadm for dev/test
 xplane-eks-3node    xplane   aws        eks      v1.18.16     t2.small   4          experimental  4 node eks managed by crossplane
 ```
@@ -401,7 +401,7 @@ accepts a git URL and path for this git location. Any git repo can be used (so l
 as it's registered with ArgoCD), but we'll use the workspace cluster for
 convenience:
 ```
-arlon cluster deploy --repo-url ${WORKSPACE_REPO_URL} --cluster-name eks-1 --profile dynamic-1 --cluster-spec general-purpose-eks
+arlon cluster deploy --repo-url ${WORKSPACE_REPO_URL} --cluster-name eks-1 --profile dynamic-1 --cluster-spec capi-eks
 ```
 The git directory hosting the cluster Helm chart is created as a subdirectory
 of a base path in the repo. The base path can be specified with `--base-path`, but
@@ -443,8 +443,8 @@ in this case `capi-aws-eks` (Cluster API on AWS with type EKS).
 At this point, the cluster is provisioning and can be seen in arlon and AWS EKS:
 ```
 $ arlon cluster list
-NAME       CLUSTERSPEC          PROFILE  
-eks-1      general-purpose-eks  dynamic-1
+NAME       CLUSTERSPEC  PROFILE  
+eks-1      capi-eks     dynamic-1
 
 $ aws eks list-clusters
 {
@@ -557,6 +557,63 @@ dynamic) it receives is determined by the bundle set defined by the profile at d
 time, and will not change in the future, even if the profile is updated to
 a new set at a later time.
 
+## Cluster updates and upgrades
+
+The `arlon cluster update [flags]` command allows you to make changes to
+an existing cluster. The following properties can be modified.
+
+### Clusterspec
+
+There are two scenarios. In the first, the clusterspec name associated with the
+cluster hasn't changed, meaning the cluster is using the same clusterspec.
+However, some properties of the clusterspec's properties have changed since
+the cluster was deployed or last updated, using `arlon clusterspec update`
+Arlon supports updating the cluster
+to use updated values of the following properties:
+- kubernetesVersion
+- nodeCount
+- nodeType
+
+_Note: Updating the cluster is not allowed if other properties of its clusterspec
+(e.g. cluster orchestration API provider, cloud, cluster type, region, pod CIDR block, etc...)
+have changed, however new clusters can always be created/deployed using the
+changed clusterspec._
+
+A change in `kubernetesVersion` will result in a cluster upgrade/downgrade.
+There are some restrictions and caveats you need to be aware of:
+- The specific kubernetes version must be supported by the particular 
+  implementation and release of the underlying cluster orchestration API provider,
+  cloud, and cluster type.
+- In general, the control plane will be upgraded first
+- Existing nodes are not typically not upgraded to the new kubernetes version.
+  Only new nodes (added as part of manual `nodeCount` change or autoscaling)
+  
+In the second scenario, as part of an update operation, you may choose to
+associate the cluster with a different clusterspec altogether. 
+The rule governing the allowed property changes remains the same: the cluster
+update operation is allowed if, relative to the previously associated clusterspec, 
+the new clusterspec's properties differ only in the values listed above.
+
+### Profile
+You can specify a completely different profile when updating a cluster.
+All bundles previously used will be removed from the cluster, and new ones
+specified by the new profile will be applied. This is regardless of whether
+the old and new profiles are static or dynamic.
+
+### Examples
+These sequence of commands updates a clusterspec to a newer kubernetes version
+and a higher node count, then upgrades the cluster to the newer specifications:
+```
+arlon clusterspec update capi-eks --nodecount 3 --kubeversion v1.19.15
+arlon cluster update eks-1
+```
+Note that the 2nd command didn't need any flags because the clusterspec used
+is the same as before.
+
+This example updates a cluster to use a new profile `my-new-profile`:
+```
+arlon cluster update eks-1 --profile my-new-profile
+```
 # Implementation details
 
 
