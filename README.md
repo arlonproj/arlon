@@ -560,7 +560,8 @@ a new set at a later time.
 ## Cluster updates and upgrades
 
 The `arlon cluster update [flags]` command allows you to make changes to
-an existing cluster. The following properties can be modified.
+an existing cluster. The clusterspec, profile, or both can change, provided
+that the following rules and guidelines are followed.
 
 ### Clusterspec
 
