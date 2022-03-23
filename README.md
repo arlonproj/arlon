@@ -582,11 +582,11 @@ changed clusterspec._
 
 A change in `kubernetesVersion` will result in a cluster upgrade/downgrade.
 There are some restrictions and caveats you need to be aware of:
-- The specific kubernetes version must be supported by the particular 
+- The specific Kubernetes version must be supported by the particular 
   implementation and release of the underlying cluster orchestration API provider,
   cloud, and cluster type.
 - In general, the control plane will be upgraded first
-- Existing nodes are not typically not upgraded to the new kubernetes version.
+- Existing nodes are not typically not upgraded to the new Kubernetes version.
   Only new nodes (added as part of manual `nodeCount` change or autoscaling)
   
 In the second scenario, as part of an update operation, you may choose to
@@ -602,7 +602,7 @@ specified by the new profile will be applied. This is regardless of whether
 the old and new profiles are static or dynamic.
 
 ### Examples
-These sequence of commands updates a clusterspec to a newer kubernetes version
+These sequence of commands updates a clusterspec to a newer Kubernetes version
 and a higher node count, then upgrades the cluster to the newer specifications:
 ```
 arlon clusterspec update capi-eks --nodecount 3 --kubeversion v1.19.15
