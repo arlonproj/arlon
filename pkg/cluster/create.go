@@ -37,9 +37,6 @@ func Create(
 		return nil, fmt.Errorf("unexpected cluster application error code: %d",
 			grpcStatus.Code())
 	}
-	if err != nil {
-		return nil, fmt.Errorf("failed to get k8s client config: %s", err)
-	}
 	corev1 := kubeClient.CoreV1()
 	configMapsApi := corev1.ConfigMaps(arlonNs)
 	cm, err := configMapsApi.Get(context.Background(), clusterSpecName, metav1.GetOptions{})
