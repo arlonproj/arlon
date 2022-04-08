@@ -2,7 +2,7 @@
 
 ## Management cluster
 
-This kubernetes cluster hosts the following components:
+This Kubernetes cluster hosts the following components:
 - ArgoCD
 - Arlo
 - Cluster management stacks e.g. Cluster API and/or Crossplane
