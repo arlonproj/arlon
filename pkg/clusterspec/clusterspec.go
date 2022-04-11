@@ -17,6 +17,7 @@ type ClusterSpec struct {
 	KubernetesVersion string
 	NodeType          string
 	NodeCount         int
+	MasterNodeCount   int
 	Region            string
 	PodCidrBlock      string
 	SshKeyName        string
@@ -31,6 +32,7 @@ const (
 	ClusterTypeKey       = "type"
 	KubernetesVersionKey = "kubernetesVersion"
 	NodeCountKey         = "nodeCount"
+	MasterNodeCountKey   = "masterNodeCount"
 	RegionKey            = "region"
 	PodCidrBlockKey      = "podCidrBlock"
 	SshKeyNameKey        = "sshKeyName"
@@ -45,6 +47,7 @@ var (
 		KubernetesVersionKey,
 		PodCidrBlockKey,
 		NodeCountKey,
+		MasterNodeCountKey,
 		NodeTypeKey,
 	}
 )
@@ -86,6 +89,10 @@ func FromConfigMap(cm *corev1.ConfigMap) (*ClusterSpec, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not parse clusterspec nodeCount: %s", err)
 	}
+	cs.MasterNodeCount, err = strconv.Atoi(cm.Data[MasterNodeCountKey])
+	if err != nil {
+		cs.MasterNodeCount = 3 // for backward compatibility if not present
+	}
 	return cs, nil
 }
 
@@ -97,6 +104,7 @@ func ToConfigMap(
 	kubernetesVersion string,
 	nodeType string,
 	nodeCount int,
+	masterNodeCount int,
 	region string,
 	podCidrBlock string,
 	sshKeyName string,
@@ -118,6 +126,7 @@ func ToConfigMap(
 			KubernetesVersionKey: kubernetesVersion,
 			NodeTypeKey:          nodeType,
 			NodeCountKey:         strconv.Itoa(nodeCount),
+			MasterNodeCountKey:   strconv.Itoa(masterNodeCount),
 			RegionKey:            region,
 			PodCidrBlockKey:      podCidrBlock,
 			SshKeyNameKey:        sshKeyName,

@@ -36,4 +36,3 @@ func decomposePath(mgmtPath string) (basePath string, clusterName string, err er
 	basePath = strings.Join(comps[0:l-2], string(os.PathSeparator))
 	return
 }
-

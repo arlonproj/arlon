@@ -14,6 +14,7 @@ func Update(
 	kubernetesVersion string,
 	nodeType string,
 	nodeCount int,
+	masterNodeCount int,
 	desc string,
 	tags string,
 ) (dirty bool, err error) {
@@ -36,6 +37,11 @@ func Update(
 	} else {
 		dirty = true
 	}
+	if masterNodeCount == 0 {
+		masterNodeCount = cs.MasterNodeCount
+	} else {
+		dirty = true
+	}
 	if desc == "" {
 		desc = cs.Description
 	} else {
@@ -50,8 +56,8 @@ func Update(
 		return
 	}
 	cm := ToConfigMap(specName, cs.ApiProvider, cs.CloudProvider, cs.Type,
-		kubernetesVersion, nodeType, nodeCount, cs.Region, cs.PodCidrBlock,
-		cs.SshKeyName, tags, desc)
+		kubernetesVersion, nodeType, nodeCount, masterNodeCount,
+		cs.Region, cs.PodCidrBlock, cs.SshKeyName, tags, desc)
 	corev1 := kubeClient.CoreV1()
 	configMapApi := corev1.ConfigMaps(arlonNs)
 	_, err = configMapApi.Update(context.Background(), cm, metav1.UpdateOptions{})

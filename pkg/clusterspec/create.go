@@ -18,6 +18,8 @@ func Create(
 	kubernetesVersion string,
 	nodeType string,
 	nodeCount int,
+	masterNodeCount int,
+	sshKeyName string,
 	desc string,
 	tags string,
 ) error {
@@ -35,8 +37,8 @@ func Create(
 		return fmt.Errorf("failed to check for existence of clusterspec: %s", err)
 	}
 	cm := ToConfigMap(specName, apiProvider, cloudProvider, clusterType,
-		kubernetesVersion, nodeType, nodeCount, "", "", "",
-		tags, desc)
+		kubernetesVersion, nodeType, nodeCount, masterNodeCount,
+		"", "", sshKeyName, tags, desc)
 	corev1 := kubeClient.CoreV1()
 	configMapApi := corev1.ConfigMaps(arlonNs)
 	_, err = configMapApi.Create(context.Background(), cm, metav1.CreateOptions{})

@@ -20,7 +20,7 @@ func Create(
 	repoUrl,
 	repoBranch,
 	basePath,
-    clusterSpecName,
+	clusterSpecName,
 	profileName string,
 	createInArgoCd bool,
 ) (*argoappv1.Application, error) {

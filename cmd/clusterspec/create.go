@@ -21,6 +21,8 @@ func createClusterspecCommand() *cobra.Command {
 	var kubernetesVersion string
 	var nodeType string
 	var nodeCount int
+	var masterNodeCount int
+	var sshKeyName string
 	command := &cobra.Command{
 		Use:   "create",
 		Short: "Create clusterspec",
@@ -34,7 +36,7 @@ func createClusterspecCommand() *cobra.Command {
 			kubeClient := kubernetes.NewForConfigOrDie(config)
 			return cspec.Create(kubeClient, arlonNs, args[0], apiProvider,
 				cloudProvider, clusterType, kubernetesVersion,
-				nodeType, nodeCount, desc, tags)
+				nodeType, nodeCount, masterNodeCount, sshKeyName, desc, tags)
 		},
 	}
 	clientConfig = cli.AddKubectlFlagsToCmd(command)
@@ -46,6 +48,9 @@ func createClusterspecCommand() *cobra.Command {
 	command.Flags().StringVar(&clusterType, "type", "eks", "the cluster type (kubeadm or eks/aks)")
 	command.Flags().StringVar(&kubernetesVersion, "kubeversion", "v1.18.16", "the kubernetes version")
 	command.Flags().StringVar(&nodeType, "nodetype", "t3.large", "the cloud-specific node instance type")
+	command.Flags().StringVar(&sshKeyName, "sshkey", "", "ssh key name for logging into nodes")
 	command.Flags().IntVar(&nodeCount, "nodecount", 2, "the number of nodes")
+	command.Flags().IntVar(&masterNodeCount, "masternodecount", 3, "the number of master nodes (3 or more required for HA)")
+	command.MarkFlagRequired("sshkey")
 	return command
 }
