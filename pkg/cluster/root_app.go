@@ -26,14 +26,14 @@ func ConstructRootApp(
 			APIVersion: application.Group + "/v1alpha1",
 		},
 		ObjectMeta: v1.ObjectMeta{
-			Name:        clusterName,
-			Namespace:   argocdNs,
-			Labels:      map[string]string{"managed-by": "arlon", "arlon-type": "cluster"},
+			Name:      clusterName,
+			Namespace: argocdNs,
+			Labels:    map[string]string{"managed-by": "arlon", "arlon-type": "cluster"},
 			Annotations: map[string]string{
 				common.ClusterSpecAnnotationKey: clusterSpecName,
-				common.ProfileAnnotationKey: profileName,
+				common.ProfileAnnotationKey:     profileName,
 			},
-			Finalizers:  []string{argoappv1.ForegroundPropagationPolicyFinalizer},
+			Finalizers: []string{argoappv1.ForegroundPropagationPolicyFinalizer},
 		},
 	}
 	cs, err := clusterspec.FromConfigMap(clusterSpecCm)

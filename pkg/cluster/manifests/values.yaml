@@ -9,6 +9,7 @@ global:
   kubernetesVersion: v1.18.16
   podCidrBlock: 192.168.0.0/16
   nodeCount: 2
+  masterNodeCount: 1
   nodeType: t3.large
   kubeconfigSecretKeyName: value
 

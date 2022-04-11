@@ -18,6 +18,7 @@ func updateClusterspecCommand() *cobra.Command {
 	var kubernetesVersion string
 	var nodeType string
 	var nodeCount int
+	var masterNodeCount int
 	command := &cobra.Command{
 		Use:   "update <clusterspec name> [flags]",
 		Short: "Update clusterspec",
@@ -30,7 +31,7 @@ func updateClusterspecCommand() *cobra.Command {
 			}
 			kubeClient := kubernetes.NewForConfigOrDie(config)
 			changed, err := cspec.Update(kubeClient, arlonNs, args[0], kubernetesVersion,
-				nodeType, nodeCount, desc, tags)
+				nodeType, nodeCount, masterNodeCount, desc, tags)
 			if err != nil {
 				return err
 			}
@@ -47,5 +48,6 @@ func updateClusterspecCommand() *cobra.Command {
 	command.Flags().StringVar(&kubernetesVersion, "kubeversion", "", "the kubernetes version")
 	command.Flags().StringVar(&nodeType, "nodetype", "", "the cloud-specific node instance type")
 	command.Flags().IntVar(&nodeCount, "nodecount", 0, "the number of nodes")
+	command.Flags().IntVar(&nodeCount, "masternodecount", 0, "the number of master nodes")
 	return command
 }

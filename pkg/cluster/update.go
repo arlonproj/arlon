@@ -17,7 +17,7 @@ func Update(
 	argocdNs,
 	arlonNs,
 	clusterName,
-    clusterSpecName,
+	clusterSpecName,
 	profileName string,
 	updateInArgoCd bool,
 ) (*argoappv1.Application, error) {

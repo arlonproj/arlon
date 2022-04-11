@@ -55,7 +55,7 @@ spec:
       apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
       kind: AWSMachineTemplate
       name: {{ .Values.global.clusterName }}-control-plane
-  replicas: 3
+  replicas: {{ .Values.global.masterNodeCount }}
   version: {{ .Values.global.kubernetesVersion }}
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1

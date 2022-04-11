@@ -49,10 +49,10 @@ func updateClusterCommand() *cobra.Command {
 				}
 				s := json.NewSerializerWithOptions(json.DefaultMetaFactory,
 					scheme, scheme, json.SerializerOptions{
-					Yaml:   true,
-					Pretty: true,
-					Strict: false,
-				})
+						Yaml:   true,
+						Pretty: true,
+						Strict: false,
+					})
 				err = s.Encode(rootApp, os.Stdout)
 				if err != nil {
 					return fmt.Errorf("failed to serialize app resource: %s", err)

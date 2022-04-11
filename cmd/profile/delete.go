@@ -1,10 +1,9 @@
 package profile
 
 import (
-	"context"
+	"arlon.io/arlon/pkg/profile"
 	"fmt"
 	"github.com/spf13/cobra"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -35,11 +34,5 @@ func deleteProfileCommand() *cobra.Command {
 
 func deleteProfile(config *restclient.Config, ns string, profileName string) error {
 	kubeClient := kubernetes.NewForConfigOrDie(config)
-	corev1 := kubeClient.CoreV1()
-	configMapApi := corev1.ConfigMaps(ns)
-	err := configMapApi.Delete(context.Background(), profileName, metav1.DeleteOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to delete profile: %s", err)
-	}
-	return nil
+	return profile.Delete(kubeClient, ns, profileName)
 }

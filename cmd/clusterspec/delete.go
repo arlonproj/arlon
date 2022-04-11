@@ -1,7 +1,7 @@
-package bundle
+package clusterspec
 
 import (
-	"arlon.io/arlon/pkg/bundle"
+	"arlon.io/arlon/pkg/clusterspec"
 	"fmt"
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/kubernetes"
@@ -11,20 +11,20 @@ import (
 
 import "github.com/argoproj/argo-cd/v2/util/cli"
 
-func deleteBundleCommand() *cobra.Command {
+func deleteClusterspecCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
 	var ns string
 	command := &cobra.Command{
 		Use:   "delete",
-		Short: "Delete configuration bundle",
-		Long:  "Delete configuration bundle",
+		Short: "Delete clusterspec",
+		Long:  "Delete clusterspec",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
-			return deleteBundle(config, ns, args[0])
+			return deleteClusterspec(config, ns, args[0])
 		},
 	}
 	clientConfig = cli.AddKubectlFlagsToCmd(command)
@@ -32,7 +32,7 @@ func deleteBundleCommand() *cobra.Command {
 	return command
 }
 
-func deleteBundle(config *restclient.Config, ns string, bundleName string) error {
+func deleteClusterspec(config *restclient.Config, ns string, clusterspecName string) error {
 	kubeClient := kubernetes.NewForConfigOrDie(config)
-	return bundle.Delete(kubeClient, ns, bundleName)
+	return clusterspec.Delete(kubeClient, ns, clusterspecName)
 }

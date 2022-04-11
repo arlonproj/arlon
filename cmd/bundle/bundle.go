@@ -9,6 +9,7 @@ func NewCommand() *cobra.Command {
 		Long:              "Manage configuration bundles",
 		DisableAutoGenTag: true,
 		Run: func(c *cobra.Command, args []string) {
+			c.Usage()
 		},
 	}
 	command.AddCommand(listBundlesCommand())

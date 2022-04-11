@@ -9,6 +9,7 @@ func NewCommand() *cobra.Command {
 		Long:              "Manage clusters",
 		DisableAutoGenTag: true,
 		Run: func(c *cobra.Command, args []string) {
+			c.Usage()
 		},
 	}
 	command.AddCommand(deployClusterCommand())
