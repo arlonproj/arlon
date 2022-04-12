@@ -166,8 +166,10 @@ You can use any Kubernetes cluster that you have admin access to. Ensure:
 - Follow steps 1-4 of the [ArgoCD installation guide](https://argo-cd.readthedocs.io/en/stable/getting_started/) to install ArgoCD onto your management cluster.
 After this step, you should be logged in as `admin` and a config file was created at `${HOME}/.config/argocd/config`
 - Create your workspace repository in your git provider if necessary, then register it.
-  Example: `argocd repo add https://github.com/myname/arlon --username myname --password secret`.
-  Note: type `argocd repo add --help` to see all available options.
+  Example: `argocd repo add https://github.com/myname/arlon_workspace --username myname --password secret`.
+   -  Note: type `argocd repo add --help` to see all available options.
+   -  For Arlon developers, this is not your fork of the Arlon source code repository, 
+       but a separate git repo where some artefacts like profiles created by Arlon will be stored. 
 - Highly recommended: [configure a webhook](https://argo-cd.readthedocs.io/en/stable/operator-manual/webhook/)
   to immediately notify ArgoCD of changes to the repo. This will be especially useful
   during the tutorial. Without a webhook, repo changes may take up to 3 minutes
