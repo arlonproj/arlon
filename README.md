@@ -164,7 +164,7 @@ You can use any Kubernetes cluster that you have admin access to. Ensure:
 ## ArgoCD
 
 - Follow steps 1-4 of the [ArgoCD installation guide](https://argo-cd.readthedocs.io/en/stable/getting_started/) to install ArgoCD onto your management cluster.
-After this step, you should be logged in as `admin` and a config file was created at `${HOME}/.argocd/config`
+After this step, you should be logged in as `admin` and a config file was created at `${HOME}/.config/argocd/config`
 - Create your workspace repository in your git provider if necessary, then register it.
   Example: `argocd repo add https://github.com/myname/arlon --username myname --password secret`.
   Note: type `argocd repo add --help` to see all available options.
@@ -186,7 +186,7 @@ kind: ConfigMap
 [...]
 ```
 - Generate an account token: `argocd account generate-token --account arlon`
-- Make a temporary copy of the config file: `cp ${HOME}/.argocd/config /tmp` then
+- Make a temporary copy of the config file: `cp ${HOME}/.config/argocd/config /tmp/argocd_config` then
   edit it to replace the value of `auth-token` with the token from
   the previous step. Save changes. This file will be used to configure the Arlon
   controller's ArgoCD credentials during the next steps.
@@ -194,7 +194,7 @@ kind: ConfigMap
 ## Arlon controller
 - Create the arlon namespace: `kubectl create ns arlon`
 - Create the ArgoCD credentials secret from the temporary config file:
-  `kubectl -n arlon create secret generic argocd-creds --from-file /tmp/config`
+  `kubectl -n arlon create secret generic argocd-creds --from-file /tmp/argocd_config`
 - Delete the temporary config file
 - Clone the arlon git repo and cd to its top directory
 - Create the `clusterregistrations` CRD: `kubectl apply -f config/crd/bases/arlon.io_clusterregistrations.yaml`
