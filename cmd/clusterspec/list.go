@@ -1,10 +1,10 @@
 package clusterspec
 
 import (
-	"arlon.io/arlon/pkg/clusterspec"
 	"context"
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/util/cli"
+	"github.com/platform9/arlon/pkg/clusterspec"
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"

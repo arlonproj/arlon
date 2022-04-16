@@ -1,14 +1,14 @@
 package cluster
 
 import (
-	"arlon.io/arlon/pkg/argocd"
-	"arlon.io/arlon/pkg/common"
 	"context"
 	"fmt"
 	apppkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/errors"
 	"github.com/argoproj/argo-cd/v2/util/io"
+	"github.com/platform9/arlon/pkg/argocd"
+	"github.com/platform9/arlon/pkg/common"
 	"github.com/spf13/cobra"
 	"os"
 	"text/tabwriter"

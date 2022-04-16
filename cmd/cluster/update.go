@@ -1,12 +1,12 @@
 package cluster
 
 import (
-	"arlon.io/arlon/pkg/argocd"
-	"arlon.io/arlon/pkg/cluster"
 	_ "embed"
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/cli"
+	"github.com/platform9/arlon/pkg/argocd"
+	"github.com/platform9/arlon/pkg/cluster"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"

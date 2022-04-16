@@ -1,4 +1,4 @@
-apiVersion: arlon.io/v1
+apiVersion: core.arlon.io/v1
 kind: ClusterRegistration
 metadata:
   name: capi-eks-quickstart

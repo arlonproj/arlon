@@ -1,8 +1,8 @@
 package profile
 
 import (
-	"arlon.io/arlon/pkg/profile"
 	"fmt"
+	"github.com/platform9/arlon/pkg/profile"
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"

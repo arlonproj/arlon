@@ -4,7 +4,7 @@ metadata:
   # "namespace" omitted since ClusterRoles are not namespaced
   name: clusterregistration-updater
 rules:
-  - apiGroups: ["arlon.io"]
+  - apiGroups: ["core.arlon.io"]
     #
     # at the HTTP level, the name of the resource for accessing Secret
     # objects is "secrets"

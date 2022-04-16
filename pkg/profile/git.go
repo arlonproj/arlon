@@ -1,14 +1,14 @@
 package profile
 
 import (
-	"arlon.io/arlon/pkg/argocd"
-	"arlon.io/arlon/pkg/bundle"
-	"arlon.io/arlon/pkg/cluster"
-	"arlon.io/arlon/pkg/gitutils"
-	"arlon.io/arlon/pkg/log"
 	"embed"
 	"fmt"
 	gogit "github.com/go-git/go-git/v5"
+	"github.com/platform9/arlon/pkg/argocd"
+	"github.com/platform9/arlon/pkg/bundle"
+	"github.com/platform9/arlon/pkg/cluster"
+	"github.com/platform9/arlon/pkg/gitutils"
+	"github.com/platform9/arlon/pkg/log"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 	"path"

@@ -1,9 +1,9 @@
 package bundle
 
 import (
-	"arlon.io/arlon/pkg/common"
 	"context"
 	"fmt"
+	"github.com/platform9/arlon/pkg/common"
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
