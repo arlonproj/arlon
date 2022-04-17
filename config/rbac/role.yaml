@@ -9,6 +9,32 @@ rules:
 - apiGroups:
   - core.arlon.io
   resources:
+  - callhomeconfigs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.arlon.io
+  resources:
+  - callhomeconfigs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.arlon.io
+  resources:
+  - callhomeconfigs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - core.arlon.io
+  resources:
   - clusterregistrations
   verbs:
   - create
