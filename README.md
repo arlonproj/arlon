@@ -195,7 +195,7 @@ kind: ConfigMap
 
 NOTE: _On some operating systems, including Linux, it's possible the source configuration
 file is located at `${HOME}/.argocd/config` instead. In any case, ensure that
-the destionation file is named `/tmp/config`, it's important for the secret creation step below_.
+the destination file is named `/tmp/config`, it's important for the secret creation step below_.
 
 ## Arlon controller
 - Create the arlon namespace: `kubectl create ns arlon`
