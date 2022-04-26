@@ -1,4 +1,4 @@
-VERSION ?= 0.1.0
+VERSION ?= 0.2.0
 REPO_SERVER ?= ghcr.io
 REPO_NAME ?= platform9
 # Image URL to use all building/pushing image targets

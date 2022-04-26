@@ -17,15 +17,17 @@ limitations under the License.
 package main
 
 import (
-	"arlon.io/arlon/cmd/bundle"
-	"arlon.io/arlon/cmd/cluster"
-	"arlon.io/arlon/cmd/clusterspec"
-	"arlon.io/arlon/cmd/controller"
-	"arlon.io/arlon/cmd/list_clusters"
-	"arlon.io/arlon/cmd/profile"
 	"flag"
-	"github.com/spf13/cobra"
 	"os"
+
+	"github.com/platform9/arlon/cmd/bundle"
+	"github.com/platform9/arlon/cmd/cluster"
+	"github.com/platform9/arlon/cmd/clusterspec"
+	"github.com/platform9/arlon/cmd/controller"
+	"github.com/platform9/arlon/cmd/list_clusters"
+	"github.com/platform9/arlon/cmd/profile"
+	"github.com/spf13/cobra"
+
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"

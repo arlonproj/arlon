@@ -64,7 +64,7 @@ type ClusterRegistrationList struct {
 }
 
 const (
-	ClusterRegistrationFinalizer = "clusterregistration.arlon.io"
+	ClusterRegistrationFinalizer = "clusterregistration.core.arlon.io"
 )
 
 func init() {

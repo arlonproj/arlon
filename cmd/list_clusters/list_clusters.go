@@ -1,13 +1,13 @@
 package list_clusters
 
 import (
-	"arlon.io/arlon/pkg/argocd"
 	"context"
 	"fmt"
 	clusterpkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/cluster"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/errors"
 	"github.com/argoproj/argo-cd/v2/util/io"
+	"github.com/platform9/arlon/pkg/argocd"
 	"github.com/spf13/cobra"
 	"os"
 	"text/tabwriter"

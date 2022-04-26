@@ -1,4 +1,4 @@
-module arlon.io/arlon
+module github.com/platform9/arlon
 
 go 1.16
 

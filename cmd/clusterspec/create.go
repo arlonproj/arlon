@@ -1,8 +1,8 @@
 package clusterspec
 
 import (
-	cspec "arlon.io/arlon/pkg/clusterspec"
 	"fmt"
+	cspec "github.com/platform9/arlon/pkg/clusterspec"
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"

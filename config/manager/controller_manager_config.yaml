@@ -8,4 +8,4 @@ webhook:
   port: 9443
 leaderElection:
   leaderElect: true
-  resourceName: d4242dee.arlon.io
+  resourceName: d4242dee.core.arlon.io
