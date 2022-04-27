@@ -1,4 +1,6 @@
 # Arlon
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fplatform9%2Farlon.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fplatform9%2Farlon?ref=badge_shield)
+
 
 Arlon is a lifecycle management and configuration tool for Kubernetes clusters.
 It allows an administrator to compose, deploy and configure a large number of
@@ -643,3 +645,7 @@ Here is a summary of the kinds of resources generated and deployed by the chart:
   of the expanded bundles. Every bundle referenced by the profile is
   copied/unpacked into its own subdirectory.
 - One ArgoCD Application resource for each bundle.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fplatform9%2Farlon.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fplatform9%2Farlon?ref=badge_large)
