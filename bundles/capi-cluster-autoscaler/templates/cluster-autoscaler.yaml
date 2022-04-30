@@ -23,13 +23,13 @@ spec:
         app: cluster-autoscaler
     spec:
       containers:
-        - image: k8s.gcr.io/autoscaling/cluster-autoscaler:{{ Values.autoscalerVersion }}
+        - image: k8s.gcr.io/autoscaling/cluster-autoscaler:{{ .Values.autoscalerVersion }}
           name: cluster-autoscaler
           command:
             - /cluster-autoscaler
           args:
             - --cloud-provider=clusterapi
-            - --node-group-auto-discovery=clusterapi:namespace={{ Values.arlon.clusterName }}
+            - --node-group-auto-discovery=clusterapi:namespace={{ .Values.arlon.clusterName }}
             - --cloud-config=/kubeconfigvolume/kubeconfig
           volumeMounts:
             - name: kubeconfigvolume
@@ -37,11 +37,11 @@ spec:
               readOnly: true
           resources:
             limits:
-              cpu: {{ .cpuLimit }}
-              memory: {{ .memLimit }}
+              cpu: {{ .Values.cpuLimit }}
+              memory: {{ .Values.memLimit }}
             requests:
-              cpu: {{ .cpuRequest }}
-              memory: {{ .memRequest }}
+              cpu: {{ .Values.cpuRequest }}
+              memory: {{ .Values.memRequest }}
       volumes:
         - name: kubeconfigvolume
           secret:
