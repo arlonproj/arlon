@@ -175,7 +175,6 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			"token secret does not have token",
 			ctrl.Result{})
 	}
-	//user.Token = base64.StdEncoding.EncodeToString(token.Data["token"])
 	user.Token = string(token.Data["token"])
 	cfg.AuthInfos["sa"] = user
 	contx := clientcmdapi.NewContext()

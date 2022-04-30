@@ -196,6 +196,13 @@ spec:
     repoURL: {{.RepoUrl}}
     path: {{.RepoPath}}
     targetRevision: HEAD
+    helm:
+      parameters:
+      # Pass cluster name to the bundle in case it needs it and is a Helm chart.
+      # Example: this is required by the CAPI cluster autoscaler.
+      # Use arlon prefix to avoid any conflicts with the bundle's own values.
+      - name: arlon.clusterName
+        value: {{.ClusterName}}
 `
 
 // This is used for a dynamic profile, which is an Application containing
@@ -302,7 +309,7 @@ func ProcessBundles(
 			DestinationNamespace: "default", // FIXME: make configurable
 		}
 		if b.Data == nil {
-			// reference type b
+			// dynamic bundle
 			if b.RepoUrl == "" {
 				return fmt.Errorf("b %s is neither static nor dynamic type", b.Name)
 			}
