@@ -112,7 +112,7 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			ctrl.Result{})
 	}
 	secretsApi := clientset.CoreV1().Secrets(chc.Spec.TargetNamespace)
-	_, err = secretsApi.Get(context.Background(), chc.Spec.TargetSecretKeyName,
+	_, err = secretsApi.Get(context.Background(), chc.Spec.TargetSecretName,
 		metav1.GetOptions{})
 	if err == nil {
 		return updateCallHomeConfigState(r, log, &chc, "complete",
@@ -120,9 +120,9 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			ctrl.Result{})
 	}
 	if !apierr.IsNotFound(err) {
-		return updateCallHomeConfigState(r, log, &chc, "error",
-			fmt.Sprintf("unexpected error getting target secret: %s", err),
-			ctrl.Result{})
+		return retryLater(r, log, &chc, "target secret",
+			chc.Spec.TargetSecretName,
+			"could not be queried, workload cluster probably still unavailable")
 	}
 	// read the service account token
 	var sa corev1.ServiceAccount
@@ -237,6 +237,10 @@ func updateCallHomeConfigState(
 	msg string,
 	result ctrl.Result,
 ) (ctrl.Result, error) {
+	if chc.Status.State == state && chc.Status.Message == msg {
+		log.Info(fmt.Sprintf("%s ... already in '%s' state", msg, state))
+		return result, nil
+	}
 	chc.Status.State = state
 	chc.Status.Message = msg
 	log.Info(fmt.Sprintf("%s ... setting state to '%s'", msg, chc.Status.State))
