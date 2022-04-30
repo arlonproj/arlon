@@ -25,17 +25,19 @@ import (
 
 // CallHomeConfigSpec defines the desired state of CallHomeConfig
 type CallHomeConfigSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of CallHomeConfig. Edit callhomeconfig_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	ServiceAccountName      string `json:"serviceAccountName"` //
+	KubeconfigSecretName    string `json:"kubeconfigSecretName"` //
+	KubeconfigSecretKeyName string `json:"kubeconfigSecretKeyName"` //
+	TargetNamespace         string `json:"targetNamespace"` //
+	TargetSecretName        string `json:"targetSecretName"` //
+	TargetSecretKeyName     string `json:"targetSecretKeyName"` //
+	ManagementClusterUrl    string `json:"managementClusterUrl"` //
 }
 
 // CallHomeConfigStatus defines the observed state of CallHomeConfig
 type CallHomeConfigStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	State   string `json:"state"`   // "retrying", "error", or "complete"
+	Message string `json:"message"` // for "retrying" status
 }
 
 //+kubebuilder:object:root=true

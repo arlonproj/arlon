@@ -25,10 +25,6 @@ import (
 
 // ClusterRegistrationSpec defines the desired state of ClusterRegistration
 type ClusterRegistrationSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of ClusterRegistration. Edit clusterregistration_types.go to remove/update
 	ClusterName             string `json:"clusterName,omitempty"`
 	KubeconfigSecretName    string `json:"kubeconfigSecretName"`
 	KubeconfigSecretKeyName string `json:"kubeconfigSecretKeyName"`

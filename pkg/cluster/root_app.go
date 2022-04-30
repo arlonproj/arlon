@@ -59,7 +59,7 @@ func ConstructRootApp(
 			})
 		}
 	}
-	subchartName, err := clusterspec.SubchartName(clusterSpecCm)
+	subchartName, err := clusterspec.SubchartNameFromClusterSpec(cs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve subchart name: %s", err)
 	}
@@ -67,6 +67,23 @@ func ConstructRootApp(
 		Name:  fmt.Sprintf("tags.%s", subchartName),
 		Value: "true",
 	})
+	var ignoreDiffs []argoappv1.ResourceIgnoreDifferences
+	if cs.ClusterAutoscalerEnabled {
+		casSubchartName, err := clusterspec.ClusterAutoscalerSubchartNameFromClusterSpec(cs)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get cluster autoscaler subchart name: %s", err)
+		}
+		helmParams = append(helmParams, argoappv1.HelmParameter{
+			Name:  fmt.Sprintf("tags.%s", casSubchartName),
+			Value: "true",
+		})
+		// Cluster autoscaler will change replicas so ignore it
+		ignoreDiffs = append(ignoreDiffs, argoappv1.ResourceIgnoreDifferences{
+			Group:        "cluster.x-k8s.io",
+			Kind:         "MachineDeployment",
+			JSONPointers: []string{"/spec/replicas"},
+		})
+	}
 	app.Spec.Source.Helm = &argoappv1.ApplicationSourceHelm{Parameters: helmParams}
 	app.Spec.Source.RepoURL = repoUrl
 	app.Spec.Source.TargetRevision = repoBranch
@@ -83,12 +100,11 @@ func ConstructRootApp(
 	// appear to update it with a value that is less precise than the requested
 	// one, for e.g. the spec might specify v1.18.16, and get updated with v1.18,
 	// causing ArgoCD to report the resource as OutOfSync
-	app.Spec.IgnoreDifferences = []argoappv1.ResourceIgnoreDifferences{
-		{
-			Group:        "controlplane.cluster.x-k8s.io",
-			Kind:         "AWSManagedControlPlane",
-			JSONPointers: []string{"/spec/version"},
-		},
-	}
+	ignoreDiffs = append(ignoreDiffs, argoappv1.ResourceIgnoreDifferences{
+		Group:        "controlplane.cluster.x-k8s.io",
+		Kind:         "AWSManagedControlPlane",
+		JSONPointers: []string{"/spec/version"},
+	})
+	app.Spec.IgnoreDifferences = ignoreDiffs
 	return app, nil
 }

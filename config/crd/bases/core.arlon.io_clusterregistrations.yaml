@@ -38,8 +38,6 @@ spec:
             description: ClusterRegistrationSpec defines the desired state of ClusterRegistration
             properties:
               clusterName:
-                description: Foo is an example field of ClusterRegistration. Edit
-                  clusterregistration_types.go to remove/update
                 type: string
               kubeconfigSecretKeyName:
                 type: string
