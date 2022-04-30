@@ -41,7 +41,7 @@ func deployClusterCommand() *cobra.Command {
 			createInArgoCd := !outputYaml
 			rootApp, err := cluster.Create(appIf, kubeClient, argocdNs, arlonNs,
 				clusterName, repoUrl, repoBranch, basePath, clusterSpecName,
-				profileName, createInArgoCd)
+				profileName, createInArgoCd, config.Host)
 			if err != nil {
 				return fmt.Errorf("failed to create cluster: %s", err)
 			}

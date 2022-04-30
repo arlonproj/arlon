@@ -19,6 +19,7 @@ func ConstructRootApp(
 	clusterSpecName string,
 	clusterSpecCm *corev1.ConfigMap,
 	profileName string,
+	managementClusterUrl string,
 ) (*argoappv1.Application, error) {
 	app := &argoappv1.Application{
 		TypeMeta: v1.TypeMeta{
@@ -48,6 +49,10 @@ func ConstructRootApp(
 		{
 			Name:  "global.kubeconfigSecretKeyName",
 			Value: clusterspec.KubeconfigSecretKeyNameByApiProvider[cs.ApiProvider],
+		},
+		{
+			Name:  "global.managementClusterUrl",
+			Value: managementClusterUrl,
 		},
 	}
 	for _, key := range clusterspec.ValidHelmParamKeys {

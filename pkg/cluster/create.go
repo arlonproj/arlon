@@ -23,6 +23,7 @@ func Create(
 	clusterSpecName,
 	profileName string,
 	createInArgoCd bool,
+	managementClusterUrl string,
 ) (*argoappv1.Application, error) {
 	_, err := appIf.Get(context.Background(),
 		&argoapp.ApplicationQuery{Name: &clusterName})
@@ -45,7 +46,7 @@ func Create(
 	}
 	repoPath := mgmtPathFromBasePath(basePath, clusterName)
 	rootApp, err := ConstructRootApp(argocdNs, clusterName, repoUrl, repoBranch,
-		repoPath, clusterSpecName, cm, profileName)
+		repoPath, clusterSpecName, cm, profileName, managementClusterUrl)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct root app: %s", err)
 	}

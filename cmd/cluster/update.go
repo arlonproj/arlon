@@ -38,7 +38,8 @@ func updateClusterCommand() *cobra.Command {
 			updateInArgoCd := !outputYaml
 			clusterName := args[0]
 			rootApp, err := cluster.Update(appIf, kubeClient, argocdNs, arlonNs,
-				clusterName, clusterSpecName, profileName, updateInArgoCd)
+				clusterName, clusterSpecName, profileName, updateInArgoCd,
+				config.Host)
 			if err != nil {
 				return fmt.Errorf("failed to update cluster: %s", err)
 			}
