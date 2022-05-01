@@ -196,6 +196,7 @@ spec:
     repoURL: {{.RepoUrl}}
     path: {{.RepoPath}}
     targetRevision: {{.RepoRevision}}
+{{- if eq .SrcType "helm" }}
     helm:
       parameters:
       # Pass cluster name to the bundle in case it needs it and is a Helm chart.
@@ -203,6 +204,13 @@ spec:
       # Use arlon prefix to avoid any conflicts with the bundle's own values.
       - name: arlon.clusterName
         value: {{.ClusterName}}
+{{- else if eq .SrcType "kustomize" }}
+    kustomize: {}
+{{- else if eq .SrcType "ksonnet" }}
+    ksonnet: {}
+{{- else if eq .SrcType "directory" }}
+    directory: {}
+{{- end }}
 `
 
 // This is used for a dynamic profile, which is an Application containing
@@ -244,6 +252,7 @@ type AppSettings struct {
 	RepoUrl              string
 	RepoPath             string
 	RepoRevision         string
+	SrcType              string
 	AppNamespace         string
 	DestinationNamespace string
 }
@@ -321,6 +330,7 @@ func ProcessBundles(
 			}
 			app.RepoUrl = b.RepoUrl
 			app.RepoPath = b.RepoPath
+			app.SrcType = b.SrcType
 		} else if b.RepoUrl != "" {
 			return fmt.Errorf("b %s has both data and repoUrl set", b.Name)
 		} else {

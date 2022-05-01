@@ -17,6 +17,7 @@ type Bundle struct {
 	RepoUrl  string
 	RepoPath string
 	RepoRevision string
+	SrcType string
 }
 
 // -----------------------------------------------------------------------------
@@ -40,9 +41,10 @@ func GetBundlesFromProfile(
 		bundles = append(bundles, Bundle{
 			Name:     bundleName,
 			Data:     secr.Data["data"],
-			RepoUrl:  string(secr.Annotations[common.RepoUrlAnnotationKey]),
-			RepoPath: string(secr.Annotations[common.RepoPathAnnotationKey]),
-			RepoRevision: string(secr.Annotations[common.RepoRevisionAnnotationKey]),
+			RepoUrl:  secr.Annotations[common.RepoUrlAnnotationKey],
+			RepoPath: secr.Annotations[common.RepoPathAnnotationKey],
+			RepoRevision: secr.Annotations[common.RepoRevisionAnnotationKey],
+			SrcType: secr.Annotations[common.SrcTypeAnnotationKey],
 		})
 	}
 	return
