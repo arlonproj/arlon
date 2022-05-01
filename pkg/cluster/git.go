@@ -195,7 +195,7 @@ spec:
   source:
     repoURL: {{.RepoUrl}}
     path: {{.RepoPath}}
-    targetRevision: HEAD
+    targetRevision: {{.RepoRevision}}
     helm:
       parameters:
       # Pass cluster name to the bundle in case it needs it and is a Helm chart.
@@ -243,6 +243,7 @@ type AppSettings struct {
 	ClusterName          string
 	RepoUrl              string
 	RepoPath             string
+	RepoRevision         string
 	AppNamespace         string
 	DestinationNamespace string
 }
@@ -307,6 +308,11 @@ func ProcessBundles(
 			AppName:              fmt.Sprintf("%s-%s", clusterName, b.Name),
 			AppNamespace:         "argocd",
 			DestinationNamespace: "default", // FIXME: make configurable
+		}
+		if b.RepoRevision == "" {
+			app.RepoRevision = "HEAD"
+		} else {
+			app.RepoRevision = b.RepoRevision
 		}
 		if b.Data == nil {
 			// dynamic bundle

@@ -17,6 +17,7 @@ func Create(
 	fromFile string,
 	repoUrl string,
 	repoPath string,
+	repoRevision string,
 	desc string,
 	tags string,
 ) error {
@@ -57,6 +58,7 @@ func Create(
 		secr.Labels["bundle-type"] = "dynamic"
 		secr.ObjectMeta.Annotations[common.RepoUrlAnnotationKey] = repoUrl
 		secr.ObjectMeta.Annotations[common.RepoPathAnnotationKey] = repoPath
+		secr.ObjectMeta.Annotations[common.RepoRevisionAnnotationKey] = repoRevision
 	} else {
 		return fmt.Errorf("the bundle must be created from a file or repo URL")
 	}

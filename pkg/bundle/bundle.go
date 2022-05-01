@@ -16,6 +16,7 @@ type Bundle struct {
 	// The following are only set on dynamic bundles
 	RepoUrl  string
 	RepoPath string
+	RepoRevision string
 }
 
 // -----------------------------------------------------------------------------
@@ -41,6 +42,7 @@ func GetBundlesFromProfile(
 			Data:     secr.Data["data"],
 			RepoUrl:  string(secr.Annotations[common.RepoUrlAnnotationKey]),
 			RepoPath: string(secr.Annotations[common.RepoPathAnnotationKey]),
+			RepoRevision: string(secr.Annotations[common.RepoRevisionAnnotationKey]),
 		})
 	}
 	return
