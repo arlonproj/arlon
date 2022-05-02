@@ -40,7 +40,7 @@ func createBundleCommand() *cobra.Command {
 	command.Flags().StringVar(&fromFile, "from-file", "", "create static bundle from this file")
 	command.Flags().StringVar(&repoUrl, "repo-url", "", "create a dynamic bundle from this repo URL")
 	command.Flags().StringVar(&repoPath, "repo-path", "", "optional path in repo specified by --from-repo")
-	command.Flags().StringVar(&repoRevision, "repo-revision", "main", "revision")
+	command.Flags().StringVar(&repoRevision, "repo-revision", "", "git revision (unspecified implies HEAD of default branch)")
 	command.Flags().StringVar(&srcType, "srctype", "", "manifest source type (directory/helm/ksonnet/kustomize, empty means autodetect)")
 	command.Flags().StringVar(&desc, "desc", "", "description")
 	command.Flags().StringVar(&tags, "tags", "", "comma separated list of tags")
