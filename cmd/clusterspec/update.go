@@ -36,6 +36,9 @@ func updateClusterspecCommand() *cobra.Command {
 			}
 			kubeClient := kubernetes.NewForConfigOrDie(config)
 			if enableClusterAutoscaler {
+				if disableClusterAutoscaler {
+					return fmt.Errorf("--disablecas and --enablecas cannot both be set")
+				}
 				clusterAutoscalerEnabledPtr = &enableClusterAutoscaler // true
 			} else if disableClusterAutoscaler {
 				clusterAutoscalerEnabledPtr = &enableClusterAutoscaler // false

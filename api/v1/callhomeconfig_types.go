@@ -25,13 +25,13 @@ import (
 
 // CallHomeConfigSpec defines the desired state of CallHomeConfig
 type CallHomeConfigSpec struct {
-	ServiceAccountName      string `json:"serviceAccountName"` //
-	KubeconfigSecretName    string `json:"kubeconfigSecretName"` //
+	ServiceAccountName      string `json:"serviceAccountName"`      //
+	KubeconfigSecretName    string `json:"kubeconfigSecretName"`    //
 	KubeconfigSecretKeyName string `json:"kubeconfigSecretKeyName"` //
-	TargetNamespace         string `json:"targetNamespace"` //
-	TargetSecretName        string `json:"targetSecretName"` //
-	TargetSecretKeyName     string `json:"targetSecretKeyName"` //
-	ManagementClusterUrl    string `json:"managementClusterUrl"` //
+	TargetNamespace         string `json:"targetNamespace"`         //
+	TargetSecretName        string `json:"targetSecretName"`        //
+	TargetSecretKeyName     string `json:"targetSecretKeyName"`     //
+	ManagementClusterUrl    string `json:"managementClusterUrl"`    //
 }
 
 // CallHomeConfigStatus defines the observed state of CallHomeConfig
