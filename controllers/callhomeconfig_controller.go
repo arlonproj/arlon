@@ -140,10 +140,8 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			ctrl.Result{})
 	}
 	if len(sa.Secrets) < 1 {
-		msg := fmt.Sprintf("serviceaccount %s does not have a token, retrying in %d seconds",
-			namespacedName.Name, retrySeconds)
-		return updateCallHomeConfigState(r, log, &chc, "retrying", msg,
-			ctrl.Result{RequeueAfter: retrySeconds * time.Second})
+		return retryLater(r, log, &chc, "serviceaccount",
+			namespacedName.Name, "does not have a token")
 	}
 	tokenSecretName := sa.Secrets[0]
 	var token corev1.Secret
