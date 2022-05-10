@@ -1,11 +1,9 @@
 package profile
 
 import (
-	"context"
 	"fmt"
+	"github.com/arlonproj/arlon/pkg/profile"
 	"github.com/spf13/cobra"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
@@ -35,38 +33,34 @@ func listProfilesCommand() *cobra.Command {
 }
 
 func listProfiles(config *restclient.Config, ns string) error {
-	kubeClient := kubernetes.NewForConfigOrDie(config)
-	corev1 := kubeClient.CoreV1()
-	configMapsApi := corev1.ConfigMaps(ns)
-	opts := metav1.ListOptions{
-		LabelSelector: "managed-by=arlon,arlon-type=profile",
-	}
-	configMaps, err := configMapsApi.List(context.Background(), opts)
+	plist, err := profile.List(config, ns)
 	if err != nil {
-		return fmt.Errorf("failed to list configMaps: %s", err)
-	}
-	if len(configMaps.Items) == 0 {
-		fmt.Println("no profiles found")
-		return nil
+		return err
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintf(w, "NAME\tTYPE\tBUNDLES\tREPO-URL\tREPO-PATH\tTAGS\tDESCRIPTION\n")
-	for _, configMap := range configMaps.Items {
+	_, _ = fmt.Fprintf(w, "NAME\tGEN\tTYPE\tBUNDLES\tREPO-URL\tREPO-PATH\tOVRDS\tTAGS\tDESCRIPTION\n")
+	for _, prof := range plist {
 		profileType := "dynamic"
-		bundles := configMap.Data["bundles"]
-		repoUrl := configMap.Data["repo-url"]
+		bundles := prof.Spec.Bundles
+		repoUrl := prof.Spec.RepoUrl
 		if repoUrl == "" {
 			repoUrl = "(N/A)"
 			profileType = "static"
 		}
-		repoPath := configMap.Data["repo-path"]
+		repoPath := prof.Spec.RepoPath
 		if repoPath == "" {
 			repoPath = "(N/A)"
 		}
-		tags := string(configMap.Data["tags"])
-		desc := string(configMap.Data["description"])
-		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
-			configMap.Name, profileType, bundles, repoUrl, repoPath, tags, desc)
+		tags := prof.Spec.Tags
+		desc := prof.Spec.Description
+		gen := "2"
+		if prof.Legacy {
+			gen = "1"
+		}
+		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\n",
+			prof.Name, gen, profileType, bundles, repoUrl, repoPath,
+			len(prof.Spec.Overrides),
+			tags, desc)
 	}
 	_ = w.Flush()
 	return nil

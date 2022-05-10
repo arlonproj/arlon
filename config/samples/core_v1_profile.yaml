@@ -1,0 +1,7 @@
+apiVersion: core.arlon.io/v1
+kind: Profile
+metadata:
+  name: profile-sample
+spec:
+  # Add fields here
+  foo: bar

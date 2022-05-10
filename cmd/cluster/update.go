@@ -1,16 +1,19 @@
 package cluster
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
+	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/cluster"
+	"github.com/arlonproj/arlon/pkg/common"
+	"github.com/arlonproj/arlon/pkg/profile"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
 )
@@ -34,12 +37,32 @@ func updateClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
-			kubeClient := kubernetes.NewForConfigOrDie(config)
 			updateInArgoCd := !outputYaml
 			clusterName := args[0]
-			rootApp, err := cluster.Update(appIf, kubeClient, argocdNs, arlonNs,
-				clusterName, clusterSpecName, profileName, updateInArgoCd,
-				config.Host)
+			oldApp, err := appIf.Get(context.Background(),
+				&argoapp.ApplicationQuery{Name: &clusterName})
+			if err != nil {
+				return fmt.Errorf("failed to get argocd app: %s", err)
+			}
+			if clusterSpecName == "" {
+				clusterSpecName = oldApp.Annotations[common.ClusterSpecAnnotationKey]
+				if clusterSpecName == "" {
+					return fmt.Errorf("existing cluster root app is missing clusterspec annotation")
+				}
+			}
+			if profileName == "" {
+				profileName = oldApp.Annotations[common.ProfileAnnotationKey]
+				if profileName == "" {
+					return fmt.Errorf("existing cluster root app is missing profile annotation")
+				}
+			}
+			prof, err := profile.Get(config, profileName, arlonNs)
+			if err != nil {
+				return fmt.Errorf("failed to get profile: %s", err)
+			}
+			rootApp, err := cluster.Update(appIf, config, argocdNs, arlonNs,
+				clusterName, clusterSpecName, prof, updateInArgoCd,
+				config.Host, oldApp)
 			if err != nil {
 				return fmt.Errorf("failed to update cluster: %s", err)
 			}

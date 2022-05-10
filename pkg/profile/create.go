@@ -3,65 +3,66 @@ package profile
 import (
 	"context"
 	"fmt"
-	v1 "k8s.io/api/core/v1"
-	apierr "k8s.io/apimachinery/pkg/api/errors"
+	arlonv1 "github.com/arlonproj/arlon/api/v1"
+	"github.com/arlonproj/arlon/pkg/controller"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	restclient "k8s.io/client-go/rest"
 	"path"
 )
 
 func Create(
-	kubeClient *kubernetes.Clientset,
+	config *restclient.Config,
 	argocdNs string,
 	arlonNs string,
 	profileName string,
 	repoUrl string,
 	repoBasePath string,
-	repoBranch string,
+	repoRevision string,
 	bundles string,
 	desc string,
 	tags string,
+	overrides []arlonv1.Override,
 ) error {
-	corev1 := kubeClient.CoreV1()
-	configMapApi := corev1.ConfigMaps(arlonNs)
-	_, err := configMapApi.Get(context.Background(), profileName, metav1.GetOptions{})
-	if err == nil {
-		return fmt.Errorf("a profile with that name already exists")
+	cli, err := controller.NewClient(config)
+	if err != nil {
+		return fmt.Errorf("failed to get controller runtime client: %s", err)
 	}
-	if !apierr.IsNotFound(err) {
-		return fmt.Errorf("failed to check for existence of profile: %s", err)
-	}
+
 	var repoPath string
 	if repoUrl == "" {
-		repoBranch = ""
+		repoRevision = ""
 	} else {
 		repoPath = path.Join(repoBasePath, profileName)
 	}
-	cm := v1.ConfigMap{
+	bundleList := StringListFromCommaSeparated(bundles)
+	tagList := StringListFromCommaSeparated(tags)
+	p := arlonv1.Profile{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: profileName,
-			Labels: map[string]string{
-				"managed-by": "arlon",
-				"arlon-type": "profile",
-			},
+			Name:      profileName,
+			Namespace: arlonNs,
 		},
-		Data: map[string]string{
-			"description": desc,
-			"bundles":     bundles,
-			"tags":        tags,
-			"repo-url":    repoUrl,
-			"repo-path":   repoPath,
-			"repo-branch": repoBranch,
+		Spec: arlonv1.ProfileSpec{
+			Description:  desc,
+			Bundles:      bundleList,
+			Tags:         tagList,
+			RepoUrl:      repoUrl,
+			RepoPath:     repoPath,
+			RepoRevision: repoRevision,
+			Overrides:    overrides,
 		},
 	}
 	if repoUrl != "" {
-		err = createInGit(kubeClient, &cm, argocdNs, arlonNs,
-			repoUrl, repoPath, repoBranch)
+		kubeClient, err := kubernetes.NewForConfig(config)
+		if err != nil {
+			return fmt.Errorf("failed to get kubernetes client: %s", err)
+		}
+		err = createInGit(kubeClient, &p, argocdNs, arlonNs)
 		if err != nil {
 			return fmt.Errorf("failed to create dynamic profile in git: %s", err)
 		}
 	}
-	_, err = configMapApi.Create(context.Background(), &cm, metav1.CreateOptions{})
+	err = cli.Create(context.Background(), &p)
 	if err != nil {
 		return fmt.Errorf("failed to create profile configmap: %s", err)
 	}

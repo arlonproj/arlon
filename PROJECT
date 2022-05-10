@@ -22,4 +22,13 @@ resources:
   kind: CallHomeConfig
   path: github.com/arlonproj/arlon/api/v1
   version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: arlon.io
+  group: core
+  kind: Profile
+  path: github.com/arlonproj/arlon/api/v1
+  version: v1
 version: "3"
