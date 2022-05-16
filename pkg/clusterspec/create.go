@@ -20,6 +20,9 @@ func Create(
 	nodeCount int,
 	masterNodeCount int,
 	sshKeyName string,
+	clusterAutoscalerEnabled bool,
+	clusterAutoscalerMinNodes int,
+	clusterAutoscalerMaxNodes int,
 	desc string,
 	tags string,
 ) error {
@@ -38,7 +41,9 @@ func Create(
 	}
 	cm := ToConfigMap(specName, apiProvider, cloudProvider, clusterType,
 		kubernetesVersion, nodeType, nodeCount, masterNodeCount,
-		"", "", sshKeyName, tags, desc)
+		"", "", sshKeyName, clusterAutoscalerEnabled,
+		clusterAutoscalerMinNodes, clusterAutoscalerMaxNodes,
+		tags, desc)
 	corev1 := kubeClient.CoreV1()
 	configMapApi := corev1.ConfigMaps(arlonNs)
 	_, err = configMapApi.Create(context.Background(), cm, metav1.CreateOptions{})

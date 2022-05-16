@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 global:
-  clusterName: clusterA
+  clusterName: cluster-x-change-me
   region: us-west-2
   sshKeyName: nobody-change-me
   kubernetesVersion: v1.18.16
@@ -12,9 +12,14 @@ global:
   masterNodeCount: 1
   nodeType: t3.large
   kubeconfigSecretKeyName: value
+  clusterAutoscalerEnabled: false
+  clusterAutoscalerMinNodes: "1"
+  clusterAutoscalerMaxNodes: "9"
+  managementClusterUrl: https://change-me.invalid.org:8888
 
 tags:
   capi-aws-eks: false
   capi-aws-kubeadm: false
+  capi-cluster-autoscaler: false
   xplane-aws-eks: false
 

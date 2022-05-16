@@ -20,6 +20,7 @@ func Update(
 	clusterSpecName,
 	profileName string,
 	updateInArgoCd bool,
+	managementClusterUrl string,
 ) (*argoappv1.Application, error) {
 	oldApp, err := appIf.Get(context.Background(),
 		&argoapp.ApplicationQuery{Name: &clusterName})
@@ -69,7 +70,8 @@ func Update(
 			clstName)
 	}
 	rootApp, err := ConstructRootApp(argocdNs, clusterName, repoUrl,
-		repoBranch, repoPath, clusterSpecName, clusterSpecCm, profileName)
+		repoBranch, repoPath, clusterSpecName, clusterSpecCm, profileName,
+		managementClusterUrl)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct root app: %s", err)
 	}

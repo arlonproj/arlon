@@ -14,8 +14,10 @@ type Bundle struct {
 	Name string
 	Data []byte
 	// The following are only set on dynamic bundles
-	RepoUrl  string
-	RepoPath string
+	RepoUrl      string
+	RepoPath     string
+	RepoRevision string
+	SrcType      string
 }
 
 // -----------------------------------------------------------------------------
@@ -37,10 +39,12 @@ func GetBundlesFromProfile(
 			return nil, fmt.Errorf("failed to get bundle secret %s: %s", bundleName, err)
 		}
 		bundles = append(bundles, Bundle{
-			Name:     bundleName,
-			Data:     secr.Data["data"],
-			RepoUrl:  string(secr.Annotations[common.RepoUrlAnnotationKey]),
-			RepoPath: string(secr.Annotations[common.RepoPathAnnotationKey]),
+			Name:         bundleName,
+			Data:         secr.Data["data"],
+			RepoUrl:      secr.Annotations[common.RepoUrlAnnotationKey],
+			RepoPath:     secr.Annotations[common.RepoPathAnnotationKey],
+			RepoRevision: secr.Annotations[common.RepoRevisionAnnotationKey],
+			SrcType:      secr.Annotations[common.SrcTypeAnnotationKey],
 		})
 	}
 	return

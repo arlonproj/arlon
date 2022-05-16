@@ -1,6 +1,6 @@
 apiVersion: v2
-name: arlon-cluster
-description: a chart for building an Arlon-managed kubernetes cluster
+name: capi-cluster-autoscaler
+description: Cluster autoscaler for Cluster API
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -22,17 +22,3 @@ version: 0.1.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "1.16.0"
-
-dependencies:
-  - name: capi-aws-eks
-    tags:
-      - capi-aws-eks
-  - name: capi-aws-kubeadm
-    tags:
-      - capi-aws-kubeadm
-  - name: xplane-aws-eks
-    tags:
-      - xplane-aws-eks
-  - name: capi-cluster-autoscaler
-    tags:
-      - capi-cluster-autoscaler

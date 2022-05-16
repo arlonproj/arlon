@@ -1,0 +1,6 @@
+K8sRegistry: k8s.gcr.io
+cpuLimit: 200m
+memLimit: 600Mi
+cpuRequest: 100m
+memRequest: 300Mi
+autoscalerVersion: v1.21.1

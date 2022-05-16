@@ -32,6 +32,11 @@ kind: MachineDeployment
 metadata:
   name: {{ .Values.global.clusterName }}-md-0
   namespace: {{ .Values.global.clusterName }}
+  {{- if .Values.global.clusterAutoscalerEnabled }}
+  annotations:
+    cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: "{{ .Values.global.clusterAutoscalerMinNodes }}"
+    cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: "{{ .Values.global.clusterAutoscalerMaxNodes }}"
+  {{- end }}
 spec:
   clusterName: {{ .Values.global.clusterName }}
   replicas: {{ .Values.global.nodeCount }}

@@ -15,6 +15,9 @@ func Update(
 	nodeType string,
 	nodeCount int,
 	masterNodeCount int,
+	clusterAutoscalerEnabledPtr *bool,
+	clusterAutoscalerMinNodes int,
+	clusterAutoscalerMaxNodes int,
 	desc string,
 	tags string,
 ) (dirty bool, err error) {
@@ -42,6 +45,23 @@ func Update(
 	} else {
 		dirty = true
 	}
+	var clusterAutoscalerEnabled bool
+	if clusterAutoscalerEnabledPtr == nil {
+		clusterAutoscalerEnabled = cs.ClusterAutoscalerEnabled
+	} else {
+		clusterAutoscalerEnabled = *clusterAutoscalerEnabledPtr
+		dirty = true
+	}
+	if clusterAutoscalerMinNodes == 0 {
+		clusterAutoscalerMinNodes = cs.ClusterAutoscalerMinNodes
+	} else {
+		dirty = true
+	}
+	if clusterAutoscalerMaxNodes == 0 {
+		clusterAutoscalerMaxNodes = cs.ClusterAutoscalerMaxNodes
+	} else {
+		dirty = true
+	}
 	if desc == "" {
 		desc = cs.Description
 	} else {
@@ -57,7 +77,9 @@ func Update(
 	}
 	cm := ToConfigMap(specName, cs.ApiProvider, cs.CloudProvider, cs.Type,
 		kubernetesVersion, nodeType, nodeCount, masterNodeCount,
-		cs.Region, cs.PodCidrBlock, cs.SshKeyName, tags, desc)
+		cs.Region, cs.PodCidrBlock, cs.SshKeyName, clusterAutoscalerEnabled,
+		clusterAutoscalerMinNodes, clusterAutoscalerMaxNodes,
+		tags, desc)
 	corev1 := kubeClient.CoreV1()
 	configMapApi := corev1.ConfigMaps(arlonNs)
 	_, err = configMapApi.Update(context.Background(), cm, metav1.UpdateOptions{})

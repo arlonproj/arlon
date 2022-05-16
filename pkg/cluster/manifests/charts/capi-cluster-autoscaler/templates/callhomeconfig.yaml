@@ -1,0 +1,15 @@
+
+---
+apiVersion: core.arlon.io/v1
+kind: CallHomeConfig
+metadata:
+  name: cluster-autoscaler
+  namespace: {{ .Values.global.clusterName }}
+spec:
+  serviceAccountName: cluster-autoscaler
+  kubeconfigSecretName: {{ .Values.global.clusterName }}-kubeconfig
+  kubeconfigSecretKeyName: value
+  targetNamespace: kube-system
+  targetSecretName: cluster-autoscaler-management-kubeconfig
+  targetSecretKeyName: kubeconfig
+  managementClusterUrl: {{ .Values.global.managementClusterUrl }}

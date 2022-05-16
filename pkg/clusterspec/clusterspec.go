@@ -10,34 +10,45 @@ import (
 )
 
 type ClusterSpec struct {
-	Name              string
-	ApiProvider       string
-	CloudProvider     string
-	Type              string
-	KubernetesVersion string
-	NodeType          string
-	NodeCount         int
-	MasterNodeCount   int
-	Region            string
-	PodCidrBlock      string
-	SshKeyName        string
-	Tags              string
-	Description       string
+	Name                      string
+	ApiProvider               string
+	CloudProvider             string
+	Type                      string
+	KubernetesVersion         string
+	NodeType                  string
+	NodeCount                 int
+	MasterNodeCount           int
+	Region                    string
+	PodCidrBlock              string
+	SshKeyName                string
+	Tags                      string
+	Description               string
+	ClusterAutoscalerEnabled  bool
+	ClusterAutoscalerMinNodes int
+	ClusterAutoscalerMaxNodes int
 }
 
 const (
-	ApiProviderKey       = "apiProvider"
-	CloudProviderKey     = "cloudProvider"
-	NodeTypeKey          = "nodeType"
-	ClusterTypeKey       = "type"
-	KubernetesVersionKey = "kubernetesVersion"
-	NodeCountKey         = "nodeCount"
-	MasterNodeCountKey   = "masterNodeCount"
-	RegionKey            = "region"
-	PodCidrBlockKey      = "podCidrBlock"
-	SshKeyNameKey        = "sshKeyName"
-	TagsKey              = "tags"
-	DescriptionKey       = "description"
+	ApiProviderKey               = "apiProvider"
+	CloudProviderKey             = "cloudProvider"
+	NodeTypeKey                  = "nodeType"
+	ClusterTypeKey               = "type"
+	KubernetesVersionKey         = "kubernetesVersion"
+	NodeCountKey                 = "nodeCount"
+	MasterNodeCountKey           = "masterNodeCount"
+	RegionKey                    = "region"
+	PodCidrBlockKey              = "podCidrBlock"
+	SshKeyNameKey                = "sshKeyName"
+	TagsKey                      = "tags"
+	DescriptionKey               = "description"
+	ClusterAutoscalerEnabledKey  = "clusterAutoscalerEnabled"
+	ClusterAutoscalerMinNodesKey = "clusterAutoscalerMinNodes"
+	ClusterAutoscalerMaxNodesKey = "clusterAutoscalerMaxNodes"
+
+	defaultMasterNodeCount           = 3
+	defaultClusterAutoscalerEnabled  = false
+	defaultClusterAutoscalerMinNodes = 1
+	defaultClusterAutoscalerMaxNodes = 9
 )
 
 var (
@@ -49,6 +60,9 @@ var (
 		NodeCountKey,
 		MasterNodeCountKey,
 		NodeTypeKey,
+		ClusterAutoscalerEnabledKey,
+		ClusterAutoscalerMinNodesKey,
+		ClusterAutoscalerMaxNodesKey,
 	}
 )
 
@@ -91,7 +105,19 @@ func FromConfigMap(cm *corev1.ConfigMap) (*ClusterSpec, error) {
 	}
 	cs.MasterNodeCount, err = strconv.Atoi(cm.Data[MasterNodeCountKey])
 	if err != nil {
-		cs.MasterNodeCount = 3 // for backward compatibility if not present
+		cs.MasterNodeCount = defaultMasterNodeCount // for backward compatibility if not present
+	}
+	cs.ClusterAutoscalerEnabled, err = strconv.ParseBool(cm.Data[ClusterAutoscalerEnabledKey])
+	if err != nil {
+		cs.ClusterAutoscalerEnabled = defaultClusterAutoscalerEnabled
+	}
+	cs.ClusterAutoscalerMinNodes, err = strconv.Atoi(cm.Data[ClusterAutoscalerMinNodesKey])
+	if err != nil {
+		cs.ClusterAutoscalerMinNodes = defaultClusterAutoscalerMinNodes
+	}
+	cs.ClusterAutoscalerMaxNodes, err = strconv.Atoi(cm.Data[ClusterAutoscalerMaxNodesKey])
+	if err != nil {
+		cs.ClusterAutoscalerMaxNodes = defaultClusterAutoscalerMaxNodes
 	}
 	return cs, nil
 }
@@ -108,6 +134,9 @@ func ToConfigMap(
 	region string,
 	podCidrBlock string,
 	sshKeyName string,
+	clusterAutoscalerEnabled bool,
+	clusterAutoscalerMinNodes int,
+	clusterAutoscalerMaxNodes int,
 	tags string,
 	description string,
 ) *corev1.ConfigMap {
@@ -120,18 +149,21 @@ func ToConfigMap(
 			},
 		},
 		Data: map[string]string{
-			ApiProviderKey:       apiProvider,
-			CloudProviderKey:     cloudProvider,
-			ClusterTypeKey:       clusterType,
-			KubernetesVersionKey: kubernetesVersion,
-			NodeTypeKey:          nodeType,
-			NodeCountKey:         strconv.Itoa(nodeCount),
-			MasterNodeCountKey:   strconv.Itoa(masterNodeCount),
-			RegionKey:            region,
-			PodCidrBlockKey:      podCidrBlock,
-			SshKeyNameKey:        sshKeyName,
-			TagsKey:              tags,
-			DescriptionKey:       description,
+			ApiProviderKey:               apiProvider,
+			CloudProviderKey:             cloudProvider,
+			ClusterTypeKey:               clusterType,
+			KubernetesVersionKey:         kubernetesVersion,
+			NodeTypeKey:                  nodeType,
+			NodeCountKey:                 strconv.Itoa(nodeCount),
+			MasterNodeCountKey:           strconv.Itoa(masterNodeCount),
+			RegionKey:                    region,
+			PodCidrBlockKey:              podCidrBlock,
+			SshKeyNameKey:                sshKeyName,
+			ClusterAutoscalerEnabledKey:  strconv.FormatBool(clusterAutoscalerEnabled),
+			ClusterAutoscalerMinNodesKey: strconv.Itoa(clusterAutoscalerMinNodes),
+			ClusterAutoscalerMaxNodesKey: strconv.Itoa(clusterAutoscalerMaxNodes),
+			TagsKey:                      tags,
+			DescriptionKey:               description,
 		},
 	}
 }
@@ -141,12 +173,23 @@ func SubchartName(cm *corev1.ConfigMap) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if err = ValidApiProvider(cs.ApiProvider); err != nil {
+	return SubchartNameFromClusterSpec(cs)
+}
+
+func SubchartNameFromClusterSpec(cs *ClusterSpec) (string, error) {
+	if err := ValidApiProvider(cs.ApiProvider); err != nil {
 		return "", err
 	}
-	if err = ValidCloudProviderAndClusterType(cs.CloudProvider, cs.Type); err != nil {
+	if err := ValidCloudProviderAndClusterType(cs.CloudProvider, cs.Type); err != nil {
 		return "", err
 	}
 	return fmt.Sprintf("%s-%s-%s", cs.ApiProvider,
 		cs.CloudProvider, cs.Type), nil
+}
+
+func ClusterAutoscalerSubchartNameFromClusterSpec(cs *ClusterSpec) (string, error) {
+	if err := ValidApiProvider(cs.ApiProvider); err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s-cluster-autoscaler", cs.ApiProvider), nil
 }

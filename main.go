@@ -20,13 +20,15 @@ import (
 	"flag"
 	"os"
 
+	"github.com/spf13/cobra"
+
 	"github.com/platform9/arlon/cmd/bundle"
+	"github.com/platform9/arlon/cmd/callhomecontroller"
 	"github.com/platform9/arlon/cmd/cluster"
 	"github.com/platform9/arlon/cmd/clusterspec"
 	"github.com/platform9/arlon/cmd/controller"
 	"github.com/platform9/arlon/cmd/list_clusters"
 	"github.com/platform9/arlon/cmd/profile"
-	"github.com/spf13/cobra"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -50,6 +52,7 @@ func main() {
 	// don't display usage upon error
 	command.SilenceUsage = true
 	command.AddCommand(controller.NewCommand())
+	command.AddCommand(callhomecontroller.NewCommand())
 	command.AddCommand(list_clusters.NewCommand())
 	command.AddCommand(bundle.NewCommand())
 	command.AddCommand(profile.NewCommand())

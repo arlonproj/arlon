@@ -6,21 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: clusterregistrations.core.arlon.io
+  name: callhomeconfigs.core.arlon.io
 spec:
   group: core.arlon.io
   names:
-    kind: ClusterRegistration
-    listKind: ClusterRegistrationList
-    plural: clusterregistrations
-    singular: clusterregistration
+    kind: CallHomeConfig
+    listKind: CallHomeConfigList
+    plural: callhomeconfigs
+    singular: callhomeconfig
   scope: Namespaced
   versions:
   - name: v1
     schema:
       openAPIV3Schema:
-        description: ClusterRegistration is the Schema for the clusterregistrations
-          API
+        description: CallHomeConfig is the Schema for the callhomeconfigs API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -35,27 +34,37 @@ spec:
           metadata:
             type: object
           spec:
-            description: ClusterRegistrationSpec defines the desired state of ClusterRegistration
+            description: CallHomeConfigSpec defines the desired state of CallHomeConfig
             properties:
-              clusterName:
-                type: string
               kubeconfigSecretKeyName:
                 type: string
               kubeconfigSecretName:
                 type: string
+              managementClusterUrl:
+                type: string
+              serviceAccountName:
+                type: string
+              targetNamespace:
+                type: string
+              targetSecretKeyName:
+                type: string
+              targetSecretName:
+                type: string
             required:
             - kubeconfigSecretKeyName
             - kubeconfigSecretName
+            - managementClusterUrl
+            - serviceAccountName
+            - targetNamespace
+            - targetSecretKeyName
+            - targetSecretName
             type: object
           status:
-            description: ClusterRegistrationStatus defines the observed state of ClusterRegistration
+            description: CallHomeConfigStatus defines the observed state of CallHomeConfig
             properties:
               message:
                 type: string
               state:
-                description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
-                  of cluster Important: Run "make" to regenerate code after modifying
-                  this file'
                 type: string
             required:
             - message

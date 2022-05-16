@@ -195,7 +195,22 @@ spec:
   source:
     repoURL: {{.RepoUrl}}
     path: {{.RepoPath}}
-    targetRevision: HEAD
+    targetRevision: {{.RepoRevision}}
+{{- if eq .SrcType "helm" }}
+    helm:
+      parameters:
+      # Pass cluster name to the bundle in case it needs it and is a Helm chart.
+      # Example: this is required by the CAPI cluster autoscaler.
+      # Use arlon prefix to avoid any conflicts with the bundle's own values.
+      - name: arlon.clusterName
+        value: {{.ClusterName}}
+{{- else if eq .SrcType "kustomize" }}
+    kustomize: {}
+{{- else if eq .SrcType "ksonnet" }}
+    ksonnet: {}
+{{- else if eq .SrcType "directory" }}
+    directory: {}
+{{- end }}
 `
 
 // This is used for a dynamic profile, which is an Application containing
@@ -236,6 +251,8 @@ type AppSettings struct {
 	ClusterName          string
 	RepoUrl              string
 	RepoPath             string
+	RepoRevision         string
+	SrcType              string
 	AppNamespace         string
 	DestinationNamespace string
 }
@@ -301,13 +318,19 @@ func ProcessBundles(
 			AppNamespace:         "argocd",
 			DestinationNamespace: "default", // FIXME: make configurable
 		}
+		if b.RepoRevision == "" {
+			app.RepoRevision = "HEAD"
+		} else {
+			app.RepoRevision = b.RepoRevision
+		}
 		if b.Data == nil {
-			// reference type b
+			// dynamic bundle
 			if b.RepoUrl == "" {
 				return fmt.Errorf("b %s is neither static nor dynamic type", b.Name)
 			}
 			app.RepoUrl = b.RepoUrl
 			app.RepoPath = b.RepoPath
+			app.SrcType = b.SrcType
 		} else if b.RepoUrl != "" {
 			return fmt.Errorf("b %s has both data and repoUrl set", b.Name)
 		} else {

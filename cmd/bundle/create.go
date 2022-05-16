@@ -16,6 +16,8 @@ func createBundleCommand() *cobra.Command {
 	var fromFile string
 	var repoUrl string
 	var repoPath string
+	var repoRevision string
+	var srcType string
 	var desc string
 	var tags string
 	command := &cobra.Command{
@@ -29,7 +31,8 @@ func createBundleCommand() *cobra.Command {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
 			kubeClient := kubernetes.NewForConfigOrDie(config)
-			return bundle.Create(kubeClient, ns, args[0], fromFile, repoUrl, repoPath, desc, tags)
+			return bundle.Create(kubeClient, ns, args[0], fromFile, repoUrl,
+				repoPath, repoRevision, srcType, desc, tags)
 		},
 	}
 	clientConfig = cli.AddKubectlFlagsToCmd(command)
@@ -37,6 +40,8 @@ func createBundleCommand() *cobra.Command {
 	command.Flags().StringVar(&fromFile, "from-file", "", "create static bundle from this file")
 	command.Flags().StringVar(&repoUrl, "repo-url", "", "create a dynamic bundle from this repo URL")
 	command.Flags().StringVar(&repoPath, "repo-path", "", "optional path in repo specified by --from-repo")
+	command.Flags().StringVar(&repoRevision, "repo-revision", "", "git revision (unspecified implies HEAD of default branch)")
+	command.Flags().StringVar(&srcType, "srctype", "", "manifest source type (directory/helm/ksonnet/kustomize, empty means autodetect)")
 	command.Flags().StringVar(&desc, "desc", "", "description")
 	command.Flags().StringVar(&tags, "tags", "", "comma separated list of tags")
 	return command
