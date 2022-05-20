@@ -2,7 +2,7 @@ package bundle
 
 import (
 	"fmt"
-	"github.com/platform9/arlon/pkg/bundle"
+	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"

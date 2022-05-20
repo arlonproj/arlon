@@ -2,7 +2,7 @@ domain: arlon.io
 layout:
 - go.kubebuilder.io/v3
 projectName: arlon
-repo: github.com/platform9/arlon
+repo: github.com/arlonproj/arlon
 resources:
 - api:
     crdVersion: v1
@@ -11,7 +11,7 @@ resources:
   domain: arlon.io
   group: core
   kind: ClusterRegistration
-  path: github.com/platform9/arlon/api/v1
+  path: github.com/arlonproj/arlon/api/v1
   version: v1
 - api:
     crdVersion: v1
@@ -20,6 +20,6 @@ resources:
   domain: arlon.io
   group: core
   kind: CallHomeConfig
-  path: github.com/platform9/arlon/api/v1
+  path: github.com/arlonproj/arlon/api/v1
   version: v1
 version: "3"

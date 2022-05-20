@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/platform9/arlon/pkg/controller"
+	"github.com/arlonproj/arlon/pkg/controller"
 	"github.com/spf13/cobra"
 )
 

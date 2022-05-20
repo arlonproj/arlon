@@ -1,9 +1,9 @@
 package controller
 
 import (
-	arlonv1 "github.com/platform9/arlon/api/v1"
-	"github.com/platform9/arlon/controllers"
-	"github.com/platform9/arlon/pkg/argocd"
+	arlonv1 "github.com/arlonproj/arlon/api/v1"
+	"github.com/arlonproj/arlon/controllers"
+	"github.com/arlonproj/arlon/pkg/argocd"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
