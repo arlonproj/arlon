@@ -20,9 +20,9 @@ import (
 	"path/filepath"
 	"testing"
 
+	corev1 "github.com/arlonproj/arlon/api/v1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	corev1 "github.com/platform9/arlon/api/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"

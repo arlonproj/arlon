@@ -2,7 +2,7 @@ package clusterspec
 
 import (
 	"fmt"
-	"github.com/platform9/arlon/pkg/clusterspec"
+	"github.com/arlonproj/arlon/pkg/clusterspec"
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"

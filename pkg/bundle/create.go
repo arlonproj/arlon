@@ -3,7 +3,7 @@ package bundle
 import (
 	"context"
 	"fmt"
-	"github.com/platform9/arlon/pkg/common"
+	"github.com/arlonproj/arlon/pkg/common"
 	v1 "k8s.io/api/core/v1"
 	apierr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

@@ -2,7 +2,7 @@ package profile
 
 import (
 	"fmt"
-	"github.com/platform9/arlon/pkg/profile"
+	"github.com/arlonproj/arlon/pkg/profile"
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"

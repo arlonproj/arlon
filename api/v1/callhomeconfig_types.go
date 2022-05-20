@@ -32,19 +32,19 @@ import (
 // with the service account named ServiceAccountName in the management cluster.
 type CallHomeConfigSpec struct {
 	// Name of autoscaler service account name in the management cluster
-	ServiceAccountName      string `json:"serviceAccountName"`      //
+	ServiceAccountName string `json:"serviceAccountName"` //
 	// Name of secret containing kubeconfig for workload cluster
-	KubeconfigSecretName    string `json:"kubeconfigSecretName"`    //
+	KubeconfigSecretName string `json:"kubeconfigSecretName"` //
 	// Name of key inside of the secret that holds the kubeconfig
 	KubeconfigSecretKeyName string `json:"kubeconfigSecretKeyName"` //
 	// Name of namespace inside workload cluster in which to create new kubeconfig secret
-	TargetNamespace         string `json:"targetNamespace"`         //
+	TargetNamespace string `json:"targetNamespace"` //
 	// Name of secret inside workload cluster
-	TargetSecretName        string `json:"targetSecretName"`        //
+	TargetSecretName string `json:"targetSecretName"` //
 	// Name of key holding the kubeconfig inside of the target secret
-	TargetSecretKeyName     string `json:"targetSecretKeyName"`     //
+	TargetSecretKeyName string `json:"targetSecretKeyName"` //
 	// The URL of the management cluster
-	ManagementClusterUrl    string `json:"managementClusterUrl"`    //
+	ManagementClusterUrl string `json:"managementClusterUrl"` //
 }
 
 // CallHomeConfigStatus defines the observed state of CallHomeConfig

@@ -19,8 +19,8 @@ package controllers
 import (
 	"context"
 	"fmt"
+	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/go-logr/logr"
-	arlonv1 "github.com/platform9/arlon/api/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierr "k8s.io/apimachinery/pkg/api/errors"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
