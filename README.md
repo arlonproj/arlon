@@ -27,9 +27,12 @@ an RBAC ruleset, an add-on, an application, etc...
 
 # Architecture
 
+![architecture](./docs/architecture_diagram.png)
+
 Arlon is composed of a controller, a library, and a CLI that exposes the library's
 functions as commands. In the future, an API server may be built from
-the library as well. 
+the library as well. Arlon adds CRDs (custom resource definitions) for several
+custom resources such as ClusterRegistration and Profile.
 
 ## Management cluster
 The management cluster is a Kubernetes cluster hosting all the components
