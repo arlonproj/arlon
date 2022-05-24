@@ -1,6 +1,6 @@
 VERSION ?= 0.3.0
 REPO_SERVER ?= ghcr.io
-REPO_NAME ?= platform9
+REPO_NAME ?= arlonproj
 # Image URL to use all building/pushing image targets
 IMG ?= $(REPO_SERVER)/$(REPO_NAME)/arlon/controller:$(VERSION)
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
