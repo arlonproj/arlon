@@ -34,21 +34,38 @@ spec:
           metadata:
             type: object
           spec:
-            description: CallHomeConfigSpec defines the desired state of CallHomeConfig
+            description: CallHomeConfigSpec defines the desired state of CallHomeConfig.
+              The resource's status becomes 'complete' when a target secret named
+              TargetSecretName is successfully created in the TargetNamespace of the
+              workload cluster identified by ManagementClusterUrl and authenticated
+              via the kubeconfig contained in the secret named KubeconfigSecretName
+              in the management cluster. The target secret will contain a kubeconfig
+              generated from the token associated with the service account named ServiceAccountName
+              in the management cluster.
             properties:
               kubeconfigSecretKeyName:
+                description: Name of key inside of the secret that holds the kubeconfig
                 type: string
               kubeconfigSecretName:
+                description: Name of secret containing kubeconfig for workload cluster
                 type: string
               managementClusterUrl:
+                description: The URL of the management cluster
                 type: string
               serviceAccountName:
+                description: Name of autoscaler service account name in the management
+                  cluster
                 type: string
               targetNamespace:
+                description: Name of namespace inside workload cluster in which to
+                  create new kubeconfig secret
                 type: string
               targetSecretKeyName:
+                description: Name of key holding the kubeconfig inside of the target
+                  secret
                 type: string
               targetSecretName:
+                description: Name of secret inside workload cluster
                 type: string
             required:
             - kubeconfigSecretKeyName
