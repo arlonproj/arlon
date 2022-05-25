@@ -6,7 +6,7 @@ import (
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/bundle"
-	"github.com/arlonproj/arlon/pkg/cluster"
+	"github.com/arlonproj/arlon/pkg/common"
 	"github.com/arlonproj/arlon/pkg/gitutils"
 	"github.com/arlonproj/arlon/pkg/log"
 	gogit "github.com/go-git/go-git/v5"
@@ -53,13 +53,13 @@ func createInGit(
 		}
 	}
 	mgmtPath := path.Join(repoPath, "mgmt")
-	err = cluster.CopyManifests(wt, content, ".", mgmtPath)
+	err = gitutils.CopyManifests(wt, content, ".", mgmtPath)
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}
 	workloadPath := path.Join(repoPath, "workload")
-	om := cluster.MakeOverridesMap(profile)
-	err = cluster.ProcessBundles(wt, "{{ .Values.clusterName }}", repoUrl,
+	om := MakeOverridesMap(profile)
+	err = gitutils.ProcessBundles(wt, "{{ .Values.clusterName }}", repoUrl,
 		mgmtPath, workloadPath, bundles, om)
 	if err != nil {
 		return fmt.Errorf("failed to process bundles: %s", err)
@@ -83,4 +83,18 @@ func createInGit(
 	}
 	log.V(1).Info("succesfully pushed working tree", "tmpDir", tmpDir)
 	return nil
+}
+
+func MakeOverridesMap(profile *arlonv1.Profile) (om common.KVPairMap) {
+	if len(profile.Spec.Overrides) == 0 {
+		return
+	}
+	om = make(common.KVPairMap)
+	for _, item := range profile.Spec.Overrides {
+		om[item.Bundle] = append(om[item.Bundle], common.KVPair{
+			Key:   item.Key,
+			Value: item.Value,
+		})
+	}
+	return
 }
