@@ -3,13 +3,13 @@ package profile
 import (
 	"embed"
 	"fmt"
+	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/cluster"
 	"github.com/arlonproj/arlon/pkg/gitutils"
 	"github.com/arlonproj/arlon/pkg/log"
 	gogit "github.com/go-git/go-git/v5"
-	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 	"path"
 )
@@ -19,21 +19,21 @@ var content embed.FS
 
 func createInGit(
 	kubeClient *kubernetes.Clientset,
-	profileCm *v1.ConfigMap,
+	profile *arlonv1.Profile,
 	argocdNs string,
 	arlonNs string,
-	repoUrl string,
-	repoPath string,
-	repoBranch string,
 ) error {
 	log := log.GetLogger()
 	corev1 := kubeClient.CoreV1()
-	bundles, err := bundle.GetBundlesFromProfile(profileCm, corev1, arlonNs)
+	bundles, err := bundle.GetBundlesFromProfile(profile, corev1, arlonNs)
 	if err != nil {
 		return fmt.Errorf("failed to get bundles: %s", err)
 	}
+	repoUrl := profile.Spec.RepoUrl
+	repoPath := profile.Spec.RepoPath
+	repoRevision := profile.Spec.RepoRevision
 	repo, tmpDir, auth, err := argocd.CloneRepo(kubeClient, argocdNs,
-		repoUrl, repoBranch)
+		repoUrl, repoRevision)
 	if err != nil {
 		return fmt.Errorf("failed to clone repo: %s", err)
 	}
@@ -58,8 +58,9 @@ func createInGit(
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}
 	workloadPath := path.Join(repoPath, "workload")
+	om := cluster.MakeOverridesMap(profile)
 	err = cluster.ProcessBundles(wt, "{{ .Values.clusterName }}", repoUrl,
-		mgmtPath, workloadPath, bundles)
+		mgmtPath, workloadPath, bundles, om)
 	if err != nil {
 		return fmt.Errorf("failed to process bundles: %s", err)
 	}
