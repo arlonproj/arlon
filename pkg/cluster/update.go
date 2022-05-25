@@ -5,39 +5,28 @@ import (
 	"fmt"
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
+	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/clusterspec"
-	"github.com/arlonproj/arlon/pkg/common"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	restclient "k8s.io/client-go/rest"
 )
 
 func Update(
 	appIf argoapp.ApplicationServiceClient,
-	kubeClient *kubernetes.Clientset,
+	config *restclient.Config,
 	argocdNs,
 	arlonNs,
 	clusterName,
-	clusterSpecName,
-	profileName string,
+	clusterSpecName string,
+	prof *arlonv1.Profile,
 	updateInArgoCd bool,
 	managementClusterUrl string,
+	oldApp *argoappv1.Application,
 ) (*argoappv1.Application, error) {
-	oldApp, err := appIf.Get(context.Background(),
-		&argoapp.ApplicationQuery{Name: &clusterName})
+	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get argocd app: %s", err)
-	}
-	if profileName == "" {
-		profileName = oldApp.Annotations[common.ProfileAnnotationKey]
-		if profileName == "" {
-			return nil, fmt.Errorf("existing cluster root app is missing profile annotation")
-		}
-	}
-	if clusterSpecName == "" {
-		clusterSpecName = oldApp.Annotations[common.ClusterSpecAnnotationKey]
-		if clusterSpecName == "" {
-			return nil, fmt.Errorf("existing cluster root app is missing clusterspec annotation")
-		}
+		return nil, fmt.Errorf("failed to get kube client: %s", err)
 	}
 	corev1 := kubeClient.CoreV1()
 	configMapsApi := corev1.ConfigMaps(arlonNs)
@@ -70,7 +59,7 @@ func Update(
 			clstName)
 	}
 	rootApp, err := ConstructRootApp(argocdNs, clusterName, repoUrl,
-		repoBranch, repoPath, clusterSpecName, clusterSpecCm, profileName,
+		repoBranch, repoPath, clusterSpecName, clusterSpecCm, prof.Name,
 		managementClusterUrl)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct root app: %s", err)
@@ -79,8 +68,8 @@ func Update(
 		oldApp.Spec.Source.Path != rootApp.Spec.Source.Path {
 		return nil, fmt.Errorf("git repo reference cannot change")
 	}
-	err = DeployToGit(kubeClient, argocdNs, arlonNs, clusterName,
-		repoUrl, repoBranch, basePath, profileName)
+	err = DeployToGit(config, argocdNs, arlonNs, clusterName,
+		repoUrl, repoBranch, basePath, prof)
 	if err != nil {
 		return nil, fmt.Errorf("failed to deploy git tree: %s", err)
 	}

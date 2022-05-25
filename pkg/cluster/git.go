@@ -2,9 +2,9 @@ package cluster
 
 import (
 	"bytes"
-	"context"
 	"embed"
 	"fmt"
+	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/gitutils"
@@ -12,10 +12,8 @@ import (
 	gogit "github.com/go-git/go-git/v5"
 	"io"
 	"io/fs"
-	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	corev1types "k8s.io/client-go/kubernetes/typed/core/v1"
+	restclient "k8s.io/client-go/rest"
 	"path"
 	"strings"
 	"text/template"
@@ -27,21 +25,21 @@ var content embed.FS
 // -----------------------------------------------------------------------------
 
 func DeployToGit(
-	kubeClient *kubernetes.Clientset,
+	config *restclient.Config,
 	argocdNs string,
 	arlonNs string,
 	clusterName string,
 	repoUrl string,
 	repoBranch string,
 	basePath string,
-	profileName string,
+	prof *arlonv1.Profile,
 ) error {
 	log := log.GetLogger()
-	corev1 := kubeClient.CoreV1()
-	prof, err := getProfileConfigMap(profileName, corev1, arlonNs)
+	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return fmt.Errorf("failed to get profile: %s", err)
+		return fmt.Errorf("failed to get kubernetes client: %s", err)
 	}
+	corev1 := kubeClient.CoreV1()
 	bundles, err := bundle.GetBundlesFromProfile(prof, corev1, arlonNs)
 	if err != nil {
 		return fmt.Errorf("failed to get bundles: %s", err)
@@ -73,20 +71,21 @@ func DeployToGit(
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}
-	profRepoUrl := prof.Data["repo-url"]
+	profRepoUrl := prof.Spec.RepoUrl
 	if profRepoUrl != "" {
 		// dynamic profile: bundles not included in root app.
 		// create an Application for the profile.
-		profRepoPath := prof.Data["repo-path"]
+		profRepoPath := prof.Spec.RepoPath
 		appPath := path.Join(mgmtPath, "templates", "profile.yaml")
-		err = ProcessDynamicProfile(wt, clusterName, profileName, argocdNs,
+		err = ProcessDynamicProfile(wt, clusterName, prof.Name, argocdNs,
 			profRepoUrl, profRepoPath, appPath)
 		if err != nil {
 			return fmt.Errorf("failed to process dynamic profile: %s", err)
 		}
 	} else {
 		// static profile: include bundles as individual Applications now
-		err = ProcessBundles(wt, clusterName, repoUrl, mgmtPath, workloadPath, bundles)
+		om := MakeOverridesMap(prof)
+		err = ProcessBundles(wt, clusterName, repoUrl, mgmtPath, workloadPath, bundles, om)
 		if err != nil {
 			return fmt.Errorf("failed to process bundles: %s", err)
 		}
@@ -154,27 +153,6 @@ func CopyManifests(wt *gogit.Worktree, fs embed.FS, root string, mgmtPath string
 
 // -----------------------------------------------------------------------------
 
-func getProfileConfigMap(
-	profileName string,
-	corev1 corev1types.CoreV1Interface,
-	arlonNs string,
-) (prof *v1.ConfigMap, err error) {
-	if profileName == "" {
-		return nil, fmt.Errorf("profile name not specified")
-	}
-	configMapsApi := corev1.ConfigMaps(arlonNs)
-	profileConfigMap, err := configMapsApi.Get(context.Background(), profileName, metav1.GetOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to get profile configmap: %s", err)
-	}
-	if profileConfigMap.Labels["arlon-type"] != "profile" {
-		return nil, fmt.Errorf("profile configmap does not have expected label")
-	}
-	return profileConfigMap, nil
-}
-
-// -----------------------------------------------------------------------------
-
 const appTmpl = `
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -204,6 +182,10 @@ spec:
       # Use arlon prefix to avoid any conflicts with the bundle's own values.
       - name: arlon.clusterName
         value: {{.ClusterName}}
+	{{- range .Overrides }}
+      - name: {{ .Key }}
+        value: {{ .Value }}
+	{{- end }}
 {{- else if eq .SrcType "kustomize" }}
     kustomize: {}
 {{- else if eq .SrcType "ksonnet" }}
@@ -246,6 +228,11 @@ spec:
         value: {{.AppName}}
 `
 
+type KVPair struct {
+	Key   string
+	Value string
+}
+
 type AppSettings struct {
 	AppName              string
 	ClusterName          string
@@ -255,6 +242,7 @@ type AppSettings struct {
 	SrcType              string
 	AppNamespace         string
 	DestinationNamespace string
+	Overrides            []KVPair
 }
 
 // -----------------------------------------------------------------------------
@@ -295,6 +283,8 @@ func ProcessDynamicProfile(
 
 // -----------------------------------------------------------------------------
 
+type OverridesMap map[string][]KVPair
+
 func ProcessBundles(
 	wt *gogit.Worktree,
 	clusterName string,
@@ -302,6 +292,7 @@ func ProcessBundles(
 	mgmtPath string,
 	workloadPath string,
 	bundles []bundle.Bundle,
+	overrides OverridesMap,
 ) error {
 	if len(bundles) == 0 {
 		return nil
@@ -331,6 +322,13 @@ func ProcessBundles(
 			app.RepoUrl = b.RepoUrl
 			app.RepoPath = b.RepoPath
 			app.SrcType = b.SrcType
+			o := overrides[b.Name]
+			if o != nil {
+				// Add overrides
+				for _, kv := range o {
+					app.Overrides = append(app.Overrides, kv)
+				}
+			}
 		} else if b.RepoUrl != "" {
 			return fmt.Errorf("b %s has both data and repoUrl set", b.Name)
 		} else {
@@ -369,3 +367,17 @@ func ProcessBundles(
 }
 
 // -----------------------------------------------------------------------------
+
+func MakeOverridesMap(profile *arlonv1.Profile) (om OverridesMap) {
+	if len(profile.Spec.Overrides) == 0 {
+		return
+	}
+	om = make(OverridesMap)
+	for _, item := range profile.Spec.Overrides {
+		om[item.Bundle] = append(om[item.Bundle], KVPair{
+			Key:   item.Key,
+			Value: item.Value,
+		})
+	}
+	return
+}

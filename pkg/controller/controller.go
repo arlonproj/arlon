@@ -8,6 +8,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
 	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -24,6 +25,12 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(arlonv1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
+}
+
+func NewClient(config *rest.Config) (client.Client, error) {
+	return client.New(config, client.Options{
+		Scheme: scheme,
+	})
 }
 
 func StartController(argocdConfigPath string, metricsAddr string, probeAddr string, enableLeaderElection bool) {

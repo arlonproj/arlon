@@ -7,10 +7,10 @@ import (
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/cluster"
+	"github.com/arlonproj/arlon/pkg/profile"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
 )
@@ -37,11 +37,14 @@ func deployClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
-			kubeClient := kubernetes.NewForConfigOrDie(config)
 			createInArgoCd := !outputYaml
-			rootApp, err := cluster.Create(appIf, kubeClient, argocdNs, arlonNs,
+			prof, err := profile.Get(config, profileName, arlonNs)
+			if err != nil {
+				return fmt.Errorf("failed to get profile: %s", err)
+			}
+			rootApp, err := cluster.Create(appIf, config, argocdNs, arlonNs,
 				clusterName, repoUrl, repoBranch, basePath, clusterSpecName,
-				profileName, createInArgoCd, config.Host)
+				prof, createInArgoCd, config.Host)
 			if err != nil {
 				return fmt.Errorf("failed to create cluster: %s", err)
 			}

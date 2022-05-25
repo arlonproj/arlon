@@ -5,27 +5,33 @@ import (
 	"fmt"
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
+	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	grpccodes "google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	restclient "k8s.io/client-go/rest"
 )
 
 func Create(
 	appIf argoapp.ApplicationServiceClient,
-	kubeClient *kubernetes.Clientset,
+	config *restclient.Config,
 	argocdNs,
 	arlonNs,
 	clusterName,
 	repoUrl,
 	repoBranch,
 	basePath,
-	clusterSpecName,
-	profileName string,
+	clusterSpecName string,
+	prof *arlonv1.Profile,
 	createInArgoCd bool,
 	managementClusterUrl string,
 ) (*argoappv1.Application, error) {
-	_, err := appIf.Get(context.Background(),
+	kubeClient, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get kube client: %s", err)
+	}
+	_, err = appIf.Get(context.Background(),
 		&argoapp.ApplicationQuery{Name: &clusterName})
 	if err == nil {
 		return nil, fmt.Errorf("arlon cluster already exists")
@@ -46,12 +52,12 @@ func Create(
 	}
 	repoPath := mgmtPathFromBasePath(basePath, clusterName)
 	rootApp, err := ConstructRootApp(argocdNs, clusterName, repoUrl, repoBranch,
-		repoPath, clusterSpecName, cm, profileName, managementClusterUrl)
+		repoPath, clusterSpecName, cm, prof.Name, managementClusterUrl)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct root app: %s", err)
 	}
-	err = DeployToGit(kubeClient, argocdNs, arlonNs, clusterName,
-		repoUrl, repoBranch, basePath, profileName)
+	err = DeployToGit(config, argocdNs, arlonNs, clusterName,
+		repoUrl, repoBranch, basePath, prof)
 	if err != nil {
 		return nil, fmt.Errorf("failed to deploy git tree: %s", err)
 	}

@@ -58,3 +58,29 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - core.arlon.io
+  resources:
+  - profiles
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.arlon.io
+  resources:
+  - profiles/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.arlon.io
+  resources:
+  - profiles/status
+  verbs:
+  - get
+  - patch
+  - update
