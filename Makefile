@@ -1,8 +1,11 @@
-VERSION ?= 0.3.0
+REPO_ROOT := $(shell PWD)
+VERSION ?= $(shell cat $(REPO_ROOT)$*/version;)
+GIT_SHORT_COMMIT := $(shell cd $(REPO_ROOT); git rev-parse --short HEAD)
 REPO_SERVER ?= ghcr.io
-REPO_NAME ?= arlonproj
+REPO_ORG ?= arlonproj
+REPO_NAME ?= arlon
 # Image URL to use all building/pushing image targets
-IMG ?= $(REPO_SERVER)/$(REPO_NAME)/arlon/controller:$(VERSION)
+IMG ?= $(REPO_SERVER)/$(REPO_ORG)/$(REPO_NAME)/controller:$(VERSION)
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
 
@@ -66,10 +69,10 @@ run: manifests generate fmt vet ## Run a controller from your host.
 	go run ./main.go
 
 docker-build: test ## Build docker image with the manager.
-	docker build -t ${IMG} .
+	docker build --label 'origin=$(REPO_ORG)/$(REPO_NAME)@$(GIT_SHORT_COMMIT)' -t ${IMG} .
 
 docker-build-notest:
-	docker build -t ${IMG} .
+	docker build --label 'origin=$(REPO_ORG)/$(REPO_NAME)@$(GIT_SHORT_COMMIT)' -t ${IMG} .
 
 docker-push: ## Push docker image with the manager.
 	docker push ${IMG}
