@@ -5,13 +5,21 @@ import (
 	"fmt"
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
-	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/clusterspec"
+	"github.com/arlonproj/arlon/pkg/common"
+	"github.com/arlonproj/arlon/pkg/profile"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 )
 
+// Update modifies a cluster to use a different cluster spec or profile,
+// or both. Only some specific changes are allowed. For example, the API
+// provider, cloud provider, or cluster type cannot change, meaning if a
+// new cluster spec is chosen, it must preserve those values.
+// There are no restrictions on the new profile, if one is specified.
+// Bundles associated with the old profile will automatically be removed from
+// the cluster.
 func Update(
 	appIf argoapp.ApplicationServiceClient,
 	config *restclient.Config,
@@ -19,11 +27,31 @@ func Update(
 	arlonNs,
 	clusterName,
 	clusterSpecName string,
-	prof *arlonv1.Profile,
+	profileName string,
 	updateInArgoCd bool,
 	managementClusterUrl string,
-	oldApp *argoappv1.Application,
 ) (*argoappv1.Application, error) {
+	oldApp, err := appIf.Get(context.Background(),
+		&argoapp.ApplicationQuery{Name: &clusterName})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get argocd app: %s", err)
+	}
+	if clusterSpecName == "" {
+		clusterSpecName = oldApp.Annotations[common.ClusterSpecAnnotationKey]
+		if clusterSpecName == "" {
+			return nil, fmt.Errorf("existing cluster root app is missing clusterspec annotation")
+		}
+	}
+	if profileName == "" {
+		profileName = oldApp.Annotations[common.ProfileAnnotationKey]
+		if profileName == "" {
+			return nil, fmt.Errorf("existing cluster root app is missing profile annotation")
+		}
+	}
+	prof, err := profile.Get(config, profileName, arlonNs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get profile: %s", err)
+	}
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get kube client: %s", err)

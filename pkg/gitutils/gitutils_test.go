@@ -1,6 +1,7 @@
-package cluster
+package gitutils
 
 import (
+	"github.com/arlonproj/arlon/pkg/common"
 	"strings"
 	"testing"
 	"text/template"
@@ -50,7 +51,10 @@ func TestAppTemplate(t *testing.T) {
 		SrcType:              "helm",
 		AppNamespace:         "yyy",
 		DestinationNamespace: "zzz",
-		Overrides:            []KVPair{{"foo", "bar"}, {"goo", "gar"}},
+		Overrides: []common.KVPair{
+			{Key: "foo", Value: "bar"},
+			{Key: "goo", Value: "gar"},
+		},
 	}
 	tmpl, err := template.New("app").Parse(appTmpl)
 	if err != nil {

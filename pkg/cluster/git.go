@@ -1,21 +1,18 @@
 package cluster
 
 import (
-	"bytes"
 	"embed"
 	"fmt"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/gitutils"
-	"github.com/arlonproj/arlon/pkg/log"
+	logpkg "github.com/arlonproj/arlon/pkg/log"
+	"github.com/arlonproj/arlon/pkg/profile"
 	gogit "github.com/go-git/go-git/v5"
-	"io"
-	"io/fs"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"path"
-	"strings"
 	"text/template"
 )
 
@@ -34,7 +31,7 @@ func DeployToGit(
 	basePath string,
 	prof *arlonv1.Profile,
 ) error {
-	log := log.GetLogger()
+	log := logpkg.GetLogger()
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return fmt.Errorf("failed to get kubernetes client: %s", err)
@@ -67,7 +64,7 @@ func DeployToGit(
 			return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
 		}
 	}
-	err = CopyManifests(wt, content, ".", mgmtPath)
+	err = gitutils.CopyManifests(wt, content, ".", mgmtPath)
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}
@@ -84,8 +81,8 @@ func DeployToGit(
 		}
 	} else {
 		// static profile: include bundles as individual Applications now
-		om := MakeOverridesMap(prof)
-		err = ProcessBundles(wt, clusterName, repoUrl, mgmtPath, workloadPath, bundles, om)
+		om := profile.MakeOverridesMap(prof)
+		err = gitutils.ProcessBundles(wt, clusterName, repoUrl, mgmtPath, workloadPath, bundles, om)
 		if err != nil {
 			return fmt.Errorf("failed to process bundles: %s", err)
 		}
@@ -112,88 +109,6 @@ func DeployToGit(
 }
 
 // -----------------------------------------------------------------------------
-
-func CopyManifests(wt *gogit.Worktree, fs embed.FS, root string, mgmtPath string) error {
-	log := log.GetLogger()
-	items, err := fs.ReadDir(root)
-	if err != nil {
-		return fmt.Errorf("failed to read embedded directory: %s", err)
-	}
-	for _, item := range items {
-		filePath := path.Join(root, item.Name())
-		if item.IsDir() {
-			if err := CopyManifests(wt, fs, filePath, mgmtPath); err != nil {
-				return err
-			}
-		} else {
-			src, err := fs.Open(filePath)
-			if err != nil {
-				return fmt.Errorf("failed to open embedded file %s: %s", filePath, err)
-			}
-			// remove manifests/ prefix
-			components := strings.Split(filePath, "/")
-			dstPath := path.Join(components[1:]...)
-			dstPath = path.Join(mgmtPath, dstPath)
-			dst, err := wt.Filesystem.Create(dstPath)
-			if err != nil {
-				_ = src.Close()
-				return fmt.Errorf("failed to create destination file %s: %s", dstPath, err)
-			}
-			_, err = io.Copy(dst, src)
-			_ = src.Close()
-			_ = dst.Close()
-			if err != nil {
-				return fmt.Errorf("failed to copy embedded file: %s", err)
-			}
-			log.V(1).Info("copied embedded file", "destination", dstPath)
-		}
-	}
-	return nil
-}
-
-// -----------------------------------------------------------------------------
-
-const appTmpl = `
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: {{.AppName}}
-  namespace: {{.AppNamespace}}
-  finalizers:
-  # This solves issue #17
-  - resources-finalizer.argocd.argoproj.io/foreground
-spec:
-  syncPolicy:
-    automated:
-      prune: true
-  destination:
-    name: {{.ClusterName}}
-    namespace: {{.DestinationNamespace}}
-  project: default
-  source:
-    repoURL: {{.RepoUrl}}
-    path: {{.RepoPath}}
-    targetRevision: {{.RepoRevision}}
-{{- if eq .SrcType "helm" }}
-    helm:
-      parameters:
-      # Pass cluster name to the bundle in case it needs it and is a Helm chart.
-      # Example: this is required by the CAPI cluster autoscaler.
-      # Use arlon prefix to avoid any conflicts with the bundle's own values.
-      - name: arlon.clusterName
-        value: {{.ClusterName}}
-	{{- range .Overrides }}
-      - name: {{ .Key }}
-        value: {{ .Value }}
-	{{- end }}
-{{- else if eq .SrcType "kustomize" }}
-    kustomize: {}
-{{- else if eq .SrcType "ksonnet" }}
-    ksonnet: {}
-{{- else if eq .SrcType "directory" }}
-    directory: {}
-{{- end }}
-`
 
 // This is used for a dynamic profile, which is an Application containing
 // other Applications (one for each bundle), so the destination must always
@@ -228,23 +143,6 @@ spec:
         value: {{.AppName}}
 `
 
-type KVPair struct {
-	Key   string
-	Value string
-}
-
-type AppSettings struct {
-	AppName              string
-	ClusterName          string
-	RepoUrl              string
-	RepoPath             string
-	RepoRevision         string
-	SrcType              string
-	AppNamespace         string
-	DestinationNamespace string
-	Overrides            []KVPair
-}
-
 // -----------------------------------------------------------------------------
 
 func ProcessDynamicProfile(
@@ -261,7 +159,7 @@ func ProcessDynamicProfile(
 		return fmt.Errorf("failed to create app template: %s", err)
 	}
 	mgmtPath := path.Join(repoPath, "mgmt")
-	app := AppSettings{
+	app := gitutils.AppSettings{
 		ClusterName:          clusterName,
 		AppName:              fmt.Sprintf("%s-profile-%s", clusterName, profileName),
 		AppNamespace:         argocdNs,
@@ -282,102 +180,3 @@ func ProcessDynamicProfile(
 }
 
 // -----------------------------------------------------------------------------
-
-type OverridesMap map[string][]KVPair
-
-func ProcessBundles(
-	wt *gogit.Worktree,
-	clusterName string,
-	repoUrl string,
-	mgmtPath string,
-	workloadPath string,
-	bundles []bundle.Bundle,
-	overrides OverridesMap,
-) error {
-	if len(bundles) == 0 {
-		return nil
-	}
-	tmpl, err := template.New("app").Parse(appTmpl)
-	if err != nil {
-		return fmt.Errorf("failed to create app template: %s", err)
-	}
-	for _, b := range bundles {
-		bundleFileName := fmt.Sprintf("%s.yaml", b.Name)
-		app := AppSettings{
-			ClusterName:          clusterName,
-			AppName:              fmt.Sprintf("%s-%s", clusterName, b.Name),
-			AppNamespace:         "argocd",
-			DestinationNamespace: "default", // FIXME: make configurable
-		}
-		if b.RepoRevision == "" {
-			app.RepoRevision = "HEAD"
-		} else {
-			app.RepoRevision = b.RepoRevision
-		}
-		if b.Data == nil {
-			// dynamic bundle
-			if b.RepoUrl == "" {
-				return fmt.Errorf("b %s is neither static nor dynamic type", b.Name)
-			}
-			app.RepoUrl = b.RepoUrl
-			app.RepoPath = b.RepoPath
-			app.SrcType = b.SrcType
-			o := overrides[b.Name]
-			if o != nil {
-				// Add overrides
-				for _, kv := range o {
-					app.Overrides = append(app.Overrides, kv)
-				}
-			}
-		} else if b.RepoUrl != "" {
-			return fmt.Errorf("b %s has both data and repoUrl set", b.Name)
-		} else {
-			// static bundle
-			dirPath := path.Join(workloadPath, b.Name)
-			err := wt.Filesystem.MkdirAll(dirPath, fs.ModeDir|0700)
-			if err != nil {
-				return fmt.Errorf("failed to create directory in working tree: %s", err)
-			}
-			bundlePath := path.Join(dirPath, bundleFileName)
-			dst, err := wt.Filesystem.Create(bundlePath)
-			if err != nil {
-				return fmt.Errorf("failed to create file in working tree: %s", err)
-			}
-			_, err = io.Copy(dst, bytes.NewReader(b.Data))
-			_ = dst.Close()
-			if err != nil {
-				return fmt.Errorf("failed to copy static b %s: %s", b.Name, err)
-			}
-			app.RepoUrl = repoUrl
-			app.RepoPath = path.Join(workloadPath, b.Name)
-		}
-		appPath := path.Join(mgmtPath, "templates", bundleFileName)
-		dst, err := wt.Filesystem.Create(appPath)
-		if err != nil {
-			return fmt.Errorf("failed to create application file %s: %s", appPath, err)
-		}
-		err = tmpl.Execute(dst, &app)
-		if err != nil {
-			dst.Close()
-			return fmt.Errorf("failed to render application template %s: %s", appPath, err)
-		}
-		dst.Close()
-	}
-	return nil
-}
-
-// -----------------------------------------------------------------------------
-
-func MakeOverridesMap(profile *arlonv1.Profile) (om OverridesMap) {
-	if len(profile.Spec.Overrides) == 0 {
-		return
-	}
-	om = make(OverridesMap)
-	for _, item := range profile.Spec.Overrides {
-		om[item.Bundle] = append(om[item.Bundle], KVPair{
-			Key:   item.Key,
-			Value: item.Value,
-		})
-	}
-	return
-}
