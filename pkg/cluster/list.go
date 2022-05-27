@@ -6,8 +6,9 @@ import (
 	apppkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	"github.com/arlonproj/arlon/pkg/common"
-	"k8s.io/client-go/kubernetes"
+	logpkg "github.com/arlonproj/arlon/pkg/log"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 )
 
@@ -16,6 +17,7 @@ func List(
 	config *restclient.Config,
 	argocdNs string,
 ) (clist []Cluster, err error) {
+	log := logpkg.GetLogger()
 	apps, err := appIf.List(context.Background(),
 		&apppkg.ApplicationQuery{Selector: "managed-by=arlon,arlon-type=cluster"})
 	if err != nil {
@@ -41,8 +43,12 @@ func List(
 		return nil, fmt.Errorf("failed to list cluster secrets: %s", err)
 	}
 	for _, secr := range secrs.Items {
+		name := secr.Data["name"]
+		if name == nil {
+			log.V(1).Info("cluster secret skipped because missing name", "secretName", secr.Name)
+		}
 		clist = append(clist, Cluster{
-			Name: secr.Name,
+			Name: string(name),
 			ProfileName: secr.Annotations[common.ProfileAnnotationKey],
 			IsUnmanaged: true,
 		})
