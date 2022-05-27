@@ -37,20 +37,22 @@ func List(
 	corev1 := kubeClient.CoreV1()
 	secrApi := corev1.Secrets(argocdNs)
 	secrs, err := secrApi.List(context.Background(), metav1.ListOptions{
-		LabelSelector: "argocd.argoproj.io/secret-type=cluster,arlon.io/cluster-type=external",
+		LabelSelector: argoClusterSecretTypeLabel + "," + externalClusterTypeLabel,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list cluster secrets: %s", err)
 	}
 	for _, secr := range secrs.Items {
-		name := secr.Data["name"]
-		if name == nil {
-			log.V(1).Info("cluster secret skipped because missing name", "secretName", secr.Name)
+		clusterName := secr.Data["name"]
+		if clusterName == nil {
+			log.V(1).Info("cluster secret skipped because missing cluster name",
+				"secretName", secr.Name)
 		}
 		clist = append(clist, Cluster{
-			Name:        string(name),
+			Name:        string(clusterName),
 			ProfileName: secr.Annotations[common.ProfileAnnotationKey],
 			IsExternal:  true,
+			SecretName: secr.Name,
 		})
 	}
 	return
