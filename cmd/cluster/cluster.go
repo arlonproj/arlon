@@ -16,5 +16,6 @@ func NewCommand() *cobra.Command {
 	command.AddCommand(listClustersCommand())
 	command.AddCommand(updateClusterCommand())
 	command.AddCommand(manageClusterCommand())
+	command.AddCommand(unmanageClusterCommand())
 	return command
 }

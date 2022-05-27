@@ -23,6 +23,9 @@ func ManageExternal(
 	clusterName string,
 	prof *arlonv1.Profile,
 ) error {
+	if prof.Spec.RepoUrl == "" {
+		return fmt.Errorf("the profile is static, only dynamic is supported")
+	}
 	log := logpkg.GetLogger()
 	conn, appIf, err := argoIf.NewApplicationClient()
 	if err != nil {
@@ -56,10 +59,10 @@ func ManageExternal(
 	corev1 := kubeClient.CoreV1()
 	secrApi := corev1.Secrets(argocdNs)
 	secrs, err := secrApi.List(context.Background(), metav1.ListOptions{
-		LabelSelector: "argocd.argoproj.io/secret-type=cluster",
+		LabelSelector: argoClusterSecretTypeLabel,
 	})
 	if err != nil {
-		return fmt.Errorf("failed to list cluster secrets: %s", err)
+		return fmt.Errorf("failed to list argo cluster secrets: %s", err)
 	}
 	var secrPtr *v1.Secret
 	for _, secr := range secrs.Items {
@@ -76,18 +79,80 @@ func ManageExternal(
 	if secrPtr == nil {
 		return fmt.Errorf("failed to find matching cluster secret")
 	}
-	lb := secrPtr.Labels["arlon.io/cluster-type"]
+	lb := secrPtr.Labels[clusterTypeLabelKey]
 	if lb != "" {
 		return fmt.Errorf("unexpectedly found arlon label in secret")
 	}
 	newSecr := secrPtr.DeepCopy()
-	newSecr.Labels["arlon.io/cluster-type"] = "external"
+	newSecr.Labels[clusterTypeLabelKey] = "external"
 	newSecr.Annotations[common.ProfileAnnotationKey] = prof.Name
 	cli, err := controller.NewClient(config)
 	if err != nil {
 		return fmt.Errorf("failed to get controller runtime client: %s", err)
 	}
 	err = cli.Patch(context.Background(), newSecr, patchclient.MergeFrom(secrPtr))
+	if err != nil {
+		return fmt.Errorf("failed to patch secret: %s", err)
+	}
+	return nil
+}
+
+
+func UnmanageExternal(
+	argoIf argoclient.Client,
+	config *restclient.Config,
+	argocdNs,
+	clusterName string,
+) error {
+	conn, appIf, err := argoIf.NewApplicationClient()
+	if err != nil {
+		return fmt.Errorf("failed to get argocd application client: %s", err)
+	}
+	defer conn.Close()
+	clist, err := List(appIf, config, argocdNs)
+	if err != nil {
+		return fmt.Errorf("failed to list existing clusters: %s", err)
+	}
+	var foundCluster *Cluster
+	for _, existingCluster := range clist {
+		if existingCluster.Name == clusterName {
+			foundCluster = &existingCluster
+			break
+		}
+	}
+	if foundCluster == nil {
+		return fmt.Errorf("cluster does not exist")
+	}
+	if !foundCluster.IsExternal {
+		return fmt.Errorf("cluster is not external")
+	}
+	if foundCluster.SecretName == "" {
+		return fmt.Errorf("cluster is missing secret information")
+	}
+	kubeClient, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return fmt.Errorf("failed to get kube client: %s", err)
+	}
+	corev1 := kubeClient.CoreV1()
+	secrApi := corev1.Secrets(argocdNs)
+	secr, err := secrApi.Get(context.Background(), foundCluster.SecretName,
+		metav1.GetOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to get argo cluster secret: %s", err)
+	}
+	if string(secr.Data["name"]) != clusterName {
+		return fmt.Errorf("secret data does not match cluster name")
+	}
+	if secr.Labels[clusterTypeLabelKey] != "external" {
+		return fmt.Errorf("secret does not have arlon cluster label")
+	}
+	newSecr := secr.DeepCopy()
+	delete(newSecr.Labels, clusterTypeLabelKey)
+	cli, err := controller.NewClient(config)
+	if err != nil {
+		return fmt.Errorf("failed to get controller runtime client: %s", err)
+	}
+	err = cli.Patch(context.Background(), newSecr, patchclient.MergeFrom(secr))
 	if err != nil {
 		return fmt.Errorf("failed to patch secret: %s", err)
 	}
