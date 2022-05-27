@@ -4,7 +4,10 @@ import (
 	"context"
 	"fmt"
 	argoclient "github.com/argoproj/argo-cd/v2/pkg/apiclient"
+	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argocluster "github.com/argoproj/argo-cd/v2/pkg/apiclient/cluster"
+	"github.com/argoproj/argo-cd/v2/pkg/apis/application"
+	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/common"
 	"github.com/arlonproj/arlon/pkg/controller"
@@ -13,8 +16,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
+	"path"
 	patchclient "sigs.k8s.io/controller-runtime/pkg/client"
 )
+
+//------------------------------------------------------------------------------
 
 func ManageExternal(
 	argoIf argoclient.Client,
@@ -83,20 +89,89 @@ func ManageExternal(
 	if lb != "" {
 		return fmt.Errorf("unexpectedly found arlon label in secret")
 	}
-	newSecr := secrPtr.DeepCopy()
-	newSecr.Labels[clusterTypeLabelKey] = "external"
-	newSecr.Annotations[common.ProfileAnnotationKey] = prof.Name
 	cli, err := controller.NewClient(config)
 	if err != nil {
 		return fmt.Errorf("failed to get controller runtime client: %s", err)
 	}
+	profileAppName := fmt.Sprintf("%s-profile-%s", clusterName, prof.Name)
+	app := constructProfileApp(profileAppName, argocdNs, clusterName, prof)
+	_, err = appIf.Create(context.Background(), &argoapp.ApplicationCreateRequest{
+		Application:          *app,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to get create profile app: %s", err)
+	}
+	newSecr := secrPtr.DeepCopy()
+	newSecr.Labels[clusterTypeLabelKey] = "external"
+	newSecr.Annotations[common.ProfileAnnotationKey] = prof.Name
+	newSecr.Annotations[common.ProfileAppAnnotationKey] = profileAppName
 	err = cli.Patch(context.Background(), newSecr, patchclient.MergeFrom(secrPtr))
 	if err != nil {
+		cascade := true
+		_,err = appIf.Delete(context.Background(), &argoapp.ApplicationDeleteRequest{
+			Name: &profileAppName, Cascade: &cascade,
+		})
+		if err != nil {
+			log.Error(err, "failed to delete profile app after failed secret patch")
+		}
 		return fmt.Errorf("failed to patch secret: %s", err)
 	}
 	return nil
 }
 
+//------------------------------------------------------------------------------
+
+func constructProfileApp(
+	appName string,
+	argocdNs string,
+	clusterName string,
+	prof *arlonv1.Profile,
+) *argoappv1.Application {
+	repoPath := path.Join(prof.Spec.RepoPath, "mgmt")
+	return &argoappv1.Application{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       application.ApplicationKind,
+			APIVersion: application.Group + "/v1alpha1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      appName,
+			Namespace: argocdNs,
+			Labels:    map[string]string{"managed-by": "arlon", "arlon-type": "profile-app"},
+			Annotations: map[string]string{
+				common.ProfileAnnotationKey: prof.Name,
+			},
+			Finalizers: []string{argoappv1.ForegroundPropagationPolicyFinalizer},
+		},
+		Spec: argoappv1.ApplicationSpec{
+			SyncPolicy: &argoappv1.SyncPolicy{
+				Automated: &argoappv1.SyncPolicyAutomated{
+					Prune: true,
+				},
+			},
+			Destination: argoappv1.ApplicationDestination{
+				Server: "https://kubernetes.default.svc",
+				Namespace: argocdNs,
+			},
+			Source: argoappv1.ApplicationSource{
+				RepoURL: prof.Spec.RepoUrl,
+				Path: repoPath,
+				TargetRevision: prof.Spec.RepoRevision,
+				Helm: &argoappv1.ApplicationSourceHelm{
+					Parameters: []argoappv1.HelmParameter{
+						{
+							Name: "clusterName", Value: clusterName,
+						},
+						{
+							Name: "profileAppName", Value: appName,
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+//------------------------------------------------------------------------------
 
 func UnmanageExternal(
 	argoIf argoclient.Client,
@@ -146,12 +221,31 @@ func UnmanageExternal(
 	if secr.Labels[clusterTypeLabelKey] != "external" {
 		return fmt.Errorf("secret does not have arlon cluster label")
 	}
-	newSecr := secr.DeepCopy()
-	delete(newSecr.Labels, clusterTypeLabelKey)
+
+
 	cli, err := controller.NewClient(config)
 	if err != nil {
 		return fmt.Errorf("failed to get controller runtime client: %s", err)
 	}
+
+	// First delete the associated profile app
+	profileAppName := secr.Annotations[common.ProfileAppAnnotationKey]
+	if profileAppName == "" {
+		return fmt.Errorf("secret does not contain profile app name annotation")
+	}
+	cascade := true
+	_,err = appIf.Delete(context.Background(), &argoapp.ApplicationDeleteRequest{
+		Name: &profileAppName, Cascade: &cascade,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to delete profile app: %s", err)
+	}
+
+	// Patch the secret to remove the arlon annotations and label
+	newSecr := secr.DeepCopy()
+	delete(newSecr.Labels, clusterTypeLabelKey)
+	delete(newSecr.Annotations, common.ProfileAnnotationKey)
+	delete(newSecr.Annotations, common.ProfileAppAnnotationKey)
 	err = cli.Patch(context.Background(), newSecr, patchclient.MergeFrom(secr))
 	if err != nil {
 		return fmt.Errorf("failed to patch secret: %s", err)
