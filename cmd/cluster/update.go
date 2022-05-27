@@ -66,6 +66,5 @@ func updateClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&profileName, "profile", "", "the configuration profile to use")
 	command.Flags().StringVar(&clusterSpecName, "cluster-spec", "", "the clusterspec to use")
 	command.Flags().BoolVar(&outputYaml, "output-yaml", false, "output root application YAML instead of updating ArgoCD root app")
-	command.MarkFlagRequired("cluster-name")
 	return command
 }
