@@ -184,19 +184,9 @@ func UnmanageExternal(
 		return fmt.Errorf("failed to get argocd application client: %s", err)
 	}
 	defer conn.Close()
-	clist, err := List(appIf, config, argocdNs)
+	foundCluster, err := Get(appIf, config, argocdNs, clusterName)
 	if err != nil {
-		return fmt.Errorf("failed to list existing clusters: %s", err)
-	}
-	var foundCluster *Cluster
-	for _, existingCluster := range clist {
-		if existingCluster.Name == clusterName {
-			foundCluster = &existingCluster
-			break
-		}
-	}
-	if foundCluster == nil {
-		return fmt.Errorf("cluster does not exist")
+		return fmt.Errorf("failed to get existing cluster: %s", err)
 	}
 	if !foundCluster.IsExternal {
 		return fmt.Errorf("cluster is not external")
@@ -221,8 +211,6 @@ func UnmanageExternal(
 	if secr.Labels[clusterTypeLabelKey] != "external" {
 		return fmt.Errorf("secret does not have arlon cluster label")
 	}
-
-
 	cli, err := controller.NewClient(config)
 	if err != nil {
 		return fmt.Errorf("failed to get controller runtime client: %s", err)

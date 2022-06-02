@@ -14,23 +14,24 @@ import (
 
 //------------------------------------------------------------------------------
 
-func List(
+func Get(
 	appIf argoapp.ApplicationServiceClient,
 	config *restclient.Config,
 	argocdNs string,
-) (clist []Cluster, err error) {
+	name string,
+) (cl *Cluster, err error) {
 	log := logpkg.GetLogger()
-	apps, err := appIf.List(context.Background(),
-		&apppkg.ApplicationQuery{Selector: "managed-by=arlon,arlon-type=cluster"})
-	if err != nil {
-		return nil, fmt.Errorf("failed to list argocd applications: %s", err)
-	}
-	for _, a := range apps.Items {
-		clist = append(clist, Cluster{
-			Name: a.Name,
-			ClusterSpecName: a.Annotations[common.ClusterSpecAnnotationKey],
-			ProfileName: a.Annotations[common.ProfileAnnotationKey],
+	app, err := appIf.Get(context.Background(),
+		&apppkg.ApplicationQuery{
+			Name: &name,
+			Selector: "managed-by=arlon,arlon-type=cluster",
 		})
+	if err == nil {
+		return &Cluster{
+			Name: app.Name,
+			ClusterSpecName: app.Annotations[common.ClusterSpecAnnotationKey],
+			ProfileName: app.Annotations[common.ProfileAnnotationKey],
+		}, nil
 	}
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
@@ -50,12 +51,14 @@ func List(
 			log.V(1).Info("cluster secret skipped because missing cluster name",
 				"secretName", secr.Name)
 		}
-		clist = append(clist, Cluster{
-			Name:        string(clusterName),
-			ProfileName: secr.Annotations[common.ProfileAnnotationKey],
-			IsExternal:  true,
-			SecretName: secr.Name,
-		})
+		if string(clusterName) == name {
+			return &Cluster{
+				Name:        name,
+				ProfileName: secr.Annotations[common.ProfileAnnotationKey],
+				IsExternal:  true,
+				SecretName: secr.Name,
+			}, nil
+		}
 	}
-	return
+	return nil, fmt.Errorf("not found")
 }
