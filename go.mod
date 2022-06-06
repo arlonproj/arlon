@@ -10,12 +10,11 @@ require (
 	github.com/go-logr/logr v0.4.0
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.16.0
-	github.com/spf13/cobra v1.2.1
+	github.com/spf13/cobra v1.4.0
 	google.golang.org/grpc v1.40.0
 	k8s.io/api v0.22.10
 	k8s.io/apimachinery v0.22.10
-	k8s.io/client-go v11.0.1-0.20190816222228-6d55c1b1f1ca+incompatible
-	k8s.io/kubernetes v1.22.2 // indirect
+	k8s.io/client-go v0.22.10
 	sigs.k8s.io/cluster-api v1.0.1
 	sigs.k8s.io/controller-runtime v0.10.3
 )
