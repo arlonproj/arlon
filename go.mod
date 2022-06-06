@@ -4,7 +4,6 @@ go 1.16
 
 require (
 	github.com/argoproj/argo-cd/v2 v2.2.9
-	github.com/argoproj/gitops-engine v0.5.5 // indirect
 	github.com/deckarep/golang-set v1.8.0
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-logr/logr v0.4.0
@@ -15,7 +14,7 @@ require (
 	k8s.io/api v0.22.10
 	k8s.io/apimachinery v0.22.10
 	k8s.io/client-go v0.22.10
-	sigs.k8s.io/cluster-api v1.0.1
+	sigs.k8s.io/cluster-api v1.0.5
 	sigs.k8s.io/controller-runtime v0.10.3
 )
 
