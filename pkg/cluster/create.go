@@ -20,9 +20,9 @@ func Create(
 	argocdNs,
 	arlonNs,
 	clusterName,
-	repoUrl,
-	repoBranch,
-	basePath,
+	repoUrl,    // gen1: target git repo, gen2: source git repo containing base
+	repoBranch, // gen1: target git revision, gen2: source git revision containing base
+	basePath,   // gen1: target git path, gen2: source git path containing base
 	clusterSpecName string, // empty for gen2
 	prof *arlonv1.Profile,
 	createInArgoCd bool,
@@ -55,7 +55,7 @@ func Create(
 		}
 	}
 	repoPath := basePath // default for gen2
-	if clusterSpecName == "" {
+	if clusterSpecName != "" {
 		repoPath = mgmtPathFromBasePath(basePath, clusterName) // gen1
 	}
 	profileName := "no-profile-for-gen2"
