@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/cli"
+	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/cluster"
 	"github.com/arlonproj/arlon/pkg/profile"
@@ -38,9 +39,16 @@ func deployClusterCommand() *cobra.Command {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
 			createInArgoCd := !outputYaml
-			prof, err := profile.Get(config, profileName, arlonNs)
-			if err != nil {
-				return fmt.Errorf("failed to get profile: %s", err)
+			var prof *arlonv1.Profile
+			if clusterSpecName != "" {
+				prof, err = profile.Get(config, profileName, arlonNs)
+				if err != nil {
+					return fmt.Errorf("failed to get profile: %s", err)
+				}
+			} else {
+				if profileName != "" {
+					return fmt.Errorf("gen2 clusters currently don't have profiles (coming soon)")
+				}
 			}
 			rootApp, err := cluster.Create(appIf, config, argocdNs, arlonNs,
 				clusterName, repoUrl, repoBranch, basePath, clusterSpecName,
@@ -74,12 +82,11 @@ func deployClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&repoBranch, "repo-branch", "main", "the git branch")
 	command.Flags().StringVar(&clusterName, "cluster-name", "", "the cluster name")
 	command.Flags().StringVar(&profileName, "profile", "", "the configuration profile to use")
-	command.Flags().StringVar(&clusterSpecName, "cluster-spec", "", "the clusterspec to use")
-	command.Flags().StringVar(&basePath, "repo-path", "clusters", "the git repository base path (cluster subdirectory will be created under this)")
+	command.Flags().StringVar(&clusterSpecName, "cluster-spec", "", "the clusterspec to use (only for gen1 clusters)")
+	command.Flags().StringVar(&basePath, "repo-path", "clusters", "the git repository base path (cluster subdirectory will be created under this for gen1 clusters)")
 	command.Flags().BoolVar(&outputYaml, "output-yaml", false, "output root application YAML instead of deploying to ArgoCD")
 	command.MarkFlagRequired("repo-url")
 	command.MarkFlagRequired("cluster-name")
-	command.MarkFlagRequired("profile")
-	command.MarkFlagRequired("cluster-spec")
 	return command
 }
+

@@ -13,11 +13,11 @@ import (
 func ConstructRootApp(
 	argocdNs string,
 	clusterName string,
-	repoUrl string,
-	repoBranch string,
-	repoPath string,
-	clusterSpecName string,
-	clusterSpecCm *corev1.ConfigMap,
+	repoUrl string,        // target repo for gen1, source repo for gen2
+	repoBranch string,     // target revision for gen1, source revision for gen2
+	repoPath string,       // target path for gen1, source path for gen2
+	clusterSpecName string,           // empty for gen2
+	clusterSpecCm *corev1.ConfigMap,  // nil for gen2
 	profileName string,
 	managementClusterUrl string,
 ) (*argoappv1.Application, error) {
@@ -37,9 +37,19 @@ func ConstructRootApp(
 			Finalizers: []string{argoappv1.ForegroundPropagationPolicyFinalizer},
 		},
 	}
-	cs, err := clusterspec.FromConfigMap(clusterSpecCm)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read clusterspec from configmap: %s", err)
+	var apiProvider string
+	var cs *clusterspec.ClusterSpec
+	if clusterSpecCm != nil {
+		// gen1
+		var err error
+		cs, err = clusterspec.FromConfigMap(clusterSpecCm)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read clusterspec from configmap: %s", err)
+		}
+		apiProvider = cs.ApiProvider
+	} else {
+		// gen2, assume CAPI for now
+		apiProvider = "capi"
 	}
 	helmParams := []argoappv1.HelmParameter{
 		{
@@ -48,32 +58,38 @@ func ConstructRootApp(
 		},
 		{
 			Name:  "global.kubeconfigSecretKeyName",
-			Value: clusterspec.KubeconfigSecretKeyNameByApiProvider[cs.ApiProvider],
+			Value: clusterspec.KubeconfigSecretKeyNameByApiProvider[apiProvider],
 		},
 		{
 			Name:  "global.managementClusterUrl",
 			Value: managementClusterUrl,
 		},
 	}
-	for _, key := range clusterspec.ValidHelmParamKeys {
-		val := clusterSpecCm.Data[key]
-		if val != "" {
-			helmParams = append(helmParams, argoappv1.HelmParameter{
-				Name:  fmt.Sprintf("global.%s", key),
-				Value: val,
-			})
+	if clusterSpecCm != nil {
+		// gen1
+		for _, key := range clusterspec.ValidHelmParamKeys {
+			val := clusterSpecCm.Data[key]
+			if val != "" {
+				helmParams = append(helmParams, argoappv1.HelmParameter{
+					Name:  fmt.Sprintf("global.%s", key),
+					Value: val,
+				})
+			}
 		}
 	}
-	subchartName, err := clusterspec.SubchartNameFromClusterSpec(cs)
-	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve subchart name: %s", err)
+	if cs != nil {
+		// gen1
+		subchartName, err := clusterspec.SubchartNameFromClusterSpec(cs)
+		if err != nil {
+			return nil, fmt.Errorf("failed to retrieve subchart name: %s", err)
+		}
+		helmParams = append(helmParams, argoappv1.HelmParameter{
+			Name:  fmt.Sprintf("tags.%s", subchartName),
+			Value: "true",
+		})
 	}
-	helmParams = append(helmParams, argoappv1.HelmParameter{
-		Name:  fmt.Sprintf("tags.%s", subchartName),
-		Value: "true",
-	})
 	var ignoreDiffs []argoappv1.ResourceIgnoreDifferences
-	if cs.ClusterAutoscalerEnabled {
+	if cs != nil && cs.ClusterAutoscalerEnabled {
 		casSubchartName, err := clusterspec.ClusterAutoscalerSubchartNameFromClusterSpec(cs)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get cluster autoscaler subchart name: %s", err)
