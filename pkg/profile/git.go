@@ -3,13 +3,13 @@ package profile
 import (
 	"embed"
 	"fmt"
+	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/bundle"
-	"github.com/arlonproj/arlon/pkg/cluster"
+	"github.com/arlonproj/arlon/pkg/common"
 	"github.com/arlonproj/arlon/pkg/gitutils"
 	"github.com/arlonproj/arlon/pkg/log"
 	gogit "github.com/go-git/go-git/v5"
-	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 	"path"
 )
@@ -19,21 +19,21 @@ var content embed.FS
 
 func createInGit(
 	kubeClient *kubernetes.Clientset,
-	profileCm *v1.ConfigMap,
+	profile *arlonv1.Profile,
 	argocdNs string,
 	arlonNs string,
-	repoUrl string,
-	repoPath string,
-	repoBranch string,
 ) error {
 	log := log.GetLogger()
 	corev1 := kubeClient.CoreV1()
-	bundles, err := bundle.GetBundlesFromProfile(profileCm, corev1, arlonNs)
+	bundles, err := bundle.GetBundlesFromProfile(profile, corev1, arlonNs)
 	if err != nil {
 		return fmt.Errorf("failed to get bundles: %s", err)
 	}
+	repoUrl := profile.Spec.RepoUrl
+	repoPath := profile.Spec.RepoPath
+	repoRevision := profile.Spec.RepoRevision
 	repo, tmpDir, auth, err := argocd.CloneRepo(kubeClient, argocdNs,
-		repoUrl, repoBranch)
+		repoUrl, repoRevision)
 	if err != nil {
 		return fmt.Errorf("failed to clone repo: %s", err)
 	}
@@ -53,13 +53,14 @@ func createInGit(
 		}
 	}
 	mgmtPath := path.Join(repoPath, "mgmt")
-	err = cluster.CopyManifests(wt, content, ".", mgmtPath)
+	err = gitutils.CopyManifests(wt, content, ".", mgmtPath)
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}
 	workloadPath := path.Join(repoPath, "workload")
-	err = cluster.ProcessBundles(wt, "{{ .Values.clusterName }}", repoUrl,
-		mgmtPath, workloadPath, bundles)
+	om := MakeOverridesMap(profile)
+	err = gitutils.ProcessBundles(wt, "{{ .Values.clusterName }}", repoUrl,
+		mgmtPath, workloadPath, bundles, om)
 	if err != nil {
 		return fmt.Errorf("failed to process bundles: %s", err)
 	}
@@ -82,4 +83,18 @@ func createInGit(
 	}
 	log.V(1).Info("succesfully pushed working tree", "tmpDir", tmpDir)
 	return nil
+}
+
+func MakeOverridesMap(profile *arlonv1.Profile) (om common.KVPairMap) {
+	if len(profile.Spec.Overrides) == 0 {
+		return
+	}
+	om = make(common.KVPairMap)
+	for _, item := range profile.Spec.Overrides {
+		om[item.Bundle] = append(om[item.Bundle], common.KVPair{
+			Key:   item.Key,
+			Value: item.Value,
+		})
+	}
+	return
 }

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/arlonproj/arlon/pkg/profile"
 	"github.com/spf13/cobra"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -18,6 +17,7 @@ func updateProfileCommand() *cobra.Command {
 	var bundles string
 	var tags string
 	var clear bool
+	var overrides []string
 	command := &cobra.Command{
 		Use:   "update",
 		Short: "Update profile",
@@ -28,18 +28,22 @@ func updateProfileCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
-			kubeClient := kubernetes.NewForConfigOrDie(config)
-			bundlesPtr := &bundles
+			var bundlesPtr *string
 			if clear {
 				if bundles != "" {
 					return fmt.Errorf("bundles must not be specified when using --clear")
 				}
-				bundlesPtr = nil // change profile to empty bundle set
-			} else if bundles == "" {
-				return fmt.Errorf("bundles must be specified unless using --clear")
+				bundlesPtr = &bundles // change profile to empty bundle set
+			} else if bundles != "" {
+				bundlesPtr = &bundles //
+			} // bundles == "", meaning no change, so leave bundlesPtr as nil
+
+			o, err := processOverrides(overrides)
+			if err != nil {
+				return fmt.Errorf("failed to process overrides: %s", err)
 			}
-			modified, err := profile.Update(kubeClient, argocdNs, arlonNs, args[0],
-				bundlesPtr, desc, tags)
+			modified, err := profile.Update(config, argocdNs, arlonNs, args[0],
+				bundlesPtr, desc, tags, o)
 			if err != nil {
 				return err
 			}
@@ -56,5 +60,6 @@ func updateProfileCommand() *cobra.Command {
 	command.Flags().StringVar(&bundles, "bundles", "", "comma separated list of bundles")
 	command.Flags().StringVar(&tags, "tags", "", "comma separated list of tags")
 	command.Flags().BoolVar(&clear, "clear", false, "set the bundle list to the empty set")
+	command.Flags().StringArrayVarP(&overrides, "param", "p", nil, "add a single parameter override of the form bundle,key,value ... can be repeated")
 	return command
 }

@@ -3,11 +3,10 @@ package bundle
 import (
 	"context"
 	"fmt"
+	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/common"
-	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1types "k8s.io/client-go/kubernetes/typed/core/v1"
-	"strings"
 )
 
 type Bundle struct {
@@ -23,17 +22,16 @@ type Bundle struct {
 // -----------------------------------------------------------------------------
 
 func GetBundlesFromProfile(
-	profileConfigMap *v1.ConfigMap,
+	profile *arlonv1.Profile,
 	corev1 corev1types.CoreV1Interface,
 	arlonNs string,
 ) (bundles []Bundle, err error) {
 	secretsApi := corev1.Secrets(arlonNs)
-	bundleList := profileConfigMap.Data["bundles"]
-	if bundleList == "" {
+	bundleList := profile.Spec.Bundles
+	if bundleList == nil {
 		return nil, nil
 	}
-	bundleItems := strings.Split(bundleList, ",")
-	for _, bundleName := range bundleItems {
+	for _, bundleName := range bundleList {
 		secr, err := secretsApi.Get(context.Background(), bundleName, metav1.GetOptions{})
 		if err != nil {
 			return nil, fmt.Errorf("failed to get bundle secret %s: %s", bundleName, err)

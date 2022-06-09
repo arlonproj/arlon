@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
 )
@@ -34,10 +33,9 @@ func updateClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
-			kubeClient := kubernetes.NewForConfigOrDie(config)
 			updateInArgoCd := !outputYaml
 			clusterName := args[0]
-			rootApp, err := cluster.Update(appIf, kubeClient, argocdNs, arlonNs,
+			rootApp, err := cluster.Update(appIf, config, argocdNs, arlonNs,
 				clusterName, clusterSpecName, profileName, updateInArgoCd,
 				config.Host)
 			if err != nil {
