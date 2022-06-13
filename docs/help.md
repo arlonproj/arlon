@@ -1,4 +1,5 @@
-# Welcome to Arlon documentation with MkDocs
+# Help with MkDocs
+Welcome to Arlon documentation with MkDocs
 
 For full documentation visit [mkdocs.org](https://www.mkdocs.org).
 

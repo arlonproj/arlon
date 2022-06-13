@@ -1,1 +1,8 @@
-site_name: Arlon Docs
+# yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
+
+site_name: Arlon 
+theme:
+  name: material
+#  name: gitbook
+#  name: 'rtd-dropdown'
+#theme: ivory
