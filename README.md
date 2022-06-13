@@ -1,6 +1,6 @@
 # Arlon
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fplatform9%2Farlon.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fplatform9%2Farlon?ref=badge_shield)
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/arlonproj/arlon)](https://goreportcard.com/report/github.com/arlonproj/arlon)
 
 Arlon is a lifecycle management and configuration tool for Kubernetes clusters.
 It allows an administrator to compose, deploy and configure a large number of
