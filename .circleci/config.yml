@@ -6,11 +6,17 @@ version: 2.1
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
   build:
-    working_directory: ~/repo
+    working_directory: ~/go/src/github.com/arlonproj/arlon
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     docker:
       - image: cimg/go:1.16.12
+
+    parallelism: 2
+
+    environment: # environment variables for the build itself
+      TEST_RESULTS: /tmp/test-results # path to where test results will be saved
+
     # Add steps to the job
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
@@ -26,6 +32,7 @@ jobs:
       - run:
           name: Install Dependencies
           command: go mod download
+      - run: make build # pull and build dependencies for the project          
       - save_cache:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
