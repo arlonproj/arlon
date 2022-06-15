@@ -18,6 +18,7 @@ package main
 
 import (
 	"flag"
+	"github.com/arlonproj/arlon/cmd/webhook"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -58,6 +59,7 @@ func main() {
 	command.AddCommand(profile.NewCommand())
 	command.AddCommand(clusterspec.NewCommand())
 	command.AddCommand(cluster.NewCommand())
+	command.AddCommand(webhook.NewCommand())
 
 	opts := zap.Options{
 		Development: true,
