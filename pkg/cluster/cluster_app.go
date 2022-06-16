@@ -14,9 +14,9 @@ func CreateClusterApp(
 	appIf argoapp.ApplicationServiceClient,
 	argocdNs string,
 	clusterName string,
-	repoUrl string,        // source repo
-	repoRevision string,   // source revision
-	repoPath string,       // source path
+	repoUrl string, // source repo
+	repoRevision string, // source revision
+	repoPath string, // source path
 	createInArgoCd bool,
 ) (*argoappv1.Application, error) {
 	app := constructClusterApp(argocdNs, clusterName, repoUrl, repoRevision, repoPath)
@@ -36,9 +36,9 @@ func CreateClusterApp(
 func constructClusterApp(
 	argocdNs string,
 	clusterName string,
-	repoUrl string,        // source repo
-	repoRevision string,     // source revision
-	repoPath string,       // source path
+	repoUrl string, // source repo
+	repoRevision string, // source revision
+	repoPath string, // source path
 ) *argoappv1.Application {
 	app := &argoappv1.Application{
 		TypeMeta: v1.TypeMeta{
@@ -48,9 +48,9 @@ func constructClusterApp(
 		ObjectMeta: v1.ObjectMeta{
 			Name:      clusterName,
 			Namespace: argocdNs,
-			Labels:    map[string]string{
-				"managed-by": "arlon",
-				"arlon-type": "cluster-app",
+			Labels: map[string]string{
+				"managed-by":    "arlon",
+				"arlon-type":    "cluster-app",
 				"arlon-cluster": clusterName,
 			},
 			Finalizers: []string{argoappv1.ForegroundPropagationPolicyFinalizer},
@@ -74,8 +74,8 @@ func constructClusterApp(
 		JSONPointers: []string{"/spec/version"},
 	})
 	app.Spec.IgnoreDifferences = ignoreDiffs
-	app.Spec.Source.Directory = &argoappv1.ApplicationSourceDirectory{
-		Recurse: true,
+	app.Spec.Source.Kustomize = &argoappv1.ApplicationSourceKustomize{
+		NamePrefix: clusterName + "-",
 	}
 	app.Spec.Source.RepoURL = repoUrl
 	app.Spec.Source.TargetRevision = repoRevision
