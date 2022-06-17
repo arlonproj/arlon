@@ -27,9 +27,9 @@ func List(
 	}
 	for _, a := range apps.Items {
 		clist = append(clist, Cluster{
-			Name: a.Name,
+			Name:            a.Name,
 			ClusterSpecName: a.Annotations[common.ClusterSpecAnnotationKey],
-			ProfileName: a.Annotations[common.ProfileAnnotationKey],
+			ProfileName:     a.Annotations[common.ProfileAnnotationKey],
 		})
 	}
 	kubeClient, err := kubernetes.NewForConfig(config)
@@ -54,7 +54,7 @@ func List(
 			Name:        string(clusterName),
 			ProfileName: secr.Annotations[common.ProfileAnnotationKey],
 			IsExternal:  true,
-			SecretName: secr.Name,
+			SecretName:  secr.Name,
 		})
 	}
 	return
