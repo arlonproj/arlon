@@ -21,18 +21,6 @@ func Get(
 	name string,
 ) (cl *Cluster, err error) {
 	log := logpkg.GetLogger()
-	app, err := appIf.Get(context.Background(),
-		&apppkg.ApplicationQuery{
-			Name: &name,
-			Selector: "managed-by=arlon,arlon-type=cluster",
-		})
-	if err == nil {
-		return &Cluster{
-			Name: app.Name,
-			ClusterSpecName: app.Annotations[common.ClusterSpecAnnotationKey],
-			ProfileName: app.Annotations[common.ProfileAnnotationKey],
-		}, nil
-	}
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get kube client: %s", err)
@@ -56,9 +44,58 @@ func Get(
 				Name:        name,
 				ProfileName: secr.Annotations[common.ProfileAnnotationKey],
 				IsExternal:  true,
-				SecretName: secr.Name,
+				SecretName:  secr.Name,
 			}, nil
 		}
 	}
-	return nil, fmt.Errorf("not found")
+	app, err := appIf.Get(context.Background(),
+		&apppkg.ApplicationQuery{
+			Name: &name,
+		})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get argocd application: %s", err)
+	}
+	typ := app.Labels["arlon-type"]
+	if typ == "cluster" {
+		return &Cluster{
+			Name:            app.Name,
+			ClusterSpecName: app.Annotations[common.ClusterSpecAnnotationKey],
+			ProfileName:     app.Annotations[common.ProfileAnnotationKey],
+		}, nil
+	}
+	if typ == "cluster-app" {
+		profileName, err := getMatchingProfileName(appIf, app.Name)
+		if err != nil {
+			return nil, fmt.Errorf("failed to matching profile name: %s", err)
+		}
+		return &Cluster{
+			Name:        app.Name,
+			ProfileName: profileName,
+			BaseCluster: &BaseClusterInfo{
+				Name:         app.Annotations[baseClusterNameAnnotation],
+				RepoUrl:      app.Annotations[baseClusterRepoUrlAnnotation],
+				RepoRevision: app.Annotations[baseClusterRepoRevisionAnnotation],
+				RepoPath:     app.Annotations[baseClusterRepoPathAnnotation],
+			},
+		}, nil
+	}
+	return nil, fmt.Errorf("not an arlon cluster")
+}
+
+//------------------------------------------------------------------------------
+
+func (c *Cluster) String() string {
+	s := "Name: " + c.Name
+	if c.IsExternal {
+		s = s + ", Type: external"
+	} else if c.BaseCluster != nil {
+		s = s + ", Type: next-gen, Base Cluster Repo Url: " + c.BaseCluster.RepoUrl +
+			", Base Cluster Repo Path: " + c.BaseCluster.RepoPath
+	} else {
+		s = s + ", Type: previous gen, Cluster Spec: " + c.ClusterSpecName
+	}
+	if c.ProfileName != "" {
+		s = s + ", Profile: " + c.ProfileName
+	}
+	return s
 }

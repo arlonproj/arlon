@@ -86,7 +86,7 @@ func Update(
 		return nil, fmt.Errorf("unexpected cluster name extracted from repo path: %s",
 			clstName)
 	}
-	rootApp, err := ConstructRootApp(argocdNs, clusterName, repoUrl,
+	rootApp, err := ConstructRootApp(argocdNs, clusterName, "", repoUrl,
 		repoBranch, repoPath, clusterSpecName, clusterSpecCm, prof.Name,
 		managementClusterUrl)
 	if err != nil {

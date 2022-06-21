@@ -20,6 +20,7 @@ func List(
 	argocdNs string,
 ) (clist []Cluster, err error) {
 	log := logpkg.GetLogger()
+	// List legacy clusters (have clusterspec)
 	apps, err := appIf.List(context.Background(),
 		&apppkg.ApplicationQuery{Selector: "managed-by=arlon,arlon-type=cluster"})
 	if err != nil {
@@ -27,11 +28,35 @@ func List(
 	}
 	for _, a := range apps.Items {
 		clist = append(clist, Cluster{
-			Name: a.Name,
+			Name:            a.Name,
 			ClusterSpecName: a.Annotations[common.ClusterSpecAnnotationKey],
-			ProfileName: a.Annotations[common.ProfileAnnotationKey],
+			ProfileName:     a.Annotations[common.ProfileAnnotationKey],
 		})
 	}
+	// List next-gen clusters (have base cluster)
+	apps, err = appIf.List(context.Background(),
+		&apppkg.ApplicationQuery{Selector: "managed-by=arlon,arlon-type=cluster-app"})
+	if err != nil {
+		return nil, fmt.Errorf("failed to list next-gen clusters: %s", err)
+	}
+	for _, a := range apps.Items {
+		// Find any corresponding profile apps
+		profileName, err := getMatchingProfileName(appIf, a.Name)
+		if err != nil {
+			return nil, fmt.Errorf("failed to matching profile name: %s", err)
+		}
+		clist = append(clist, Cluster{
+			Name:        a.Name,
+			ProfileName: profileName,
+			BaseCluster: &BaseClusterInfo{
+				Name:         a.Annotations[baseClusterNameAnnotation],
+				RepoUrl:      a.Annotations[baseClusterRepoUrlAnnotation],
+				RepoRevision: a.Annotations[baseClusterRepoRevisionAnnotation],
+				RepoPath:     a.Annotations[baseClusterRepoPathAnnotation],
+			},
+		})
+	}
+
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get kube client: %s", err)
@@ -54,8 +79,32 @@ func List(
 			Name:        string(clusterName),
 			ProfileName: secr.Annotations[common.ProfileAnnotationKey],
 			IsExternal:  true,
-			SecretName: secr.Name,
+			SecretName:  secr.Name,
 		})
 	}
 	return
+}
+
+//------------------------------------------------------------------------------
+
+func getMatchingProfileName(
+	appIf argoapp.ApplicationServiceClient,
+	clusterName string,
+) (string, error) {
+	profileApps, err := appIf.List(context.Background(),
+		&apppkg.ApplicationQuery{
+			Selector: "managed-by=arlon,arlon-type=profile-app,arlon-cluster=" + clusterName,
+		})
+	if err != nil {
+		return "", fmt.Errorf(
+			"failed to list profile apps associated with cluster %s: %s",
+			clusterName, err,
+		)
+	}
+	if len(profileApps.Items) > 0 {
+		// In theory, multiple profile apps can be associated with the same
+		// cluster. For now, just report the first one found.
+		return profileApps.Items[0].Labels["arlon-profile"], nil
+	}
+	return "", nil
 }
