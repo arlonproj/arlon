@@ -53,7 +53,7 @@ func ManageExternal(
 	}
 	defer conn2.Close()
 	_, err = clusterIf.Get(context.Background(), &argocluster.ClusterQuery{
-		Name:               clusterName,
+		Name: clusterName,
 	})
 	if err != nil {
 		return fmt.Errorf("cluster is not registered in argocd")
@@ -96,7 +96,7 @@ func ManageExternal(
 	profileAppName := fmt.Sprintf("%s-profile-%s", clusterName, prof.Name)
 	app := constructProfileApp(profileAppName, argocdNs, clusterName, prof)
 	_, err = appIf.Create(context.Background(), &argoapp.ApplicationCreateRequest{
-		Application:          *app,
+		Application: *app,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to get create profile app: %s", err)
@@ -108,7 +108,7 @@ func ManageExternal(
 	err = cli.Patch(context.Background(), newSecr, patchclient.MergeFrom(secrPtr))
 	if err != nil {
 		cascade := true
-		_,err = appIf.Delete(context.Background(), &argoapp.ApplicationDeleteRequest{
+		_, err = appIf.Delete(context.Background(), &argoapp.ApplicationDeleteRequest{
 			Name: &profileAppName, Cascade: &cascade,
 		})
 		if err != nil {
@@ -149,12 +149,12 @@ func constructProfileApp(
 				},
 			},
 			Destination: argoappv1.ApplicationDestination{
-				Server: "https://kubernetes.default.svc",
+				Server:    "https://kubernetes.default.svc",
 				Namespace: argocdNs,
 			},
 			Source: argoappv1.ApplicationSource{
-				RepoURL: prof.Spec.RepoUrl,
-				Path: repoPath,
+				RepoURL:        prof.Spec.RepoUrl,
+				Path:           repoPath,
 				TargetRevision: prof.Spec.RepoRevision,
 				Helm: &argoappv1.ApplicationSourceHelm{
 					Parameters: []argoappv1.HelmParameter{
@@ -222,7 +222,7 @@ func UnmanageExternal(
 		return fmt.Errorf("secret does not contain profile app name annotation")
 	}
 	cascade := true
-	_,err = appIf.Delete(context.Background(), &argoapp.ApplicationDeleteRequest{
+	_, err = appIf.Delete(context.Background(), &argoapp.ApplicationDeleteRequest{
 		Name: &profileAppName, Cascade: &cascade,
 	})
 	if err != nil {
