@@ -23,14 +23,14 @@ func Get(
 	log := logpkg.GetLogger()
 	app, err := appIf.Get(context.Background(),
 		&apppkg.ApplicationQuery{
-			Name: &name,
+			Name:     &name,
 			Selector: "managed-by=arlon,arlon-type=cluster",
 		})
 	if err == nil {
 		return &Cluster{
-			Name: app.Name,
+			Name:            app.Name,
 			ClusterSpecName: app.Annotations[common.ClusterSpecAnnotationKey],
-			ProfileName: app.Annotations[common.ProfileAnnotationKey],
+			ProfileName:     app.Annotations[common.ProfileAnnotationKey],
 		}, nil
 	}
 	kubeClient, err := kubernetes.NewForConfig(config)
@@ -56,7 +56,7 @@ func Get(
 				Name:        name,
 				ProfileName: secr.Annotations[common.ProfileAnnotationKey],
 				IsExternal:  true,
-				SecretName: secr.Name,
+				SecretName:  secr.Name,
 			}, nil
 		}
 	}
