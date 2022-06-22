@@ -20,9 +20,10 @@ func Create(
 	argocdNs,
 	arlonNs,
 	clusterName,
-	repoUrl,    // gen1: target git repo, gen2: source git repo containing base
+	innerClusterName, // gen2 only, leave empty otherwise
+	repoUrl, // gen1: target git repo, gen2: source git repo containing base
 	repoBranch, // gen1: target git revision, gen2: source git revision containing base
-	basePath,   // gen1: target git path, gen2: source git path containing base
+	basePath, // gen1: target git path, gen2: source git path containing base
 	clusterSpecName string, // empty for gen2
 	prof *arlonv1.Profile,
 	createInArgoCd bool,
@@ -62,7 +63,7 @@ func Create(
 	if prof != nil {
 		profileName = prof.Name
 	}
-	rootApp, err := ConstructRootApp(argocdNs, clusterName, repoUrl, repoBranch,
+	rootApp, err := ConstructRootApp(argocdNs, clusterName, innerClusterName, repoUrl, repoBranch,
 		repoPath, clusterSpecName, cm, profileName, managementClusterUrl)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct root app: %s", err)

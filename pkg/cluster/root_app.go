@@ -13,11 +13,12 @@ import (
 func ConstructRootApp(
 	argocdNs string,
 	clusterName string,
-	repoUrl string,        // target repo for gen1, source repo for gen2
-	repoBranch string,     // target revision for gen1, source revision for gen2
-	repoPath string,       // target path for gen1, source path for gen2
-	clusterSpecName string,           // empty for gen2
-	clusterSpecCm *corev1.ConfigMap,  // nil for gen2
+	innerClusterName string, // only used for gen2, ok to leave empty
+	repoUrl string, // target repo for gen1, source repo for gen2
+	repoBranch string, // target revision for gen1, source revision for gen2
+	repoPath string, // target path for gen1, source path for gen2
+	clusterSpecName string, // empty for gen2
+	clusterSpecCm *corev1.ConfigMap, // nil for gen2
 	profileName string,
 	managementClusterUrl string,
 ) (*argoappv1.Application, error) {
@@ -74,6 +75,13 @@ func ConstructRootApp(
 			Value: managementClusterUrl,
 		},
 	}
+	if innerClusterName != "" {
+		innerClusterNameWithDashSuffix := innerClusterName + "-"
+		helmParams = append(helmParams, argoappv1.HelmParameter{
+			Name:  "global.innerClusterNameWithDashSuffix",
+			Value: innerClusterNameWithDashSuffix,
+		})
+	}
 	if clusterSpecCm != nil {
 		// gen1
 		for _, key := range clusterspec.ValidHelmParamKeys {
@@ -85,9 +93,6 @@ func ConstructRootApp(
 				})
 			}
 		}
-	}
-	if cs != nil {
-		// gen1
 		subchartName, err := clusterspec.SubchartNameFromClusterSpec(cs)
 		if err != nil {
 			return nil, fmt.Errorf("failed to retrieve subchart name: %s", err)
@@ -96,9 +101,6 @@ func ConstructRootApp(
 			Name:  fmt.Sprintf("tags.%s", subchartName),
 			Value: "true",
 		})
-	}
-	if cs != nil {
-		// gen1
 		var ignoreDiffs []argoappv1.ResourceIgnoreDifferences
 		if cs.ClusterAutoscalerEnabled {
 			casSubchartName, err := clusterspec.ClusterAutoscalerSubchartNameFromClusterSpec(cs)
