@@ -26,7 +26,7 @@ var (
 func ValidValues(vals map[string]bool) string {
 	var ret string
 	var i int
-	for val, _ := range vals {
+	for val := range vals {
 		var sep string
 		if i > 0 {
 			sep = "|"
