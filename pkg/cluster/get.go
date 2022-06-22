@@ -21,18 +21,6 @@ func Get(
 	name string,
 ) (cl *Cluster, err error) {
 	log := logpkg.GetLogger()
-	app, err := appIf.Get(context.Background(),
-		&apppkg.ApplicationQuery{
-			Name:     &name,
-			Selector: "managed-by=arlon,arlon-type=cluster",
-		})
-	if err == nil {
-		return &Cluster{
-			Name:            app.Name,
-			ClusterSpecName: app.Annotations[common.ClusterSpecAnnotationKey],
-			ProfileName:     app.Annotations[common.ProfileAnnotationKey],
-		}, nil
-	}
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get kube client: %s", err)
@@ -59,6 +47,18 @@ func Get(
 				SecretName:  secr.Name,
 			}, nil
 		}
+	}
+	app, err := appIf.Get(context.Background(),
+		&apppkg.ApplicationQuery{
+			Name:     &name,
+			Selector: "managed-by=arlon,arlon-type=cluster",
+		})
+	if err == nil {
+		return &Cluster{
+			Name:            app.Name,
+			ClusterSpecName: app.Annotations[common.ClusterSpecAnnotationKey],
+			ProfileName:     app.Annotations[common.ProfileAnnotationKey],
+		}, nil
 	}
 	return nil, fmt.Errorf("not found")
 }
