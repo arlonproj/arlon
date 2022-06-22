@@ -1,0 +1,11 @@
+site_name: Arlon 
+theme: windmill
+
+nav:
+  - Home: index.md
+  - Readme: about.md
+  - Arlon_Help: help.md
+  - Arlon_Design: design.md
+
+repo_url: https://github.com/arlonproj/arlon
+repo_name: arlonproj/arlon
