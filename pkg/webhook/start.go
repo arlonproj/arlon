@@ -12,7 +12,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-
 func Start(port int) error {
 	scheme := runtime.NewScheme()
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
@@ -26,9 +25,9 @@ func Start(port int) error {
 		return fmt.Errorf("failed to get new kubernetes client: %s", err)
 	}
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
-		Scheme:           scheme,
-		Port:             port,
-		LeaderElection:   false,
+		Scheme:         scheme,
+		Port:           port,
+		LeaderElection: false,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to get new manager: %s", err)
@@ -47,4 +46,3 @@ func Start(port int) error {
 	fmt.Println("manager started")
 	return nil
 }
-

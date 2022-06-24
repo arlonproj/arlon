@@ -14,5 +14,6 @@ func NewCommand() *cobra.Command {
 	}
 	command.AddCommand(validateBaseClusterCommand())
 	command.AddCommand(validateGitBaseClusterCommand())
+	command.AddCommand(prepareBaseClusterCommand())
 	return command
 }

@@ -64,4 +64,3 @@ func (wh *webhook) toV1AdmissionResponse(msg string, err error) *v1.AdmissionRes
 		},
 	}
 }
-
