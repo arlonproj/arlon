@@ -64,7 +64,7 @@ func createInGit(
 	if err != nil {
 		return fmt.Errorf("failed to process bundles: %s", err)
 	}
-	changed, err := gitutils.CommitChanges(tmpDir, wt)
+	changed, err := gitutils.CommitChanges(tmpDir, wt, "manage arlon profile "+repoPath)
 	if err != nil {
 		return fmt.Errorf("failed to commit changes: %s", err)
 	}

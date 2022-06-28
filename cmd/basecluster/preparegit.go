@@ -23,12 +23,18 @@ func prepareGitBaseClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
-			clusterName, err := bcl.PrepareGitDir(config, argocdNs, repoUrl,
-				repoRevision, repoPath)
+			clusterName, changed, err := bcl.PrepareGitDir(config, argocdNs,
+				repoUrl, repoRevision, repoPath)
 			if err != nil {
-				return err
+				return fmt.Errorf("git preparation failed: %s", err)
 			}
-			fmt.Println("preparation successful, cluster name:", clusterName)
+			if changed {
+				fmt.Println("preparation successful, cluster name:", clusterName)
+			} else {
+				fmt.Println("the files for cluster <",
+					clusterName,
+					"> are already compliant as base cluster, no preparation necessary")
+			}
 			return nil
 		},
 	}

@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/arlonproj/arlon/pkg/argocd"
+	"github.com/arlonproj/arlon/pkg/gitutils"
 	logpkg "github.com/arlonproj/arlon/pkg/log"
+	gogit "github.com/go-git/go-git/v5"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/cli-runtime/pkg/resource"
@@ -98,20 +100,20 @@ func PrepareGitDir(
 	repoUrl string,
 	repoRevision string,
 	repoPath string,
-) (clusterName string, err error) {
+) (clusterName string, changed bool, err error) {
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return "", fmt.Errorf("failed to get kubernetes client: %s", err)
+		return "", false, fmt.Errorf("failed to get kubernetes client: %s", err)
 	}
-	repo, tmpDir, _, err := argocd.CloneRepo(kubeClient, argocdNs,
+	repo, tmpDir, auth, err := argocd.CloneRepo(kubeClient, argocdNs,
 		repoUrl, repoRevision)
 	defer os.RemoveAll(tmpDir)
 	if err != nil {
-		return "", fmt.Errorf("failed to clone repo: %s", err)
+		return "", false, fmt.Errorf("failed to clone repo: %s", err)
 	}
 	wt, err := repo.Worktree()
 	if err != nil {
-		return "", fmt.Errorf("failed to get repo worktree: %s", err)
+		return "", false, fmt.Errorf("failed to get repo worktree: %s", err)
 	}
 	fs := wt.Filesystem
 	var kustomizationFound bool
@@ -119,11 +121,11 @@ func PrepareGitDir(
 	var manifestFile string
 	infos, err := fs.ReadDir(repoPath)
 	if err != nil {
-		return "", fmt.Errorf("failed to list repo directory: %s", err)
+		return "", false, fmt.Errorf("failed to list repo directory: %s", err)
 	}
 	for _, info := range infos {
 		if info.IsDir() {
-			return "", fmt.Errorf("found subdirectory: %s", info.Name())
+			return "", false, fmt.Errorf("found subdirectory: %s", info.Name())
 		}
 		if info.Name() == "kustomization.yaml" {
 			kustomizationFound = true
@@ -134,58 +136,77 @@ func PrepareGitDir(
 			continue
 		}
 		if manifestFile != "" {
-			return "", fmt.Errorf("multiple manifests found: (%s, %s)",
+			return "", false, fmt.Errorf("multiple manifests found: (%s, %s)",
 				manifestFile, info.Name())
 		}
 		manifestFile = info.Name()
 	}
 	if manifestFile == "" {
-		return "", fmt.Errorf("failed to find base cluster manifest file")
+		return "", false, fmt.Errorf("failed to find base cluster manifest file")
 	}
 	manifestRelPath := path.Join(repoPath, manifestFile)
 	manifestAbsPath := path.Join(tmpDir, manifestRelPath)
 	clusterName, modifiedYaml, err := Prepare(manifestAbsPath, false)
 	if err != nil {
-		return "", fmt.Errorf("failed to prepare manifest: %s", err)
+		return "", false, fmt.Errorf("failed to prepare manifest: %s", err)
 	}
 	if modifiedYaml != nil {
 		// The manifest contains namespaces. Overwrite it with the modified
 		// copy that has the namespaces reomoved.
 		file, err := fs.OpenFile(manifestRelPath, os.O_WRONLY|os.O_TRUNC, 0644)
 		if err != nil {
-			return "", fmt.Errorf("failed to open manifest for writing: %s", err)
+			return "", false, fmt.Errorf("failed to open manifest for writing: %s", err)
 		}
 		_, err = bytes.NewBuffer(modifiedYaml).WriteTo(file)
 		_ = file.Close()
 		if err != nil {
-			return "", fmt.Errorf("failed to write to manifest: %s", err)
+			return "", false, fmt.Errorf("failed to write to manifest: %s", err)
 		}
 	}
 	if !kustomizationFound {
 		tmpl, err := template.New("kust").Parse(kustomizationYamlTemplate)
 		if err != nil {
-			return "", fmt.Errorf("failed to create kustomization template: %s", err)
+			return "", false, fmt.Errorf("failed to create kustomization template: %s", err)
 		}
 		file, err := fs.Create(path.Join(repoPath, "kustomization.yaml"))
 		if err != nil {
-			return "", fmt.Errorf("failed to create kustomization.yaml: %s", err)
+			return "", false, fmt.Errorf("failed to create kustomization.yaml: %s", err)
 		}
 		err = tmpl.Execute(file, &KustomizationTemplateParams{manifestFile})
 		_ = file.Close()
 		if err != nil {
-			return "", fmt.Errorf("failed to write to kustomization.yaml: %s", err)
+			return "", false, fmt.Errorf("failed to write to kustomization.yaml: %s", err)
 		}
 	}
 	if !configurationsFound {
 		file, err := fs.Create(path.Join(repoPath, "configurations.yaml"))
 		if err != nil {
-			return "", fmt.Errorf("failed to create configurations.yaml: %s", err)
+			return "", false, fmt.Errorf("failed to create configurations.yaml: %s", err)
 		}
 		_, err = file.Write([]byte(configurationsYaml))
 		_ = file.Close()
 		if err != nil {
-			return "", fmt.Errorf("failed to write to configurations.yaml: %s", err)
+			return "", false, fmt.Errorf("failed to write to configurations.yaml: %s", err)
 		}
+	}
+	changed, err = gitutils.CommitChanges(tmpDir, wt,
+		"prepare base cluster files for "+manifestRelPath)
+	if err != nil {
+		err = fmt.Errorf("failed to commit changes: %s", err)
+		return
+	}
+	if !changed {
+		return
+	}
+	err = repo.Push(&gogit.PushOptions{
+		RemoteName: gogit.DefaultRemoteName,
+		Auth:       auth,
+		Progress:   nil,
+		CABundle:   nil,
+	})
+	if err != nil {
+		err = fmt.Errorf("failed to push to remote repository: %s", err)
+		return
 	}
 	return
 }
