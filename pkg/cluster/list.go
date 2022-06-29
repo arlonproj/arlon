@@ -20,6 +20,7 @@ func List(
 	argocdNs string,
 ) (clist []Cluster, err error) {
 	log := logpkg.GetLogger()
+	// List legacy clusters (have clusterspec)
 	apps, err := appIf.List(context.Background(),
 		&apppkg.ApplicationQuery{Selector: "managed-by=arlon,arlon-type=cluster"})
 	if err != nil {
@@ -32,6 +33,24 @@ func List(
 			ProfileName:     a.Annotations[common.ProfileAnnotationKey],
 		})
 	}
+	// List next-gen clusters (have base cluster)
+	apps, err = appIf.List(context.Background(),
+		&apppkg.ApplicationQuery{Selector: "managed-by=arlon,arlon-type=cluster-app"})
+	if err != nil {
+		return nil, fmt.Errorf("failed to list next-gen clusters: %s", err)
+	}
+	for _, a := range apps.Items {
+		clist = append(clist, Cluster{
+			Name: a.Name,
+			BaseCluster: &BaseClusterInfo{
+				Name:         a.Annotations[baseClusterNameAnnotation],
+				RepoUrl:      a.Annotations[baseClusterRepoUrlAnnotation],
+				RepoRevision: a.Annotations[baseClusterRepoRevisionAnnotation],
+				RepoPath:     a.Annotations[baseClusterRepoPathAnnotation],
+			},
+		})
+	}
+
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get kube client: %s", err)

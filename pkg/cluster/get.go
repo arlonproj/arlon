@@ -60,5 +60,21 @@ func Get(
 			ProfileName:     app.Annotations[common.ProfileAnnotationKey],
 		}, nil
 	}
+	app, err = appIf.Get(context.Background(),
+		&apppkg.ApplicationQuery{
+			Name:     &name,
+			Selector: "managed-by=arlon,arlon-type=cluster-app",
+		})
+	if err == nil {
+		return &Cluster{
+			Name: app.Name,
+			BaseCluster: &BaseClusterInfo{
+				Name:         app.Annotations[baseClusterNameAnnotation],
+				RepoUrl:      app.Annotations[baseClusterRepoUrlAnnotation],
+				RepoRevision: app.Annotations[baseClusterRepoRevisionAnnotation],
+				RepoPath:     app.Annotations[baseClusterRepoPathAnnotation],
+			},
+		}, nil
+	}
 	return nil, fmt.Errorf("not found")
 }

@@ -39,20 +39,22 @@ func createClusterCommand() *cobra.Command {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
 			createInArgoCd := !outputYaml
-			innerClusterName, err := bcl.ValidateGitDir(config, argocdNs,
+			baseClusterName, err := bcl.ValidateGitDir(config, argocdNs,
 				clusterRepoUrl, clusterRepoRevision, clusterRepoPath)
 			if err != nil {
 				return fmt.Errorf("failed to validate base cluster: %s", err)
 			}
+			// Create "arlon app" for cluster
 			arlonApp, err := cluster.Create(appIf, config, argocdNs, arlonNs,
-				clusterName, innerClusterName, arlonRepoUrl, arlonRepoRevision,
+				clusterName, baseClusterName, arlonRepoUrl, arlonRepoRevision,
 				arlonRepoPath, "",
 				nil, createInArgoCd, config.Host)
 			if err != nil {
 				return fmt.Errorf("failed to create arlon app: %s", err)
 			}
+			// Create "cluster app" for cluster
 			clusterApp, err := cluster.CreateClusterApp(appIf, argocdNs,
-				clusterName, clusterRepoUrl, clusterRepoRevision,
+				clusterName, baseClusterName, clusterRepoUrl, clusterRepoRevision,
 				clusterRepoPath, createInArgoCd)
 			if err != nil {
 				return fmt.Errorf("failed to create cluster app: %s", err)

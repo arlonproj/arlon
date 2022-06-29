@@ -14,12 +14,14 @@ func CreateClusterApp(
 	appIf argoapp.ApplicationServiceClient,
 	argocdNs string,
 	clusterName string,
+	baseClusterName string,
 	repoUrl string, // source repo
 	repoRevision string, // source revision
 	repoPath string, // source path
 	createInArgoCd bool,
 ) (*argoappv1.Application, error) {
-	app := constructClusterApp(argocdNs, clusterName, repoUrl, repoRevision, repoPath)
+	app := constructClusterApp(argocdNs, clusterName, baseClusterName,
+		repoUrl, repoRevision, repoPath)
 	if createInArgoCd {
 		appCreateRequest := argoapp.ApplicationCreateRequest{
 			Application: *app,
@@ -36,6 +38,7 @@ func CreateClusterApp(
 func constructClusterApp(
 	argocdNs string,
 	clusterName string,
+	baseClusterName string,
 	repoUrl string, // source repo
 	repoRevision string, // source revision
 	repoPath string, // source path
@@ -52,6 +55,12 @@ func constructClusterApp(
 				"managed-by":    "arlon",
 				"arlon-type":    "cluster-app",
 				"arlon-cluster": clusterName,
+			},
+			Annotations: map[string]string{
+				baseClusterNameAnnotation:         baseClusterName,
+				baseClusterRepoUrlAnnotation:      repoUrl,
+				baseClusterRepoRevisionAnnotation: repoRevision,
+				baseClusterRepoPathAnnotation:     repoPath,
 			},
 			Finalizers: []string{argoappv1.ForegroundPropagationPolicyFinalizer},
 		},
