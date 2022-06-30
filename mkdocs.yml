@@ -18,5 +18,7 @@ theme:
 #  name: gitbook
 #  name: 'rtd-dropdown'
 #theme: ivory
+# The default edit_uri is : edit/master/docs/
+edit_uri: edit/main/docs/
 repo_url: https://github.com/arlonproj/arlon
 repo_name: arlonproj/arlon
