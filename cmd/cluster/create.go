@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/cli"
+	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	bcl "github.com/arlonproj/arlon/pkg/basecluster"
 	"github.com/arlonproj/arlon/pkg/cluster"
+	"github.com/arlonproj/arlon/pkg/profile"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
@@ -27,6 +29,7 @@ func createClusterCommand() *cobra.Command {
 	var clusterRepoPath string
 	var clusterName string
 	var outputYaml bool
+	var profileName string
 	command := &cobra.Command{
 		Use:   "create",
 		Short: "create new cluster from a base",
@@ -44,6 +47,17 @@ func createClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to validate base cluster: %s", err)
 			}
+			var prof *arlonv1.Profile
+			if profileName != "" {
+				prof, err = profile.Get(config, profileName, arlonNs)
+				if err != nil {
+					return fmt.Errorf("failed to get profile: %s", err)
+				}
+				if prof.Spec.RepoUrl == "" {
+					return fmt.Errorf("profile %s is not dynamic",
+						profileName)
+				}
+			}
 			// Create "arlon app" for cluster
 			arlonApp, err := cluster.Create(appIf, config, argocdNs, arlonNs,
 				clusterName, baseClusterName, arlonRepoUrl, arlonRepoRevision,
@@ -59,6 +73,16 @@ func createClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to create cluster app: %s", err)
 			}
+			// Create "profile app" for cluster if necessary
+			var profileApp *v1alpha1.Application
+			if prof != nil {
+				profileAppName := fmt.Sprintf("%s-profile-%s", clusterName, prof.Name)
+				profileApp, err = cluster.CreateProfileApp(profileAppName,
+					appIf, argocdNs, clusterName, prof, createInArgoCd)
+				if err != nil {
+					return fmt.Errorf("failed to profile app: %s", err)
+				}
+			}
 			if outputYaml {
 				scheme := runtime.NewScheme()
 				if err := v1alpha1.AddToScheme(scheme); err != nil {
@@ -72,10 +96,20 @@ func createClusterCommand() *cobra.Command {
 					})
 				err = s.Encode(arlonApp, os.Stdout)
 				if err != nil {
-					return fmt.Errorf("failed to serialize app resource: %s", err)
+					return fmt.Errorf("failed to encode arlon app: %s", err)
 				}
 				fmt.Println("---")
 				err = s.Encode(clusterApp, os.Stdout)
+				if err != nil {
+					return fmt.Errorf("failed to encode cluster app: %s", err)
+				}
+				if profileApp != nil {
+					fmt.Println("---")
+					err = s.Encode(profileApp, os.Stdout)
+					if err != nil {
+						return fmt.Errorf("failed to encode profile app: %s", err)
+					}
+				}
 			}
 			return nil
 		},
@@ -91,6 +125,7 @@ func createClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&clusterRepoPath, "repo-path", "", "the git repository path for cluster template")
 	command.Flags().StringVar(&clusterName, "cluster-name", "", "the cluster name")
 	command.Flags().BoolVar(&outputYaml, "output-yaml", false, "output root applications YAML instead of deploying to ArgoCD")
+	command.Flags().StringVar(&profileName, "profile", "", "profile name (if specified, must refer to dynamic profile)")
 	command.MarkFlagRequired("repo-url")
 	command.MarkFlagRequired("cluster-name")
 	return command

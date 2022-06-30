@@ -136,7 +136,12 @@ func constructProfileApp(
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      appName,
 			Namespace: argocdNs,
-			Labels:    map[string]string{"managed-by": "arlon", "arlon-type": "profile-app"},
+			Labels: map[string]string{
+				"managed-by":    "arlon",
+				"arlon-type":    "profile-app",
+				"arlon-cluster": clusterName,
+				"arlon-profile": prof.Name,
+			},
 			Annotations: map[string]string{
 				common.ProfileAnnotationKey: prof.Name,
 			},

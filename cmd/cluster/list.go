@@ -46,15 +46,14 @@ func listClusters(clientConfig clientcmd.ClientConfig, argocdNs string) error {
 
 func printClusterTable(clist []cluster.Cluster) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintf(w, "NAME\tEXTERNAL\tHASBASECLUSTER\tBASECLUSTER\tCLUSTERSPEC\tPROFILE\t\n")
+	_, _ = fmt.Fprintf(w, "NAME\tEXTERNAL\tBASECLUSTER\tCLUSTERSPEC\tPROFILE\t\n")
 	for _, c := range clist {
 		var baseClusterName string
-		hasBasCluster := c.BaseCluster != nil
-		if hasBasCluster {
+		if c.BaseCluster != nil {
 			baseClusterName = c.BaseCluster.Name
 		}
-		_, _ = fmt.Fprintf(w, "%s\t%v\t%v\t%s\t%s\t%s\n", c.Name, c.IsExternal,
-			hasBasCluster, baseClusterName, c.ClusterSpecName, c.ProfileName)
+		_, _ = fmt.Fprintf(w, "%s\t%v\t%s\t%s\t%s\n", c.Name, c.IsExternal,
+			baseClusterName, c.ClusterSpecName, c.ProfileName)
 	}
 	_ = w.Flush()
 }

@@ -40,8 +40,26 @@ func List(
 		return nil, fmt.Errorf("failed to list next-gen clusters: %s", err)
 	}
 	for _, a := range apps.Items {
+		// Find any corresponding profile apps
+		profileApps, err := appIf.List(context.Background(),
+			&apppkg.ApplicationQuery{
+				Selector: "managed-by=arlon,arlon-type=profile-app,arlon-cluster=" + a.Name,
+			})
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to list profile apps associated with cluster %s: %s",
+				a.Name, err,
+			)
+		}
+		var profileName string
+		if len(profileApps.Items) > 0 {
+			// In theory, multiple profile apps can be associated with the same
+			// cluster. For now, just report the first one found.
+			profileName = profileApps.Items[0].Labels["arlon-profile"]
+		}
 		clist = append(clist, Cluster{
-			Name: a.Name,
+			Name:        a.Name,
+			ProfileName: profileName,
 			BaseCluster: &BaseClusterInfo{
 				Name:         a.Annotations[baseClusterNameAnnotation],
 				RepoUrl:      a.Annotations[baseClusterRepoUrlAnnotation],
