@@ -50,24 +50,27 @@ func Get(
 	}
 	app, err := appIf.Get(context.Background(),
 		&apppkg.ApplicationQuery{
-			Name:     &name,
-			Selector: "managed-by=arlon,arlon-type=cluster",
+			Name: &name,
 		})
-	if err == nil {
+	if err != nil {
+		return nil, fmt.Errorf("failed to get argocd application: %s", err)
+	}
+	typ := app.Labels["arlon-type"]
+	if typ == "cluster" {
 		return &Cluster{
 			Name:            app.Name,
 			ClusterSpecName: app.Annotations[common.ClusterSpecAnnotationKey],
 			ProfileName:     app.Annotations[common.ProfileAnnotationKey],
 		}, nil
 	}
-	app, err = appIf.Get(context.Background(),
-		&apppkg.ApplicationQuery{
-			Name:     &name,
-			Selector: "managed-by=arlon,arlon-type=cluster-app",
-		})
-	if err == nil {
+	if typ == "cluster-app" {
+		profileName, err := getMatchingProfileName(appIf, app.Name)
+		if err != nil {
+			return nil, fmt.Errorf("failed to matching profile name: %s", err)
+		}
 		return &Cluster{
-			Name: app.Name,
+			Name:        app.Name,
+			ProfileName: profileName,
 			BaseCluster: &BaseClusterInfo{
 				Name:         app.Annotations[baseClusterNameAnnotation],
 				RepoUrl:      app.Annotations[baseClusterRepoUrlAnnotation],
@@ -76,5 +79,23 @@ func Get(
 			},
 		}, nil
 	}
-	return nil, fmt.Errorf("not found")
+	return nil, fmt.Errorf("not an arlon cluster")
+}
+
+//------------------------------------------------------------------------------
+
+func (c *Cluster) String() string {
+	s := "Name: " + c.Name
+	if c.IsExternal {
+		s = s + ", Type: external"
+	} else if c.BaseCluster != nil {
+		s = s + ", Type: next-gen, Base Cluster Repo Url: " + c.BaseCluster.RepoUrl +
+			", Base Cluster Repo Path: " + c.BaseCluster.RepoPath
+	} else {
+		s = s + ", Type: previous gen, Cluster Spec: " + c.ClusterSpecName
+	}
+	if c.ProfileName != "" {
+		s = s + ", Profile: " + c.ProfileName
+	}
+	return s
 }

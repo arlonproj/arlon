@@ -41,21 +41,9 @@ func List(
 	}
 	for _, a := range apps.Items {
 		// Find any corresponding profile apps
-		profileApps, err := appIf.List(context.Background(),
-			&apppkg.ApplicationQuery{
-				Selector: "managed-by=arlon,arlon-type=profile-app,arlon-cluster=" + a.Name,
-			})
+		profileName, err := getMatchingProfileName(appIf, a.Name)
 		if err != nil {
-			return nil, fmt.Errorf(
-				"failed to list profile apps associated with cluster %s: %s",
-				a.Name, err,
-			)
-		}
-		var profileName string
-		if len(profileApps.Items) > 0 {
-			// In theory, multiple profile apps can be associated with the same
-			// cluster. For now, just report the first one found.
-			profileName = profileApps.Items[0].Labels["arlon-profile"]
+			return nil, fmt.Errorf("failed to matching profile name: %s", err)
 		}
 		clist = append(clist, Cluster{
 			Name:        a.Name,
@@ -95,4 +83,28 @@ func List(
 		})
 	}
 	return
+}
+
+//------------------------------------------------------------------------------
+
+func getMatchingProfileName(
+	appIf argoapp.ApplicationServiceClient,
+	clusterName string,
+) (string, error) {
+	profileApps, err := appIf.List(context.Background(),
+		&apppkg.ApplicationQuery{
+			Selector: "managed-by=arlon,arlon-type=profile-app,arlon-cluster=" + clusterName,
+		})
+	if err != nil {
+		return "", fmt.Errorf(
+			"failed to list profile apps associated with cluster %s: %s",
+			clusterName, err,
+		)
+	}
+	if len(profileApps.Items) > 0 {
+		// In theory, multiple profile apps can be associated with the same
+		// cluster. For now, just report the first one found.
+		return profileApps.Items[0].Labels["arlon-profile"], nil
+	}
+	return "", nil
 }
