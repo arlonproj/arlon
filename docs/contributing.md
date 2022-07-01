@@ -1,10 +1,10 @@
 # How to contribute to Arlon
 
 ## Code changes 
-TODO
+Open a pull request (PR) on GitHub following the typical GitHub workflow [here](https://github.com/arlonproj/arlon/pulls). 
 
-## Bug reports
-TODO
+## Issues / Bug reports
+We track issue in GitHub. Report an issue [here](https://github.com/arlonproj/arlon/issues/new).
 
 ## Documentation
 Fork the Arlon repository on GitHub and make the desired changes. 
