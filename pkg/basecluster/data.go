@@ -9,7 +9,8 @@ configurations:
 
 // -----------------------------------------------------------------------------
 
-const configurationsYaml = `nameReference:
+const configurationsYaml = `# Source: https://blog.scottlowe.org/2021/10/11/kustomize-transformer-configurations-for-cluster-api-v1beta1/
+nameReference:
 - kind: Cluster
   group: cluster.x-k8s.io
   version: v1beta1
