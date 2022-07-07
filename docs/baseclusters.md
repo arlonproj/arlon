@@ -1,7 +1,8 @@
 # Next-gen Cluster Provisioning using Base Clusters
 
-This proposal describes a new way of provisioning workload clusters from the *Base Cluster*
-construct, which replaces the current ClusterSpec. To distinguish them from current generation
+This proposal describes a new way of provisioning workload clusters in Arlon.
+The most significant change is the *Base Cluster* construct, which replaces the current ClusterSpec.
+To distinguish them from current generation
 clusters, the ones deployed from a base cluster are called next-gen clusters.
 
 ## Goals
@@ -15,23 +16,27 @@ automatically propagate to all workload clusters deployed from it.
 
 ## Profile support
 
-While profiles are also being re-architected, the first implementation of next-gen clusters
+- While profiles are also being re-architected, the first implementation of next-gen clusters
 fully integrates with current-generation profiles, which are expressed as Profile custom resources
 and compiled into a set of intermediate files in a git repository.
+- Profiles are optional, and a next-gen cluster can be created without a profile.
+One can be attached later.
 
 ## Architecture diagram
 
-This example shows a base cluster named capi-quickstart used to deploy two workload
-clusters cluster-a and cluster-b. The cluster cluster-a is given profile xxx,
-while cluster-b is given profile yyy.
+This example shows a base cluster named `capi-quickstart` used to deploy two workload
+clusters `cluster-a` and `cluster-b`. Additionally, `cluster-a` is given profile `xxx`,
+while `cluster-b` is given profile `yyy`.
 
 ![architecture](arlon_gen2.png)
 
 ## Base Cluster
 
 A base cluster serves as a base for creating new workload clusters. The workload clusters
-are all copies of the base cluster, meaning that they inherit all characteristics of the
-base cluster except for resource names, which are renamed during the cluster creation process.
+are all exact copies of the base cluster, meaning that they acquire all unmodified resources of the
+base cluster, except for:
+- resource names, which are prefixed during the cluster creation process to make them unique to avoid conflicts
+- the namespace, which is set to a new namespace unique to the workload cluster
 
 ### Preparation
 
@@ -60,7 +65,10 @@ arlon basecluster preparegit --repo-url <repoUrl> --repo-path <pathToDirectory> 
 
 This pushes a commit to the repo with these changes:
 - A `kustomization.yaml` file is added to the directory to make the manifest customizable by Kustomize.
-- A `configurations.yaml` file is added to configure the `namereference` Kustomize plugin to rename resource names.
+- A `configurations.yaml` file is added to configure the [namereference](https://github.com/kubernetes-sigs/kustomize/blob/master/examples/transformerconfigs/README.md#name-reference-transformer) 
+Kustomize plugin which ensures `reference` fields are correctly set when pointing to resource names 
+that ArgoCD will modify using the Kustomize [nameprefix](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/nameprefix/)
+mechanism. The content of the file is sourced from this [Scott Lowe blog article](https://blog.scottlowe.org/2021/10/11/kustomize-transformer-configurations-for-cluster-api-v1beta1/).
 - All `namespace` properties in the cluster manifest are removed to allow Kustomize to override the
 namespace of all resources.
 
@@ -70,36 +78,87 @@ If prep is successful, another invocation of `arlon basecluster validategit` sho
 
 ### Creation
 
-Use `arlon cluster create` to create a new workload cluster from the base cluster.
-The command creates 2 (or 3, if a profile is specified) ArgoCD application resources that together
+Use `arlon cluster create` to create a next-gen workload cluster from a base cluster
+(*this is different from* `arlon cluster deploy` *for creating current-generation clusters*).
+The command creates between 2 and 3 (depending on whether a profile is used)
+ArgoCD application resources that together
 make up the cluster and its contents. The general usage is:
 ```
-arlon cluster create --cluster-name <clusterName> --repo-url <repoUrl> --repo-path <pathToDirectory> [--output-yaml] [--profile <profileName>] 
+arlon cluster create --cluster-name <clusterName> --repo-url <repoUrl> --repo-path <pathToDirectory> [--output-yaml] [--profile <profileName>] [--repo-revision <repoRevision>]
 ```
 
 The command supports two modes of operation:
-- With `--output-yaml`: output yaml that you can inspect, save to a file, or pipe to `kubectl apply -f`
+- With `--output-yaml`: output a list of YAML resources that you can inspect, save to a file, or pipe to `kubectl apply -f`
 - Without `--output-yaml`: create the application resources directly in the management cluster currently referenced by your KUBECONFIG and context.  
 
-The profile is optional; a cluster can be created with no profile.
+The `--profile` flag is optional; a cluster can be created with no profile.
 
-## Composition
+### Composition
 
 A workload cluster is composed of 2 to 3 ArgoCD application resources, which are named
 based on the name of the base cluster and the workload cluster. For illustration purposes,
 the following discussion assumes that the base cluster is named `capi-quickstart`, the
-workload cluster is named `cluster-a`, and the optional profile is named `profile-xxx`.
+workload cluster is named `cluster-a`, and the optional profile is named `xxx`.
 
-### Cluster app
+#### Cluster app
 
-The `cluster-a` application is the "cluster app"; it is responsible for deploying the 
-base cluster resources, meaning the Cluster API manifests.
+The `cluster-a` application is the *cluster app* for the cluster.
+It is responsible for deploying the base cluster resources, meaning the Cluster API manifests.
 It is named directly from the workload cluster name.
-The ApplicationSource in its Spec points to the base cluster's git
-directory. All resources are configured to:
-- Reside in the `cluster-a` namespace, which is deployed by the "arlon app" (see below)
+
+The application's spec uses a ApplicationSourceKustomize that points to the base cluster's git
+directory. The spec ensures that all deployed resources are configured to:
+- Reside in the `cluster-a` namespace, which is deployed by the *arlon app* (see below).
+This achieved by setting `app.Spec.Destination.Namespace` to the workload cluster's name
+  (*this only works if the resources do not specify an explicit namespace; this requirement is
+taken care of by the "prep" step on the base cluster*).
 - Be named `cluster-a-capi-quickstart`, meaning the workload cluster name followed by the
-base cluster name.
+base cluster name. This is achieved by setting `app.Spec.Source.Kustomize.NamePrefix` to
+the workload cluster name plus a hyphen.
 
+#### Arlon app
 
+The `cluster-a-arlon` application is the *arlon app* for the cluster.
+It is resposible for deploying:
+- The `cluster-a` namespace, which holds most resources related to this workload cluster,
+such as the Cluster API manifests deployed by the cluster app.
+- Resources required to register the workload cluster with argocd when available:
+ClusterRegistration and associated RBAC rules.
+- Additional resources (service account, more RBAC rules) for Cluster Autoscaler if enabled.
 
+The application spec's ApplicationSource points to the existing Arlon Helm chart
+located here by default:
+- Repo: https://github.com/arlonproj/arlon.git
+- Revision: private/leb/gen2 (IMPORTANT: NEEDS TO CHANGE TO STABLE BRANCH OR TAG)
+- Path: pkg/cluster/manifests
+
+This is the same Helm chart that current-generation clusters are deployed from, using `arlon cluster deploy`.
+When used for the arlon app for a next-gen cluster, the Helm parameters are configured to only deploy
+the Arlon resources, with the subchart for cluster resources disabled, since those resources will
+be deployed by the cluster app.
+
+**Important issue**: as described above, the application source resides in the public Arlon repo.
+To avoid breaking user's deployed clusters, the source must be stable and not change!
+- This probably means a particular Arlon release should point the source to a stable tag (not even a branch?)
+- As an alternative, during Arlon setup, allow the user to copy the Helm chart into a private repo,
+  and point the source there.
+
+#### Profile app (optional)
+
+A next-gen cluster can be assigned a current-gen dynamic profile, in which case Arlon creates
+a *profile app* named `<clusterName>-profile-<profileName>`, or `cluster-a-profile-xxx` in the running
+example.
+
+This is similar to the profile app created when attaching a profile app to an external cluster.
+The application source points to the git location of the dynamic profile.
+
+### Teardown
+
+Since a next-gen cluster is composed of multiple ArgoCD applications, destroying the cluster
+requires deleting all of its applications. To facilitate this, the 2 or 3 applications created
+by `arlon cluster create` are automatically labeled with `arlon-cluster=<clusterName>`.
+
+The user has two options for destroying a next-gen cluster:
+- The easiest way: `arlon cluster delete <clusterName>`. This command automatically detects a next-gen
+cluster and cleans up all related applications.
+- A more manual way: `kubectl delete application -l arlon-cluster=<clusterName>`
