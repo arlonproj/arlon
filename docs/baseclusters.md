@@ -43,7 +43,9 @@ base cluster, except for:
 - To create a base cluster, a user first creates a single YAML file containing the desired Cluster API
 cluster and all related resources (e.g. MachineDeployments, etc...), using whatever tool the user
 chooses (e.g. `clusterctl generate cluster`). The user is responsible for the correctness of the file
-and resources within. Arlon will not check for errors.
+and resources within. Arlon will not check for errors. For example, the specified Kubernetes version
+must be supported by the Cluster API providers currently installed in the management cluster. If it
+isn't, resulting clusters will fail and enter a perpetual OutOfSync state.
 - The user then commits and pushes the manifest file to a dedicated directory in a git repository.
 The name of the cluster resource does not matter, it will be used as a suffix during workload
 cluster creation. The directory should be unique to the file, and not contain any other files.
@@ -162,3 +164,32 @@ The user has two options for destroying a next-gen cluster:
 - The easiest way: `arlon cluster delete <clusterName>`. This command automatically detects a next-gen
 cluster and cleans up all related applications.
 - A more manual way: `kubectl delete application -l arlon-cluster=<clusterName>`
+
+## Update Semantics
+
+A base cluster lives in git and is shared by all workload clusters created from it.
+This is sometimes referred to as *Linked Mode*.
+Any git update to the cluster can affect the associated workload clusters, therefore
+such updates must be planned and managed with care; there is a real risk of such an
+update breaking existing clusters. 
+
+- By default, a workload's cluster *cluster app* is configured with auto-sync, meaning ArgoCD will
+immediately apply any changes in the base cluster to the deployed Cluster API cluster resources.
+- In general, a base cluster **does not need to be "prepped" again** after a modification to its main
+manifest file (the one containing the Cluster API resources). So the user is free to edit the manifest
+directly, commit/push the changes, and expect to see immediate changes to already-deployed clusters
+created from that base cluster.
+
+### Unsupported changes
+
+The controllers for Cluster API and its providers disallow changes to some fields belonging
+to already-deployed resources.
+- For example, changing the base cluster name (the objectmedata.) will have disastrous consequences on already-deployed
+clusters, causing many resources to enter the OutOfSync state and never recover because ArgoCD
+fails to apply the changes (they are rejected by the controllers).
+- Besides the cluster name, other fields cannot change (this has been observed anecdotally, we don't
+yet have an exhaustive list).
+- Changing the Kubernetes version of the control plane or data plane *is* supported, so long as the new version
+is supported by the relevant providers. If accepted, such a change will result in a rolling update
+of the corresponding plane.
+
