@@ -184,9 +184,10 @@ created from that base cluster.
 
 The controllers for Cluster API and its providers disallow changes to some fields belonging
 to already-deployed resources.
-- For example, changing the base cluster name (the objectmedata.) will have disastrous consequences on already-deployed
+- For example, changing the base cluster name (`medata.Name` of the `Cluster` resource) will have disastrous consequences on already-deployed
 clusters, causing many resources to enter the OutOfSync state and never recover because ArgoCD
-fails to apply the changes (they are rejected by the controllers).
+fails to apply the changes (they are rejected by the controllers). Consequently, a user should never
+change the name of a base cluster.
 - Besides the cluster name, other fields cannot change (this has been observed anecdotally, we don't
 yet have an exhaustive list).
 - Changing the Kubernetes version of the control plane or data plane *is* supported, so long as the new version
