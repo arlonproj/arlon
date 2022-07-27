@@ -1,6 +1,7 @@
 package controller
 
 import (
+	appset "github.com/argoproj-labs/applicationset/api/v1alpha1"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/controllers"
 	"github.com/arlonproj/arlon/pkg/argocd"
@@ -24,6 +25,7 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(arlonv1.AddToScheme(scheme))
+	utilruntime.Must(appset.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 

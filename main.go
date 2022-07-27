@@ -18,8 +18,7 @@ package main
 
 import (
 	"flag"
-	"os"
-
+	"github.com/arlonproj/arlon/cmd/app"
 	"github.com/arlonproj/arlon/cmd/basecluster"
 	"github.com/arlonproj/arlon/cmd/bundle"
 	"github.com/arlonproj/arlon/cmd/callhomecontroller"
@@ -29,10 +28,12 @@ import (
 	"github.com/arlonproj/arlon/cmd/gitrepo"
 	"github.com/arlonproj/arlon/cmd/install"
 	"github.com/arlonproj/arlon/cmd/list_clusters"
+	"github.com/arlonproj/arlon/cmd/ngprofile"
 	"github.com/arlonproj/arlon/cmd/profile"
 	"github.com/arlonproj/arlon/cmd/verify"
 	"github.com/arlonproj/arlon/cmd/webhook"
 	"github.com/spf13/cobra"
+	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -67,6 +68,8 @@ func main() {
 	command.AddCommand(gitrepo.NewCommand())
 	command.AddCommand(verify.NewCommand())
 	command.AddCommand(install.NewCommand())
+	command.AddCommand(app.NewCommand())
+	command.AddCommand(ngprofile.NewCommand())
 
 	opts := zap.Options{
 		Development: true,
