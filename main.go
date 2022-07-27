@@ -20,6 +20,7 @@ import (
 	"flag"
 	"github.com/arlonproj/arlon/cmd/app"
 	"github.com/arlonproj/arlon/cmd/basecluster"
+	"github.com/arlonproj/arlon/cmd/ngprofile"
 	"github.com/arlonproj/arlon/cmd/webhook"
 	"os"
 
@@ -64,6 +65,7 @@ func main() {
 	command.AddCommand(webhook.NewCommand())
 	command.AddCommand(basecluster.NewCommand())
 	command.AddCommand(app.NewCommand())
+	command.AddCommand(ngprofile.NewCommand())
 
 	opts := zap.Options{
 		Development: true,
