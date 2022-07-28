@@ -13,5 +13,6 @@ func NewCommand() *cobra.Command {
 		},
 	}
 	command.AddCommand(listAppsCommand())
+	command.AddCommand(addToProfileCommand())
 	return command
 }
