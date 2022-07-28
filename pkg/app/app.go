@@ -22,12 +22,11 @@ func List(config *restclient.Config, ns string) (apslist []appset.ApplicationSet
 		return nil, fmt.Errorf("failed to get controller runtime client: %s", err)
 	}
 	var asl appset.ApplicationSetList
-	sel := labels.NewSelector()
 	req, err := labels.NewRequirement("managed-by", selection.In, []string{"arlon"})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create requirement: %s", err)
 	}
-	sel.Add(*req)
+	sel := labels.NewSelector().Add(*req)
 	err = cli.List(context.Background(), &asl, &client.ListOptions{
 		Namespace:     ns,
 		LabelSelector: sel,
