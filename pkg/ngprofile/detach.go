@@ -8,7 +8,7 @@ import (
 	"github.com/arlonproj/arlon/pkg/app"
 )
 
-func AttachToCluster(argoIf argoclient.Client, profName string, clusterName string,
+func DetachFromCluster(argoIf argoclient.Client, profName string, clusterName string,
 ) (modified bool, err error) {
 	conn, clustIf, err := argoIf.NewClusterClient()
 	if err != nil {
@@ -24,11 +24,10 @@ func AttachToCluster(argoIf argoclient.Client, profName string, clusterName stri
 	if clust.Labels == nil {
 		clust.Labels = make(map[string]string)
 	}
-	if clust.Labels[app.ProfileLabelKey] == profName {
-		// already has it
-		return
+	if clust.Labels[app.ProfileLabelKey] != profName {
+		return // cluster not using this profile
 	}
-	clust.Labels[app.ProfileLabelKey] = profName
+	delete(clust.Labels, app.ProfileLabelKey)
 	_, err = clustIf.Update(context.Background(), &clusterpkg.ClusterUpdateRequest{
 		Cluster: clust,
 	})

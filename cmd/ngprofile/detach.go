@@ -10,13 +10,13 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func attachCommand() *cobra.Command {
+func detachCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
 	var argocdNs string
 	command := &cobra.Command{
-		Use:   "attach <profilename> <clustername> [flags]",
-		Short: "attach profile to cluster",
-		Long:  "attach profile to cluster",
+		Use:   "detach <profilename> <clustername> [flags]",
+		Short: "detach profile from cluster",
+		Long:  "detach profile from cluster",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(c *cobra.Command, args []string) error {
 			argoIf := argocd.NewArgocdClientOrDie("")
@@ -33,12 +33,12 @@ func attachCommand() *cobra.Command {
 			if profMap[profName] == nil {
 				return fmt.Errorf("profile does not exist")
 			}
-			modified, err := ngprofile.AttachToCluster(argoIf, profName, clusterName)
+			modified, err := ngprofile.DetachFromCluster(argoIf, profName, clusterName)
 			if err != nil {
-				return fmt.Errorf("failed to attach profile to cluster: %s", err)
+				return fmt.Errorf("failed to detach profile from cluster: %s", err)
 			}
 			if !modified {
-				fmt.Println("cluster was already using that profile")
+				fmt.Println("no change: cluster was not using that profile")
 				return nil
 			}
 			return nil
