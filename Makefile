@@ -1,4 +1,4 @@
-REPO_ROOT := $(shell PWD)
+REPO_ROOT := $(shell pwd)
 VERSION ?= $(shell cat $(REPO_ROOT)$*/version;)
 GIT_SHORT_COMMIT := $(shell cd $(REPO_ROOT); git rev-parse --short HEAD)
 REPO_SERVER ?= ghcr.io

@@ -46,8 +46,10 @@ func StartController(argocdConfigPath string, metricsAddr string, probeAddr stri
 		// in a particular namespace. Caching requires RBAC to be setup for
 		// cluster-wide List access, as opposed to the more secure
 		// namespace-scoped access.
+		// Update: need to do the same for ServiceAccount
 		ClientDisableCacheFor: []client.Object{
 			&corev1.Secret{},
+			&corev1.ServiceAccount{},
 		},
 	})
 	if err != nil {
@@ -102,6 +104,7 @@ func StartCallHomeController(metricsAddr string, probeAddr string, enableLeaderE
 		// namespace-scoped access.
 		ClientDisableCacheFor: []client.Object{
 			&corev1.Secret{},
+			&corev1.ServiceAccount{},
 		},
 	})
 	if err != nil {
