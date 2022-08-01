@@ -3,7 +3,7 @@ module github.com/arlonproj/arlon
 go 1.17
 
 require (
-	github.com/argoproj/argo-cd/v2 v2.2.11
+	github.com/argoproj/argo-cd/v2 v2.2.12
 	github.com/deckarep/golang-set v1.8.0
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-logr/logr v0.4.0
@@ -129,7 +129,7 @@ require (
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.19.0 // indirect
-	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
+	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/exp v0.0.0-20210901193431-a062eea981d2 // indirect
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f // indirect
@@ -167,6 +167,8 @@ require (
 )
 
 replace (
+	//github.com/dgrijalva/jwt-go/v4 => github.com/golang-jwt/jwt/v4 v4.4.2
+	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
 	k8s.io/api => k8s.io/api v0.22.12
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.22.12
 	k8s.io/apimachinery => k8s.io/apimachinery v0.22.12
