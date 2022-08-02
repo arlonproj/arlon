@@ -20,6 +20,7 @@ func Create(
 	nodeCount int,
 	masterNodeCount int,
 	sshKeyName string,
+	region string,
 	clusterAutoscalerEnabled bool,
 	clusterAutoscalerMinNodes int,
 	clusterAutoscalerMaxNodes int,
@@ -41,7 +42,7 @@ func Create(
 	}
 	cm := ToConfigMap(specName, apiProvider, cloudProvider, clusterType,
 		kubernetesVersion, nodeType, nodeCount, masterNodeCount,
-		"", "", sshKeyName, clusterAutoscalerEnabled,
+		region, "", sshKeyName, clusterAutoscalerEnabled,
 		clusterAutoscalerMinNodes, clusterAutoscalerMaxNodes,
 		tags, desc)
 	corev1 := kubeClient.CoreV1()
