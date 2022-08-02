@@ -19,6 +19,8 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"time"
+
 	cmdutil "github.com/argoproj/argo-cd/v2/cmd/util"
 	"github.com/argoproj/argo-cd/v2/pkg/apiclient"
 	"github.com/argoproj/argo-cd/v2/pkg/apiclient/cluster"
@@ -38,7 +40,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
-	"time"
 )
 
 // ClusterRegistrationReconciler reconciles a ClusterRegistration object
@@ -152,7 +153,7 @@ func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.
 			ctrl.Result{})
 	}
 	managerBearerToken, err := clusterauth.InstallClusterManagerRBAC(clientset,
-		"kube-system", []string{})
+		"kube-system", []string{}, time.Second*30) // timeout for GetServiceAccountBearerToken poll
 	if err != nil {
 		return updateState(r, log, &cr, "retrying",
 			fmt.Sprintf("failed to install service account in destination cluster: '%s' ... retrying in 10 secs", err),
