@@ -34,10 +34,6 @@ spec:
   # Below tags will be added to all the aws resources.
   additionalTags:
     ClusterName: {{ .Values.global.clusterName }}
-    # DuFQDN: "<DDU/KDU FQDN>"
-  identityRef:
-    kind: AWSClusterStaticIdentity
-    name: 2545501e519d4e06a22eba3f2157e97a-aws
 ---
 apiVersion: controlplane.cluster.x-k8s.io/v1beta1
 kind: NodeletControlPlane
