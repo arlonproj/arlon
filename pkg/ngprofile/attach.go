@@ -30,7 +30,8 @@ func AttachToCluster(argoIf argoclient.Client, profName string, clusterName stri
 	}
 	clust.Labels[app.ProfileLabelKey] = profName
 	_, err = clustIf.Update(context.Background(), &clusterpkg.ClusterUpdateRequest{
-		Cluster: clust,
+		Cluster:       clust,
+		UpdatedFields: []string{"labels"},
 	})
 	if err != nil {
 		err = fmt.Errorf("failed to update argocd cluster: %s", err)

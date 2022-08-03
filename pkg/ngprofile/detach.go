@@ -29,7 +29,8 @@ func DetachFromCluster(argoIf argoclient.Client, profName string, clusterName st
 	}
 	delete(clust.Labels, app.ProfileLabelKey)
 	_, err = clustIf.Update(context.Background(), &clusterpkg.ClusterUpdateRequest{
-		Cluster: clust,
+		Cluster:       clust,
+		UpdatedFields: []string{"labels"},
 	})
 	if err != nil {
 		err = fmt.Errorf("failed to update argocd cluster: %s", err)
