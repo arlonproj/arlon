@@ -33,6 +33,9 @@ func Create(
 	if err := ValidCloudProviderAndClusterType(cloudProvider, clusterType); err != nil {
 		return err
 	}
+	if err := ValidRegionByProvider(cloudProvider, region); err != nil {
+		return err
+	}
 	_, err := Get(kubeClient, arlonNs, specName)
 	if err == nil {
 		return fmt.Errorf("a clusterspec with that name already exists")
