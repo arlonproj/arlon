@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/argoproj/argo-cd/v2 v2.2.12
+	github.com/aws/aws-sdk-go v1.44.68
 	github.com/deckarep/golang-set v1.8.0
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-logr/logr v0.4.0
@@ -17,8 +18,6 @@ require (
 	sigs.k8s.io/cluster-api v1.0.5 //v1.1.0 will upgrade k8s APIs to v0.23.x
 	sigs.k8s.io/controller-runtime v0.10.3 //v1.11 will upgrade k8s APIs to v0.23.x
 )
-
-require github.com/aws/aws-sdk-go v1.44.68
 
 require (
 	cloud.google.com/go v0.93.3 // indirect

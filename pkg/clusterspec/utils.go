@@ -113,8 +113,8 @@ func isOneOf(val string, possibleValues []string) bool {
 	return false
 }
 
-// ValidRegionByProvider checks if a supplied region string is valid or not for the given provider.
-func ValidRegionByProvider(provider string, region string) error {
+// ValidateRegionByProvider checks if a supplied region string is valid or not for the given provider.
+func ValidateRegionByProvider(provider string, region string) error {
 	validRegions := validRegionsByProvider[provider]
 	if !isOneOf(region, validRegions) {
 		return fmt.Errorf("invalid region %s for %s, valid values are: %v", region, provider, validRegions)

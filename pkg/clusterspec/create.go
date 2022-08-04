@@ -33,7 +33,7 @@ func Create(
 	if err := ValidCloudProviderAndClusterType(cloudProvider, clusterType); err != nil {
 		return err
 	}
-	if err := ValidRegionByProvider(cloudProvider, region); err != nil {
+	if err := ValidateRegionByProvider(cloudProvider, region); err != nil {
 		return err
 	}
 	_, err := Get(kubeClient, arlonNs, specName)
