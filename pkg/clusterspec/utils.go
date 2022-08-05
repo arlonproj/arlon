@@ -22,9 +22,9 @@ var (
 		azure: true,
 	}
 	ValidClusterTypesByCloud = map[string]map[string]bool{
-		"aws":   {"kubeadm": true, "eks": true, "nodelet": true},
-		"gcp":   {"kubeadm": true, "gke": true},
-		"azure": {"kubeadm": true, "aks": true},
+		aws:   {"kubeadm": true, "eks": true, "nodelet": true},
+		gcp:   {"kubeadm": true, "gke": true},
+		azure: {"kubeadm": true, "aks": true},
 	}
 	KubeconfigSecretKeyNameByApiProvider = map[string]string{
 		"capi":   "value",
