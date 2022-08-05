@@ -1,0 +1,143 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: {{ .Values.global.clusterName }}
+  namespace: {{ .Values.global.clusterName }}
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+        - {{ .Values.global.podCidrBlock }}
+    services:
+      cidrBlocks:
+        - {{ .Values.global.podCidrBlock }}
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: NodeletControlPlane
+    name: {{ .Values.global.clusterName }}-control-plane
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: AWSCluster
+    name: {{ .Values.global.clusterName }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AWSCluster
+metadata:
+  name: {{ .Values.global.clusterName }}
+  namespace: {{ .Values.global.clusterName }}
+spec:
+  region: {{ .Values.global.region }}
+  sshKeyName: {{ .Values.global.sshKeyName }}
+  controlPlaneLoadBalancer:
+    healthCheckProtocol: TCP
+  # Optional: Add additional tags to aws resources
+  # Below tags will be added to all the aws resources.
+  additionalTags:
+    ClusterName: {{ .Values.global.clusterName }}
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: NodeletControlPlane
+metadata:
+  name: {{ .Values.global.clusterName }}-control-plane
+  namespace: {{ .Values.global.clusterName }}
+spec:
+  machineTemplate:
+    infrastructureRef:
+      apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+      kind: AWSMachineTemplate
+      name: {{ .Values.global.clusterName }}-control-plane
+    nodeletConfigSpec: {}
+      # Uncomment to enable HTTPProxy
+      # httpProxy:
+    #   proxy: ""
+  replicas: 1
+  version: v1.22.9
+  cni:
+    calico:
+      natOutgoing: true
+      IPIPMode: "Always"
+  # dns:
+  #   route53:
+  #     apiFqdn: pmk-aws-multi-tenancy-1-api.platform9.systems
+  #     hostedZoneID: <zoneId>
+  schedulable: true
+  apiserver:
+    privileged: true # Needed for calico
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AWSMachineTemplate
+metadata:
+  name: {{ .Values.global.clusterName }}-control-plane
+  namespace: {{ .Values.global.clusterName }}
+spec:
+  template:
+    spec:
+      publicIP: true
+      rootVolume:
+        size: 50
+        type: gp3
+      ami:
+        id: ami-0b99000c6e2e4f2bf
+      iamInstanceProfile: control-plane.cluster-api-provider-aws.sigs.k8s.io
+      instanceType: t2.medium
+      sshKeyName: {{ .Values.global.sshKeyName }}
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: {{ .Values.global.clusterName }}-md-0
+  namespace: {{ .Values.global.clusterName }}
+  {{- if .Values.global.clusterAutoscalerEnabled }}
+  annotations:
+    cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: "{{ .Values.global.clusterAutoscalerMinNodes }}"
+    cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: "{{ .Values.global.clusterAutoscalerMaxNodes }}"
+  {{- end }}
+spec:
+  clusterName: {{ .Values.global.clusterName }}
+  replicas: {{ .Values.global.nodeCount }}
+  selector:
+    matchLabels:
+      machineDeployment: {{ .Values.global.clusterName }}-md-0
+  template:
+    metadata:
+      labels:
+        machineDeployment: {{ .Values.global.clusterName }}-md-0
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: NodeletConfigTemplate
+          name: {{ .Values.global.clusterName }}-md-0
+      clusterName: {{ .Values.global.clusterName }}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AWSMachineTemplate
+        name: {{ .Values.global.clusterName }}-md-0
+      version: {{ .Values.global.kubernetesVersion }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AWSMachineTemplate
+metadata:
+  name: {{ .Values.global.clusterName }}-md-0
+  namespace: {{ .Values.global.clusterName }}
+spec:
+  template:
+    spec:
+      publicIP: true
+      rootVolume:
+        size: 50
+        type: gp3
+      ami:
+        id: ami-0b99000c6e2e4f2bf
+      iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
+      instanceType: t2.medium
+      sshKeyName: {{ .Values.global.sshKeyName }}
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: NodeletConfigTemplate
+metadata:
+  name: {{ .Values.global.clusterName }}-md-0
+  namespace: {{ .Values.global.clusterName }}
+spec:
+  template:
+    spec: {}
