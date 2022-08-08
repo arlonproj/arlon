@@ -16,7 +16,7 @@ func createProfileCommand() *cobra.Command {
 	var arlonNs string
 	var argocdNs string
 	var desc string
-	var bundles string
+	var bundles = make([]string, 1)
 	var tags string
 	var repoUrl string
 	var repoBasePath string
@@ -44,7 +44,7 @@ func createProfileCommand() *cobra.Command {
 	command.Flags().StringVar(&arlonNs, "arlon-ns", "arlon", "the arlon namespace")
 	command.Flags().StringVar(&argocdNs, "argocd-ns", "argocd", "the ArgoCD namespace")
 	command.Flags().StringVar(&desc, "desc", "", "description")
-	command.Flags().StringVar(&bundles, "bundles", "", "comma separated list of bundles")
+	command.Flags().StringSliceVar(&bundles, "bundles", nil, "comma separated list of bundles")
 	command.Flags().StringVar(&tags, "tags", "", "comma separated list of tags")
 	command.Flags().StringVar(&repoUrl, "repo-url", "", "create a dynamic profile and store in specified git repository")
 	command.Flags().StringVar(&repoBasePath, "repo-base-path", "profiles", "optional git base path for dynamic profile. The profile directory will be created under this.")

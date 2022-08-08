@@ -19,7 +19,7 @@ func Create(
 	repoUrl string,
 	repoBasePath string,
 	repoRevision string,
-	bundles string,
+	bundles []string,
 	desc string,
 	tags string,
 	overrides []arlonv1.Override,
@@ -35,7 +35,6 @@ func Create(
 	} else {
 		repoPath = path.Join(repoBasePath, profileName)
 	}
-	bundleList := StringListFromCommaSeparated(bundles)
 	tagList := StringListFromCommaSeparated(tags)
 	p := arlonv1.Profile{
 		ObjectMeta: metav1.ObjectMeta{
@@ -44,7 +43,7 @@ func Create(
 		},
 		Spec: arlonv1.ProfileSpec{
 			Description:  desc,
-			Bundles:      bundleList,
+			Bundles:      bundles,
 			Tags:         tagList,
 			RepoUrl:      repoUrl,
 			RepoPath:     repoPath,
