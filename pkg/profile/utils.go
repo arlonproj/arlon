@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
+	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/controller"
 	sets "github.com/deckarep/golang-set"
 	v1 "k8s.io/api/core/v1"
@@ -207,4 +208,12 @@ func GetAugmented(config *restclient.Config, name string, ns string) (*Augmented
 		return nil, fmt.Errorf("failed to get profile: %s", err)
 	}
 	return &AugmentedProfile{Profile: *prof}, nil
+}
+
+func bundleListToNameSlice(bundles []bundle.ListItem) []string {
+	var bundleNames = make([]string, 0)
+	for _, item := range bundles {
+		bundleNames = append(bundleNames, item.Name)
+	}
+	return bundleNames
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
+	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/controller"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -28,7 +29,14 @@ func Create(
 	if err != nil {
 		return fmt.Errorf("failed to get controller runtime client: %s", err)
 	}
-
+	bundlesList, err := bundle.List(config, arlonNs)
+	if err != nil {
+		return err
+	}
+	bundleNames := bundleListToNameSlice(bundlesList)
+	if !stringListsEquivalent(bundleNames, bundles) {
+		return fmt.Errorf("one or more supplied bundles don't exist")
+	}
 	var repoPath string
 	if repoUrl == "" {
 		repoRevision = ""
