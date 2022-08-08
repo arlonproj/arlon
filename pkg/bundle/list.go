@@ -40,7 +40,7 @@ func List(config *restclient.Config, namespace string) ([]ListItem, error) {
 	if len(secrets.Items) == 0 {
 		return nil, ErrNoBundles
 	}
-	var bundles = make([]ListItem, 1)
+	var bundles = make([]ListItem, 0)
 	for _, secret := range secrets.Items {
 		labels := secret.GetLabels()
 		bundleType := labels["bundle-type"]
