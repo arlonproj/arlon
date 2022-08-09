@@ -25,6 +25,11 @@ func Create(
 	tags string,
 	overrides []arlonv1.Override,
 ) error {
+	for _, name := range bundles {
+		if !bundle.IsValidK8sName(name) {
+			return fmt.Errorf("%w: %s", bundle.ErrInvalidName, name)
+		}
+	}
 	cli, err := controller.NewClient(config)
 	if err != nil {
 		return fmt.Errorf("failed to get controller runtime client: %s", err)

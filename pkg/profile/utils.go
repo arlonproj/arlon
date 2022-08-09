@@ -210,6 +210,7 @@ func GetAugmented(config *restclient.Config, name string, ns string) (*Augmented
 	return &AugmentedProfile{Profile: *prof}, nil
 }
 
+// bundleListToNameSlice takes in a slice of bundle.ListItem and creates a slice consisting of name of each bundle.
 func bundleListToNameSlice(bundles []bundle.ListItem) []string {
 	var bundleNames = make([]string, 0)
 	for _, item := range bundles {

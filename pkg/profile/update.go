@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
+	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/controller"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
@@ -18,11 +19,16 @@ func Update(
 	argocdNs string,
 	arlonNs string,
 	profileName string,
-	bundlesPtr *string,
+	bundlesPtr []string,
 	desc string,
 	tags string,
 	overrides []arlonv1.Override,
 ) (dirty bool, err error) {
+	for _, name := range bundlesPtr {
+		if !bundle.IsValidK8sName(name) {
+			return false, fmt.Errorf("%w: %s", bundle.ErrInvalidName, name)
+		}
+	}
 	prof, err := GetAugmented(config, profileName, arlonNs)
 	if err != nil {
 		return false, fmt.Errorf("failed to get augmented profile: %s", err)
@@ -43,7 +49,7 @@ func Update(
 	if bundlesPtr == nil {
 		bundles = CommaSeparatedFromStringList(prof.Spec.Bundles)
 	} else {
-		bundles = *bundlesPtr
+		bundles = CommaSeparatedFromStringList(bundlesPtr)
 	}
 	if !stringListsEquivalent(StringListFromCommaSeparated(bundles), prof.Spec.Bundles) {
 		prof.Spec.Bundles = StringListFromCommaSeparated(bundles)
