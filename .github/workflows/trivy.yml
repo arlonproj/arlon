@@ -27,7 +27,7 @@ jobs:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
     name: Build
-    runs-on: "ubuntu-18.04"
+    runs-on: "ubuntu-20.04"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -37,7 +37,7 @@ jobs:
           docker build -t docker.io/arlonproj/arlon:${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@2a2157eb22c08c9a1fac99263430307b8d1bc7a2
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: 'docker.io/arlonproj/arlon:${{ github.sha }}'
           format: 'template'
