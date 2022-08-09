@@ -3,13 +3,14 @@ package profile
 import (
 	"context"
 	"fmt"
+	"path"
+
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/controller"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
-	"path"
 )
 
 func Create(
@@ -39,7 +40,7 @@ func Create(
 		return err
 	}
 	bundleNames := bundleListToNameSlice(bundlesList)
-	if !stringListsEquivalent(bundleNames, bundles) {
+	if !isSubset(bundleNames, bundles) {
 		return fmt.Errorf("one or more supplied bundles don't exist")
 	}
 	var repoPath string

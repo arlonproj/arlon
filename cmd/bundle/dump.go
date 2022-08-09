@@ -4,13 +4,15 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/spf13/cobra"
 	"io"
+	"os"
+
+	"github.com/arlonproj/arlon/pkg/bundle"
+	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"os"
 )
 
 import "github.com/argoproj/argo-cd/v2/util/cli"
@@ -37,6 +39,9 @@ func dumpBundleCommand() *cobra.Command {
 }
 
 func dumpBundle(config *restclient.Config, ns string, bundleName string) error {
+	if !bundle.IsValidK8sName(bundleName) {
+		return fmt.Errorf("%w: %s", bundle.ErrInvalidName, bundleName)
+	}
 	kubeClient := kubernetes.NewForConfigOrDie(config)
 	corev1 := kubeClient.CoreV1()
 	secretsApi := corev1.Secrets(ns)

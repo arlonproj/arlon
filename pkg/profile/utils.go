@@ -3,6 +3,8 @@ package profile
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/controller"
@@ -14,7 +16,6 @@ import (
 	corev1types "k8s.io/client-go/kubernetes/typed/core/v1"
 	restclient "k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"strings"
 )
 
 type AugmentedProfile struct {
@@ -217,4 +218,10 @@ func bundleListToNameSlice(bundles []bundle.ListItem) []string {
 		bundleNames = append(bundleNames, item.Name)
 	}
 	return bundleNames
+}
+
+func isSubset(sub, super []string) bool {
+	superset := sets.NewSetFromSlice(stringSliceToInterfaceSlice(super))
+	subset := sets.NewSetFromSlice(stringSliceToInterfaceSlice(super))
+	return subset.IsSubset(superset)
 }
