@@ -10,7 +10,7 @@ import (
 	restclient "k8s.io/client-go/rest"
 )
 
-// Updates a profile to the specified set of bundles. Tags and description
+// Update updates a profile to the specified set of bundles. Tags and description
 // may also be updated.
 // If bundlesPtr is nil, no change is made to the bundle set. Otherwise,
 // *bundlesPtr specifies the new set.
@@ -28,6 +28,14 @@ func Update(
 		if !bundle.IsValidK8sName(name) {
 			return false, fmt.Errorf("%w: %s", bundle.ErrInvalidName, name)
 		}
+	}
+	existingBundles, err := bundle.List(config, arlonNs)
+	if err != nil {
+		return false, err
+	}
+	existingBundleNames := bundleListToNameSlice(existingBundles)
+	if !isSubset(bundlesPtr, existingBundleNames) {
+		return false, ErrMissingBundles
 	}
 	prof, err := GetAugmented(config, profileName, arlonNs)
 	if err != nil {

@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -22,6 +23,10 @@ type AugmentedProfile struct {
 	arlonv1.Profile
 	Legacy bool // whether the profile is stored as a configmap
 }
+
+var (
+	ErrMissingBundles = errors.New("one or more supplied bundles don't exist")
+)
 
 // -----------------------------------------------------------------------------
 
@@ -222,6 +227,6 @@ func bundleListToNameSlice(bundles []bundle.ListItem) []string {
 
 func isSubset(sub, super []string) bool {
 	superset := sets.NewSetFromSlice(stringSliceToInterfaceSlice(super))
-	subset := sets.NewSetFromSlice(stringSliceToInterfaceSlice(super))
+	subset := sets.NewSetFromSlice(stringSliceToInterfaceSlice(sub))
 	return subset.IsSubset(superset)
 }

@@ -41,7 +41,7 @@ func Create(
 	}
 	bundleNames := bundleListToNameSlice(bundlesList)
 	if !isSubset(bundleNames, bundles) {
-		return fmt.Errorf("one or more supplied bundles don't exist")
+		return ErrMissingBundles
 	}
 	var repoPath string
 	if repoUrl == "" {
