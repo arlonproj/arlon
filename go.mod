@@ -7,11 +7,10 @@ require (
 	github.com/deckarep/golang-set v1.8.0
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-logr/logr v0.4.0
-	github.com/onsi/ginkgo v1.16.4
-	github.com/onsi/gomega v1.16.0
-	github.com/spf13/cobra v1.4.0
-	golang.org/x/text v0.3.7 // indirect
-	google.golang.org/grpc v1.40.0
+	github.com/onsi/ginkgo v1.16.5
+	github.com/onsi/gomega v1.20.0
+	github.com/spf13/cobra v1.5.0
+	google.golang.org/grpc v1.48.0
 	k8s.io/api v0.22.10
 	k8s.io/apimachinery v0.22.10
 	k8s.io/cli-runtime v0.22.10
