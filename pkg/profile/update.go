@@ -31,7 +31,7 @@ func Update(
 	}
 	existingBundles, err := bundle.List(config, arlonNs)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to list bundles: %w", err)
 	}
 	existingBundleNames := bundleListToNameSlice(existingBundles)
 	if !isSubset(bundlesPtr, existingBundleNames) {
