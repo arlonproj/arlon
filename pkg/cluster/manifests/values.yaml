@@ -4,6 +4,7 @@
 
 global:
   clusterName: cluster-x-change-me
+  innerClusterNameWithDashSuffix: ""
   region: us-west-2
   sshKeyName: nobody-change-me
   kubernetesVersion: v1.18.16

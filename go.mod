@@ -13,9 +13,11 @@ require (
 	google.golang.org/grpc v1.48.0
 	k8s.io/api v0.22.10
 	k8s.io/apimachinery v0.22.10
+	k8s.io/cli-runtime v0.22.10
 	k8s.io/client-go v0.22.10
 	sigs.k8s.io/cluster-api v1.0.5
 	sigs.k8s.io/controller-runtime v0.10.3
+	sigs.k8s.io/kustomize/kyaml v0.11.0
 )
 
 replace (

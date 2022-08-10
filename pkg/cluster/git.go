@@ -87,7 +87,7 @@ func DeployToGit(
 			return fmt.Errorf("failed to process bundles: %s", err)
 		}
 	}
-	changed, err := gitutils.CommitChanges(tmpDir, wt)
+	changed, err := gitutils.CommitChanges(tmpDir, wt, "deploy arlon cluster "+clusterPath)
 	if err != nil {
 		return fmt.Errorf("failed to commit changes: %s", err)
 	}

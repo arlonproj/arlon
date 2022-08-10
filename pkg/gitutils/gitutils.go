@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func CommitChanges(tmpDir string, wt *gogit.Worktree) (changed bool, err error) {
+func CommitChanges(tmpDir string, wt *gogit.Worktree, commitMsg string) (changed bool, err error) {
 	status, err := wt.Status()
 	if err != nil {
 		return false, fmt.Errorf("failed to get worktree status: %s", err)
@@ -52,7 +52,6 @@ func CommitChanges(tmpDir string, wt *gogit.Worktree) (changed bool, err error) 
 			When:  time.Now(),
 		},
 	}
-	commitMsg := "add arlon manifests"
 	_, err = wt.Commit(commitMsg, commitOpts)
 	if err != nil {
 		return changed, fmt.Errorf("failed to commit change: %s", err)

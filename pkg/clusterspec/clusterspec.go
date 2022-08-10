@@ -191,5 +191,9 @@ func ClusterAutoscalerSubchartNameFromClusterSpec(cs *ClusterSpec) (string, erro
 	if err := ValidApiProvider(cs.ApiProvider); err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%s-cluster-autoscaler", cs.ApiProvider), nil
+	return ClusterAutoscalerSubchartNameFromApiProvider(cs.ApiProvider), nil
+}
+
+func ClusterAutoscalerSubchartNameFromApiProvider(apiProvider string) string {
+	return fmt.Sprintf("%s-cluster-autoscaler", apiProvider)
 }
