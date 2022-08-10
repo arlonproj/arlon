@@ -54,6 +54,11 @@ var testData = []testEntry{
 		"",
 		"capi-quickstart",
 	},
+	{
+		"09_invalid_manifest",
+		"builder failed to run",
+		"",
+	},
 }
 
 func TestValidation(t *testing.T) {
