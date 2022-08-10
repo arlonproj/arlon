@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/argoproj/argo-cd/v2 v2.2.12
-	github.com/aws/aws-sdk-go v1.44.68
+	github.com/aws/aws-sdk-go v1.44.73
 	github.com/deckarep/golang-set v1.8.0
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-logr/logr v0.4.0
@@ -52,8 +52,8 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/docker/distribution v2.7.1+incompatible // indirect
-	github.com/emicklei/go-restful v2.9.5+incompatible // indirect
+	github.com/docker/distribution v2.8.1+incompatible // indirect
+	github.com/emicklei/go-restful v2.16.0+incompatible // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/evanphx/json-patch v4.11.0+incompatible // indirect
 	github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d // indirect
@@ -171,8 +171,8 @@ require (
 )
 
 replace (
-	//github.com/dgrijalva/jwt-go/v4 => github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
+	github.com/emicklei/go-restful/v3 => github.com/emicklei/go-restful/v3 v3.9.0
 	k8s.io/api => k8s.io/api v0.22.12
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.22.12
 	k8s.io/apimachinery => k8s.io/apimachinery v0.22.12
