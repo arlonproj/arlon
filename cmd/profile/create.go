@@ -16,7 +16,7 @@ func createProfileCommand() *cobra.Command {
 	var arlonNs string
 	var argocdNs string
 	var desc string
-	var bundles = make([]string, 1)
+	var bundles []string
 	var tags string
 	var repoUrl string
 	var repoBasePath string

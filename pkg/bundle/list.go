@@ -23,7 +23,6 @@ type ListItem struct {
 
 var (
 	ErrFailedList = errors.New("failed to list secrets")
-	ErrNoBundles  = errors.New("no bundles found")
 )
 
 func List(config *restclient.Config, namespace string) ([]ListItem, error) {
@@ -38,7 +37,7 @@ func List(config *restclient.Config, namespace string) ([]ListItem, error) {
 		return nil, fmt.Errorf("%w: %s", ErrFailedList, err)
 	}
 	if len(secrets.Items) == 0 {
-		return nil, ErrNoBundles
+		return nil, nil
 	}
 	var bundles = make([]ListItem, 0)
 	for _, secret := range secrets.Items {

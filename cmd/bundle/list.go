@@ -1,7 +1,6 @@
 package bundle
 
 import (
-	"errors"
 	"fmt"
 	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/spf13/cobra"
@@ -36,13 +35,12 @@ func listBundlesCommand() *cobra.Command {
 func listBundles(config *restclient.Config, ns string) error {
 	bundles, err := bundle.List(config, ns)
 	if err != nil {
-		if errors.Is(err, bundle.ErrNoBundles) {
-			fmt.Println(err.Error())
-			return nil
-		}
 		return err
 	}
-
+	if len(bundles) == 0 {
+		fmt.Println("no bundles found")
+		return nil
+	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	_, _ = fmt.Fprintf(w, "NAME\tTYPE\tTAGS\tREPO\tPATH\tREVISION\tSRCTYPE\tDESCRIPTION\n")
 	for _, bundleItm := range bundles {

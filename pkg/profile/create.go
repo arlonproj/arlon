@@ -39,8 +39,8 @@ func Create(
 	if err != nil {
 		return err
 	}
-	bundleNames := bundleListToNameSlice(bundlesList)
-	if !isSubset(bundleNames, bundles) {
+	existingBundleNames := bundleListToNameSlice(bundlesList)
+	if !isSubset(bundles, existingBundleNames) {
 		return ErrMissingBundles
 	}
 	var repoPath string
