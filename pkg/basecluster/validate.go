@@ -32,13 +32,13 @@ func Validate(fileName string) (clusterName string, err error) {
 		}
 		if gvk.Kind == "Cluster" {
 			if clusterName != "" {
-				return "", fmt.Errorf("there are 2 or more clusters")
+				return "", ErrMultipleClusters
 			}
 			clusterName = info.Name
 		}
 	}
 	if clusterName == "" {
-		return "", fmt.Errorf("failed to find cluster resource")
+		return "", ErrNoClusterResource
 	}
 	return
 }
@@ -67,13 +67,22 @@ func ValidateGitDir(
 		return "", fmt.Errorf("failed to get repo worktree: %s", err)
 	}
 	fs := wt.Filesystem
-	var kustomizationFound bool
-	var configurationsFound bool
-	var manifestFile string
 	infos, err := fs.ReadDir(repoPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to list repo directory: %s", err)
 	}
+	dirPath := path.Join(tmpDir, repoPath)
+	return validateDir(dirPath, infos)
+}
+
+// -----------------------------------------------------------------------------
+
+// Given a list of file entries from a directory, validates whether
+// conditions are met for using the directory as a base cluster.
+func validateDir(dirPath string, infos []os.FileInfo) (clusterName string, err error) {
+	var kustomizationFound bool
+	var configurationsFound bool
+	var manifestFile string
 	for _, info := range infos {
 		if info.IsDir() {
 			return "", fmt.Errorf("found subdirectory: %s", info.Name())
@@ -87,20 +96,19 @@ func ValidateGitDir(
 			continue
 		}
 		if manifestFile != "" {
-			return "", fmt.Errorf("multiple manifests found: (%s, %s)",
-				manifestFile, info.Name())
+			return "", ErrMultipleManifests
 		}
 		manifestFile = info.Name()
 	}
 	if manifestFile == "" {
-		return "", fmt.Errorf("failed to find base cluster manifest file")
+		return "", ErrNoManifest
 	}
 	if !kustomizationFound {
-		return "", fmt.Errorf("kustomization.yaml is missing")
+		return "", ErrNoKustomizationYaml
 	}
 	if !configurationsFound {
-		return "", fmt.Errorf("configurations.yaml is missing")
+		return "", ErrNoConfigurationsYaml
 	}
-	manifestPath := path.Join(tmpDir, repoPath, manifestFile)
+	manifestPath := path.Join(dirPath, manifestFile)
 	return Validate(manifestPath)
 }
