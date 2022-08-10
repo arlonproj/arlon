@@ -1,6 +1,7 @@
 package basecluster
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -64,18 +65,9 @@ var testData = []testEntry{
 func TestValidation(t *testing.T) {
 	for _, testCase := range testData {
 		dirPath := path.Join("testdata", testCase.DirName)
-		dirEntries, err := os.ReadDir(dirPath)
+		fileInfos, err := readDir(dirPath)
 		if err != nil {
-			t.Fatalf("failed to read directory: %s", err)
-		}
-		var fileInfos []os.FileInfo
-		for _, dirEntry := range dirEntries {
-			fileInfo, err := dirEntry.Info()
-			if err != nil {
-				t.Fatalf("failed to get fileinfo in %s for %s",
-					testCase.DirName, dirEntry.Name())
-			}
-			fileInfos = append(fileInfos, fileInfo)
+			t.Fatalf("failed to read directory %s: %s", dirPath, err)
 		}
 		clustName, err := validateDir(dirPath, fileInfos)
 		if err != nil {
@@ -91,4 +83,21 @@ func TestValidation(t *testing.T) {
 			t.Fatalf("unexpected cluster name: %s", clustName)
 		}
 	}
+}
+
+func readDir(dirPath string) (fileInfos []os.FileInfo, err error) {
+	dirEntries, err := os.ReadDir(dirPath)
+	if err != nil {
+		err = fmt.Errorf("failed to read directory: %s", err)
+		return
+	}
+	for _, dirEntry := range dirEntries {
+		fileInfo, err := dirEntry.Info()
+		if err != nil {
+			err = fmt.Errorf("failed to get fileinfo for %s",
+				dirEntry.Name())
+		}
+		fileInfos = append(fileInfos, fileInfo)
+	}
+	return
 }
