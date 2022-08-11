@@ -19,6 +19,7 @@ package main
 import (
 	"flag"
 	"github.com/arlonproj/arlon/cmd/basecluster"
+	"github.com/arlonproj/arlon/cmd/gitrepo"
 	"github.com/arlonproj/arlon/cmd/webhook"
 	"os"
 
@@ -62,7 +63,7 @@ func main() {
 	command.AddCommand(cluster.NewCommand())
 	command.AddCommand(webhook.NewCommand())
 	command.AddCommand(basecluster.NewCommand())
-
+	command.AddCommand(gitrepo.NewCommand())
 	opts := zap.Options{
 		Development: true,
 	}
