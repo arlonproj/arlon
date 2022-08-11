@@ -1,12 +1,9 @@
 package bundle
 
 import (
-	"context"
 	"fmt"
-	"github.com/arlonproj/arlon/pkg/common"
+	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/spf13/cobra"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
@@ -36,39 +33,19 @@ func listBundlesCommand() *cobra.Command {
 }
 
 func listBundles(config *restclient.Config, ns string) error {
-	kubeClient := kubernetes.NewForConfigOrDie(config)
-	corev1 := kubeClient.CoreV1()
-	secretsApi := corev1.Secrets(ns)
-	opts := metav1.ListOptions{
-		LabelSelector: "managed-by=arlon,arlon-type=config-bundle",
-	}
-	secrets, err := secretsApi.List(context.Background(), opts)
+	bundles, err := bundle.List(config, ns)
 	if err != nil {
-		return fmt.Errorf("failed to list secrets: %s", err)
+		return err
 	}
-	if len(secrets.Items) == 0 {
+	if len(bundles) == 0 {
 		fmt.Println("no bundles found")
 		return nil
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	_, _ = fmt.Fprintf(w, "NAME\tTYPE\tTAGS\tREPO\tPATH\tREVISION\tSRCTYPE\tDESCRIPTION\n")
-	for _, secret := range secrets.Items {
-		bundleType := secret.Labels["bundle-type"]
-		if bundleType == "" {
-			bundleType = "(undefined)"
-		}
-		repoUrl := secret.Annotations[common.RepoUrlAnnotationKey]
-		repoPath := secret.Annotations[common.RepoPathAnnotationKey]
-		repoRevision := secret.Annotations[common.RepoRevisionAnnotationKey]
-		srcType := secret.Annotations[common.SrcTypeAnnotationKey]
-		if bundleType != "dynamic" {
-			repoUrl = "(N/A)"
-			repoPath = "(N/A)"
-		}
-		tags := string(secret.Data["tags"])
-		desc := string(secret.Data["description"])
-		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", secret.Name,
-			bundleType, tags, repoUrl, repoPath, repoRevision, srcType, desc)
+	for _, bundleItm := range bundles {
+		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", bundleItm.Name,
+			bundleItm.Type, bundleItm.Tags, bundleItm.Repo, bundleItm.Path, bundleItm.Revision, bundleItm.SrcType, bundleItm.Description)
 	}
 	_ = w.Flush()
 	return nil

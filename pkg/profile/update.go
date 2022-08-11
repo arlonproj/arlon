@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
+	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/controller"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 )
 
-// Updates a profile to the specified set of bundles. Tags and description
+// Update updates a profile to the specified set of bundles. Tags and description
 // may also be updated.
 // If bundlesPtr is nil, no change is made to the bundle set. Otherwise,
 // *bundlesPtr specifies the new set.
@@ -18,11 +19,24 @@ func Update(
 	argocdNs string,
 	arlonNs string,
 	profileName string,
-	bundlesPtr *string,
+	bundlesPtr []string,
 	desc string,
 	tags string,
 	overrides []arlonv1.Override,
 ) (dirty bool, err error) {
+	for _, name := range bundlesPtr {
+		if !bundle.IsValidK8sName(name) {
+			return false, fmt.Errorf("%w: %s", bundle.ErrInvalidName, name)
+		}
+	}
+	existingBundles, err := bundle.List(config, arlonNs)
+	if err != nil {
+		return false, fmt.Errorf("failed to list bundles: %w", err)
+	}
+	existingBundleNames := bundleListToNameSlice(existingBundles)
+	if !isSubset(bundlesPtr, existingBundleNames) {
+		return false, ErrMissingBundles
+	}
 	prof, err := GetAugmented(config, profileName, arlonNs)
 	if err != nil {
 		return false, fmt.Errorf("failed to get augmented profile: %s", err)
@@ -43,7 +57,7 @@ func Update(
 	if bundlesPtr == nil {
 		bundles = CommaSeparatedFromStringList(prof.Spec.Bundles)
 	} else {
-		bundles = *bundlesPtr
+		bundles = CommaSeparatedFromStringList(bundlesPtr)
 	}
 	if !stringListsEquivalent(StringListFromCommaSeparated(bundles), prof.Spec.Bundles) {
 		prof.Spec.Bundles = StringListFromCommaSeparated(bundles)

@@ -2,8 +2,12 @@ package profile
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
+
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
+	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/controller"
 	sets "github.com/deckarep/golang-set"
 	v1 "k8s.io/api/core/v1"
@@ -13,13 +17,16 @@ import (
 	corev1types "k8s.io/client-go/kubernetes/typed/core/v1"
 	restclient "k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"strings"
 )
 
 type AugmentedProfile struct {
 	arlonv1.Profile
 	Legacy bool // whether the profile is stored as a configmap
 }
+
+var (
+	ErrMissingBundles = errors.New("one or more supplied bundles don't exist")
+)
 
 // -----------------------------------------------------------------------------
 
@@ -207,4 +214,19 @@ func GetAugmented(config *restclient.Config, name string, ns string) (*Augmented
 		return nil, fmt.Errorf("failed to get profile: %s", err)
 	}
 	return &AugmentedProfile{Profile: *prof}, nil
+}
+
+// bundleListToNameSlice takes in a slice of bundle.ListItem and creates a slice consisting of name of each bundle.
+func bundleListToNameSlice(bundles []bundle.ListItem) []string {
+	var bundleNames = make([]string, 0)
+	for _, item := range bundles {
+		bundleNames = append(bundleNames, item.Name)
+	}
+	return bundleNames
+}
+
+func isSubset(sub, super []string) bool {
+	superset := sets.NewSetFromSlice(stringSliceToInterfaceSlice(super))
+	subset := sets.NewSetFromSlice(stringSliceToInterfaceSlice(sub))
+	return subset.IsSubset(superset)
 }

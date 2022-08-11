@@ -14,7 +14,7 @@ func updateProfileCommand() *cobra.Command {
 	var arlonNs string
 	var argocdNs string
 	var desc string
-	var bundles string
+	var bundles []string
 	var tags string
 	var clear bool
 	var overrides []string
@@ -28,14 +28,14 @@ func updateProfileCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
-			var bundlesPtr *string
+			var bundlesPtr []string = nil
 			if clear {
-				if bundles != "" {
+				if bundles != nil {
 					return fmt.Errorf("bundles must not be specified when using --clear")
 				}
-				bundlesPtr = &bundles // change profile to empty bundle set
-			} else if bundles != "" {
-				bundlesPtr = &bundles //
+				bundlesPtr = nil // change profile to empty bundle set
+			} else if bundles != nil {
+				bundlesPtr = bundles //
 			} // bundles == "", meaning no change, so leave bundlesPtr as nil
 
 			o, err := processOverrides(overrides)
@@ -57,7 +57,7 @@ func updateProfileCommand() *cobra.Command {
 	command.Flags().StringVar(&arlonNs, "arlon-ns", "arlon", "the arlon namespace")
 	command.Flags().StringVar(&argocdNs, "argocd-ns", "argocd", "the ArgoCD namespace")
 	command.Flags().StringVar(&desc, "desc", "", "description")
-	command.Flags().StringVar(&bundles, "bundles", "", "comma separated list of bundles")
+	command.Flags().StringSliceVar(&bundles, "bundles", nil, "comma separated list of bundles")
 	command.Flags().StringVar(&tags, "tags", "", "comma separated list of tags")
 	command.Flags().BoolVar(&clear, "clear", false, "set the bundle list to the empty set")
 	command.Flags().StringArrayVarP(&overrides, "param", "p", nil, "add a single parameter override of the form bundle,key,value ... can be repeated")
