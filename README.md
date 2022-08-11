@@ -208,7 +208,7 @@ the destination file is named `/tmp/config`, it's important for the secret creat
   `kubectl -n arlon create secret generic argocd-creds --from-file /tmp/config`
 - Delete the temporary config file
 - Clone the arlon git repo and cd to its top directory
-- Create the `clusterregistrations` CRD: `kubectl apply -f config/crd/bases/core.arlon.io_clusterregistrations.yaml`
+- Create the CRDs: `kubectl apply -f config/crd/bases/`
 - Deploy the controller: `kubectl apply -f deploy/manifests/`
 - Ensure the controller eventually enters the Running state: `watch kubectl -n arlon get pod`
 
