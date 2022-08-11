@@ -6,11 +6,29 @@ import (
 	"github.com/otiai10/copy"
 	"os"
 	"path"
+	"strings"
 	"testing"
 )
 
+type testCase struct {
+	dirName         string
+	expectedPrepErr string // empty means prep is expected to succeed
+}
+
+var testCases = []testCase{
+	{"requires_prep", ""},
+	{"requires_prep_2", "2 or more clusters"},
+}
+
 func TestPreparation(t *testing.T) {
-	srcDir := path.Join("testdata", "requires_prep")
+
+	for _, tc := range testCases {
+		testOneDir(t, tc)
+	}
+}
+
+func testOneDir(t *testing.T, tc testCase) {
+	srcDir := path.Join("testdata", tc.dirName)
 	tmpDir, err := os.MkdirTemp("", "arlon-unittest-")
 	if err != nil {
 		t.Fatalf("failed to create temp directory: %s", err)
@@ -31,7 +49,15 @@ func TestPreparation(t *testing.T) {
 	fs := osfs.New(tmpDir)
 	manifestFileName, clusterName, err := prepareDir(fs, ".", tmpDir)
 	if err != nil {
-		t.Fatalf("preparation failed: %s", err)
+		if tc.expectedPrepErr == "" {
+			t.Fatalf("unexpected preparation failure: %s", err)
+		} else if !strings.Contains(err.Error(), tc.expectedPrepErr) {
+			t.Fatalf("unexpected preparation error: %s", err)
+		} else {
+			return
+		}
+	} else if tc.expectedPrepErr != "" {
+		t.Fatalf("unexpected preparation success")
 	}
 	if manifestFileName != "manifest.yaml" {
 		t.Fatalf("unexpected manifest file name: %s", manifestFileName)

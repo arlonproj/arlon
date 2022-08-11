@@ -118,6 +118,9 @@ func PrepareGitDir(
 	}
 	fs := wt.Filesystem
 	manifestFileName, clusterName, err := prepareDir(fs, repoPath, tmpDir)
+	if err != nil {
+		return "", false, fmt.Errorf("failed to prepare directory: %s", err)
+	}
 	changed, err = gitutils.CommitChanges(tmpDir, wt,
 		"prepare base cluster files for "+path.Join(repoPath, manifestFileName))
 	if err != nil {
