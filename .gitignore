@@ -21,9 +21,10 @@ testbin/*
 # editor and IDE paraphernalia
 .vscode
 .idea
+.vscode/
 *.swp
 *.swo
 *~
-
+.vscode
 arlon
 
