@@ -20,17 +20,12 @@ type RepoCreds struct {
 
 // -----------------------------------------------------------------------------
 
-// Clones a git repo registered with argocd into a local repository
+// CloneRepo clones a git repo registered with argocd into a local repository
 func CloneRepo(
-	kubeClient *kubernetes.Clientset,
-	argocdNs string,
+	creds *RepoCreds,
 	repoUrl string,
 	repoBranch string,
 ) (repo *gogit.Repository, tmpDir string, auth *http.BasicAuth, err error) {
-	creds, err := getRepoCreds(kubeClient, argocdNs, repoUrl)
-	if err != nil {
-		return nil, "", nil, fmt.Errorf("failed to get repository credentials: %s", err)
-	}
 	auth = &http.BasicAuth{
 		Username: creds.Username,
 		Password: creds.Password,
@@ -56,7 +51,7 @@ func CloneRepo(
 
 // -----------------------------------------------------------------------------
 
-func getRepoCreds(
+func GetRepoCredsFromArgoCd(
 	kubeClient *kubernetes.Clientset,
 	argocdNs string,
 	repoUrl string,

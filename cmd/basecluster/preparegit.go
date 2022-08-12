@@ -3,8 +3,10 @@ package basecluster
 import (
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/util/cli"
+	"github.com/arlonproj/arlon/pkg/argocd"
 	bcl "github.com/arlonproj/arlon/pkg/basecluster"
 	"github.com/spf13/cobra"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -23,7 +25,15 @@ func prepareGitBaseClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
-			clusterName, changed, err := bcl.PrepareGitDir(config, argocdNs,
+			kubeClient, err := kubernetes.NewForConfig(config)
+			if err != nil {
+				return fmt.Errorf("failed to get kubernetes client: %s", err)
+			}
+			creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoUrl)
+			if err != nil {
+				return fmt.Errorf("failed to get repository credentials: %s", err)
+			}
+			clusterName, changed, err := bcl.PrepareGitDir(creds,
 				repoUrl, repoRevision, repoPath)
 			if err != nil {
 				return fmt.Errorf("git preparation failed: %s", err)

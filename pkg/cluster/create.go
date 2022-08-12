@@ -6,6 +6,8 @@ import (
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
+	"github.com/arlonproj/arlon/pkg/argocd"
+	"github.com/arlonproj/arlon/pkg/bundle"
 	grpccodes "google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 	v1 "k8s.io/api/core/v1"
@@ -70,7 +72,20 @@ func Create(
 	}
 	if clusterSpecName != "" {
 		// gen1 only: deploy cluster files to git
-		err = DeployToGit(config, argocdNs, arlonNs, clusterName,
+		kubeClient, err = kubernetes.NewForConfig(config)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get kubernetes client: %s", err)
+		}
+		corev1 := kubeClient.CoreV1()
+		bundles, err := bundle.GetBundlesFromProfile(prof, corev1, arlonNs)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get bundles: %s", err)
+		}
+		creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoUrl)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get repository credentials: %s", err)
+		}
+		err = DeployToGit(creds, argocdNs, bundles, clusterName,
 			repoUrl, repoBranch, basePath, prof)
 		if err != nil {
 			return nil, fmt.Errorf("failed to deploy git tree: %s", err)
