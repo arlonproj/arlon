@@ -21,14 +21,12 @@ func Validate(fileName string) (clusterName string, err error) {
 	res := bld.Unstructured().FilenameParam(false, &opts).Do()
 	infos, err := res.Infos()
 	if err != nil {
-		return "", fmt.Errorf("builder failed to run: %s", err)
+		return "", fmt.Errorf("%w: %s", ErrBuilderFailedRun, err)
 	}
 	for _, info := range infos {
 		gvk := info.Object.GetObjectKind().GroupVersionKind()
 		if info.Namespace != "" {
-			return "",
-				fmt.Errorf("resource %s of kind %s has a namespace defined",
-					info.Name, gvk.Kind)
+			return "", fmt.Errorf("%w: resource: %s, kind: %s", ErrResourceHasNamespace, info.Name, gvk.Kind)
 		}
 		if gvk.Kind == "Cluster" {
 			if clusterName != "" {
