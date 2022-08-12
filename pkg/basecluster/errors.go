@@ -13,4 +13,5 @@ var (
 	ErrNoClusterResource    = errors.New("no cluster resource found")
 	ErrBuilderFailedRun     = errors.New("builder failed to run")
 	ErrResourceHasNamespace = errors.New("resource has a namespace defined")
+	Err2orMoreClusters      = errors.New("there are 2 or more clusters")
 )

@@ -44,7 +44,7 @@ func Prepare(fileName string, validateOnly bool) (clusterName string, modifiedYa
 		gvk := info.Object.GetObjectKind().GroupVersionKind()
 		if gvk.Kind == "Cluster" {
 			if clusterName != "" {
-				err = fmt.Errorf("there are 2 or more clusters")
+				err = Err2orMoreClusters
 				return
 			}
 			clusterName = info.Name

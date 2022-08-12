@@ -4,20 +4,20 @@ import (
 	"fmt"
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/otiai10/copy"
+	"gotest.tools/assert"
 	"os"
 	"path"
-	"strings"
 	"testing"
 )
 
 type testCase struct {
 	dirName         string
-	expectedPrepErr string // empty means prep is expected to succeed
+	expectedPrepErr error
 }
 
 var testCases = []testCase{
-	{"requires_prep", ""},
-	{"requires_prep_2", "2 or more clusters"},
+	{"requires_prep", nil},
+	{"requires_prep_2", Err2orMoreClusters},
 }
 
 func TestPreparation(t *testing.T) {
@@ -30,17 +30,11 @@ func TestPreparation(t *testing.T) {
 func testOneDir(t *testing.T, tc testCase) {
 	srcDir := path.Join("testdata", tc.dirName)
 	tmpDir, err := os.MkdirTemp("", "arlon-unittest-")
-	if err != nil {
-		t.Fatalf("failed to create temp directory: %s", err)
-	}
+	assert.NilError(t, err)
 	err = copy.Copy(srcDir, tmpDir)
-	if err != nil {
-		t.Fatalf("failed to copy directory %s: %s", tmpDir, err)
-	}
+	assert.NilError(t, err, "failed to copy directory %s: %s", tmpDir, err)
 	fileInfos, err := readDir(tmpDir)
-	if err != nil {
-		t.Fatalf("failed to read directory %s: %s", tmpDir, err)
-	}
+	assert.NilError(t, err, "failed to read directory %s: %s", tmpDir, err)
 	_, err = validateDir(tmpDir, fileInfos)
 	if err == nil {
 		t.Fatalf("validation returned no error")
@@ -48,33 +42,19 @@ func testOneDir(t *testing.T, tc testCase) {
 	fmt.Println("validation returned expected error:", err)
 	fs := osfs.New(tmpDir)
 	manifestFileName, clusterName, err := prepareDir(fs, ".", tmpDir)
-	if err != nil {
-		if tc.expectedPrepErr == "" {
-			t.Fatalf("unexpected preparation failure: %s", err)
-		} else if !strings.Contains(err.Error(), tc.expectedPrepErr) {
-			t.Fatalf("unexpected preparation error: %s", err)
-		} else {
-			return
-		}
-	} else if tc.expectedPrepErr != "" {
-		t.Fatalf("unexpected preparation success")
+	if tc.expectedPrepErr == nil {
+		assert.NilError(t, err, "expected nil error")
+	} else {
+		assert.ErrorContains(t, err, tc.expectedPrepErr.Error())
+		return
 	}
-	if manifestFileName != "manifest.yaml" {
-		t.Fatalf("unexpected manifest file name: %s", manifestFileName)
-	}
-	if clusterName != "capi-quickstart" {
-		t.Fatalf("unexpected cluster name: %s", clusterName)
-	}
+	assert.Equal(t, manifestFileName, "manifest.yaml")
+	assert.Equal(t, clusterName, "capi-quickstart")
+
 	// validate again
 	fileInfos, err = readDir(tmpDir)
-	if err != nil {
-		t.Fatalf("failed to read directory %s: %s", tmpDir, err)
-	}
+	assert.NilError(t, err)
 	clusterName, err = validateDir(tmpDir, fileInfos)
-	if err != nil {
-		t.Fatalf("unexpected validation error: %s", err)
-	}
-	if clusterName != "capi-quickstart" {
-		t.Fatalf("unexpected cluster name: %s", clusterName)
-	}
+	assert.NilError(t, err)
+	assert.Equal(t, clusterName, "capi-quickstart")
 }
