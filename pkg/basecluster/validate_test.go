@@ -1,63 +1,64 @@
 package basecluster
 
 import (
+	"errors"
 	"fmt"
+	"gotest.tools/assert"
 	"os"
 	"path"
-	"strings"
 	"testing"
 )
 
 type testEntry struct {
 	DirName     string
-	ErrPattern  string
+	ErrPattern  error
 	ClusterName string
 }
 
 var testData = []testEntry{
 	{
 		"01_no_configurations",
-		ErrNoConfigurationsYaml.Error(),
+		ErrNoConfigurationsYaml,
 		"",
 	},
 	{
 		"02_no_kustomization",
-		ErrNoKustomizationYaml.Error(),
+		ErrNoKustomizationYaml,
 		"",
 	},
 	{
 		"03_no_manifest",
-		ErrNoManifest.Error(),
+		ErrNoManifest,
 		"",
 	},
 	{
 		"04_multiple_manifests",
-		ErrMultipleManifests.Error(),
+		ErrMultipleManifests,
 		"",
 	},
 	{
 		"05_has_namespace",
-		"has a namespace defined",
+		ErrResourceHasNamespace,
 		"",
 	},
 	{
 		"06_multiple_clusters",
-		ErrMultipleClusters.Error(),
+		ErrMultipleClusters,
 		"",
 	},
 	{
 		"07_no_cluster",
-		ErrNoClusterResource.Error(),
+		ErrNoClusterResource,
 		"",
 	},
 	{
 		"08_ok",
-		"",
+		nil,
 		"capi-quickstart",
 	},
 	{
 		"09_invalid_manifest",
-		"builder failed to run",
+		ErrBuilderFailedRun,
 		"",
 	},
 }
@@ -70,18 +71,10 @@ func TestValidation(t *testing.T) {
 			t.Fatalf("failed to read directory %s: %s", dirPath, err)
 		}
 		clustName, err := validateDir(dirPath, fileInfos)
-		if err != nil {
-			if testCase.ErrPattern == "" {
-				t.Fatalf("unexpected error in %s: %s", testCase.DirName, err)
-			}
-			if !strings.Contains(err.Error(), testCase.ErrPattern) {
-				t.Fatalf("unexpected error in %s: %s", testCase.DirName, err)
-			}
-		} else if testCase.ErrPattern != "" {
-			t.Fatalf("did not find expected error in %s", testCase.DirName)
-		} else if clustName != testCase.ClusterName {
-			t.Fatalf("unexpected cluster name: %s", clustName)
+		if !errors.Is(err, testCase.ErrPattern) {
+			t.Fatalf("unexpected error in %s, expected: %v, got: %v", testCase.DirName, testCase.ErrPattern, err)
 		}
+		assert.Equal(t, clustName, testCase.ClusterName)
 	}
 }
 
