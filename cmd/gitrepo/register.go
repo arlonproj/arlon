@@ -96,13 +96,12 @@ func register() *cobra.Command {
 				err = fmt.Errorf("cannot open config file, error: %w", err)
 				return
 			}
-			defer func() {
-				err := file.Close()
+			defer func(f *os.File) {
+				err := f.Close()
 				if err != nil {
-					err = fmt.Errorf("failed to close config file, error: %w", err)
-					return
+					fmt.Printf("failed to close config file, error: %v\n", err)
 				}
-			}()
+			}(file)
 			content, err := io.ReadAll(file)
 			if err != nil {
 				err = fmt.Errorf("cannot read config file, error: %w", err)
@@ -110,7 +109,7 @@ func register() *cobra.Command {
 			}
 			var repoCtxCfg RepoCtxCfg
 			if len(content) > 0 {
-				if err := json.Unmarshal(content, &repoCtxCfg); err != nil {
+				if err = json.Unmarshal(content, &repoCtxCfg); err != nil {
 					err = fmt.Errorf("cannot read config file, error: %w", err)
 					return
 				}
