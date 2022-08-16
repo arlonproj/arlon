@@ -19,11 +19,10 @@ testbin/*
 !vendor/**/zz_generated.*
 
 # editor and IDE paraphernalia
-.idea
 .vscode
+.idea
 *.swp
 *.swo
 *~
-
 arlon
 

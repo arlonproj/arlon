@@ -23,6 +23,7 @@ func createClusterspecCommand() *cobra.Command {
 	var nodeCount int
 	var masterNodeCount int
 	var sshKeyName string
+	var region string
 	var clusterAutoscalerEnabled bool
 	var clusterAutoscalerMinNodes int
 	var clusterAutoscalerMaxNodes int
@@ -40,7 +41,7 @@ func createClusterspecCommand() *cobra.Command {
 			return cspec.Create(kubeClient, arlonNs, args[0], apiProvider,
 				cloudProvider, clusterType, kubernetesVersion,
 				nodeType, nodeCount, masterNodeCount, sshKeyName,
-				clusterAutoscalerEnabled,
+				region, clusterAutoscalerEnabled,
 				clusterAutoscalerMinNodes, clusterAutoscalerMaxNodes,
 				desc, tags)
 		},
@@ -55,11 +56,13 @@ func createClusterspecCommand() *cobra.Command {
 	command.Flags().StringVar(&kubernetesVersion, "kubeversion", "v1.18.16", "the kubernetes version")
 	command.Flags().StringVar(&nodeType, "nodetype", "t3.large", "the cloud-specific node instance type")
 	command.Flags().StringVar(&sshKeyName, "sshkey", "", "ssh key name for logging into nodes")
+	command.Flags().StringVar(&region, "region", "", "region in which cluster gets deployed")
 	command.Flags().IntVar(&nodeCount, "nodecount", 2, "the number of nodes")
 	command.Flags().IntVar(&masterNodeCount, "masternodecount", 3, "the number of master nodes (3 or more required for HA)")
 	command.Flags().BoolVar(&clusterAutoscalerEnabled, "casenabled", false, "enable cluster autoscaler")
 	command.Flags().IntVar(&clusterAutoscalerMinNodes, "casmin", 1, "minimum number of nodes for cluster autoscaling")
 	command.Flags().IntVar(&clusterAutoscalerMaxNodes, "casmax", 9, "maximum number of nodes for cluster autoscaling")
 	command.MarkFlagRequired("sshkey")
+	command.MarkFlagRequired("region")
 	return command
 }

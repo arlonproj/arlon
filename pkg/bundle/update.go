@@ -17,6 +17,9 @@ func Update(
 	desc string,
 	tags string,
 ) error {
+	if !IsValidK8sName(bundleName) {
+		return fmt.Errorf("%w: %s", ErrInvalidName, bundleName)
+	}
 	corev1 := kubeClient.CoreV1()
 	secretsApi := corev1.Secrets(ns)
 	secr, err := secretsApi.Get(context.Background(), bundleName, metav1.GetOptions{})

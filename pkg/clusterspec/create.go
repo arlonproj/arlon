@@ -20,6 +20,7 @@ func Create(
 	nodeCount int,
 	masterNodeCount int,
 	sshKeyName string,
+	region string,
 	clusterAutoscalerEnabled bool,
 	clusterAutoscalerMinNodes int,
 	clusterAutoscalerMaxNodes int,
@@ -32,6 +33,9 @@ func Create(
 	if err := ValidCloudProviderAndClusterType(cloudProvider, clusterType); err != nil {
 		return err
 	}
+	if err := ValidateRegionByProvider(cloudProvider, region); err != nil {
+		return err
+	}
 	_, err := Get(kubeClient, arlonNs, specName)
 	if err == nil {
 		return fmt.Errorf("a clusterspec with that name already exists")
@@ -41,7 +45,7 @@ func Create(
 	}
 	cm := ToConfigMap(specName, apiProvider, cloudProvider, clusterType,
 		kubernetesVersion, nodeType, nodeCount, masterNodeCount,
-		"", "", sshKeyName, clusterAutoscalerEnabled,
+		region, "", sshKeyName, clusterAutoscalerEnabled,
 		clusterAutoscalerMinNodes, clusterAutoscalerMaxNodes,
 		tags, desc)
 	corev1 := kubeClient.CoreV1()

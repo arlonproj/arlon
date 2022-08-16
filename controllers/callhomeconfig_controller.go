@@ -19,10 +19,11 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"time"
+
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
-	apierr "k8s.io/apimachinery/pkg/api/errors"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -33,7 +34,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
-	"time"
 )
 
 // CallHomeConfigReconciler reconciles a CallHomeConfig object
@@ -119,7 +119,7 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			"target secret already exists",
 			ctrl.Result{})
 	}
-	if !apierr.IsNotFound(err) {
+	if !apierrors.IsNotFound(err) {
 		return retryLater(r, log, &chc, "target secret",
 			chc.Spec.TargetSecretName,
 			"could not be queried, workload cluster probably still unavailable")
