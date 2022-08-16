@@ -67,7 +67,8 @@ func GetKubeclientAndRepoCreds(
 	}
 	creds, err = GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoUrl)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to get repository credentials: %s", err)
+		return nil, nil,
+			fmt.Errorf("failed to get repository credentials from argocd: %s", err)
 	}
 	return
 }
