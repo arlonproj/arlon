@@ -7,7 +7,6 @@ import (
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/controller"
-	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 )
 
@@ -91,12 +90,7 @@ func Update(
 	}
 	if prof.Spec.RepoUrl != "" {
 		// Dynamic profile needs updating in git
-		var kubeClient *kubernetes.Clientset
-		kubeClient, err = kubernetes.NewForConfig(config)
-		if err != nil {
-			return false, fmt.Errorf("failed to get kube client: %s", err)
-		}
-		creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, prof.Spec.RepoUrl)
+		kubeClient, creds, err := argocd.GetKubeclientAndRepoCreds(config, argocdNs, prof.Spec.RepoUrl)
 		if err != nil {
 			return false, fmt.Errorf("failed to get repository credentials: %s", err)
 		}

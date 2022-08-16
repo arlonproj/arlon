@@ -13,7 +13,6 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
 )
@@ -42,11 +41,7 @@ func createClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
-			kubeClient, err := kubernetes.NewForConfig(config)
-			if err != nil {
-				return fmt.Errorf("failed to get kubernetes client: %s", err)
-			}
-			creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, clusterRepoUrl)
+			_, creds, err := argocd.GetKubeclientAndRepoCreds(config, argocdNs, clusterRepoUrl)
 			if err != nil {
 				return fmt.Errorf("failed to get repository credentials: %s", err)
 			}

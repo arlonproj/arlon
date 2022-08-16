@@ -72,16 +72,12 @@ func Create(
 	}
 	if clusterSpecName != "" {
 		// gen1 only: deploy cluster files to git
-		kubeClient, err = kubernetes.NewForConfig(config)
+		creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoUrl)
 		if err != nil {
-			return nil, fmt.Errorf("failed to get kubernetes client: %s", err)
+			return nil, fmt.Errorf("failed to get repo credentials: %s", err)
 		}
 		corev1 := kubeClient.CoreV1()
 		bundles, err := bundle.GetBundlesFromProfile(prof, corev1, arlonNs)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get bundles: %s", err)
-		}
-		creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoUrl)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get repository credentials: %s", err)
 		}

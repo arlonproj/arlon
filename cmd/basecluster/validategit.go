@@ -6,7 +6,6 @@ import (
 	"github.com/arlonproj/arlon/pkg/argocd"
 	bcl "github.com/arlonproj/arlon/pkg/basecluster"
 	"github.com/spf13/cobra"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -25,11 +24,7 @@ func validateGitBaseClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
-			kubeClient, err := kubernetes.NewForConfig(config)
-			if err != nil {
-				return fmt.Errorf("failed to get kubernetes client: %s", err)
-			}
-			creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoUrl)
+			_, creds, err := argocd.GetKubeclientAndRepoCreds(config, argocdNs, repoUrl)
 			if err != nil {
 				return fmt.Errorf("failed to get repository credentials: %s", err)
 			}

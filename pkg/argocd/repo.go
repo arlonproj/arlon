@@ -8,6 +8,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"os"
 	"strings"
 )
@@ -45,6 +46,28 @@ func CloneRepo(
 	})
 	if err != nil {
 		return nil, "", nil, fmt.Errorf("failed to clone repository: %s", err)
+	}
+	return
+}
+
+// -----------------------------------------------------------------------------
+
+func GetKubeclientAndRepoCreds(
+	config *rest.Config,
+	argocdNs string,
+	repoUrl string,
+) (
+	kubeClient *kubernetes.Clientset,
+	creds *RepoCreds,
+	err error,
+) {
+	kubeClient, err = kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get kubernetes client: %s", err)
+	}
+	creds, err = GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoUrl)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get repository credentials: %s", err)
 	}
 	return
 }
