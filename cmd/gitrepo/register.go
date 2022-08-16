@@ -28,13 +28,17 @@ type RepoCtxCfg struct {
 	Repos   []RepoCtx `json:"repos,omitempty"`
 }
 
+const (
+	repoCtxFile    = "repoctx"
+	repoDefaultCtx = "default"
+)
+
 func register() *cobra.Command {
 	var (
-		repoUrl     string
-		userName    string
-		password    string
-		alias       string
-		repoCtxFile = "repoctx"
+		repoUrl  string
+		userName string
+		password string
+		alias    string
 	)
 	command := &cobra.Command{
 		Use:   "register",
@@ -66,7 +70,6 @@ func register() *cobra.Command {
 			if repoOpts.Repo.Username != "" && repoOpts.Repo.Password == "" {
 				repoOpts.Repo.Password = cli.PromptPassword(repoOpts.Repo.Password)
 			}
-
 			repoAccessReq := repository.RepoAccessQuery{
 				Repo:     repoOpts.Repo.Repo,
 				Username: repoOpts.Repo.Username,
@@ -116,6 +119,10 @@ func register() *cobra.Command {
 			}
 			repoCtxCfg.Repos = append(repoCtxCfg.Repos, repoCtx)
 			if repoCtxCfg.Current.Url == "" {
+				if repoCtx.Alias == repoDefaultCtx {
+					err = fmt.Errorf("default alias already exists")
+					return
+				}
 				repoCtxCfg.Current = repoCtx
 			}
 			repoData, err := json.MarshalIndent(repoCtxCfg, "", "\t")
@@ -138,7 +145,7 @@ func register() *cobra.Command {
 	}
 	command.Flags().StringVar(&userName, "user", "", "username for the repository configuration")
 	command.Flags().StringVar(&password, "password", "", "password of the user")
-	command.Flags().StringVar(&alias, "alias", "default", "alias for the git repository")
+	command.Flags().StringVar(&alias, "alias", repoDefaultCtx, "alias for the git repository")
 	command.MarkFlagRequired("user")
 	return command
 }
