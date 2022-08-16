@@ -29,6 +29,7 @@ import (
 	"github.com/arlonproj/arlon/cmd/gitrepo"
 	"github.com/arlonproj/arlon/cmd/list_clusters"
 	"github.com/arlonproj/arlon/cmd/profile"
+	"github.com/arlonproj/arlon/cmd/verify"
 	"github.com/arlonproj/arlon/cmd/webhook"
 	"github.com/spf13/cobra"
 
@@ -63,6 +64,8 @@ func main() {
 	command.AddCommand(webhook.NewCommand())
 	command.AddCommand(basecluster.NewCommand())
 	command.AddCommand(gitrepo.NewCommand())
+	command.AddCommand(verify.NewCommand())
+
 	opts := zap.Options{
 		Development: true,
 	}
