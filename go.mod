@@ -22,6 +22,7 @@ require (
 )
 
 require (
+	gotest.tools v2.2.0+incompatible
 	k8s.io/cli-runtime v0.22.12
 	sigs.k8s.io/kustomize/kyaml v0.11.0
 )
@@ -67,7 +68,6 @@ require (
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-errors/errors v1.0.1 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
-	github.com/go-git/go-billy/v5 v5.3.1 // indirect
 	github.com/go-logr/zapr v0.4.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.5 // indirect
