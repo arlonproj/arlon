@@ -6,6 +6,7 @@ import (
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/gitutils"
 	logpkg "github.com/arlonproj/arlon/pkg/log"
+	"github.com/go-git/go-billy/v5"
 	gogit "github.com/go-git/go-git/v5"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -43,7 +44,7 @@ func Prepare(fileName string, validateOnly bool) (clusterName string, modifiedYa
 		gvk := info.Object.GetObjectKind().GroupVersionKind()
 		if gvk.Kind == "Cluster" {
 			if clusterName != "" {
-				err = fmt.Errorf("there are 2 or more clusters")
+				err = Err2orMoreClusters
 				return
 			}
 			clusterName = info.Name
@@ -116,81 +117,12 @@ func PrepareGitDir(
 		return "", false, fmt.Errorf("failed to get repo worktree: %s", err)
 	}
 	fs := wt.Filesystem
-	var kustomizationFound bool
-	var configurationsFound bool
-	var manifestFile string
-	infos, err := fs.ReadDir(repoPath)
+	manifestFileName, clusterName, err := prepareDir(fs, repoPath, tmpDir)
 	if err != nil {
-		return "", false, fmt.Errorf("failed to list repo directory: %s", err)
-	}
-	for _, info := range infos {
-		if info.IsDir() {
-			return "", false, fmt.Errorf("found subdirectory: %s", info.Name())
-		}
-		if info.Name() == "kustomization.yaml" {
-			kustomizationFound = true
-			continue
-		}
-		if info.Name() == "configurations.yaml" {
-			configurationsFound = true
-			continue
-		}
-		if manifestFile != "" {
-			return "", false, fmt.Errorf("multiple manifests found: (%s, %s)",
-				manifestFile, info.Name())
-		}
-		manifestFile = info.Name()
-	}
-	if manifestFile == "" {
-		return "", false, fmt.Errorf("failed to find base cluster manifest file")
-	}
-	manifestRelPath := path.Join(repoPath, manifestFile)
-	manifestAbsPath := path.Join(tmpDir, manifestRelPath)
-	clusterName, modifiedYaml, err := Prepare(manifestAbsPath, false)
-	if err != nil {
-		return "", false, fmt.Errorf("failed to prepare manifest: %s", err)
-	}
-	if modifiedYaml != nil {
-		// The manifest contains namespaces. Overwrite it with the modified
-		// copy that has the namespaces reomoved.
-		file, err := fs.OpenFile(manifestRelPath, os.O_WRONLY|os.O_TRUNC, 0644)
-		if err != nil {
-			return "", false, fmt.Errorf("failed to open manifest for writing: %s", err)
-		}
-		_, err = bytes.NewBuffer(modifiedYaml).WriteTo(file)
-		_ = file.Close()
-		if err != nil {
-			return "", false, fmt.Errorf("failed to write to manifest: %s", err)
-		}
-	}
-	if !kustomizationFound {
-		tmpl, err := template.New("kust").Parse(kustomizationYamlTemplate)
-		if err != nil {
-			return "", false, fmt.Errorf("failed to create kustomization template: %s", err)
-		}
-		file, err := fs.Create(path.Join(repoPath, "kustomization.yaml"))
-		if err != nil {
-			return "", false, fmt.Errorf("failed to create kustomization.yaml: %s", err)
-		}
-		err = tmpl.Execute(file, &KustomizationTemplateParams{manifestFile})
-		_ = file.Close()
-		if err != nil {
-			return "", false, fmt.Errorf("failed to write to kustomization.yaml: %s", err)
-		}
-	}
-	if !configurationsFound {
-		file, err := fs.Create(path.Join(repoPath, "configurations.yaml"))
-		if err != nil {
-			return "", false, fmt.Errorf("failed to create configurations.yaml: %s", err)
-		}
-		_, err = file.Write([]byte(configurationsYaml))
-		_ = file.Close()
-		if err != nil {
-			return "", false, fmt.Errorf("failed to write to configurations.yaml: %s", err)
-		}
+		return "", false, fmt.Errorf("failed to prepare directory: %s", err)
 	}
 	changed, err = gitutils.CommitChanges(tmpDir, wt,
-		"prepare base cluster files for "+manifestRelPath)
+		"prepare base cluster files for "+path.Join(repoPath, manifestFileName))
 	if err != nil {
 		err = fmt.Errorf("failed to commit changes: %s", err)
 		return
@@ -207,6 +139,108 @@ func PrepareGitDir(
 	if err != nil {
 		err = fmt.Errorf("failed to push to remote repository: %s", err)
 		return
+	}
+	return
+}
+
+// -----------------------------------------------------------------------------
+
+// Prepares specified directory to use as base cluster, and returns the
+// name of the cluster resource. dirRelPath is the name of the directory
+// relative to the file system, and actualFsRootDir is the actual path
+// of the file system's root directory on the native file system.
+func prepareDir(
+	fs billy.Filesystem,
+	dirRelPath string,
+	actualFsRootDir string,
+) (manifestFileName string, clusterName string, err error) {
+	var kustomizationFound bool
+	var configurationsFound bool
+	infos, err := fs.ReadDir(dirRelPath)
+	if err != nil {
+		err = fmt.Errorf("failed to list repo directory: %s", err)
+		return
+	}
+	for _, info := range infos {
+		if info.IsDir() {
+			err = fmt.Errorf("found subdirectory: %s", info.Name())
+			return
+		}
+		if info.Name() == "kustomization.yaml" {
+			kustomizationFound = true
+			continue
+		}
+		if info.Name() == "configurations.yaml" {
+			configurationsFound = true
+			continue
+		}
+		if manifestFileName != "" {
+			err = fmt.Errorf("multiple manifests found: (%s, %s)",
+				manifestFileName, info.Name())
+			return
+		}
+		manifestFileName = info.Name()
+	}
+	if manifestFileName == "" {
+		err = fmt.Errorf("failed to find base cluster manifest file")
+		return
+	}
+	manifestRelPath := path.Join(dirRelPath, manifestFileName)
+	manifestAbsPath := path.Join(actualFsRootDir, manifestRelPath)
+	clusterName, modifiedYaml, err := Prepare(manifestAbsPath, false)
+	if err != nil {
+		err = fmt.Errorf("failed to prepare manifest: %s", err)
+		return
+	}
+	if modifiedYaml != nil {
+		// The manifest contains namespaces. Overwrite it with the modified
+		// copy that has the namespaces reomoved.
+		var file billy.File
+		file, err = fs.OpenFile(manifestRelPath, os.O_WRONLY|os.O_TRUNC, 0644)
+		if err != nil {
+			err = fmt.Errorf("failed to open manifest for writing: %s", err)
+			return
+		}
+		_, err = bytes.NewBuffer(modifiedYaml).WriteTo(file)
+		_ = file.Close()
+		if err != nil {
+			err = fmt.Errorf("failed to write to manifest: %s", err)
+			return
+		}
+	}
+	if !kustomizationFound {
+		var tmpl *template.Template
+		tmpl, err = template.New("kust").Parse(kustomizationYamlTemplate)
+		if err != nil {
+			err = fmt.Errorf("failed to create kustomization template: %s", err)
+			return
+		}
+		var file billy.File
+		file, err = fs.Create(path.Join(dirRelPath, "kustomization.yaml"))
+		if err != nil {
+			err = fmt.Errorf("failed to create kustomization.yaml: %s", err)
+			return
+		}
+		err = tmpl.Execute(file, &KustomizationTemplateParams{manifestFileName})
+		_ = file.Close()
+		if err != nil {
+			err = fmt.Errorf("failed to write to kustomization.yaml: %s", err)
+			return
+		}
+	}
+	if !configurationsFound {
+		var file billy.File
+		file, err = fs.Create(path.Join(dirRelPath, "configurations.yaml"))
+		if err != nil {
+			err = fmt.Errorf("failed to create configurations.yaml: %s", err)
+			return
+		}
+		_, err = file.Write([]byte(configurationsYaml))
+		_ = file.Close()
+		if err != nil {
+			err = fmt.Errorf("failed to write to configurations.yaml: %s", err)
+			return
+		}
 	}
 	return
 }

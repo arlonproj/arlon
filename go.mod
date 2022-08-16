@@ -6,10 +6,12 @@ require (
 	github.com/argoproj/argo-cd/v2 v2.2.12
 	github.com/aws/aws-sdk-go v1.44.73
 	github.com/deckarep/golang-set v1.8.0
+	github.com/go-git/go-billy/v5 v5.3.1
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-logr/logr v0.4.0
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.20.0
+	github.com/otiai10/copy v1.7.0
 	github.com/spf13/cobra v1.5.0
 	google.golang.org/grpc v1.48.0
 	k8s.io/api v0.22.12
