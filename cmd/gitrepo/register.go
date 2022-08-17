@@ -4,33 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"os"
-	"path/filepath"
-
 	cmdutil "github.com/argoproj/argo-cd/v2/cmd/util"
 	"github.com/argoproj/argo-cd/v2/pkg/apiclient/repository"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/argoproj/argo-cd/v2/util/errors"
 	argocdio "github.com/argoproj/argo-cd/v2/util/io"
-	"github.com/argoproj/argo-cd/v2/util/localconfig"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/spf13/cobra"
-)
-
-type RepoCtx struct {
-	Url   string `json:"url,omitempty"`
-	Alias string `json:"alias,omitempty"`
-}
-
-type RepoCtxCfg struct {
-	Current RepoCtx   `json:"current,omitempty"`
-	Repos   []RepoCtx `json:"repos,omitempty"`
-}
-
-const (
-	repoCtxFile    = "repoctx"
-	repoDefaultCtx = "default"
+	"os"
 )
 
 func register() *cobra.Command {
@@ -70,6 +51,33 @@ func register() *cobra.Command {
 			if repoOpts.Repo.Username != "" && repoOpts.Repo.Password == "" {
 				repoOpts.Repo.Password = cli.PromptPassword(repoOpts.Repo.Password)
 			}
+			cfgFile, err := getRepoCfgPath()
+			if err != nil {
+				return fmt.Errorf("%v: %w", errLoadCfgFile, err)
+			}
+			file, err := os.OpenFile(cfgFile, os.O_RDWR|os.O_CREATE, 0666)
+			if err != nil {
+				err = fmt.Errorf("%v: %w", errLoadCfgFile, err)
+				return
+			}
+			defer func(f *os.File) {
+				err := f.Close()
+				if err != nil {
+					fmt.Printf("failed to close config file, error: %v\n", err)
+				}
+			}(file)
+			repoCtxCfg, err := loadRepoCfg(file)
+			if err != nil {
+				return fmt.Errorf("%v: %w", errLoadCfgFile, err)
+			}
+			if aliasExists(repoCtxCfg.Repos, alias) {
+				fmt.Printf("alias already exists")
+				return
+			}
+			if repoCtxCfg.Default.Url != "" && alias == repoDefaultCtx {
+				err = fmt.Errorf("default alias already exists")
+				return
+			}
 			repoAccessReq := repository.RepoAccessQuery{
 				Repo:     repoOpts.Repo.Repo,
 				Username: repoOpts.Repo.Username,
@@ -88,56 +96,21 @@ func register() *cobra.Command {
 				Url:   createdRepo.Repo,
 				Alias: alias,
 			}
-			cfgDir, err := localconfig.DefaultConfigDir()
-			if err != nil {
-				err = fmt.Errorf("cannot open config file %s, error: %w", cfgDir, err)
-				return
-			}
-			cfgFile := filepath.Join(cfgDir, repoCtxFile)
-			file, err := os.OpenFile(cfgFile, os.O_RDWR|os.O_CREATE, 0666)
-			if err != nil {
-				err = fmt.Errorf("cannot open config file, error: %w", err)
-				return
-			}
-			defer func(f *os.File) {
-				err := f.Close()
-				if err != nil {
-					fmt.Printf("failed to close config file, error: %v\n", err)
-				}
-			}(file)
-			content, err := io.ReadAll(file)
-			if err != nil {
-				err = fmt.Errorf("cannot read config file, error: %w", err)
-				return
-			}
-			var repoCtxCfg RepoCtxCfg
-			if len(content) > 0 {
-				if err = json.Unmarshal(content, &repoCtxCfg); err != nil {
-					err = fmt.Errorf("cannot read config file, error: %w", err)
-					return
-				}
-			}
 			repoCtxCfg.Repos = append(repoCtxCfg.Repos, repoCtx)
-			if repoCtxCfg.Current.Url == "" {
-				if repoCtx.Alias == repoDefaultCtx {
-					err = fmt.Errorf("default alias already exists")
-					return
-				}
-				repoCtxCfg.Current = repoCtx
+			if repoCtx.Alias == repoDefaultCtx {
+				repoCtxCfg.Default = repoCtx
 			}
 			repoData, err := json.MarshalIndent(repoCtxCfg, "", "\t")
 			if err != nil {
-				return fmt.Errorf("cannot serialize repo context, error: %w", err)
-			}
-			if err := file.Truncate(0); err != nil {
-				return fmt.Errorf("cannot overwrite config file, error: %w", err)
-			}
-			if _, err := file.Seek(0, 0); err != nil {
-				return fmt.Errorf("cannot overwrite config file, error: %w", err)
-			}
-			_, err = file.Write(repoData)
-			if err != nil {
 				return err
+			}
+			err = truncateFile(file)
+			if err != nil {
+				return fmt.Errorf("%v: %w", errOverwriteCfg, err)
+			}
+			err = storeRepoCfg(file, repoData)
+			if err != nil {
+				return fmt.Errorf("%v: %w", errOverwriteCfg, err)
 			}
 			fmt.Printf("Repository %s added\n", createdRepo.Repo)
 			return nil

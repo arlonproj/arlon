@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/util/localconfig"
 	"github.com/spf13/cobra"
-	"io"
 	"os"
 	"path/filepath"
 )
@@ -23,14 +22,12 @@ func unregister() *cobra.Command {
 			repoAlias = args[0]
 			cfgDir, err := localconfig.DefaultConfigDir()
 			if err != nil {
-				err = fmt.Errorf("cannot open config file, error: %w", err)
-				return
+				return fmt.Errorf("%v: %w", errLoadCfgFile, err)
 			}
 			cfgFile := filepath.Join(cfgDir, repoCtxFile)
 			file, err := os.OpenFile(cfgFile, os.O_RDWR|os.O_CREATE, 0666)
 			if err != nil {
-				err = fmt.Errorf("cannot open config file, error: %w", err)
-				return
+				return fmt.Errorf("%v: %w", errLoadCfgFile, err)
 			}
 			defer func(f *os.File) {
 				err := f.Close()
@@ -38,46 +35,36 @@ func unregister() *cobra.Command {
 					fmt.Printf("failed to close config file, error: %v\n", err)
 				}
 			}(file)
-			content, err := io.ReadAll(file)
+			repoCtxCfg, err := loadRepoCfg(file)
 			if err != nil {
-				err = fmt.Errorf("cannot read config file, error: %w", err)
-				return
+				return fmt.Errorf("%v: %w", errLoadCfgFile, err)
 			}
-			if len(content) == 0 {
+			if len(repoCtxCfg.Repos) == 0 {
 				fmt.Println("no repositories registered")
-				return
-			}
-			var repoCtxCfg RepoCtxCfg
-			if err = json.Unmarshal(content, &repoCtxCfg); err != nil {
-				err = fmt.Errorf("cannot open config file, error: %w", err)
 				return
 			}
 			for i, repo := range repoCtxCfg.Repos {
 				if repo.Alias != repoAlias {
 					continue
 				}
-				if repo.Alias == repoDefaultCtx && repoCtxCfg.Current.Alias == repoDefaultCtx {
-					repoCtxCfg.Current = RepoCtx{}
+				if repo.Alias == repoDefaultCtx {
+					repoCtxCfg.Default = RepoCtx{}
 				}
 				repoCtxCfg.Repos = append(repoCtxCfg.Repos[:i], repoCtxCfg.Repos[i+1:]...)
 				repoData, err := json.MarshalIndent(repoCtxCfg, "", "\t")
 				if err != nil {
-					return fmt.Errorf("cannot serialize repo context, error: %w", err)
-				}
-				if err := file.Truncate(0); err != nil {
-					return fmt.Errorf("cannot overwrite config file, error: %w", err)
-				}
-				if _, err := file.Seek(0, 0); err != nil {
-					return fmt.Errorf("cannot overwrite config file, error: %w", err)
-				}
-				_, err = file.Write(repoData)
-				if err != nil {
 					return err
 				}
-				fmt.Printf("Repository %s deleted\n", repoAlias)
+				if err := truncateFile(file); err != nil {
+					return fmt.Errorf("%v: %w", errOverwriteCfg, err)
+				}
+				if err := storeRepoCfg(file, repoData); err != nil {
+					return fmt.Errorf("%v: %w", errOverwriteCfg, err)
+				}
+				fmt.Printf("Repository %s unregistered locally\n", repoAlias)
 				return nil
 			}
-			return
+			return errNotFound
 		},
 	}
 	return command
