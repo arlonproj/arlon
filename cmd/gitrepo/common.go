@@ -2,7 +2,6 @@ package gitrepo
 
 import (
 	"errors"
-	"fmt"
 	"github.com/argoproj/argo-cd/v2/util/localconfig"
 	"io"
 	"k8s.io/apimachinery/pkg/util/json"
@@ -34,7 +33,6 @@ var (
 func getRepoCfgPath() (string, error) {
 	cfgDir, err := localconfig.DefaultConfigDir()
 	if err != nil {
-		err = fmt.Errorf("cannot open config file %s, error: %w", cfgDir, err)
 		return "", err
 	}
 	return filepath.Join(cfgDir, repoCtxFile), nil
