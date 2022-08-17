@@ -79,7 +79,7 @@ func Create(
 		corev1 := kubeClient.CoreV1()
 		bundles, err := bundle.GetBundlesFromProfile(prof, corev1, arlonNs)
 		if err != nil {
-			return nil, fmt.Errorf("failed to get repository credentials: %s", err)
+			return nil, fmt.Errorf("failed to get bundles from profile: %s", err)
 		}
 		err = DeployToGit(creds, argocdNs, bundles, clusterName,
 			repoUrl, repoBranch, basePath, prof)

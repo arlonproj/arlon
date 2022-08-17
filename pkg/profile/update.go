@@ -92,7 +92,7 @@ func Update(
 		// Dynamic profile needs updating in git
 		kubeClient, creds, err := argocd.GetKubeclientAndRepoCreds(config, argocdNs, prof.Spec.RepoUrl)
 		if err != nil {
-			return false, fmt.Errorf("failed to get repository credentials: %s", err)
+			return false, fmt.Errorf("failed to get kubeclient and repository credentials: %s", err)
 		}
 		corev1 := kubeClient.CoreV1()
 		bndl, err := bundle.GetBundlesFromProfile(&prof.Profile, corev1, arlonNs)

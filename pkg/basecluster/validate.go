@@ -48,10 +48,10 @@ func ValidateGitDir(
 	repoPath string,
 ) (clusterName string, err error) {
 	repo, tmpDir, _, err := argocd.CloneRepo(creds, repoUrl, repoRevision)
-	defer os.RemoveAll(tmpDir)
 	if err != nil {
 		return "", fmt.Errorf("failed to clone repo: %s", err)
 	}
+	defer os.RemoveAll(tmpDir)
 	wt, err := repo.Worktree()
 	if err != nil {
 		return "", fmt.Errorf("failed to get repo worktree: %s", err)

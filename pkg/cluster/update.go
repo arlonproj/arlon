@@ -98,10 +98,6 @@ func Update(
 		oldApp.Spec.Source.Path != rootApp.Spec.Source.Path {
 		return nil, fmt.Errorf("git repo reference cannot change")
 	}
-	kubeClient, err = kubernetes.NewForConfig(config)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get kubernetes client: %s", err)
-	}
 	bundles, err := bundle.GetBundlesFromProfile(prof, corev1, arlonNs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get bundles: %s", err)
