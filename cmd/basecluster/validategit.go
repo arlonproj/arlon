@@ -1,9 +1,11 @@
 package basecluster
 
 import (
+	"errors"
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	bcl "github.com/arlonproj/arlon/pkg/basecluster"
+	"github.com/arlonproj/arlon/pkg/gitrepo"
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -12,6 +14,7 @@ func validateGitBaseClusterCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
 	var argocdNs string
 	var repoUrl string
+	var repoAlias string
 	var repoPath string
 	var repoRevision string
 	command := &cobra.Command{
@@ -19,6 +22,16 @@ func validateGitBaseClusterCommand() *cobra.Command {
 		Short: "validate base cluster directory in git",
 		Long:  "validate base cluster directory in git",
 		RunE: func(c *cobra.Command, args []string) error {
+			if repoUrl == "" {
+				repoCtx, err := gitrepo.GetAlias(repoAlias)
+				if err != nil {
+					if errors.Is(err, gitrepo.ErrNotFound) {
+						return err
+					}
+					return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
+				}
+				repoUrl = repoCtx.Url
+			}
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
@@ -35,8 +48,9 @@ func validateGitBaseClusterCommand() *cobra.Command {
 	clientConfig = cli.AddKubectlFlagsToCmd(command)
 	command.Flags().StringVar(&argocdNs, "argocd-ns", "argocd", "the argocd namespace")
 	command.Flags().StringVar(&repoUrl, "repo-url", "", "the git repository url for base cluster directory")
+	command.Flags().StringVar(&repoAlias, "repo-alias", gitrepo.RepoDefaultCtx, "git repository alias to use")
 	command.Flags().StringVar(&repoRevision, "repo-revision", "main", "the git revision for base cluster directory")
 	command.Flags().StringVar(&repoPath, "repo-path", "", "the git repository path for base cluster directory")
-	command.MarkFlagRequired("repo-url")
+	command.MarkFlagsMutuallyExclusive("repo-url", "repo-alias")
 	return command
 }
