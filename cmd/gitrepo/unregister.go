@@ -3,10 +3,9 @@ package gitrepo
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/argoproj/argo-cd/v2/util/localconfig"
+	"github.com/arlonproj/arlon/pkg/gitrepo"
 	"github.com/spf13/cobra"
 	"os"
-	"path/filepath"
 )
 
 func unregister() *cobra.Command {
@@ -20,14 +19,13 @@ func unregister() *cobra.Command {
 		Long:  "unregister a previously registered configuration",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			repoAlias = args[0]
-			cfgDir, err := localconfig.DefaultConfigDir()
+			cfgFile, err := gitrepo.GetRepoCfgPath()
 			if err != nil {
-				return fmt.Errorf("%v: %w", errLoadCfgFile, err)
+				return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
 			}
-			cfgFile := filepath.Join(cfgDir, repoCtxFile)
 			file, err := os.OpenFile(cfgFile, os.O_RDWR|os.O_CREATE, 0666)
 			if err != nil {
-				return fmt.Errorf("%v: %w", errLoadCfgFile, err)
+				return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
 			}
 			defer func(f *os.File) {
 				err := f.Close()
@@ -35,9 +33,9 @@ func unregister() *cobra.Command {
 					fmt.Printf("failed to close config file, error: %v\n", err)
 				}
 			}(file)
-			repoCtxCfg, err := loadRepoCfg(file)
+			repoCtxCfg, err := gitrepo.LoadRepoCfg(file)
 			if err != nil {
-				return fmt.Errorf("%v: %w", errLoadCfgFile, err)
+				return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
 			}
 			if len(repoCtxCfg.Repos) == 0 {
 				fmt.Println("no repositories registered")
@@ -47,24 +45,24 @@ func unregister() *cobra.Command {
 				if repo.Alias != repoAlias {
 					continue
 				}
-				if repo.Alias == repoDefaultCtx {
-					repoCtxCfg.Default = RepoCtx{}
+				if repo.Alias == gitrepo.RepoDefaultCtx {
+					repoCtxCfg.Default = gitrepo.RepoCtx{}
 				}
 				repoCtxCfg.Repos = append(repoCtxCfg.Repos[:i], repoCtxCfg.Repos[i+1:]...)
 				repoData, err := json.MarshalIndent(repoCtxCfg, "", "\t")
 				if err != nil {
 					return err
 				}
-				if err := truncateFile(file); err != nil {
-					return fmt.Errorf("%v: %w", errOverwriteCfg, err)
+				if err := gitrepo.TruncateFile(file); err != nil {
+					return fmt.Errorf("%v: %w", gitrepo.ErrOverwriteCfg, err)
 				}
-				if err := storeRepoCfg(file, repoData); err != nil {
-					return fmt.Errorf("%v: %w", errOverwriteCfg, err)
+				if err := gitrepo.StoreRepoCfg(file, repoData); err != nil {
+					return fmt.Errorf("%v: %w", gitrepo.ErrOverwriteCfg, err)
 				}
 				fmt.Printf("Repository %s unregistered locally\n", repoAlias)
 				return nil
 			}
-			return errNotFound
+			return gitrepo.ErrNotFound
 		},
 	}
 	return command

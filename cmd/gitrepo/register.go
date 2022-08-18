@@ -10,6 +10,7 @@ import (
 	"github.com/argoproj/argo-cd/v2/util/errors"
 	argocdio "github.com/argoproj/argo-cd/v2/util/io"
 	"github.com/arlonproj/arlon/pkg/argocd"
+	"github.com/arlonproj/arlon/pkg/gitrepo"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -51,13 +52,13 @@ func register() *cobra.Command {
 			if repoOpts.Repo.Username != "" && repoOpts.Repo.Password == "" {
 				repoOpts.Repo.Password = cli.PromptPassword(repoOpts.Repo.Password)
 			}
-			cfgFile, err := getRepoCfgPath()
+			cfgFile, err := gitrepo.GetRepoCfgPath()
 			if err != nil {
-				return fmt.Errorf("%v: %w", errLoadCfgFile, err)
+				return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
 			}
 			file, err := os.OpenFile(cfgFile, os.O_RDWR|os.O_CREATE, 0666)
 			if err != nil {
-				err = fmt.Errorf("%v: %w", errLoadCfgFile, err)
+				err = fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
 				return
 			}
 			defer func(f *os.File) {
@@ -66,15 +67,15 @@ func register() *cobra.Command {
 					fmt.Printf("failed to close config file, error: %v\n", err)
 				}
 			}(file)
-			repoCtxCfg, err := loadRepoCfg(file)
+			repoCtxCfg, err := gitrepo.LoadRepoCfg(file)
 			if err != nil {
-				return fmt.Errorf("%v: %w", errLoadCfgFile, err)
+				return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
 			}
-			if aliasExists(repoCtxCfg.Repos, alias) {
+			if gitrepo.AliasExists(repoCtxCfg.Repos, alias) {
 				fmt.Printf("alias already exists")
 				return
 			}
-			if repoCtxCfg.Default.Url != "" && alias == repoDefaultCtx {
+			if repoCtxCfg.Default.Url != "" && alias == gitrepo.RepoDefaultCtx {
 				err = fmt.Errorf("default alias already exists")
 				return
 			}
@@ -92,25 +93,25 @@ func register() *cobra.Command {
 			}
 			createdRepo, err := client.CreateRepository(ctx, &repoCreateReq)
 			errors.CheckError(err)
-			repoCtx := RepoCtx{
+			repoCtx := gitrepo.RepoCtx{
 				Url:   createdRepo.Repo,
 				Alias: alias,
 			}
 			repoCtxCfg.Repos = append(repoCtxCfg.Repos, repoCtx)
-			if repoCtx.Alias == repoDefaultCtx {
+			if repoCtx.Alias == gitrepo.RepoDefaultCtx {
 				repoCtxCfg.Default = repoCtx
 			}
 			repoData, err := json.MarshalIndent(repoCtxCfg, "", "\t")
 			if err != nil {
 				return err
 			}
-			err = truncateFile(file)
+			err = gitrepo.TruncateFile(file)
 			if err != nil {
-				return fmt.Errorf("%v: %w", errOverwriteCfg, err)
+				return fmt.Errorf("%v: %w", gitrepo.ErrOverwriteCfg, err)
 			}
-			err = storeRepoCfg(file, repoData)
+			err = gitrepo.StoreRepoCfg(file, repoData)
 			if err != nil {
-				return fmt.Errorf("%v: %w", errOverwriteCfg, err)
+				return fmt.Errorf("%v: %w", gitrepo.ErrOverwriteCfg, err)
 			}
 			fmt.Printf("Repository %s added\n", createdRepo.Repo)
 			return nil
@@ -118,7 +119,7 @@ func register() *cobra.Command {
 	}
 	command.Flags().StringVar(&userName, "user", "", "username for the repository configuration")
 	command.Flags().StringVar(&password, "password", "", "password of the user")
-	command.Flags().StringVar(&alias, "alias", repoDefaultCtx, "alias for the git repository")
+	command.Flags().StringVar(&alias, "alias", gitrepo.RepoDefaultCtx, "alias for the git repository")
 	command.MarkFlagRequired("user")
 	return command
 }

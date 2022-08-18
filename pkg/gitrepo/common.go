@@ -21,16 +21,16 @@ type RepoCtxCfg struct {
 
 const (
 	repoCtxFile    = "repoctx"
-	repoDefaultCtx = "default"
+	RepoDefaultCtx = "default"
 )
 
 var (
-	errNotFound     = errors.New("given alias doesn't exist")
-	errLoadCfgFile  = errors.New("failed to load config file")
-	errOverwriteCfg = errors.New("cannot overwrite config file")
+	ErrNotFound     = errors.New("given alias doesn't exist")
+	ErrLoadCfgFile  = errors.New("failed to load config file")
+	ErrOverwriteCfg = errors.New("cannot overwrite config file")
 )
 
-func getRepoCfgPath() (string, error) {
+func GetRepoCfgPath() (string, error) {
 	cfgDir, err := localconfig.DefaultConfigDir()
 	if err != nil {
 		return "", err
@@ -38,7 +38,7 @@ func getRepoCfgPath() (string, error) {
 	return filepath.Join(cfgDir, repoCtxFile), nil
 }
 
-func loadRepoCfg(reader io.Reader) (RepoCtxCfg, error) {
+func LoadRepoCfg(reader io.Reader) (RepoCtxCfg, error) {
 	content, err := io.ReadAll(reader)
 	if err != nil {
 		return RepoCtxCfg{}, err
@@ -53,7 +53,7 @@ func loadRepoCfg(reader io.Reader) (RepoCtxCfg, error) {
 	return cfg, nil
 }
 
-func aliasExists(repoList []RepoCtx, targetAlias string) bool {
+func AliasExists(repoList []RepoCtx, targetAlias string) bool {
 	for _, repoCtx := range repoList {
 		if repoCtx.Alias == targetAlias {
 			return true
@@ -62,7 +62,7 @@ func aliasExists(repoList []RepoCtx, targetAlias string) bool {
 	return false
 }
 
-func truncateFile(file *os.File) error {
+func TruncateFile(file *os.File) error {
 	if err := file.Truncate(0); err != nil {
 		return err
 	}
@@ -72,7 +72,7 @@ func truncateFile(file *os.File) error {
 	return nil
 }
 
-func storeRepoCfg(writer io.Writer, data []byte) error {
+func StoreRepoCfg(writer io.Writer, data []byte) error {
 	_, err := writer.Write(data)
 	return err
 }

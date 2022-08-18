@@ -3,18 +3,20 @@ package cluster
 import (
 	_ "embed"
 	"fmt"
+	"os"
+
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	bcl "github.com/arlonproj/arlon/pkg/basecluster"
 	"github.com/arlonproj/arlon/pkg/cluster"
+	"github.com/arlonproj/arlon/pkg/gitrepo"
 	"github.com/arlonproj/arlon/pkg/profile"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/client-go/tools/clientcmd"
-	"os"
 )
 
 func createClusterCommand() *cobra.Command {
@@ -25,6 +27,7 @@ func createClusterCommand() *cobra.Command {
 	var arlonRepoRevision string
 	var arlonRepoPath string
 	var clusterRepoUrl string
+	var repoAlias string
 	var clusterRepoRevision string
 	var clusterRepoPath string
 	var clusterName string
@@ -35,6 +38,13 @@ func createClusterCommand() *cobra.Command {
 		Short: "create new cluster from a base",
 		Long:  "create new cluster from a base",
 		RunE: func(c *cobra.Command, args []string) error {
+			if clusterRepoUrl == "" {
+				var err error
+				clusterRepoUrl, err = repoUrlFromAlias(repoAlias)
+				if err != nil {
+					return err
+				}
+			}
 			conn, appIf := argocd.NewArgocdClientOrDie("").NewApplicationClientOrDie()
 			defer conn.Close()
 			config, err := clientConfig.ClientConfig()
@@ -120,13 +130,46 @@ func createClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&arlonRepoUrl, "arlon-repo-url", "https://github.com/arlonproj/arlon.git", "the git repository url for arlon template")
 	command.Flags().StringVar(&arlonRepoRevision, "arlon-repo-revision", "private/leb/gen2", "the git revision for arlon template")
 	command.Flags().StringVar(&arlonRepoPath, "arlon-repo-path", "pkg/cluster/manifests", "the git repository path for arlon template")
-	command.Flags().StringVar(&clusterRepoUrl, "repo-url", "https://github.com/clusterproj/cluster.git", "the git repository url for cluster template")
+	command.Flags().StringVar(&clusterRepoUrl, "repo-url", "", "the git repository url for cluster template")
+	command.Flags().StringVar(&repoAlias, "repo-alias", gitrepo.RepoDefaultCtx, "git repository alias to use")
 	command.Flags().StringVar(&clusterRepoRevision, "repo-revision", "main", "the git revision for cluster template")
 	command.Flags().StringVar(&clusterRepoPath, "repo-path", "", "the git repository path for cluster template")
 	command.Flags().StringVar(&clusterName, "cluster-name", "", "the cluster name")
 	command.Flags().BoolVar(&outputYaml, "output-yaml", false, "output root applications YAML instead of deploying to ArgoCD")
 	command.Flags().StringVar(&profileName, "profile", "", "profile name (if specified, must refer to dynamic profile)")
-	command.MarkFlagRequired("repo-url")
 	command.MarkFlagRequired("cluster-name")
+	command.MarkFlagsMutuallyExclusive("repo-url", "repo-alias")
 	return command
+}
+
+func repoUrlFromAlias(repoAlias string) (string, error) {
+	cfgPath, err := gitrepo.GetRepoCfgPath()
+	if err != nil {
+		return "", fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
+	}
+	cfgFile, err := os.OpenFile(cfgPath, os.O_RDONLY, 0666)
+	if err != nil {
+		return "", fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
+	}
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			fmt.Printf("failed to close config file, error: %v\n", err)
+		}
+	}(cfgFile)
+	cfgData, err := gitrepo.LoadRepoCfg(cfgFile)
+	if err != nil {
+		return "", fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
+	}
+	if repoAlias == gitrepo.RepoDefaultCtx {
+		defaultCfg := cfgData.Default
+		return defaultCfg.Url, nil
+	}
+	for _, repo := range cfgData.Repos {
+		if repo.Alias != repoAlias {
+			continue
+		}
+		return repo.Url, nil
+	}
+	return "", gitrepo.ErrNotFound
 }
