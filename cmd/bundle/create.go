@@ -58,8 +58,6 @@ func createBundleCommand() *cobra.Command {
 	command.Flags().StringVar(&srcType, "srctype", "", "manifest source type (directory/helm/ksonnet/kustomize, empty means autodetect)")
 	command.Flags().StringVar(&desc, "desc", "", "description")
 	command.Flags().StringVar(&tags, "tags", "", "comma separated list of tags")
-	command.MarkFlagsMutuallyExclusive("repo-alias", "repo-url")
-	command.MarkFlagsMutuallyExclusive("from-file", "repo-url")
-	command.MarkFlagsMutuallyExclusive("from-file", "repo-alias")
+	command.MarkFlagsMutuallyExclusive("repo-alias", "repo-url", "from-file")
 	return command
 }

@@ -66,8 +66,7 @@ func createProfileCommand() *cobra.Command {
 	command.Flags().StringVar(&repoBasePath, "repo-base-path", "profiles", "optional git base path for dynamic profile. The profile directory will be created under this.")
 	command.Flags().StringVar(&repoBranch, "repo-branch", "main", "optional git branch for dynamic profile (requires --repo-url)")
 	command.Flags().StringArrayVarP(&overrides, "param", "p", nil, "a single parameter override of the form bundle,key,value ... can be repeated")
-	command.MarkFlagsMutuallyExclusive("static", "repo-url")
-	command.MarkFlagsMutuallyExclusive("static", "repo-alias")
+	command.MarkFlagsMutuallyExclusive("static", "repo-url", "repo-alias")
 	command.MarkFlagsMutuallyExclusive("repo-url", "repo-alias")
 	command.MarkFlagRequired("bundles")
 	return command
