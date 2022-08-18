@@ -2,6 +2,7 @@ package gitrepo
 
 import (
 	"errors"
+	"fmt"
 	"github.com/argoproj/argo-cd/v2/util/localconfig"
 	"io"
 	"k8s.io/apimachinery/pkg/util/json"
@@ -75,4 +76,36 @@ func TruncateFile(file *os.File) error {
 func StoreRepoCfg(writer io.Writer, data []byte) error {
 	_, err := writer.Write(data)
 	return err
+}
+
+func GetAlias(repoAlias string) (*RepoCtx, error) {
+	cfgPath, err := GetRepoCfgPath()
+	if err != nil {
+		return nil, err
+	}
+	cfgFile, err := os.OpenFile(cfgPath, os.O_RDONLY, 0666)
+	if err != nil {
+		return nil, err
+	}
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			fmt.Printf("failed to close config file, error: %v\n", err)
+		}
+	}(cfgFile)
+	cfgData, err := LoadRepoCfg(cfgFile)
+	if err != nil {
+		return nil, err
+	}
+	if repoAlias == RepoDefaultCtx {
+		defaultCfg := cfgData.Default
+		return &defaultCfg, nil
+	}
+	for _, repo := range cfgData.Repos {
+		if repo.Alias != repoAlias {
+			continue
+		}
+		return &repo, nil
+	}
+	return nil, ErrNotFound
 }

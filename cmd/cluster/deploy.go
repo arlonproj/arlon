@@ -2,9 +2,14 @@ package cluster
 
 import (
 	_ "embed"
+	"errors"
 	"fmt"
+	"github.com/arlonproj/arlon/pkg/gitrepo"
+	"os"
+
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/cli"
+	argocdio "github.com/argoproj/argo-cd/v2/util/io"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/cluster"
@@ -13,7 +18,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/client-go/tools/clientcmd"
-	"os"
 )
 
 func deployClusterCommand() *cobra.Command {
@@ -21,6 +25,7 @@ func deployClusterCommand() *cobra.Command {
 	var argocdNs string
 	var arlonNs string
 	var repoUrl string
+	var repoAlias string
 	var repoBranch string
 	var basePath string
 	var clusterName string
@@ -32,8 +37,18 @@ func deployClusterCommand() *cobra.Command {
 		Short: "deploy new cluster",
 		Long:  "deploy new cluster",
 		RunE: func(c *cobra.Command, args []string) error {
+			if repoUrl == "" {
+				repoCtx, err := gitrepo.GetAlias(repoAlias)
+				if err != nil {
+					if errors.Is(err, gitrepo.ErrNotFound) {
+						return err
+					}
+					return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
+				}
+				repoUrl = repoCtx.Url
+			}
 			conn, appIf := argocd.NewArgocdClientOrDie("").NewApplicationClientOrDie()
-			defer conn.Close()
+			defer argocdio.Close(conn)
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
@@ -79,13 +94,14 @@ func deployClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&argocdNs, "argocd-ns", "argocd", "the argocd namespace")
 	command.Flags().StringVar(&arlonNs, "arlon-ns", "arlon", "the arlon namespace")
 	command.Flags().StringVar(&repoUrl, "repo-url", "", "the git repository url")
+	command.Flags().StringVar(&repoAlias, "repo-alias", gitrepo.RepoDefaultCtx, "git repository alias to use")
 	command.Flags().StringVar(&repoBranch, "repo-branch", "main", "the git branch")
 	command.Flags().StringVar(&clusterName, "cluster-name", "", "the cluster name")
 	command.Flags().StringVar(&profileName, "profile", "", "the configuration profile to use")
 	command.Flags().StringVar(&clusterSpecName, "cluster-spec", "", "the clusterspec to use (only for gen1 clusters)")
 	command.Flags().StringVar(&basePath, "repo-path", "clusters", "the git repository base path (cluster subdirectory will be created under this for gen1 clusters)")
 	command.Flags().BoolVar(&outputYaml, "output-yaml", false, "output root application YAML instead of deploying to ArgoCD")
-	command.MarkFlagRequired("repo-url")
 	command.MarkFlagRequired("cluster-name")
+	command.MarkFlagsMutuallyExclusive("repo-url", "repo-alias")
 	return command
 }

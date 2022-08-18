@@ -2,6 +2,7 @@ package cluster
 
 import (
 	_ "embed"
+	"errors"
 	"fmt"
 	"os"
 
@@ -39,11 +40,14 @@ func createClusterCommand() *cobra.Command {
 		Long:  "create new cluster from a base",
 		RunE: func(c *cobra.Command, args []string) error {
 			if clusterRepoUrl == "" {
-				var err error
-				clusterRepoUrl, err = repoUrlFromAlias(repoAlias)
+				repoCtx, err := gitrepo.GetAlias(repoAlias)
 				if err != nil {
-					return err
+					if errors.Is(err, gitrepo.ErrNotFound) {
+						return err
+					}
+					return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
 				}
+				clusterRepoUrl = repoCtx.Url
 			}
 			conn, appIf := argocd.NewArgocdClientOrDie("").NewApplicationClientOrDie()
 			defer conn.Close()
@@ -140,36 +144,4 @@ func createClusterCommand() *cobra.Command {
 	command.MarkFlagRequired("cluster-name")
 	command.MarkFlagsMutuallyExclusive("repo-url", "repo-alias")
 	return command
-}
-
-func repoUrlFromAlias(repoAlias string) (string, error) {
-	cfgPath, err := gitrepo.GetRepoCfgPath()
-	if err != nil {
-		return "", fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
-	}
-	cfgFile, err := os.OpenFile(cfgPath, os.O_RDONLY, 0666)
-	if err != nil {
-		return "", fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
-	}
-	defer func(f *os.File) {
-		err := f.Close()
-		if err != nil {
-			fmt.Printf("failed to close config file, error: %v\n", err)
-		}
-	}(cfgFile)
-	cfgData, err := gitrepo.LoadRepoCfg(cfgFile)
-	if err != nil {
-		return "", fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
-	}
-	if repoAlias == gitrepo.RepoDefaultCtx {
-		defaultCfg := cfgData.Default
-		return defaultCfg.Url, nil
-	}
-	for _, repo := range cfgData.Repos {
-		if repo.Alias != repoAlias {
-			continue
-		}
-		return repo.Url, nil
-	}
-	return "", gitrepo.ErrNotFound
 }
