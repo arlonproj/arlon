@@ -2,7 +2,6 @@ package basecluster
 
 import (
 	"errors"
-	"fmt"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/gitutils"
 	gogit "github.com/go-git/go-git/v5"
@@ -17,12 +16,12 @@ func TestGitPreparation(t *testing.T) {
 	subdirName := "requires_prep"
 	repoRevision := "master"
 	_, srcGitDir := createFileSystemBasedRepo(t, subdirName)
-	fmt.Println(srcGitDir)
+	t.Log("repo dir:", srcGitDir)
 	creds := &argocd.RepoCreds{}
 	repoUrl := "file://" + srcGitDir
 	_, err := ValidateGitDir(creds, repoUrl, repoRevision, subdirName)
 	assert.Assert(t, errors.Is(err, ErrNoKustomizationYaml), "unexpected validation error: %s", err)
-	fmt.Println("got expected error:", err)
+	t.Log("got expected error:", err)
 	clustName, changed, err := PrepareGitDir(creds, repoUrl, repoRevision, subdirName)
 	assert.NilError(t, err, "failed to prepare git directory")
 	assert.Assert(t, changed, "git dir preparation resulted in no changes")
@@ -44,5 +43,6 @@ func createFileSystemBasedRepo(t *testing.T, subdirName string) (*gogit.Reposito
 	assert.NilError(t, err, "failed to get worktree")
 	changed, err := gitutils.CommitChanges(tmpDir, wt, "initial commit")
 	assert.Assert(t, changed, "unexpected changed status from CommitChanges()")
+	t.Cleanup(func() { os.RemoveAll(tmpDir) })
 	return repo, tmpDir
 }
