@@ -27,7 +27,7 @@ func updateBundleCommand() *cobra.Command {
 		Long:  "update configuration bundle",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
-			if fromFile == "" && repoUrl == "" {
+			if fromFile == "" && repoUrl == "" && repoAlias != "" {
 				repoCtx, err := gitrepo.GetAlias(repoAlias)
 				if err != nil {
 					if errors.Is(err, gitrepo.ErrNotFound) {
@@ -49,12 +49,10 @@ func updateBundleCommand() *cobra.Command {
 	command.Flags().StringVar(&ns, "ns", "arlon", "the arlon namespace")
 	command.Flags().StringVar(&fromFile, "from-file", "", "update static bundle from this file")
 	command.Flags().StringVar(&repoUrl, "repo-url", "", "update a dynamic bundle from this repo URL")
-	command.Flags().StringVar(&repoAlias, "repo-alias", gitrepo.RepoDefaultCtx, "the git repository alias to use")
+	command.Flags().StringVar(&repoAlias, "repo-alias", "", "the git repository alias to use")
 	command.Flags().StringVar(&repoPath, "repo-path", "", "optional path in repo specified by --from-repo")
 	command.Flags().StringVar(&desc, "desc", "", "description")
 	command.Flags().StringVar(&tags, "tags", "", "comma separated list of tags")
-	command.MarkFlagsMutuallyExclusive("repo-alias", "repo-url")
-	command.MarkFlagsMutuallyExclusive("from-file", "repo-url")
-	command.MarkFlagsMutuallyExclusive("from-file", "repo-alias")
+	command.MarkFlagsMutuallyExclusive("from-file", "repo-alias", "repo-url")
 	return command
 }
