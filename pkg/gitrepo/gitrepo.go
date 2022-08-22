@@ -3,6 +3,7 @@ package gitrepo
 import (
 	"errors"
 	"fmt"
+	argocdio "github.com/argoproj/argo-cd/v2/util/io"
 	"github.com/argoproj/argo-cd/v2/util/localconfig"
 	"io"
 	"k8s.io/apimachinery/pkg/util/json"
@@ -80,18 +81,8 @@ func StoreRepoCfg(writer io.Writer, data []byte) error {
 	return err
 }
 
-func getAlias(repoAlias, cfgPath string) (*RepoCtx, error) {
-	cfgFile, err := os.OpenFile(cfgPath, os.O_RDONLY, 0666)
-	if err != nil {
-		return nil, err
-	}
-	defer func(f *os.File) {
-		err := f.Close()
-		if err != nil {
-			fmt.Printf("failed to close config file, error: %v\n", err)
-		}
-	}(cfgFile)
-	cfgData, err := LoadRepoCfg(cfgFile)
+func getAlias(repoAlias string, reader io.Reader) (*RepoCtx, error) {
+	cfgData, err := LoadRepoCfg(reader)
 	if err != nil {
 		return nil, err
 	}
@@ -109,11 +100,12 @@ func getAlias(repoAlias, cfgPath string) (*RepoCtx, error) {
 }
 
 func GetRepoUrl(repoAlias string) (string, error) {
-	cfgPath, err := getRepoCfgPath()
+	cfgFile, err := ReadDefaultConfig()
 	if err != nil {
 		return "", err
 	}
-	repoCtx, err := getAlias(repoAlias, cfgPath)
+	argocdio.Close(cfgFile)
+	repoCtx, err := getAlias(repoAlias, cfgFile)
 	if err != nil {
 		if !errors.Is(err, ErrNotFound) {
 			return "", fmt.Errorf("%v: %w", ErrNotFound, err)

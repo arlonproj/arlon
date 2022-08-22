@@ -20,6 +20,9 @@ func unregister() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			repoAlias = args[0]
 			file, err := gitrepo.ReadDefaultConfig()
+			if err != nil {
+				return err
+			}
 			defer argocdio.Close(file)
 			repoCtxCfg, err := gitrepo.LoadRepoCfg(file)
 			if err != nil {

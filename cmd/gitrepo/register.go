@@ -52,6 +52,9 @@ func register() *cobra.Command {
 				repoOpts.Repo.Password = cli.PromptPassword(repoOpts.Repo.Password)
 			}
 			file, err := gitrepo.ReadDefaultConfig()
+			if err != nil {
+				return err
+			}
 			defer argocdio.Close(file)
 			repoCtxCfg, err := gitrepo.LoadRepoCfg(file)
 			if err != nil {
