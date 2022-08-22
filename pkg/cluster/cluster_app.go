@@ -3,6 +3,7 @@ package cluster
 import (
 	"context"
 	"fmt"
+
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
@@ -24,7 +25,7 @@ func CreateClusterApp(
 		repoUrl, repoRevision, repoPath)
 	if createInArgoCd {
 		appCreateRequest := argoapp.ApplicationCreateRequest{
-			Application: *app,
+			Application: app,
 		}
 		_, err := appIf.Create(context.Background(), &appCreateRequest)
 		if err != nil {
