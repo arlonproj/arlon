@@ -2,7 +2,6 @@ package cluster
 
 import (
 	_ "embed"
-	"errors"
 	"fmt"
 	"github.com/arlonproj/arlon/pkg/gitrepo"
 	"os"
@@ -38,14 +37,11 @@ func deployClusterCommand() *cobra.Command {
 		Long:  "deploy new cluster",
 		RunE: func(c *cobra.Command, args []string) error {
 			if repoUrl == "" {
-				repoCtx, err := gitrepo.GetAlias(repoAlias)
+				var err error
+				repoUrl, err = gitrepo.GetRepoUrl(repoAlias)
 				if err != nil {
-					if errors.Is(err, gitrepo.ErrNotFound) {
-						return err
-					}
-					return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
+					return err
 				}
-				repoUrl = repoCtx.Url
 			}
 			conn, appIf := argocd.NewArgocdClientOrDie("").NewApplicationClientOrDie()
 			defer argocdio.Close(conn)

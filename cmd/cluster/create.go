@@ -2,7 +2,6 @@ package cluster
 
 import (
 	_ "embed"
-	"errors"
 	"fmt"
 	"os"
 
@@ -40,14 +39,11 @@ func createClusterCommand() *cobra.Command {
 		Long:  "create new cluster from a base",
 		RunE: func(c *cobra.Command, args []string) error {
 			if clusterRepoUrl == "" {
-				repoCtx, err := gitrepo.GetAlias(repoAlias)
+				var err error
+				clusterRepoUrl, err = gitrepo.GetRepoUrl(repoAlias)
 				if err != nil {
-					if errors.Is(err, gitrepo.ErrNotFound) {
-						return err
-					}
-					return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
+					return err
 				}
-				clusterRepoUrl = repoCtx.Url
 			}
 			conn, appIf := argocd.NewArgocdClientOrDie("").NewApplicationClientOrDie()
 			defer conn.Close()

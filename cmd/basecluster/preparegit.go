@@ -1,7 +1,6 @@
 package basecluster
 
 import (
-	"errors"
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	bcl "github.com/arlonproj/arlon/pkg/basecluster"
@@ -23,14 +22,11 @@ func prepareGitBaseClusterCommand() *cobra.Command {
 		Long:  "prepare base cluster directory in git",
 		RunE: func(c *cobra.Command, args []string) error {
 			if repoUrl == "" {
-				repoCtx, err := gitrepo.GetAlias(repoAlias)
+				var err error
+				repoUrl, err = gitrepo.GetRepoUrl(repoAlias)
 				if err != nil {
-					if errors.Is(err, gitrepo.ErrNotFound) {
-						return err
-					}
-					return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
+					return err
 				}
-				repoUrl = repoCtx.Url
 			}
 			config, err := clientConfig.ClientConfig()
 			if err != nil {

@@ -12,7 +12,6 @@ import (
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/gitrepo"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func register() *cobra.Command {
@@ -52,21 +51,8 @@ func register() *cobra.Command {
 			if repoOpts.Repo.Username != "" && repoOpts.Repo.Password == "" {
 				repoOpts.Repo.Password = cli.PromptPassword(repoOpts.Repo.Password)
 			}
-			cfgFile, err := gitrepo.GetRepoCfgPath()
-			if err != nil {
-				return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
-			}
-			file, err := os.OpenFile(cfgFile, os.O_RDWR|os.O_CREATE, 0666)
-			if err != nil {
-				err = fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
-				return
-			}
-			defer func(f *os.File) {
-				err := f.Close()
-				if err != nil {
-					fmt.Printf("failed to close config file, error: %v\n", err)
-				}
-			}(file)
+			file, err := gitrepo.ReadDefaultConfig()
+			defer argocdio.Close(file)
 			repoCtxCfg, err := gitrepo.LoadRepoCfg(file)
 			if err != nil {
 				return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)

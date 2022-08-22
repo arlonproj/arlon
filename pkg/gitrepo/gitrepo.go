@@ -22,6 +22,7 @@ type RepoCtxCfg struct {
 
 const (
 	repoCtxFile    = "repoctx"
+	arlonCfgDir    = ".arlon"
 	RepoDefaultCtx = "default"
 )
 
@@ -31,12 +32,13 @@ var (
 	ErrOverwriteCfg = errors.New("cannot overwrite config file")
 )
 
-func GetRepoCfgPath() (string, error) {
-	cfgDir, err := localconfig.DefaultConfigDir()
+func getRepoCfgPath() (string, error) {
+	argoDir, err := localconfig.DefaultConfigDir()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(cfgDir, repoCtxFile), nil
+	cfgBase := filepath.Dir(argoDir)
+	return filepath.Join(cfgBase, arlonCfgDir, repoCtxFile), nil
 }
 
 func LoadRepoCfg(reader io.Reader) (RepoCtxCfg, error) {
@@ -78,11 +80,7 @@ func StoreRepoCfg(writer io.Writer, data []byte) error {
 	return err
 }
 
-func GetAlias(repoAlias string) (*RepoCtx, error) {
-	cfgPath, err := GetRepoCfgPath()
-	if err != nil {
-		return nil, err
-	}
+func getAlias(repoAlias, cfgPath string) (*RepoCtx, error) {
 	cfgFile, err := os.OpenFile(cfgPath, os.O_RDONLY, 0666)
 	if err != nil {
 		return nil, err
@@ -108,4 +106,38 @@ func GetAlias(repoAlias string) (*RepoCtx, error) {
 		return &repo, nil
 	}
 	return nil, ErrNotFound
+}
+
+func GetRepoUrl(repoAlias string) (string, error) {
+	cfgPath, err := getRepoCfgPath()
+	if err != nil {
+		return "", err
+	}
+	repoCtx, err := getAlias(repoAlias, cfgPath)
+	if err != nil {
+		if !errors.Is(err, ErrNotFound) {
+			return "", fmt.Errorf("%v: %w", ErrNotFound, err)
+		}
+		return "", err
+	}
+	return repoCtx.Url, nil
+}
+
+func ReadDefaultConfig() (*os.File, error) {
+	cfgFile, err := getRepoCfgPath()
+	if err != nil {
+		return nil, err
+	}
+	if _, err := os.Stat(cfgFile); err != nil {
+		err := os.MkdirAll(filepath.Dir(cfgFile), os.ModePerm)
+		if err != nil {
+			return nil, err
+		}
+	}
+	file, err := os.OpenFile(cfgFile, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		err = fmt.Errorf("%v: %w", ErrLoadCfgFile, err)
+		return nil, err
+	}
+	return file, nil
 }

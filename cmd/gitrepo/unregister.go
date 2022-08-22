@@ -3,9 +3,9 @@ package gitrepo
 import (
 	"encoding/json"
 	"fmt"
+	argocdio "github.com/argoproj/argo-cd/v2/util/io"
 	"github.com/arlonproj/arlon/pkg/gitrepo"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func unregister() *cobra.Command {
@@ -19,20 +19,8 @@ func unregister() *cobra.Command {
 		Long:  "unregister a previously registered configuration",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			repoAlias = args[0]
-			cfgFile, err := gitrepo.GetRepoCfgPath()
-			if err != nil {
-				return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
-			}
-			file, err := os.OpenFile(cfgFile, os.O_RDWR|os.O_CREATE, 0666)
-			if err != nil {
-				return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
-			}
-			defer func(f *os.File) {
-				err := f.Close()
-				if err != nil {
-					fmt.Printf("failed to close config file, error: %v\n", err)
-				}
-			}(file)
+			file, err := gitrepo.ReadDefaultConfig()
+			defer argocdio.Close(file)
 			repoCtxCfg, err := gitrepo.LoadRepoCfg(file)
 			if err != nil {
 				return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)

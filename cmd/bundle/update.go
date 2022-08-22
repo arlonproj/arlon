@@ -1,7 +1,6 @@
 package bundle
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/argoproj/argo-cd/v2/util/cli"
@@ -28,14 +27,11 @@ func updateBundleCommand() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			if fromFile == "" && repoUrl == "" && repoAlias != "" {
-				repoCtx, err := gitrepo.GetAlias(repoAlias)
+				var err error
+				repoUrl, err = gitrepo.GetRepoUrl(repoAlias)
 				if err != nil {
-					if errors.Is(err, gitrepo.ErrNotFound) {
-						return err
-					}
-					return fmt.Errorf("%v: %w", gitrepo.ErrLoadCfgFile, err)
+					return err
 				}
-				repoUrl = repoCtx.Url
 			}
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
