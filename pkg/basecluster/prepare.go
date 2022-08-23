@@ -11,9 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/cli-runtime/pkg/resource"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
-	restclient "k8s.io/client-go/rest"
 	"os"
 	"path"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
@@ -96,18 +94,12 @@ type KustomizationTemplateParams struct {
 }
 
 func PrepareGitDir(
-	config *restclient.Config,
-	argocdNs string,
+	creds *argocd.RepoCreds,
 	repoUrl string,
 	repoRevision string,
 	repoPath string,
 ) (clusterName string, changed bool, err error) {
-	kubeClient, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return "", false, fmt.Errorf("failed to get kubernetes client: %s", err)
-	}
-	repo, tmpDir, auth, err := argocd.CloneRepo(kubeClient, argocdNs,
-		repoUrl, repoRevision)
+	repo, tmpDir, auth, err := argocd.CloneRepo(creds, repoUrl, repoRevision)
 	defer os.RemoveAll(tmpDir)
 	if err != nil {
 		return "", false, fmt.Errorf("failed to clone repo: %s", err)

@@ -51,8 +51,12 @@ func createClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
+			_, creds, err := argocd.GetKubeclientAndRepoCreds(config, argocdNs, clusterRepoUrl)
+			if err != nil {
+				return fmt.Errorf("failed to get repository credentials: %s", err)
+			}
 			createInArgoCd := !outputYaml
-			baseClusterName, err := bcl.ValidateGitDir(config, argocdNs,
+			baseClusterName, err := bcl.ValidateGitDir(creds,
 				clusterRepoUrl, clusterRepoRevision, clusterRepoPath)
 			if err != nil {
 				return fmt.Errorf("failed to validate base cluster: %s", err)

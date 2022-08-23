@@ -8,6 +8,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"os"
 	"strings"
 )
@@ -20,17 +21,12 @@ type RepoCreds struct {
 
 // -----------------------------------------------------------------------------
 
-// Clones a git repo registered with argocd into a local repository
+// CloneRepo clones a git repo registered with argocd into a local repository
 func CloneRepo(
-	kubeClient *kubernetes.Clientset,
-	argocdNs string,
+	creds *RepoCreds,
 	repoUrl string,
 	repoBranch string,
 ) (repo *gogit.Repository, tmpDir string, auth *http.BasicAuth, err error) {
-	creds, err := getRepoCreds(kubeClient, argocdNs, repoUrl)
-	if err != nil {
-		return nil, "", nil, fmt.Errorf("failed to get repository credentials: %s", err)
-	}
 	auth = &http.BasicAuth{
 		Username: creds.Username,
 		Password: creds.Password,
@@ -56,7 +52,30 @@ func CloneRepo(
 
 // -----------------------------------------------------------------------------
 
-func getRepoCreds(
+func GetKubeclientAndRepoCreds(
+	config *rest.Config,
+	argocdNs string,
+	repoUrl string,
+) (
+	kubeClient *kubernetes.Clientset,
+	creds *RepoCreds,
+	err error,
+) {
+	kubeClient, err = kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get kubernetes client: %s", err)
+	}
+	creds, err = GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoUrl)
+	if err != nil {
+		return nil, nil,
+			fmt.Errorf("failed to get repository credentials from argocd: %s", err)
+	}
+	return
+}
+
+// -----------------------------------------------------------------------------
+
+func GetRepoCredsFromArgoCd(
 	kubeClient *kubernetes.Clientset,
 	argocdNs string,
 	repoUrl string,

@@ -10,7 +10,6 @@ import (
 	"github.com/arlonproj/arlon/pkg/gitutils"
 	"github.com/arlonproj/arlon/pkg/log"
 	gogit "github.com/go-git/go-git/v5"
-	"k8s.io/client-go/kubernetes"
 	"path"
 )
 
@@ -18,22 +17,16 @@ import (
 var content embed.FS
 
 func createInGit(
-	kubeClient *kubernetes.Clientset,
+	creds *argocd.RepoCreds,
 	profile *arlonv1.Profile,
-	argocdNs string,
 	arlonNs string,
+	bundles []bundle.Bundle,
 ) error {
 	log := log.GetLogger()
-	corev1 := kubeClient.CoreV1()
-	bundles, err := bundle.GetBundlesFromProfile(profile, corev1, arlonNs)
-	if err != nil {
-		return fmt.Errorf("failed to get bundles: %s", err)
-	}
 	repoUrl := profile.Spec.RepoUrl
 	repoPath := profile.Spec.RepoPath
 	repoRevision := profile.Spec.RepoRevision
-	repo, tmpDir, auth, err := argocd.CloneRepo(kubeClient, argocdNs,
-		repoUrl, repoRevision)
+	repo, tmpDir, auth, err := argocd.CloneRepo(creds, repoUrl, repoRevision)
 	if err != nil {
 		return fmt.Errorf("failed to clone repo: %s", err)
 	}

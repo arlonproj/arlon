@@ -3,6 +3,7 @@ package basecluster
 import (
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/util/cli"
+	"github.com/arlonproj/arlon/pkg/argocd"
 	bcl "github.com/arlonproj/arlon/pkg/basecluster"
 	"github.com/arlonproj/arlon/pkg/gitrepo"
 	"github.com/spf13/cobra"
@@ -32,8 +33,11 @@ func validateGitBaseClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
-			clusterName, err := bcl.ValidateGitDir(config, argocdNs, repoUrl,
-				repoRevision, repoPath)
+			_, creds, err := argocd.GetKubeclientAndRepoCreds(config, argocdNs, repoUrl)
+			if err != nil {
+				return fmt.Errorf("failed to get repository credentials: %s", err)
+			}
+			clusterName, err := bcl.ValidateGitDir(creds, repoUrl, repoRevision, repoPath)
 			if err != nil {
 				return err
 			}

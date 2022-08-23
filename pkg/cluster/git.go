@@ -10,8 +10,6 @@ import (
 	logpkg "github.com/arlonproj/arlon/pkg/log"
 	"github.com/arlonproj/arlon/pkg/profile"
 	gogit "github.com/go-git/go-git/v5"
-	"k8s.io/client-go/kubernetes"
-	restclient "k8s.io/client-go/rest"
 	"path"
 	"text/template"
 )
@@ -22,9 +20,9 @@ var content embed.FS
 // -----------------------------------------------------------------------------
 
 func DeployToGit(
-	config *restclient.Config,
+	creds *argocd.RepoCreds,
 	argocdNs string,
-	arlonNs string,
+	bundles []bundle.Bundle,
 	clusterName string,
 	repoUrl string,
 	repoBranch string,
@@ -32,17 +30,7 @@ func DeployToGit(
 	prof *arlonv1.Profile,
 ) error {
 	log := logpkg.GetLogger()
-	kubeClient, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return fmt.Errorf("failed to get kubernetes client: %s", err)
-	}
-	corev1 := kubeClient.CoreV1()
-	bundles, err := bundle.GetBundlesFromProfile(prof, corev1, arlonNs)
-	if err != nil {
-		return fmt.Errorf("failed to get bundles: %s", err)
-	}
-	repo, tmpDir, auth, err := argocd.CloneRepo(kubeClient, argocdNs,
-		repoUrl, repoBranch)
+	repo, tmpDir, auth, err := argocd.CloneRepo(creds, repoUrl, repoBranch)
 	if err != nil {
 		return fmt.Errorf("failed to clone repo: %s", err)
 	}

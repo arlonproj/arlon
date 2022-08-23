@@ -3,14 +3,14 @@ package profile
 import (
 	"context"
 	"fmt"
-	"path"
-
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
+	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/controller"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
+	"path"
 )
 
 func Create(
@@ -70,7 +70,16 @@ func Create(
 		if err != nil {
 			return fmt.Errorf("failed to get kubernetes client: %s", err)
 		}
-		err = createInGit(kubeClient, &p, argocdNs, arlonNs)
+		corev1 := kubeClient.CoreV1()
+		bundles, err := bundle.GetBundlesFromProfile(&p, corev1, arlonNs)
+		if err != nil {
+			return fmt.Errorf("failed to get bundles: %s", err)
+		}
+		creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoUrl)
+		if err != nil {
+			return fmt.Errorf("failed to get repository credentials: %s", err)
+		}
+		err = createInGit(creds, &p, argocdNs, bundles)
 		if err != nil {
 			return fmt.Errorf("failed to create dynamic profile in git: %s", err)
 		}

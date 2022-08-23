@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
+	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/controller"
-	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 )
 
@@ -90,11 +90,16 @@ func Update(
 	}
 	if prof.Spec.RepoUrl != "" {
 		// Dynamic profile needs updating in git
-		kubeClient, err := kubernetes.NewForConfig(config)
+		kubeClient, creds, err := argocd.GetKubeclientAndRepoCreds(config, argocdNs, prof.Spec.RepoUrl)
 		if err != nil {
-			return false, fmt.Errorf("failed to get kube client: %s", err)
+			return false, fmt.Errorf("failed to get kubeclient and repository credentials: %s", err)
 		}
-		err = createInGit(kubeClient, &prof.Profile, argocdNs, arlonNs)
+		corev1 := kubeClient.CoreV1()
+		bndl, err := bundle.GetBundlesFromProfile(&prof.Profile, corev1, arlonNs)
+		if err != nil {
+			return false, fmt.Errorf("failed to get bundles: %s", err)
+		}
+		err = createInGit(creds, &prof.Profile, argocdNs, bndl)
 		if err != nil {
 			return false, fmt.Errorf("failed to update dynamic profile in git: %s", err)
 		}

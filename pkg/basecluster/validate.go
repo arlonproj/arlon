@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"k8s.io/cli-runtime/pkg/resource"
-	"k8s.io/client-go/kubernetes"
-	restclient "k8s.io/client-go/rest"
 	"os"
 	"path"
 )
@@ -44,22 +42,16 @@ func Validate(fileName string) (clusterName string, err error) {
 // -----------------------------------------------------------------------------
 
 func ValidateGitDir(
-	config *restclient.Config,
-	argocdNs string,
+	creds *argocd.RepoCreds,
 	repoUrl string,
 	repoRevision string,
 	repoPath string,
 ) (clusterName string, err error) {
-	kubeClient, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return "", fmt.Errorf("failed to get kubernetes client: %s", err)
-	}
-	repo, tmpDir, _, err := argocd.CloneRepo(kubeClient, argocdNs,
-		repoUrl, repoRevision)
-	defer os.RemoveAll(tmpDir)
+	repo, tmpDir, _, err := argocd.CloneRepo(creds, repoUrl, repoRevision)
 	if err != nil {
 		return "", fmt.Errorf("failed to clone repo: %s", err)
 	}
+	defer os.RemoveAll(tmpDir)
 	wt, err := repo.Worktree()
 	if err != nil {
 		return "", fmt.Errorf("failed to get repo worktree: %s", err)

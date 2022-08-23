@@ -5,6 +5,8 @@ import (
 	"fmt"
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
+	"github.com/arlonproj/arlon/pkg/argocd"
+	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/clusterspec"
 	"github.com/arlonproj/arlon/pkg/common"
 	"github.com/arlonproj/arlon/pkg/profile"
@@ -96,7 +98,15 @@ func Update(
 		oldApp.Spec.Source.Path != rootApp.Spec.Source.Path {
 		return nil, fmt.Errorf("git repo reference cannot change")
 	}
-	err = DeployToGit(config, argocdNs, arlonNs, clusterName,
+	bundles, err := bundle.GetBundlesFromProfile(prof, corev1, arlonNs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get bundles: %s", err)
+	}
+	creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoUrl)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get repository credentials: %s", err)
+	}
+	err = DeployToGit(creds, argocdNs, bundles, clusterName,
 		repoUrl, repoBranch, basePath, prof)
 	if err != nil {
 		return nil, fmt.Errorf("failed to deploy git tree: %s", err)
