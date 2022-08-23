@@ -327,11 +327,11 @@ dynamic bundle from it:
 ```
 cd ${WORKSPACE_REPO}
 mkdir -p bundles/calico
-curl https://docs.projectcalico.org/v3.21/manifests/calico.yaml -O > bundles/calico/calico.yaml
+curl https://docs.projectcalico.org/v3.21/manifests/calico.yaml -o bundles/calico/calico.yaml
 git add bundles/calico
 git commit -m "add calico"
 git push origin main
-arlon bundle create calico --tags networking,cni --desc "Calico CNI" --repo-url https://github.com/argoproj/argocd-example-apps.git --repo-path bundles/guestbook
+arlon bundle create calico --tags networking,cni --desc "Calico CNI" --repo-url ${WORKSPACE_REPO_URL} --repo-path bundles/calico
 ```
 
 List your bundles to verify they were correctly entered:
