@@ -3,6 +3,7 @@ package profile
 import (
 	"fmt"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
+	"github.com/arlonproj/arlon/pkg/gitrepo"
 	"github.com/arlonproj/arlon/pkg/profile"
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/tools/clientcmd"
@@ -19,6 +20,8 @@ func createProfileCommand() *cobra.Command {
 	var bundles []string
 	var tags string
 	var repoUrl string
+	var isStatic bool
+	var repoAlias string
 	var repoBasePath string
 	var repoBranch string
 	var overrides []string
@@ -28,6 +31,13 @@ func createProfileCommand() *cobra.Command {
 		Long:  "Create profile",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
+			if repoUrl == "" && !isStatic {
+				var err error
+				repoUrl, err = gitrepo.GetRepoUrl(repoAlias)
+				if err != nil {
+					return err
+				}
+			}
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
@@ -47,9 +57,12 @@ func createProfileCommand() *cobra.Command {
 	command.Flags().StringSliceVar(&bundles, "bundles", nil, "comma separated list of bundles")
 	command.Flags().StringVar(&tags, "tags", "", "comma separated list of tags")
 	command.Flags().StringVar(&repoUrl, "repo-url", "", "create a dynamic profile and store in specified git repository")
+	command.Flags().BoolVar(&isStatic, "static", false, "indicates if the profile is static")
+	command.Flags().StringVar(&repoAlias, "repo-alias", gitrepo.RepoDefaultCtx, "the git repository alias to use")
 	command.Flags().StringVar(&repoBasePath, "repo-base-path", "profiles", "optional git base path for dynamic profile. The profile directory will be created under this.")
 	command.Flags().StringVar(&repoBranch, "repo-branch", "main", "optional git branch for dynamic profile (requires --repo-url)")
 	command.Flags().StringArrayVarP(&overrides, "param", "p", nil, "a single parameter override of the form bundle,key,value ... can be repeated")
+	command.MarkFlagsMutuallyExclusive("static", "repo-url", "repo-alias")
 	command.MarkFlagRequired("bundles")
 	return command
 }

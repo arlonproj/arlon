@@ -15,8 +15,8 @@ limitations under the License.
 */
 
 // Package v1 contains API Schema definitions for the arlo v1 API group
-//+kubebuilder:object:generate=true
-//+groupName=core.arlon.io
+// +kubebuilder:object:generate=true
+// +groupName=core.arlon.io
 package v1
 
 import (

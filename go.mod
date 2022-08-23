@@ -22,6 +22,7 @@ require (
 )
 
 require (
+	github.com/stretchr/testify v1.7.0
 	gotest.tools v2.2.0+incompatible
 	k8s.io/cli-runtime v0.22.12
 	sigs.k8s.io/kustomize/kyaml v0.11.0
@@ -127,7 +128,6 @@ require (
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/vmihailenco/go-tinylfu v0.2.1 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.4 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
