@@ -22,7 +22,7 @@ require (
 )
 
 require (
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.8.0
 	gotest.tools v2.2.0+incompatible
 	k8s.io/cli-runtime v0.22.12
 	sigs.k8s.io/kustomize/kyaml v0.11.0
