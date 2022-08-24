@@ -3,6 +3,7 @@
 #                     Default
 # GIT_SERVER_PORT     8188
 # GIT_ROOT            Create new directory under /tmp
+# GIT_CLONE_ROOT      Create new directory under /tmp
 # ARGOCD_GIT_TAG      release-2.4
 # ARGOCD_CONFIG_FILE  Create new one under /tmp
 
@@ -83,6 +84,36 @@ if ! docker inspect ${gitserver_cntr_name} &> /dev/null ; then
 else
     echo git server container already running
 fi
+
+git_clone_root=${GIT_CLONE_ROOT}
+if [ -z "${git_clone_root}" ]; then
+    git_clone_root=$(mktemp -d /tmp/arlon-testbed-gitclone.XXXXX)
+fi
+echo git clone root: ${git_clone_root}
+
+git_url=http://${bridge_addr}:${git_server_port}/myrepo.git
+
+git_clone_dir=${git_clone_root}/myrepo
+if [ ! -d "${git_clone_dir}" ]; then
+    echo cloning git repo
+    pushd ${git_clone_root}
+    git clone ${git_url}
+    popd
+else
+    echo git repo already cloned
+fi
+
+pushd ${git_clone_dir}
+if ! test -f README.md ; then
+    echo adding README.md and creating main branch
+    echo hello > README.md
+    git add README.md
+    git commit -m "add README.md"
+    git push origin HEAD:main
+else
+    echo README.md already present
+fi
+popd
 
 tb_cntr_name='kind-arlon-testbed'
 
