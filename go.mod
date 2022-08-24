@@ -1,6 +1,6 @@
 module github.com/arlonproj/arlon
 
-go 1.17
+go 1.18
 
 require (
 	github.com/argoproj/argo-cd/v2 v2.4.11
