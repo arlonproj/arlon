@@ -673,6 +673,8 @@ Gen2 clusters are powerful because the base cluster can be arbitrarily complex a
 new and still evolving, gen2 clusters have several known limitations relative to gen1.
 * You cannot customize/override any property of the base cluster on the fly when creating a workload cluster,
   which is an exact clone of the base cluster except for the names of its resources and their namespace.
+  The work-around is to make a copy of the base cluster directory, push the new directory, make
+  the desired changes, commit & push the changes, and register the directory as a new base cluster.
 * If you modify and commit a change to one or more properties of the base cluster that the underlying Cluster API provider deems as "immutable", new
   workload clusters created from the base cluster will have the modified propert(ies), but ArgoCD will flag existing clusters as OutOfSync, since
   the provider will continually reject attempts to apply the new property values. The existing clusters continue to function, despite appearing unhealthy
