@@ -177,7 +177,7 @@ require (
 )
 
 replace (
-	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
+	
 	github.com/emicklei/go-restful/v3 => github.com/emicklei/go-restful/v3 v3.9.0
 	k8s.io/api => k8s.io/api v0.23.10
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.23.10
