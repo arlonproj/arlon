@@ -680,6 +680,13 @@ new and still evolving, gen2 clusters have several known limitations relative to
   the provider will continually reject attempts to apply the new property values. The existing clusters continue to function, despite appearing unhealthy
   in the ArgoCD UI and CLI outputs.
 
+Examples of mutable properties in Cluster API resources:
+- Number of replicas (modification will result in a scale-up / down)
+- Kubernetes version (modification will result in an upgrade)
+
+Examples of immutable properties:
+- Most fields of AWSMachineTemplate (instance type, labels, etc...)
+ 
 ## For more information
 
 For more details on gen2 clusters, refer to the [design document](docs/baseclusters.md).
