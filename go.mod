@@ -3,7 +3,7 @@ module github.com/arlonproj/arlon
 go 1.17
 
 require (
-	github.com/argoproj/argo-cd/v2 v2.4.10 //v2.3.7
+	github.com/argoproj/argo-cd/v2 v2.4.11
 	github.com/aws/aws-sdk-go v1.44.81
 	github.com/deckarep/golang-set v1.8.0
 	github.com/go-git/go-billy/v5 v5.3.1
@@ -44,7 +44,7 @@ require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
-	github.com/argoproj/gitops-engine v0.7.1 // indirect
+	github.com/argoproj/gitops-engine v0.7.3 // indirect
 	github.com/argoproj/pkg v0.11.1-0.20211203175135-36c59d8fafe0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
