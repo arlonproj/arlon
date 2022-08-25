@@ -3,18 +3,21 @@ package clusterspec
 import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
+	"sort"
 )
 
 const (
-	aws   = "aws"
-	gcp   = "gcp"
-	azure = "azure"
+	aws    = "aws"
+	gcp    = "gcp"
+	azure  = "azure"
+	capi   = "capi"
+	xplane = "xplane"
 )
 
 var (
 	ValidApiProviders = map[string]bool{
-		"capi":   true,
-		"xplane": true,
+		capi:   true,
+		xplane: true,
 	}
 	ValidCloudProviders = map[string]bool{
 		aws:   true,
@@ -68,10 +71,22 @@ var (
 	}
 )
 
+var (
+	ErrInvalidAPIProvider = fmt.Errorf("invalid api provider, the valid values are: %s",
+		ValidValues(ValidApiProviders))
+	ErrInvalidCloudProvider = fmt.Errorf("invalid cloud provider, the valid values are: %s",
+		ValidValues(ValidCloudProviders))
+)
+
 func ValidValues(vals map[string]bool) string {
+	var allKeys []string
+	for key, _ := range vals {
+		allKeys = append(allKeys, key)
+	}
+	sort.Strings(allKeys)
 	var ret string
 	var i int
-	for val, _ := range vals {
+	for _, val := range allKeys {
 		var sep string
 		if i > 0 {
 			sep = "|"
@@ -84,16 +99,14 @@ func ValidValues(vals map[string]bool) string {
 
 func ValidApiProvider(apiProvider string) error {
 	if !ValidApiProviders[apiProvider] {
-		return fmt.Errorf("invalid api provider, the valid values are: %s",
-			ValidValues(ValidApiProviders))
+		return ErrInvalidAPIProvider
 	}
 	return nil
 }
 
 func ValidCloudProviderAndClusterType(cloudProvider string, clusterType string) error {
 	if !ValidCloudProviders[cloudProvider] {
-		return fmt.Errorf("invalid cloud provider, the valid values are: %s",
-			ValidValues(ValidCloudProviders))
+		return ErrInvalidCloudProvider
 	}
 	if !ValidClusterTypesByCloud[cloudProvider][clusterType] {
 		return fmt.Errorf("invalid cluster type, the valid values are: %s",
