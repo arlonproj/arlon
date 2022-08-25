@@ -1,11 +1,12 @@
 # Optional environment variables
 #
-#                     Default
-# GIT_SERVER_PORT     8188
-# GIT_ROOT            Create new directory under /tmp
-# GIT_CLONE_ROOT      Create new directory under /tmp
-# ARGOCD_GIT_TAG      release-2.4
-# ARGOCD_CONFIG_FILE  Create new one under /tmp
+#                         Default
+# GIT_SERVER_PORT         8188
+# GIT_ROOT                Create new directory under /tmp
+# GIT_CLONE_ROOT          Create new directory under /tmp
+# ARGOCD_GIT_TAG          release-2.4
+# ARGOCD_CONFIG_FILE      Create new one under /tmp
+# ARGGOCD_FORWARDING_PORT 8189
 
 set -e
 set -o pipefail
@@ -146,6 +147,19 @@ if [ -z "${argocd_git_tag}" ]; then
     argocd_git_tag="release-2.4"
 fi
 echo applying argocd manifest from git tag: ${argocd_git_tag}
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/${argocd_git_tag}/manifests/install.yaml
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/${argocd_git_tag}/manifests/install.yaml > /dev/null
+
+if pkill -f "kubectl port-forward svc/argocd-server" ; then
+    echo terminated previous port forwarding session
+fi
+
+argocd_forwarding_port=${ARGGOCD_FORWARDING_PORT}
+if [ -z "${argocd_forwarding_port}" ]; then
+    argocd_forwarding_port=8189
+fi
+
+kubectl port-forward svc/argocd-server -n argocd ${argocd_forwarding_port}:443 &>/dev/null &
+pwd=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo)
+argocd login localhost:${argocd_forwarding_port} --username admin --password ${pwd} --insecure
 
 echo --- All done ---
