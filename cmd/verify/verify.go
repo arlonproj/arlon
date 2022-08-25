@@ -15,16 +15,17 @@ import (
 )
 
 var (
-	ErrKubectlInstall  = errors.New("kubectl is not installed or missing in your $PATH")
-	ErrKubectlSet      = errors.New("error setting kubeconfig")
-	ErrKcPermission    = errors.New("set the kubeconfig or kubeconfig does not have required access")
-	ErrArgoCD          = errors.New("argocd is not installed or missing in your $PATH")
-	ErrArgoCDAuthToken = errors.New("argocd auth token has expired, login to argocd again")
-	ErrGit             = errors.New("git is not installed or missing in your $PATH")
-	ErrArlonNs         = errors.New("arlon is not installed or missing in your $PATH")
-	ErrCapi            = errors.New("capi services are not installed or missing in your $PATH")
-	ErrCapiCP          = errors.New("error fetching the capi cloudproviders")
-	ErrNs              = errors.New("failed to get the namespace")
+	ErrKubectlInstall        = errors.New("kubectl is not installed or missing in your $PATH")
+	ErrKubeConfigPathMissing = errors.New("kubeconfigPath parameter should be passed to verify kubeconfig access")
+	ErrKubectlSet            = errors.New("error setting kubeconfig")
+	ErrKcPermission          = errors.New("set the kubeconfig or kubeconfig does not have required access")
+	ErrArgoCD                = errors.New("argocd is not installed or missing in your $PATH")
+	ErrArgoCDAuthToken       = errors.New("argocd auth token has expired, login to argocd again")
+	ErrGit                   = errors.New("git is not installed or missing in your $PATH")
+	ErrArlonNs               = errors.New("arlon is not installed or missing in your $PATH")
+	ErrCapi                  = errors.New("capi services are not installed or missing in your $PATH")
+	ErrCapiCP                = errors.New("error fetching the capi cloudproviders")
+	ErrNs                    = errors.New("failed to get the namespace")
 )
 
 func NewCommand() *cobra.Command {
@@ -112,6 +113,10 @@ func verifyKubectl(kubeconfigPath string) (bool, error) {
 	_, err := exec.LookPath("kubectl")
 	if err != nil {
 		return false, ErrKubectlInstall
+	}
+
+	if len(kubeconfigPath) == 0 {
+		return false, ErrKubeConfigPathMissing
 	}
 
 	//Check if kubeconfig is correct and kubectl commands are functional
