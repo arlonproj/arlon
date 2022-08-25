@@ -33,7 +33,7 @@ func TestIsValidK8sName(t *testing.T) {
 		},
 		{
 			Name:     "gdrjnk+(gd",
-			Desc:     "LongName",
+			Desc:     "InvalidChars",
 			Expected: false,
 		},
 	}
