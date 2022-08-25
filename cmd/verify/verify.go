@@ -15,89 +15,96 @@ import (
 )
 
 var (
-	ErrKubectlInstall    = errors.New("kubectl is not installed or missing in your $PATH")
-	ErrKubectlSet        = errors.New("error setting kubeconfig")
-	ErrClusterInfo       = errors.New("set the kubeconfig or kubeconfig does not have required access")
-	ErrArgoCD            = errors.New("argocd is not installed or missing in your $PATH")
-	ErrArgoCDAuthToken   = errors.New("argocd auth token has expired, login to argocd again")
-	ErrGit               = errors.New("git is not installed or missing in your $PATH")
-	ErrArlonNs           = errors.New("arlon is not installed or missing in your $PATH")
-	ErrCapi              = errors.New("capi services are not installed or missing in your $PATH")
-	ErrCapiCP            = errors.New("error fetching the capi cloudproviders")
-	ErrNs                = errors.New("failed to get the namespace")
-	ErrListNs            = errors.New("error listing namespaces")
-	ErrKubeconfigMissing = errors.New("enter kubeconfig using arlon verify --kubeconfigPath")
+	ErrKubectlInstall  = errors.New("kubectl is not installed or missing in your $PATH")
+	ErrKubectlSet      = errors.New("error setting kubeconfig")
+	ErrKcPermission    = errors.New("set the kubeconfig or kubeconfig does not have required access")
+	ErrArgoCD          = errors.New("argocd is not installed or missing in your $PATH")
+	ErrArgoCDAuthToken = errors.New("argocd auth token has expired, login to argocd again")
+	ErrGit             = errors.New("git is not installed or missing in your $PATH")
+	ErrArlonNs         = errors.New("arlon is not installed or missing in your $PATH")
+	ErrCapi            = errors.New("capi services are not installed or missing in your $PATH")
+	ErrCapiCP          = errors.New("error fetching the capi cloudproviders")
+	ErrNs              = errors.New("failed to get the namespace")
 )
 
 func NewCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
 	var kubeconfigPath string
-	command := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "verify",
 		Short:             "Verify if arlon cli can run",
 		Long:              "Verify if required kubectl,argocd,git access is present before profiles and bundles are created",
 		DisableAutoGenTag: true,
 		Example:           "arlonctl verify --kubeconfigPath",
 		RunE: func(c *cobra.Command, args []string) error {
-			config, err := clientConfig.ClientConfig()
+			err := verify(clientConfig, kubeconfigPath)
 			if err != nil {
-				return fmt.Errorf("failed to get k8s client config")
-			}
-
-			// Verify kubectl status
-			kubectlStatus, err := verifyKubectl(kubeconfigPath)
-			if err != nil {
-				fmt.Println("Error while verifying kubectl status: ", err)
-			} else {
-				fmt.Println("Successfully verified kubectl status")
-			}
-
-			// Verify argocd status
-			argoStatus, err := verifyArgoCD()
-			if err != nil {
-				fmt.Println("Error while verifying argocd status: ", err)
-			} else {
-				fmt.Println("Successfully verified argocd status")
-			}
-
-			// Verify git status
-			gitStatus, err := verifyGit()
-			if err != nil {
-				fmt.Println("Error while verifying git status: ", err)
-			} else {
-				fmt.Println("Successfully verified git status")
-			}
-
-			// Verify capi status
-			capiStatus, err := verifyCapi(config)
-			if err == ErrCapiCP {
-				fmt.Println("Error while verifying capi cloudprovider status: ", err)
-			} else if err == ErrCapi {
-				fmt.Println("Error while verifying capi services status ", err)
-			} else {
-				fmt.Println("Successfully verified capi status")
-			}
-
-			// Verify arlon status
-			arlonStatus, err := verifyArlon(config)
-			if err != nil {
-				fmt.Println("Error while verifying arlon status: ", err)
-			} else {
-				fmt.Println("Successfully verified arlon status")
-			}
-
-			fmt.Println()
-			if kubectlStatus && argoStatus && gitStatus && arlonStatus && capiStatus {
-				fmt.Println("All requirements are installed")
-			} else {
-				fmt.Println("The check for Arlon prerequisites failed. Please install the missing tool(s).")
+				return err
 			}
 			return nil
 		},
 	}
-	clientConfig = cli.AddKubectlFlagsToCmd(command)
-	command.Flags().StringVar(&kubeconfigPath, "kubeconfigPath", "kubeconfig", "kubeconfig file location")
-	return command
+	clientConfig = cli.AddKubectlFlagsToCmd(cmd)
+	cmd.Flags().StringVar(&kubeconfigPath, "kubeconfigPath", "", "kubeconfig file location")
+	return cmd
+}
+
+func verify(clientConfig clientcmd.ClientConfig, kubeconfigPath string) error {
+	var err error
+	config, err := clientConfig.ClientConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get k8s client config")
+	}
+
+	// Verify kubectl status
+	kubectlStatus, err := verifyKubectl(kubeconfigPath)
+	if err != nil {
+		fmt.Println("Error while verifying kubectl status: ", err)
+	} else {
+		fmt.Println("Successfully verified kubectl status")
+	}
+
+	// Verify argocd status
+	argoStatus, err := verifyArgoCD()
+	if err != nil {
+		fmt.Println("Error while verifying argocd status: ", err)
+	} else {
+		fmt.Println("Successfully verified argocd status")
+	}
+
+	// Verify git status
+	gitStatus, err := verifyGit()
+	if err != nil {
+		fmt.Println("Error while verifying git status: ", err)
+	} else {
+		fmt.Println("Successfully verified git status")
+	}
+
+	// Verify capi status
+	capiStatus, err := verifyCapi(config)
+	if err == ErrCapiCP {
+		fmt.Println("Error while verifying capi cloudprovider status: ", err)
+	} else if err == ErrCapi {
+		fmt.Println("Error while verifying capi services status ", err)
+	} else {
+		fmt.Println("Successfully verified capi status")
+	}
+
+	// Verify arlon status
+	arlonStatus, err := verifyArlon(config)
+	if err != nil {
+		fmt.Println("Error while verifying arlon status: ", err)
+	} else {
+		fmt.Println("Successfully verified arlon status")
+	}
+
+	fmt.Println()
+	if kubectlStatus && argoStatus && gitStatus && arlonStatus && capiStatus {
+		fmt.Println("All requirements are installed")
+	} else {
+		fmt.Println("The check for Arlon prerequisites failed. Please install the missing tool(s).")
+	}
+	return nil
 }
 
 // Check if kubectl is installed and the kubeconfig is pointing to the correct kubeconfig
@@ -112,9 +119,9 @@ func verifyKubectl(kubeconfigPath string) (bool, error) {
 	if err != nil {
 		return false, ErrKubectlSet
 	}
-	errClusterInfo := checkNamespace(config, "kube-system")
-	if errClusterInfo != nil {
-		return false, ErrClusterInfo
+	errKcPermission := checkNamespace(config, "kube-system")
+	if errKcPermission != nil {
+		return false, ErrKcPermission
 	}
 	return true, nil
 }
@@ -147,9 +154,7 @@ func verifyGit() (bool, error) {
 // Verify if the arlon services are running
 func verifyArlon(config *restclient.Config) (bool, error) {
 	err := checkNamespace(config, "arlon")
-	if err == ErrListNs {
-		return false, ErrListNs
-	} else if err == ErrNs {
+	if err == ErrNs {
 		return false, ErrArlonNs
 	}
 	return true, nil
@@ -169,8 +174,6 @@ func verifyCapi(config *restclient.Config) (bool, error) {
 		errCapaZ := checkCapzCloudProvider(config)
 		if errCapaZ == ErrNs {
 			return false, ErrCapiCP
-		} else if errCapaZ == ErrListNs {
-			return false, ErrListNs
 		}
 	}
 
@@ -200,14 +203,9 @@ func checkCapzCloudProvider(config *restclient.Config) error {
 func checkNamespace(config *restclient.Config, namespace string) error {
 	kubeClient := kubernetes.NewForConfigOrDie(config)
 	corev1 := kubeClient.CoreV1()
-	nsList, err := corev1.Namespaces().List(context.TODO(), metav1.ListOptions{})
+	_, err := corev1.Namespaces().Get(context.TODO(), namespace, metav1.GetOptions{})
 	if err != nil {
-		return ErrListNs
+		return ErrNs
 	}
-	for _, n := range nsList.Items {
-		if n.Name == namespace {
-			return nil
-		}
-	}
-	return ErrNs
+	return nil
 }
