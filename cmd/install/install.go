@@ -35,11 +35,11 @@ func NewCommand() *cobra.Command {
 			// Install kubectl and point it to the kubeconfig
 			_, err = installKubectl()
 			if err == ErrKubectlPresent {
-				fmt.Println(Green("✓") + "kubectl is already present in the path")
+				fmt.Println(Green("✓") + " kubectl is already present in the path")
 			} else if err != nil {
 				fmt.Println(Red("x ")+"Error while installing kubectl ", err)
 			} else {
-				fmt.Println(Green("✓") + "Successfully installed kubectl")
+				fmt.Println(Green("✓") + " Successfully installed kubectl")
 			}
 
 			fmt.Println()
@@ -53,11 +53,11 @@ func NewCommand() *cobra.Command {
 			fmt.Println()
 			_, err = installArgoCD()
 			if err == ErrArgoCDPresent {
-				fmt.Println(Green("✓") + "argocd is already present in the path")
+				fmt.Println(Green("✓") + " argocd is already present in the path")
 			} else if err != nil {
 				fmt.Println(Red("x ")+"Error while installing argocd ", err)
 			} else {
-				fmt.Println(Green("✓") + "Successfully installed argocd")
+				fmt.Println(Green("✓") + " Successfully installed argocd")
 			}
 
 			return nil
@@ -162,7 +162,6 @@ func downloadKubectlLatest(osPlatform string) error {
 	}
 	_, err1 := exec.Command("curl", "-o", kubectlPath, "-LO", downloadKubectl).Output()
 	if err1 != nil {
-		fmt.Println(" → Error downloading latest stable kubectl version")
 		return err1
 	}
 	return nil
@@ -216,7 +215,6 @@ func downloadArgoCDLatest(osPlatform string) error {
 	}
 	_, err1 := exec.Command("curl", "-o", argocdPath, "-LO", downloadArgoCD).Output()
 	if err1 != nil {
-		fmt.Println(" → Error downloading stable argocd version")
 		return err1
 	}
 	return nil
