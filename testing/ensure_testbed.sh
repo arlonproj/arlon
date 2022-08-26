@@ -216,12 +216,17 @@ fi
 # Deploy arlon controller
 kubectl apply -f deploy/manifests/
 
-if ! arlon bundle list|grep guestbook-static ; then
+if ! arlon bundle list|grep guestbook-static > /dev/null ; then
     echo creating guestbook-static bundle
     arlon bundle create guestbook-static --tags applications --desc "guestbook app" --from-file examples/bundles/guestbook.yaml
 fi
 
-if ! arlon bundle list|grep guestbook-dynamic ; then
+if ! arlon bundle list|grep xenial-static > /dev/null ; then
+    echo creating xenial-static bundle
+    arlon bundle create xenial-static --tags applications --desc "xenial pod" --from-file examples/bundles/xenial.yaml
+fi
+
+if ! arlon bundle list|grep guestbook-dynamic > /dev/null ; then
     echo creating guestbook-dynamic bundle
     pushd ${workspace_repo}
     mkdir -p bundles/guestbook
@@ -231,6 +236,23 @@ if ! arlon bundle list|grep guestbook-dynamic ; then
     git push origin main
     arlon bundle create guestbook-dynamic --tags applications --desc "guestbook app (dynamic)" --repo-url ${workspace_repo_url} --repo-path bundles/guestbook
     popd
+fi
+
+if ! arlon bundle list|grep calico > /dev/null ; then
+    echo creating calico bundle
+    pushd ${workspace_repo}
+    mkdir -p bundles/calico
+    curl https://docs.projectcalico.org/v3.21/manifests/calico.yaml -o bundles/calico/calico.yaml
+    git add bundles/calico
+    git commit -m "add calico"
+    git push origin main
+    arlon bundle create calico --tags networking,cni --desc "Calico CNI" --repo-url ${workspace_repo_url} --repo-path bundles/calico
+    popd
+fi
+
+if ! arlon profile list|grep static-1 > /dev/null ; then
+    echo creating static-1 profile
+    arlon profile create static-1 --static --bundles guestbook-static,xenial-static --desc "static profile 1" --tags examples
 fi
 
 echo --- All done ---
