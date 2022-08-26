@@ -7,6 +7,7 @@ import (
 	"os/exec"
 
 	"github.com/argoproj/pkg/kube/cli"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -26,6 +27,9 @@ var (
 	ErrCapi                  = errors.New("capi services are not installed or missing in your $PATH")
 	ErrCapiCP                = errors.New("error fetching the capi cloudproviders")
 	ErrNs                    = errors.New("failed to get the namespace")
+	Yellow                   = color.New(color.FgHiYellow).SprintFunc()
+	Green                    = color.New(color.FgGreen).SprintFunc()
+	Red                      = color.New(color.FgRed).SprintFunc()
 )
 
 func NewCommand() *cobra.Command {
@@ -60,7 +64,7 @@ func verify(clientConfig clientcmd.ClientConfig, kubeconfigPath string) error {
 	// Verify kubectl status
 	kubectlStatus, err := verifyKubectl(kubeconfigPath)
 	if err != nil {
-		fmt.Println("Error while verifying kubectl status: ", err)
+		fmt.Println(Red("x ")+"Error while verifying kubectl status: ", err)
 	} else {
 		fmt.Println("Successfully verified kubectl status")
 	}
@@ -68,7 +72,7 @@ func verify(clientConfig clientcmd.ClientConfig, kubeconfigPath string) error {
 	// Verify argocd status
 	argoStatus, err := verifyArgoCD()
 	if err != nil {
-		fmt.Println("Error while verifying argocd status: ", err)
+		fmt.Println(Red("x ")+"Error while verifying argocd status: ", err)
 	} else {
 		fmt.Println("Successfully verified argocd status")
 	}
@@ -76,7 +80,7 @@ func verify(clientConfig clientcmd.ClientConfig, kubeconfigPath string) error {
 	// Verify git status
 	gitStatus, err := verifyGit()
 	if err != nil {
-		fmt.Println("Error while verifying git status: ", err)
+		fmt.Println(Red("x ")+"Error while verifying git status: ", err)
 	} else {
 		fmt.Println("Successfully verified git status")
 	}
@@ -84,9 +88,9 @@ func verify(clientConfig clientcmd.ClientConfig, kubeconfigPath string) error {
 	// Verify capi status
 	capiStatus, err := verifyCapi(config)
 	if err == ErrCapiCP {
-		fmt.Println("Error while verifying capi cloudprovider status: ", err)
+		fmt.Println(Red("x ")+"Error while verifying capi cloudprovider status: ", err)
 	} else if err == ErrCapi {
-		fmt.Println("Error while verifying capi services status ", err)
+		fmt.Println(Red("x ")+"Error while verifying capi services status ", err)
 	} else {
 		fmt.Println("Successfully verified capi status")
 	}
@@ -94,14 +98,14 @@ func verify(clientConfig clientcmd.ClientConfig, kubeconfigPath string) error {
 	// Verify arlon status
 	arlonStatus, err := verifyArlon(config)
 	if err != nil {
-		fmt.Println("Error while verifying arlon status: ", err)
+		fmt.Println(Red("x ")+"Error while verifying arlon status: ", err)
 	} else {
-		fmt.Println("Successfully verified arlon status")
+		fmt.Println("Successfully verified arlon namespace is present")
 	}
 
 	fmt.Println()
 	if kubectlStatus && argoStatus && gitStatus && arlonStatus && capiStatus {
-		fmt.Println("All requirements are installed")
+		fmt.Println(Green("✓") + " All requirements are installed")
 	} else {
 		fmt.Println("The check for Arlon prerequisites failed. Please install the missing tool(s).")
 	}
@@ -207,8 +211,7 @@ func checkCapzCloudProvider(config *restclient.Config) error {
 // Function to check for a particular namespace
 func checkNamespace(config *restclient.Config, namespace string) error {
 	kubeClient := kubernetes.NewForConfigOrDie(config)
-	corev1 := kubeClient.CoreV1()
-	_, err := corev1.Namespaces().Get(context.TODO(), namespace, metav1.GetOptions{})
+	_, err := kubeClient.CoreV1().Namespaces().Get(context.TODO(), namespace, metav1.GetOptions{})
 	if err != nil {
 		return ErrNs
 	}

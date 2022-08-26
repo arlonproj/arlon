@@ -16,6 +16,7 @@ var (
 	ErrArgoCDPresent  = errors.New("argocd is already present")
 	ErrKubectlFail    = errors.New("error installing kubectl")
 	ErrArgoCDFail     = errors.New("error installing argocd")
+	ErrCurlMissing    = errors.New("please install curl and set it in path")
 	kubectlPath       = "/usr/local/bin/kubectl"
 	argocdPath        = "/usr/local/bin/argocd"
 	Yellow            = color.New(color.FgHiYellow).SprintFunc()
@@ -71,7 +72,6 @@ func installKubectl() (bool, error) {
 	_, err := exec.LookPath("kubectl")
 	if err != nil {
 		fmt.Println(Yellow("! ") + "kubectl is not installed")
-		fmt.Println(" → Proceeding to install kubectl")
 		errInstallKubectl := installKubectlPlatform()
 		if errInstallKubectl != nil {
 			return false, ErrKubectlFail
@@ -96,7 +96,6 @@ func installArgoCD() (bool, error) {
 	_, err := exec.LookPath("argocd")
 	if err != nil {
 		fmt.Println(Yellow("! ") + "argocd cli is not installed")
-		fmt.Println(" → Proceeding to install argocd")
 		errInstallArgocd := installArgoCDPlatform()
 		if errInstallArgocd != nil {
 			fmt.Println(" → Error installing argocd")
@@ -119,6 +118,7 @@ func installKubectlPlatform() error {
 		err = downloadKubectlLatest(osPlatform)
 		if err != nil {
 			fmt.Println(" → Error installing the latest kubectl version")
+			return err
 		}
 		_, err = exec.Command("chmod", "+x", kubectlPath).Output()
 		if err != nil {
@@ -127,21 +127,27 @@ func installKubectlPlatform() error {
 		}
 
 	case "windows":
-		err1 := downloadKubectlLatest(osPlatform)
-		if err1 != nil {
+		_, err := exec.LookPath("curl")
+		if err != nil {
+			return ErrCurlMissing
+		}
+		err = downloadKubectlLatest(osPlatform)
+		if err != nil {
 			fmt.Println(" → Error installing the latest kubectl version")
+			return err
 		}
 		fmt.Println(" → Add kubectl binary to your windows path")
 
 	case "linux":
-		err1 := downloadKubectlLatest(osPlatform)
-		if err1 != nil {
+		err = downloadKubectlLatest(osPlatform)
+		if err != nil {
 			fmt.Println(" → Error installing the latest kubectl version")
+			return err
 		}
-		_, err2 := exec.Command("chmod", "+x", kubectlPath).Output()
-		if err2 != nil {
+		_, err = exec.Command("chmod", "+x", kubectlPath).Output()
+		if err != nil {
 			fmt.Println(" → Error giving access to kubectl")
-			return err2
+			return err
 		}
 	}
 	return nil
@@ -150,9 +156,10 @@ func installKubectlPlatform() error {
 // Downloads the latest version of kubectl
 func downloadKubectlLatest(osPlatform string) error {
 	latestVersion := "https://storage.googleapis.com/kubernetes-release/release/stable.txt"
+	var err error
 	ver, err := exec.Command("curl", "-sL", latestVersion).Output()
 	if err != nil {
-		return fmt.Errorf("error fetching kubectl version")
+		return err
 	}
 	var downloadKubectl string
 	if osPlatform == "windows" {
@@ -160,45 +167,50 @@ func downloadKubectlLatest(osPlatform string) error {
 	} else {
 		downloadKubectl = "https://storage.googleapis.com/kubernetes-release/release/" + string(ver) + "/bin/" + osPlatform + "/amd64/kubectl"
 	}
-	_, err1 := exec.Command("curl", "-o", kubectlPath, "-LO", downloadKubectl).Output()
-	if err1 != nil {
-		return err1
+	_, err = exec.Command("curl", "-o", kubectlPath, "-LO", downloadKubectl).Output()
+	if err != nil {
+		return err
 	}
 	return nil
 }
 
 // Check the platform and on the basis of that install argocd
 func installArgoCDPlatform() error {
+	var err error
 	osPlatform := runtime.GOOS
 	fmt.Println(" → Installing argocd")
 	switch osPlatform {
 	case "darwin":
-		err1 := downloadArgoCDLatest(osPlatform)
-		if err1 != nil {
+		err = downloadArgoCDLatest(osPlatform)
+		if err != nil {
 			fmt.Println(" → Error installing the latest argocd version")
 		}
-		_, err2 := exec.Command("chmod", "+x", argocdPath).Output()
-		if err2 != nil {
+		_, err = exec.Command("chmod", "+x", argocdPath).Output()
+		if err != nil {
 			fmt.Println(" → Error giving access to argocd")
-			return err2
+			return err
 		}
 
 	case "windows":
-		err1 := downloadArgoCDLatest(osPlatform)
-		if err1 != nil {
+		_, err := exec.LookPath("curl")
+		if err != nil {
+			return ErrCurlMissing
+		}
+		err = downloadArgoCDLatest(osPlatform)
+		if err != nil {
 			fmt.Println(" → Error installing the latest argocd version")
 		}
 		fmt.Println(" → Add argocd binary to your windows path")
 
 	case "linux":
-		err1 := downloadArgoCDLatest(osPlatform)
-		if err1 != nil {
+		err = downloadArgoCDLatest(osPlatform)
+		if err != nil {
 			fmt.Println(" → Error installing the latest argocd version")
 		}
-		_, err2 := exec.Command("chmod", "+x", argocdPath).Output()
-		if err2 != nil {
+		_, err = exec.Command("chmod", "+x", argocdPath).Output()
+		if err != nil {
 			fmt.Println(" → Error giving execute permission to argocd (ArgoCD CLI)")
-			return err2
+			return err
 		}
 	}
 	return nil
@@ -213,9 +225,9 @@ func downloadArgoCDLatest(osPlatform string) error {
 	} else {
 		downloadArgoCD = "https://github.com/argoproj/argo-cd/releases/download/" + argocdVersion + "/argocd-" + osPlatform + "-amd64"
 	}
-	_, err1 := exec.Command("curl", "-o", argocdPath, "-LO", downloadArgoCD).Output()
-	if err1 != nil {
-		return err1
+	_, err := exec.Command("curl", "-o", argocdPath, "-LO", downloadArgoCD).Output()
+	if err != nil {
+		return err
 	}
 	return nil
 }
