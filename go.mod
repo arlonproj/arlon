@@ -16,7 +16,7 @@ require (
 	google.golang.org/grpc v1.48.0
 	k8s.io/api v0.22.12
 	k8s.io/apimachinery v0.22.12
-	k8s.io/client-go v0.22.12
+	k8s.io/client-go v11.0.1-0.20190816222228-6d55c1b1f1ca+incompatible
 	sigs.k8s.io/cluster-api v1.0.5 //v1.1.0 will upgrade k8s APIs to v0.23.x
 	sigs.k8s.io/controller-runtime v0.10.3 //v1.11 will upgrade k8s APIs to v0.23.x
 )
@@ -26,6 +26,13 @@ require (
 	gotest.tools v2.2.0+incompatible
 	k8s.io/cli-runtime v0.22.12
 	sigs.k8s.io/kustomize/kyaml v0.11.0
+)
+
+require (
+	github.com/go-openapi/spec v0.19.5 // indirect
+	github.com/src-d/gcfg v1.4.0 // indirect
+	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
+	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 )
 
 require (
@@ -44,6 +51,7 @@ require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
+	github.com/argoproj/argo-cd v1.8.7
 	github.com/argoproj/gitops-engine v0.5.5 // indirect
 	github.com/argoproj/pkg v0.11.1-0.20211203175135-36c59d8fafe0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect

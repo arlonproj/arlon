@@ -94,7 +94,7 @@ func createClusterCommand() *cobra.Command {
 				profileApp, err = cluster.CreateProfileApp(profileAppName,
 					appIf, argocdNs, clusterName, prof, createInArgoCd)
 				if err != nil {
-					return fmt.Errorf("failed to profile app: %s", err)
+					return fmt.Errorf("failed to create profile app: %s", err)
 				}
 			}
 			if outputYaml {
