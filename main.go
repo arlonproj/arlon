@@ -27,6 +27,7 @@ import (
 	"github.com/arlonproj/arlon/cmd/clusterspec"
 	"github.com/arlonproj/arlon/cmd/controller"
 	"github.com/arlonproj/arlon/cmd/gitrepo"
+	"github.com/arlonproj/arlon/cmd/install"
 	"github.com/arlonproj/arlon/cmd/list_clusters"
 	"github.com/arlonproj/arlon/cmd/profile"
 	"github.com/arlonproj/arlon/cmd/verify"
@@ -65,6 +66,7 @@ func main() {
 	command.AddCommand(basecluster.NewCommand())
 	command.AddCommand(gitrepo.NewCommand())
 	command.AddCommand(verify.NewCommand())
+	command.AddCommand(install.NewCommand())
 
 	opts := zap.Options{
 		Development: true,
