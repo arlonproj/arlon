@@ -26,6 +26,12 @@ function wait_until()
     return 1
 }
 
+arlon_repo=`pwd`
+if ! grep git@github.com:arlonproj/arlon.git .git/config &> /dev/null ; then
+    echo "it doesn't look like we are in the arlon repository"
+    exit 1
+fi
+
 if ! arlon &> /dev/null; then
     echo arlon command not found in $PATH
     exit 1
@@ -97,19 +103,19 @@ if [ -z "${git_clone_root}" ]; then
 fi
 echo git clone root: ${git_clone_root}
 
-git_url=http://${bridge_addr}:${git_server_port}/myrepo.git
+workspace_repo_url=http://${bridge_addr}:${git_server_port}/myrepo.git
 
-git_clone_dir=${git_clone_root}/myrepo
-if [ ! -d "${git_clone_dir}" ]; then
+workspace_repo=${git_clone_root}/myrepo
+if [ ! -d "${workspace_repo}" ]; then
     echo cloning git repo
     pushd ${git_clone_root}
-    git clone ${git_url}
+    git clone ${workspace_repo_url}
     popd
 else
     echo git repo already cloned
 fi
 
-pushd ${git_clone_dir}
+pushd ${workspace_repo}
 if ! test -f README.md ; then
     echo adding README.md and creating main branch
     echo hello > README.md
@@ -169,7 +175,7 @@ pwd=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.da
 wait_until "argocd login localhost:${argocd_forwarding_port} --username admin --password ${pwd} --insecure" 2 30
 
 # This is idempotent so no need to check whether repo already registered
-argocd repo add ${git_url} --username dummy-user --password dummy-password
+argocd repo add ${workspace_repo_url} --username dummy-user --password dummy-password
 
 if ! kubectl get ns arlon &> /dev/null ; then
     echo creating arlon namespace
@@ -197,5 +203,24 @@ else
     echo argo-creds secret already exists
 fi
 
+# Deploy arlon controller
 kubectl apply -f deploy/manifests/
+
+if ! arlon bundle list|grep guestbook-static ; then
+    echo creating guestbook-static bundle
+    arlon bundle create guestbook-static --tags applications --desc "guestbook app" --from-file examples/bundles/guestbook.yaml
+fi
+
+if ! arlon bundle list|grep guestbook-dynamic ; then
+    echo creating guestbook-dynamic bundle
+    pushd ${workspace_repo}
+    mkdir -p bundles/guestbook
+    cp ${arlon_repo}/examples/bundles/guestbook.yaml bundles/guestbook
+    git add bundles/guestbook
+    git commit -m "add guestbook"
+    git push origin main
+    arlon bundle create guestbook-dynamic --tags applications --desc "guestbook app (dynamic)" --repo-url ${workspace_repo_url} --repo-path bundles/guestbook
+    popd
+fi
+
 echo --- All done ---
