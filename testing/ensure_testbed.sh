@@ -192,7 +192,7 @@ if ! kubectl get secret argocd-creds -n arlon &> /dev/null ; then
     echo "  auth-token: ${auth_token}" >> ${tmp_config}
     echo creating argocd-creds secret
     kubectl -n arlon create secret generic argocd-creds --from-file ${tmp_config}
-    # rm -f ${tmp_config}
+    rm -f ${tmp_config}
 else
     echo argo-creds secret already exists
 fi
