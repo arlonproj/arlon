@@ -11,21 +11,16 @@ import (
 )
 
 var (
-	ErrKubectlInstall  = errors.New("kubectl is not installed")
-	ErrKubeconfigNs    = errors.New("set the kubeconfig or kubeconfig does not have required permissions")
-	ErrArgoCD          = errors.New("argocd is not installed")
-	ErrArgoCDAuthToken = errors.New("argocd auth token has expired, login to argocd again")
-	ErrGit             = errors.New("git is not installed")
-	ErrKubectlPresent  = errors.New("kubectl is already installed")
-	ErrGitPresent      = errors.New("git is already installed")
-	ErrArgoCDPresent   = errors.New("argocd is already present")
-	ErrKubectlFail     = errors.New("error installing kubectl")
-	ErrArgoCDFail      = errors.New("error installing argocd")
-	kubectlPath        = "/usr/local/bin/kubectl"
-	argocdPath         = "/usr/local/bin/argocd"
-	Yellow             = color.New(color.FgHiYellow).SprintFunc()
-	Green              = color.New(color.FgGreen).SprintFunc()
-	Red                = color.New(color.FgRed).SprintFunc()
+	ErrKubectlPresent = errors.New("kubectl is already installed")
+	ErrGitPresent     = errors.New("git is already installed")
+	ErrArgoCDPresent  = errors.New("argocd is already present")
+	ErrKubectlFail    = errors.New("error installing kubectl")
+	ErrArgoCDFail     = errors.New("error installing argocd")
+	kubectlPath       = "/usr/local/bin/kubectl"
+	argocdPath        = "/usr/local/bin/argocd"
+	Yellow            = color.New(color.FgHiYellow).SprintFunc()
+	Green             = color.New(color.FgGreen).SprintFunc()
+	Red               = color.New(color.FgRed).SprintFunc()
 )
 
 func NewCommand() *cobra.Command {
@@ -34,7 +29,7 @@ func NewCommand() *cobra.Command {
 		Short:             "Install required tools for Arlon",
 		Long:              "Install kubectl, Argocd cli, check git cli",
 		DisableAutoGenTag: true,
-		Example:           "arlonctl install",
+		Example:           "arlon install",
 		RunE: func(c *cobra.Command, args []string) error {
 			var err error
 			// Install kubectl and point it to the kubeconfig
@@ -79,7 +74,6 @@ func installKubectl() (bool, error) {
 		fmt.Println(" → Proceeding to install kubectl")
 		errInstallKubectl := installKubectlPlatform()
 		if errInstallKubectl != nil {
-			fmt.Println(" → Error installing kubectl")
 			return false, ErrKubectlFail
 		} else {
 			return true, nil
@@ -117,18 +111,19 @@ func installArgoCD() (bool, error) {
 
 // Check the platform and on the basis of that install kubectl
 func installKubectlPlatform() error {
+	var err error
 	osPlatform := runtime.GOOS
 	fmt.Println(" → Installing kubectl")
 	switch osPlatform {
 	case "darwin":
-		err1 := downloadKubectlLatest(osPlatform)
-		if err1 != nil {
+		err = downloadKubectlLatest(osPlatform)
+		if err != nil {
 			fmt.Println(" → Error installing the latest kubectl version")
 		}
-		_, err2 := exec.Command("chmod", "+x", kubectlPath).Output()
-		if err2 != nil {
+		_, err = exec.Command("chmod", "+x", kubectlPath).Output()
+		if err != nil {
 			fmt.Println(" → Error giving access to kubectl")
-			return err2
+			return err
 		}
 
 	case "windows":
@@ -157,8 +152,7 @@ func downloadKubectlLatest(osPlatform string) error {
 	latestVersion := "https://storage.googleapis.com/kubernetes-release/release/stable.txt"
 	ver, err := exec.Command("curl", "-sL", latestVersion).Output()
 	if err != nil {
-		fmt.Println(" → Error fetching latest kubectl version")
-		return err
+		return fmt.Errorf("error fetching kubectl version")
 	}
 	var downloadKubectl string
 	if osPlatform == "windows" {
