@@ -26,6 +26,11 @@ function wait_until()
     return 1
 }
 
+if ! arlon &> /dev/null; then
+    echo arlon command not found in $PATH
+    exit 1
+fi
+
 if ! git version > /dev/null; then
     echo git not installed
     exit 1
@@ -160,6 +165,37 @@ fi
 
 kubectl port-forward svc/argocd-server -n argocd ${argocd_forwarding_port}:443 &>/dev/null &
 pwd=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo)
-argocd login localhost:${argocd_forwarding_port} --username admin --password ${pwd} --insecure
 
+wait_until "argocd login localhost:${argocd_forwarding_port} --username admin --password ${pwd} --insecure" 2 30
+
+# This is idempotent so no need to check whether repo already registered
+argocd repo add ${git_url} --username dummy-user --password dummy-password
+
+if ! kubectl get ns arlon &> /dev/null ; then
+    echo creating arlon namespace
+    kubectl create ns arlon
+fi
+
+# Arlon CRDs
+kubectl apply -f config/crd/bases
+
+# ArgoCD config maps for configuring 'arlon' user
+kubectl apply -f testing/manifests
+
+# argocd config file for arlon controller
+if ! kubectl get secret argocd-creds -n arlon &> /dev/null ; then
+    wait_until "auth_token=$(argocd account generate-token --account arlon)" 2 10
+    echo auth_token: ${auth_token}
+    # The file name 'config' is important as that's how it'll appear when mounted in arlon container
+    tmp_config=/tmp/config
+    cp testing/argocd-config-for-controller.template.yaml ${tmp_config}
+    echo "  auth-token: ${auth_token}" >> ${tmp_config}
+    echo creating argocd-creds secret
+    kubectl -n arlon create secret generic argocd-creds --from-file ${tmp_config}
+    # rm -f ${tmp_config}
+else
+    echo argo-creds secret already exists
+fi
+
+kubectl apply -f deploy/manifests/
 echo --- All done ---
