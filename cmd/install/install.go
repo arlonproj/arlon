@@ -195,13 +195,13 @@ func installArgoCDPlatform() error {
 		if err != nil {
 			return ErrCurlMissing
 		}
-		err = downloadArgoCDLatest(osPlatform)
+		err = downloadArgoCD(osPlatform)
 		if err != nil {
 			fmt.Println(" → Error installing the latest argocd version")
 		}
 		fmt.Println(" → Add argocd binary to your windows path")
 	default:
-		err = downloadArgoCDLatest(osPlatform)
+		err = downloadArgoCD(osPlatform)
 		if err != nil {
 			fmt.Println(" → Error installing the latest argocd version")
 		}
@@ -215,7 +215,7 @@ func installArgoCDPlatform() error {
 }
 
 // Downloads the latest version of argocd
-func downloadArgoCDLatest(osPlatform string) error {
+func downloadArgoCD(osPlatform string) error {
 	var downloadArgoCD string
 	argocdVersion := "v2.2.12"
 	if osPlatform == "windows" {
