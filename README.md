@@ -399,7 +399,7 @@ dynamic-2-calico  dynamic  calico,guestbook-static,xenial   ${WORKSPACE_REPO_URL
 static-1          static   guestbook-dynamic,xenial         (N/A)                  (N/A)                      examples     static profile 1
 ```
 
-## Clusters
+## Clusters (gen1)
 
 We are now ready to deploy our first cluster. It will be of type EKS. Since
 EKS clusters come configured with pod networking out of the box, we choose
@@ -627,10 +627,73 @@ This example updates a cluster to use a new profile `my-new-profile`:
 ```
 arlon cluster update eks-1 --profile my-new-profile
 ```
+
+# Next-Generation (gen2) Clusters - New in version 0.9.x
+
+Gen1 clusters are limited in capability by the Helm chart used to deploy the infrastructure resources.
+Advanced Cluster API configurations, such as those using multiple MachinePools, each with different
+instance types, is not supported.
+
+Gen2 clusters solve this problem by allowing you to create workload clusters from a *base cluster*
+that you design and provide in the form of a manifest file stored in a git directory. The manifest
+typically contains multiple related resources that together define an arbitrarily complex cluster.
+If you make subsequent changes to the base cluster, workload clusters originally created from it
+will automatically acquire the changes.
+
+Before a manifest directory can be used as a base cluster, it must first be "prepared" or "prepped"
+by Arlon. The "prep" phase makes minor changes to the directory and manifest to help Arlon deploy
+multiple copies of the cluster without naming conflicts.
+
+To determine if a git directory is eligible to serve as base cluster, run the `basecluster validategit` command:
+```
+arlon basecluster validategit --repo-url <repoUrl> --repo-path <pathToDirectory> [--repo-revision revision]  
+```
+
+To prepare a git directory to serve as base cluster, use the `basecluster preparegit` command:
+```
+arlon basecluster preparegit --repo-url <repoUrl> --repo-path <pathToDirectory> [--repo-revision revision]  
+```
+
+To create a gen2 workload cluster from the base cluster:
+```
+arlon cluster create --cluster-name <clusterName> --repo-url <repoUrl> --repo-path <pathToDirectory> [--output-yaml] [--profile <profileName>] [--repo-revision <repoRevision>]
+```
+
+To destroy a gen2 workload cluster:
+```
+arlon cluster delete <clusterName>
+```
+
+Arlon creates between 2 and 3 ArgoCD application resources to compose a gen2 cluster (the 3rd application, called "profile app", is used when
+an optional profile is specified at cluster creation time). When you destroy a gen2 cluster, Arlon will find all related ArgoCD applications
+and clean them up.
+
+## Known issues and limitations.
+Gen2 clusters are powerful because the base cluster can be arbitrarily complex and feature rich. Since they are fairly
+new and still evolving, gen2 clusters have several known limitations relative to gen1.
+* You cannot customize/override any property of the base cluster on the fly when creating a workload cluster,
+  which is an exact clone of the base cluster except for the names of its resources and their namespace.
+  The work-around is to make a copy of the base cluster directory, push the new directory, make
+  the desired changes, commit & push the changes, and register the directory as a new base cluster.
+* If you modify and commit a change to one or more properties of the base cluster that the underlying Cluster API provider deems as "immutable", new
+  workload clusters created from the base cluster will have the modified propert(ies), but ArgoCD will flag existing clusters as OutOfSync, since
+  the provider will continually reject attempts to apply the new property values. The existing clusters continue to function, despite appearing unhealthy
+  in the ArgoCD UI and CLI outputs.
+
+Examples of mutable properties in Cluster API resources:
+- Number of replicas (modification will result in a scale-up / down)
+- Kubernetes version (modification will result in an upgrade)
+
+Examples of immutable properties:
+- Most fields of AWSMachineTemplate (instance type, labels, etc...)
+ 
+## For more information
+
+For more details on gen2 clusters, refer to the [design document](docs/baseclusters.md).
+
 # Implementation details
 
-
-## Cluster chart
+## Cluster chart (gen1)
 
 The cluster chart is a Helm chart that creates (and optionally applies) the
 manifests necessary to create a cluster and deploy desired configurations
