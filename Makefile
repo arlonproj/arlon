@@ -65,6 +65,23 @@ test: manifests generate fmt vet ## Run tests.
 build: generate fmt vet ## Build manager binary.
 	go build -o bin/arlon main.go
 
+# goreleaser can invoke this target to produce binaries for different OS and CPU arch combinations
+build-cli: fmt vet ## Build CLI binary (with the current OS and CPU architecture) from the go env.
+	go build -o bin/arlon main.go
+
+build-cli-linux: fmt vet ## Build CLI binary for Linux
+	GOOS=linux GOARCH=amd64 go build -o bin/arlon main.go
+
+build-cli-mac: fmt vet ## Build CLI binary for Mac (AMD/ Intel CPU)
+	GOOS=darwin GOARCH=amd64 go build -o bin/arlon main.go
+
+build-cli-mac: fmt vet ## Build CLI binary for Mac (Apple Silicon)
+	GOOS=darwin GOARCH=arm64 go build -o bin/arlon main.go
+
+# Arlon has not been tested on Windows yet.
+build-cli-win: fmt vet ## Build CLI binary for Windows.
+	GOOS=windows GOARCH=amd64 go build -o bin/arlon main.go
+
 run: manifests generate fmt vet ## Run a controller from your host.
 	go run ./main.go
 
