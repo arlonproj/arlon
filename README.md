@@ -326,9 +326,11 @@ and it is registered as a git repo in ArgoCD. The tutorial will assume
 the existence of these environment variables:
 - `${ARLON_REPO}`: where the arlon repo is locally checked out
 - `${WORKSPACE_REPO}`: where the workspace repo is locally checked out
-- `${WORKSPACE_REPO_URL}`: the workspace repo's git URL. It typically looks 
-like `https://github.com/${username}/${reponame}.git`
-- Additionally, examples assuming `arlon git register` has been used to register "default" and a "prod" aliases will also be given.
+- `${WORKSPACE_REPO_URL}`: the workspace repo's git URL. It typically looks like `https://github.com/${username}/${reponame}.git`
+- `${CLOUD_REGION}`: the region where you want to deploy example clusters and workloads (e.g. us-west-2)
+- `${SSH_KEY_NAME}`: the name of a public ssh key name registered in your cloud account, to enable ssh to your cluster nodes
+
+Additionally, for examples assuming `arlon git register`, "default" and a "prod" git repo aliases will also be given.
 
 _Note: for the best experience, make sure your workspace repo is configured
 to send change notifications to ArgoCD via a webhook. See the Installation section for details._
@@ -340,18 +342,18 @@ One of the cluster specs is for an unconfigured API provider (Crossplane);
 this is for illustrative purposes, since we will not use it in this tutorial.
 
 ```
-arlon clusterspec create capi-kubeadm-3node --api capi --cloud aws --type kubeadm --kubeversion v1.18.16 --nodecount 3 --nodetype t2.medium --tags devel,test --desc "3 node kubeadm for dev/test"
-arlon clusterspec create capi-eks --api capi --cloud aws --type eks --kubeversion v1.18.16 --nodecount 2 --nodetype t2.large --tags staging --desc "2 node eks for general purpose"
-arlon clusterspec create xplane-eks-3node --api xplane --cloud aws --type eks --kubeversion v1.18.16 --nodecount 4 --nodetype t2.small --tags experimental --desc "4 node eks managed by crossplane"
+arlon clusterspec create capi-kubeadm-3node --api capi --cloud aws --type kubeadm --kubeversion v1.18.16 --nodecount 3 --nodetype t2.medium --tags devel,test --desc "3 node kubeadm for dev/test" --region ${CLOUD_REGION} --sshkey ${SSH_KEY_NAME}
+arlon clusterspec create capi-eks --api capi --cloud aws --type eks --kubeversion v1.18.16 --nodecount 2 --nodetype t2.large --tags staging --desc "2 node eks for general purpose" --region ${CLOUD_REGION} --sshkey ${SSH_KEY_NAME}
+arlon clusterspec create xplane-eks-3node --api xplane --cloud aws --type eks --kubeversion v1.18.16 --nodecount 4 --nodetype t2.small --tags experimental --desc "4 node eks managed by crossplane" --region ${CLOUD_REGION} --sshkey ${SSH_KEY_NAME}
 ```
 
 Ensure you can now list the cluster specs:
 ```
 $ arlon clusterspec list
-NAME                APIPROV  CLOUDPROV  TYPE     KUBEVERSION  NODETYPE   NODECOUNT  TAGS          DESCRIPTION
-capi-eks            capi     aws        eks      v1.18.16     t2.large   2          staging       2 node eks for general purpose
-capi-kubeadm-3node  capi     aws        kubeadm  v1.18.16     t2.medium  3          devel,test    3 node kubeadm for dev/test
-xplane-eks-3node    xplane   aws        eks      v1.18.16     t2.small   4          experimental  4 node eks managed by crossplane
+NAME                APIPROV  CLOUDPROV  TYPE     KUBEVERSION  NODETYPE   NODECNT  MSTNODECNT  SSHKEY  CAS    CASMIN  CASMAX  TAGS          DESCRIPTION
+capi-eks            capi     aws        eks      v1.18.16     t2.large   2        3           leb     false  1       9       staging       2 node eks for general purpose
+capi-kubeadm-3node  capi     aws        kubeadm  v1.18.16     t2.medium  3        3           leb     false  1       9       devel,test    3 node kubeadm for dev/test
+xplane-eks-3node    xplane   aws        eks      v1.18.16     t2.small   4        3           leb     false  1       9       experimental  4 node eks managed by crossplane
 ```
 
 ## Bundles
