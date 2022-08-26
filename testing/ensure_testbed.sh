@@ -73,8 +73,22 @@ echo git server port: ${git_server_port}
 git_root=${GIT_ROOT}
 if [ -z "${git_root}" ]; then
     git_root=$(mktemp -d /tmp/arlon-testbed-git.XXXXX)
+    chmod og+rwx ${git_root}
 fi
 echo git root: ${git_root}
+
+gitserver_cntr_name="arlon-testbed-gitserver"
+if ! docker inspect ${gitserver_cntr_name} &> /dev/null ; then
+    if ! docker run -d -v ${git_root}:/var/lib/git -p ${git_server_port}:80 --name ${gitserver_cntr_name} --rm cirocosta/gitserver-http > /dev/null ; then
+        echo failed to start git server container
+        exit 5
+    else
+        echo started git server container
+        sleep 2
+    fi
+else
+    echo git server container already running
+fi
 
 git_repo_dir=${git_root}/myrepo.git
 if [ ! -d "${git_repo_dir}" ]; then
@@ -82,20 +96,10 @@ if [ ! -d "${git_repo_dir}" ]; then
     mkdir ${git_repo_dir}
     pushd ${git_repo_dir}
     git init --bare
+    sed -i s/master/main/ HEAD
     popd
 fi
 echo git repo at ${git_repo_dir}
-
-gitserver_cntr_name="arlon-testbed-gitserver"
-if ! docker inspect ${gitserver_cntr_name} &> /dev/null ; then
-    if ! docker run -d -v ${git_root}:/var/lib/git -p ${git_server_port}:80 --name ${gitserver_cntr_name} --rm cirocosta/gitserver-http > /dev/null ; then
-        echo failed to start git server container
-        exit 5
-    else echo started git server container
-    fi
-else
-    echo git server container already running
-fi
 
 git_clone_root=${GIT_CLONE_ROOT}
 if [ -z "${git_clone_root}" ]; then
@@ -110,6 +114,12 @@ if [ ! -d "${workspace_repo}" ]; then
     echo cloning git repo
     pushd ${git_clone_root}
     git clone ${workspace_repo_url}
+    cd myrepo
+    echo hello > README.md
+    git add README.md
+    git commit -m README.md
+    git push origin HEAD:main
+    git checkout main
     popd
 else
     echo git repo already cloned
