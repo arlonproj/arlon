@@ -255,4 +255,14 @@ if ! arlon profile list|grep static-1 > /dev/null ; then
     arlon profile create static-1 --static --bundles guestbook-static,xenial-static --desc "static profile 1" --tags examples
 fi
 
+if ! arlon profile list|grep dynamic-1 > /dev/null ; then
+    echo creating dynamic-1 profile
+    arlon profile create dynamic-1 --repo-url ${workspace_repo_url} --repo-base-path profiles --bundles guestbook-static,xenial-static --desc "dynamic test 1" --tags examples
+fi
+
+if ! arlon profile list|grep dynamic-2-calico > /dev/null ; then
+    echo creating dynamic-2-calico profile
+    arlon profile create dynamic-2-calico --repo-url ${workspace_repo_url} --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial-static --desc "dynamic test 2" --tags examples
+fi
+
 echo --- All done ---
