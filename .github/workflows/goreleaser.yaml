@@ -38,7 +38,7 @@ jobs:
       -
         name: Run package tests
         run: |
-          go test -v ./pkg/...
+          make pkgtest
       -
         name: Import GPG key
         id: import_gpg

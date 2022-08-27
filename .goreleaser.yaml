@@ -32,7 +32,7 @@ builds:
 
 archives:
   - id: 'cli'
-    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}_{{ .Version }}'
     replacements:
       darwin: 'Darwin'
       linux: 'Linux'

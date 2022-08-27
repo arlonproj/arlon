@@ -114,3 +114,6 @@ GOBIN=$(PROJECT_DIR)/bin go install $(2) ;\
 rm -rf $$TMP_DIR ;\
 }
 endef
+
+pkgtest:
+	go test -v ./pkg/...
