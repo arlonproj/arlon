@@ -2,8 +2,8 @@
 #
 #                         Default
 # GIT_SERVER_PORT         8188
-# GIT_ROOT                Create new directory under /tmp
-# GIT_CLONE_ROOT          Create new directory under /tmp
+# GIT_ROOT                /tmp/arlon-testbed-git
+# GIT_CLONE_ROOT          /tmp/arlon-testbed-git-clone
 # ARGOCD_GIT_TAG          release-2.4
 # ARGOCD_CONFIG_FILE      Create new one under /tmp
 # ARGGOCD_FORWARDING_PORT 8189
@@ -70,16 +70,19 @@ if [ -z "${git_server_port}" ]; then
 fi
 echo git server port: ${git_server_port}
 
-git_root=${GIT_ROOT}
-if [ -z "${git_root}" ]; then
-    git_root=$(mktemp -d /tmp/arlon-testbed-git.XXXXX)
-    chmod og+rwx ${git_root}
+if [ -z "${GIT_ROOT}" ]; then
+    GIT_ROOT=/tmp/arlon-testbed-git
 fi
-echo git root: ${git_root}
+echo git root: ${GIT_ROOT}
+
+if [ ! -d "${GIT_ROOT}" ]; then
+    mkdir ${GIT_ROOT}
+    chmod og+rwx ${GIT_ROOT}
+fi
 
 gitserver_cntr_name="arlon-testbed-gitserver"
 if ! docker inspect ${gitserver_cntr_name} &> /dev/null ; then
-    if ! docker run -d -v ${git_root}:/var/lib/git -p ${git_server_port}:80 --name ${gitserver_cntr_name} --rm cirocosta/gitserver-http > /dev/null ; then
+    if ! docker run -d -v ${GIT_ROOT}:/var/lib/git -p ${git_server_port}:80 --name ${gitserver_cntr_name} --rm cirocosta/gitserver-http > /dev/null ; then
         echo failed to start git server container
         exit 5
     else
@@ -90,7 +93,7 @@ else
     echo git server container already running
 fi
 
-git_repo_dir=${git_root}/myrepo.git
+git_repo_dir=${GIT_ROOT}/myrepo.git
 if [ ! -d "${git_repo_dir}" ]; then
     echo initializing git repo
     mkdir ${git_repo_dir}
@@ -101,18 +104,21 @@ if [ ! -d "${git_repo_dir}" ]; then
 fi
 echo git repo at ${git_repo_dir}
 
-git_clone_root=${GIT_CLONE_ROOT}
-if [ -z "${git_clone_root}" ]; then
-    git_clone_root=$(mktemp -d /tmp/arlon-testbed-gitclone.XXXXX)
+if [ -z "${GIT_CLONE_ROOT}" ]; then
+    GIT_CLONE_ROOT=/tmp/arlon-testbed-git-clone
 fi
-echo git clone root: ${git_clone_root}
+echo git clone root: ${GIT_CLONE_ROOT}
+
+if [ ! -d "${GIT_CLONE_ROOT}" ]; then
+    mkdir ${GIT_CLONE_ROOT}
+fi
 
 workspace_repo_url=http://${bridge_addr}:${git_server_port}/myrepo.git
 
-workspace_repo=${git_clone_root}/myrepo
+workspace_repo=${GIT_CLONE_ROOT}/myrepo
 if [ ! -d "${workspace_repo}" ]; then
     echo cloning git repo
-    pushd ${git_clone_root}
+    pushd ${GIT_CLONE_ROOT}
     git clone ${workspace_repo_url}
     cd myrepo
     echo hello > README.md
@@ -174,18 +180,18 @@ if pkill -f "kubectl port-forward svc/argocd-server" ; then
     echo terminated previous port forwarding session
 fi
 
+wait_until 'set -o pipefail; pwd=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)' 6 20
+
 argocd_forwarding_port=${ARGGOCD_FORWARDING_PORT}
 if [ -z "${argocd_forwarding_port}" ]; then
     argocd_forwarding_port=8189
 fi
-
 kubectl port-forward svc/argocd-server -n argocd ${argocd_forwarding_port}:443 &>/dev/null &
-pwd=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo)
 
-wait_until "argocd login localhost:${argocd_forwarding_port} --username admin --password ${pwd} --insecure" 2 30
+wait_until "argocd login localhost:${argocd_forwarding_port} --username admin --password ${pwd} --insecure" 6 20
 
 # This is idempotent so no need to check whether repo already registered
-argocd repo add ${workspace_repo_url} --username dummy-user --password dummy-password
+wait_until "argocd repo add ${workspace_repo_url} --username dummy-user --password dummy-password" 2 30
 
 if ! kubectl get ns arlon &> /dev/null ; then
     echo creating arlon namespace
