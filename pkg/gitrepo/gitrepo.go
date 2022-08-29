@@ -104,7 +104,7 @@ func GetRepoUrl(repoAlias string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	argocdio.Close(cfgFile)
+	defer argocdio.Close(cfgFile)
 	repoCtx, err := getAlias(repoAlias, cfgFile)
 	if err != nil {
 		if !errors.Is(err, ErrNotFound) {
