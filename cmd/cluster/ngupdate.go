@@ -18,7 +18,7 @@ func ngupdateClusterCommand() *cobra.Command {
 	var argocdNs string
 	var arlonNs string
 	var profileName string
-	var deleteProfileName string
+	var deleteProfileName bool
 	command := &cobra.Command{
 		Use:   "ngupdate <clustername> [flags]",
 		Short: "update existing next-gen cluster",
@@ -40,7 +40,7 @@ func ngupdateClusterCommand() *cobra.Command {
 			if len(apps.Items) == 0 {
 				return fmt.Errorf("Failed to get the given cluster")
 			}
-			if deleteProfileName == "" {
+			if !deleteProfileName {
 				_, err = cluster.NgUpdate(appIf, config, argocdNs, arlonNs, name, profileName, true)
 				if err != nil {
 
@@ -59,6 +59,6 @@ func ngupdateClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&argocdNs, "argocd-ns", "argocd", "the argocd namespace")
 	command.Flags().StringVar(&arlonNs, "arlon-ns", "arlon", "the arlon namespace")
 	command.Flags().StringVar(&profileName, "profile", "", "the configuration profile to use")
-	command.Flags().StringVar(&deleteProfileName, "delete-profile", "", "the configuration profile to be deleted")
+	command.Flags().BoolVar(&deleteProfileName, "delete-profile", false, "the configuration profile to be deleted")
 	return command
 }
