@@ -23,7 +23,7 @@ func NgUpdate(
 	if err != nil {
 		return nil, fmt.Errorf("failed to get profile: %s", err)
 	}
-	DestroyProfileApps(appIf, clusterName)
+	err = DestroyProfileApps(appIf, clusterName)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to delete profile app: %s", err)
 	}
