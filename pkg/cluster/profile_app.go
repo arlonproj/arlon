@@ -30,3 +30,26 @@ func CreateProfileApp(
 	}
 	return app, nil
 }
+func DestructProfileApp(
+	appIf argoapp.ApplicationServiceClient,
+	clusterName string,
+) error {
+	var err error
+	apps, err := appIf.List(context.Background(),
+		&argoapp.ApplicationQuery{Selector: "arlon-cluster=" + clusterName + ",arlon-type=profile-app"})
+	for _, app := range apps.Items {
+		cascade := true
+		_, err = appIf.Delete(
+			context.Background(),
+			&argoapp.ApplicationDeleteRequest{
+				Name:    &app.Name,
+				Cascade: &cascade,
+			})
+		if err != nil {
+			return fmt.Errorf("failed to delete related profile app %s: %s",
+				app.Name, err)
+		}
+		fmt.Println("deleted related app:", app.Name)
+	}
+	return err
+}

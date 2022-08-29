@@ -20,5 +20,6 @@ func NewCommand() *cobra.Command {
 	command.AddCommand(createClusterCommand())
 	command.AddCommand(getClusterCommand())
 	command.AddCommand(deleteClusterCommand())
+	command.AddCommand(ngupdateClusterCommand())
 	return command
 }
