@@ -71,8 +71,8 @@ func Get(
 	arlonNs string,
 	specName string,
 ) (cs *ClusterSpec, err error) {
-	corev1 := kubeClient.CoreV1()
-	configMapApi := corev1.ConfigMaps(arlonNs)
+	client := kubeClient.CoreV1()
+	configMapApi := client.ConfigMaps(arlonNs)
 	cm, err := configMapApi.Get(context.Background(), specName, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
