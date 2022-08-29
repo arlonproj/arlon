@@ -60,6 +60,6 @@ func ngupdateClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&argocdNs, "argocd-ns", "argocd", "the argocd namespace")
 	command.Flags().StringVar(&arlonNs, "arlon-ns", "arlon", "the arlon namespace")
 	command.Flags().StringVar(&profileName, "profile", "", "the configuration profile to use")
-	command.Flags().BoolVar(&deleteProfileName, "delete-profile", false, "the configuration profile to be deleted")
+	command.Flags().BoolVar(&deleteProfileName, "delete-profile", false, "delete the existing profile app from the cluster")
 	return command
 }
