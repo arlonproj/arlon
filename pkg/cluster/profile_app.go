@@ -30,7 +30,9 @@ func CreateProfileApp(
 	}
 	return app, nil
 }
-func DestructProfileApp(
+
+// DestroyProfileApp destroys a profile-app that accompanies an arlon-app for gen2 clusters
+func DestroyProfileApps(
 	appIf argoapp.ApplicationServiceClient,
 	clusterName string,
 ) error {
@@ -49,7 +51,6 @@ func DestructProfileApp(
 			return fmt.Errorf("failed to delete related profile app %s: %s",
 				app.Name, err)
 		}
-		fmt.Println("deleted related app:", app.Name)
 	}
 	return err
 }

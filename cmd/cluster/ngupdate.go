@@ -47,7 +47,7 @@ func ngupdateClusterCommand() *cobra.Command {
 					return fmt.Errorf("Error: %s", err)
 				}
 			} else {
-				err = cluster.DestructProfileApp(appIf, name)
+				err = cluster.DestroyProfileApps(appIf, name)
 				if err != nil {
 					return fmt.Errorf("Failed to delete the profile app")
 				}

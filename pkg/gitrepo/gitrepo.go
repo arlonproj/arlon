@@ -3,12 +3,13 @@ package gitrepo
 import (
 	"errors"
 	"fmt"
-	argocdio "github.com/argoproj/argo-cd/v2/util/io"
-	"github.com/argoproj/argo-cd/v2/util/localconfig"
 	"io"
-	"k8s.io/apimachinery/pkg/util/json"
 	"os"
 	"path/filepath"
+
+	argocdio "github.com/argoproj/argo-cd/v2/util/io"
+	"github.com/argoproj/argo-cd/v2/util/localconfig"
+	"k8s.io/apimachinery/pkg/util/json"
 )
 
 type RepoCtx struct {
@@ -104,7 +105,7 @@ func GetRepoUrl(repoAlias string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	argocdio.Close(cfgFile)
+	defer argocdio.Close(cfgFile)
 	repoCtx, err := getAlias(repoAlias, cfgFile)
 	if err != nil {
 		if !errors.Is(err, ErrNotFound) {

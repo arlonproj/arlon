@@ -24,11 +24,9 @@ func NgUpdate(
 	if err != nil {
 		return nil, fmt.Errorf("failed to get profile: %s", err)
 	}
-	apps, err := appIf.List(context.Background(),
+	_, err = appIf.List(context.Background(),
 		&argoapp.ApplicationQuery{Selector: "arlon-cluster=" + clusterName + ",arlon-type=profile-app"})
-	if len(apps.Items) != 0 {
-		DestructProfileApp(appIf, clusterName)
-	}
+	DestroyProfileApps(appIf, clusterName)
 	profileAppName := fmt.Sprintf("%s-profile-%s", clusterName, prof.Name)
 	profileApp, err := CreateProfileApp(profileAppName,
 		appIf, argocdNs, clusterName, prof, updateInArgoCd)
