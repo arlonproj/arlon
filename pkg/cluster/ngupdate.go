@@ -1,7 +1,6 @@
 package cluster
 
 import (
-	"context"
 	"fmt"
 
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
@@ -24,8 +23,6 @@ func NgUpdate(
 	if err != nil {
 		return nil, fmt.Errorf("failed to get profile: %s", err)
 	}
-	_, err = appIf.List(context.Background(),
-		&argoapp.ApplicationQuery{Selector: "arlon-cluster=" + clusterName + ",arlon-type=profile-app"})
 	DestroyProfileApps(appIf, clusterName)
 	profileAppName := fmt.Sprintf("%s-profile-%s", clusterName, prof.Name)
 	profileApp, err := CreateProfileApp(profileAppName,
