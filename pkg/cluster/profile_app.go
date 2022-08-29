@@ -30,3 +30,28 @@ func CreateProfileApp(
 	}
 	return app, nil
 }
+
+// DestroyProfileApp destroys a profile-app that accompanies an arlon-app for gen2 clusters
+func DestroyProfileApps(
+	appIf argoapp.ApplicationServiceClient,
+	clusterName string,
+) error {
+	var err error
+	selector := "arlon-cluster=" + clusterName + ",arlon-type=profile-app"
+	apps, err := appIf.List(context.Background(),
+		&argoapp.ApplicationQuery{Selector: &selector})
+	for _, app := range apps.Items {
+		cascade := true
+		_, err = appIf.Delete(
+			context.Background(),
+			&argoapp.ApplicationDeleteRequest{
+				Name:    &app.Name,
+				Cascade: &cascade,
+			})
+		if err != nil {
+			return fmt.Errorf("failed to delete related profile app %s: %s",
+				app.Name, err)
+		}
+	}
+	return err
+}
