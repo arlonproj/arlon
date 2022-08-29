@@ -3,6 +3,8 @@ package cluster
 import (
 	"context"
 	"fmt"
+	"path"
+
 	argoclient "github.com/argoproj/argo-cd/v2/pkg/apiclient"
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argocluster "github.com/argoproj/argo-cd/v2/pkg/apiclient/cluster"
@@ -12,11 +14,10 @@ import (
 	"github.com/arlonproj/arlon/pkg/common"
 	"github.com/arlonproj/arlon/pkg/controller"
 	logpkg "github.com/arlonproj/arlon/pkg/log"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
-	"path"
 	patchclient "sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -96,7 +97,7 @@ func ManageExternal(
 	profileAppName := fmt.Sprintf("%s-profile-%s", clusterName, prof.Name)
 	app := constructProfileApp(profileAppName, argocdNs, clusterName, prof)
 	_, err = appIf.Create(context.Background(), &argoapp.ApplicationCreateRequest{
-		Application: *app,
+		Application: app,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to get create profile app: %s", err)

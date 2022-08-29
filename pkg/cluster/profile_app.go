@@ -3,6 +3,7 @@ package cluster
 import (
 	"context"
 	"fmt"
+
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
@@ -20,7 +21,7 @@ func CreateProfileApp(
 	app := constructProfileApp(profileAppName, argocdNs, clusterName, prof)
 	if createInArgoCd {
 		appCreateRequest := argoapp.ApplicationCreateRequest{
-			Application: *app,
+			Application: app,
 		}
 		_, err := appIf.Create(context.Background(), &appCreateRequest)
 		if err != nil {

@@ -3,10 +3,11 @@ package basecluster
 import (
 	"errors"
 	"fmt"
-	"gotest.tools/assert"
 	"os"
 	"path"
 	"testing"
+
+	"gotest.tools/v3/assert"
 )
 
 type testEntry struct {
