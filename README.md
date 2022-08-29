@@ -438,7 +438,7 @@ We can now create profiles to group bundles into useful, deployable sets.
 First, create a static profile containing bundles xenial-static and guestbook-static:
 
 ```
-arlon profile create static-1 --static --bundles guestbook-static,xenial --desc "static profile 1" --tags examples
+arlon profile create static-1 --static --bundles guestbook-static,xenial-static --desc "static profile 1" --tags examples
 ```
 
 Secondly, create a dynamic version of the same profile. We'll store the compiled
@@ -446,13 +446,13 @@ form of the profile in the `profiles/dynamic-1` directory of the workspace repo.
 it manually; instead, the arlon CLI will create it for us, and it will push
 the change to git:
 ```
-arlon profile create dynamic-1 --repo-url ${WORKSPACE_REPO_URL} --repo-base-path profiles --bundles guestbook-static,xenial --desc "dynamic test 1" --tags examples
+arlon profile create dynamic-1 --repo-url ${WORKSPACE_REPO_URL} --repo-base-path profiles --bundles guestbook-static,xenial-static --desc "dynamic test 1" --tags examples
             # OR
 # using repository aliases
   # using the default alias
-arlon profile create dynamic-1 --repo-base-path profiles --bundles guestbook-static,xenial --desc "dynamic test 1" --tags examples
+arlon profile create dynamic-1 --repo-base-path profiles --bundles guestbook-static,xenial-static --desc "dynamic test 1" --tags examples
   # using the prod alias
-arlon profile create dynamic-1 --repo-alias prod --repo-base-path profiles --bundles guestbook-static,xenial --desc "dynamic test 1" --tags examples
+arlon profile create dynamic-1 --repo-alias prod --repo-base-path profiles --bundles guestbook-static,xenial-static --desc "dynamic test 1" --tags examples
 ```
 _Note: the `--repo-base-path profiles` option tells `arlon` to create the profile
 under a base directory `profiles/` (to be created if it doesn't exist). That
@@ -483,21 +483,21 @@ This is not done for `guestbook-dynamic` because it is dynamic.
 Finally, we create another variant of the same profile, with the only difference
 being the addition of Calico bundle. It'll be used on clusters that need a CNI provider:
 ```
-arlon profile create dynamic-2-calico --repo-url ${WORKSPACE_REPO_URL} --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial --desc "dynamic test 1" --tags examples
+arlon profile create dynamic-2-calico --repo-url ${WORKSPACE_REPO_URL} --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial-static --desc "dynamic test 1" --tags examples
             # OR
 # using repository aliases
   # using the default alias
-arlon profile create dynamic-2-calico --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial --desc "dynamic test 1" --tags examples
+arlon profile create dynamic-2-calico --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial-static --desc "dynamic test 1" --tags examples
   # using the prod alias
-arlon profile create dynamic-2-calico --repo-alias prod --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial --desc "dynamic test 1" --tags examples
+arlon profile create dynamic-2-calico --repo-alias prod --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial-static --desc "dynamic test 1" --tags examples
 ```
 Listing the profiles should show:
 ```
 $ arlon profile list
-NAME              TYPE     BUNDLES                          REPO-URL               REPO-PATH                  TAGS         DESCRIPTION
-dynamic-1         dynamic  guestbook-static,xenial          ${WORKSPACE_REPO_URL}  profiles/dynamic-1         examples     dynamic test 1
-dynamic-2-calico  dynamic  calico,guestbook-static,xenial   ${WORKSPACE_REPO_URL}  profiles/dynamic-2-calico  examples     dynamic test 1
-static-1          static   guestbook-dynamic,xenial         (N/A)                  (N/A)                      examples     static profile 1
+NAME              TYPE     BUNDLES                                 REPO-URL               REPO-PATH                  TAGS         DESCRIPTION
+dynamic-1         dynamic  guestbook-static,xenial-static          ${WORKSPACE_REPO_URL}  profiles/dynamic-1         examples     dynamic test 1
+dynamic-2-calico  dynamic  calico,guestbook-static,xenial-static   ${WORKSPACE_REPO_URL}  profiles/dynamic-2-calico  examples     dynamic test 1
+static-1          static   guestbook-dynamic,xenial-static         (N/A)                  (N/A)                      examples     static profile 1
 ```
 
 ## Clusters (gen1)
@@ -630,7 +630,7 @@ from `dynamic-1` by specifying a new bundle set:
 ```
 arlon profile update dynamic-1 --bundles xenial
 ```
-Since the old bundle set was `guestbook-static,xenial`, that command resulted
+Since the old bundle set was `guestbook-static,xenial-static`, that command resulted
 in the removal of `guestbook-static` from the profile.
 In the UI, observe the `eks-1-profile-dynamic-1` app going through Sync
 and Progressing phases, eventually reaching the healthy (green) state.
