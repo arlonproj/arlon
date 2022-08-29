@@ -342,18 +342,18 @@ One of the cluster specs is for an unconfigured API provider (Crossplane);
 this is for illustrative purposes, since we will not use it in this tutorial.
 
 ```
-arlon clusterspec create capi-kubeadm-3node --api capi --cloud aws --type kubeadm --kubeversion v1.18.16 --nodecount 3 --nodetype t2.medium --tags devel,test --desc "3 node kubeadm for dev/test" --region ${CLOUD_REGION} --sshkey ${SSH_KEY_NAME}
-arlon clusterspec create capi-eks --api capi --cloud aws --type eks --kubeversion v1.18.16 --nodecount 2 --nodetype t2.large --tags staging --desc "2 node eks for general purpose" --region ${CLOUD_REGION} --sshkey ${SSH_KEY_NAME}
-arlon clusterspec create xplane-eks-3node --api xplane --cloud aws --type eks --kubeversion v1.18.16 --nodecount 4 --nodetype t2.small --tags experimental --desc "4 node eks managed by crossplane" --region ${CLOUD_REGION} --sshkey ${SSH_KEY_NAME}
+arlon clusterspec create capi-kubeadm-3node --api capi --cloud aws --type kubeadm --kubeversion v1.21.10 --nodecount 3 --nodetype t2.medium --tags devel,test --desc "3 node kubeadm for dev/test" --region ${CLOUD_REGION} --sshkey ${SSH_KEY_NAME}
+arlon clusterspec create capi-eks --api capi --cloud aws --type eks --kubeversion v1.21.10 --nodecount 2 --nodetype t2.large --tags staging --desc "2 node eks for general purpose" --region ${CLOUD_REGION} --sshkey ${SSH_KEY_NAME}
+arlon clusterspec create xplane-eks-3node --api xplane --cloud aws --type eks --kubeversion v1.21.10 --nodecount 4 --nodetype t2.small --tags experimental --desc "4 node eks managed by crossplane" --region ${CLOUD_REGION} --sshkey ${SSH_KEY_NAME}
 ```
 
 Ensure you can now list the cluster specs:
 ```
 $ arlon clusterspec list
 NAME                APIPROV  CLOUDPROV  TYPE     KUBEVERSION  NODETYPE   NODECNT  MSTNODECNT  SSHKEY  CAS    CASMIN  CASMAX  TAGS          DESCRIPTION
-capi-eks            capi     aws        eks      v1.18.16     t2.large   2        3           leb     false  1       9       staging       2 node eks for general purpose
-capi-kubeadm-3node  capi     aws        kubeadm  v1.18.16     t2.medium  3        3           leb     false  1       9       devel,test    3 node kubeadm for dev/test
-xplane-eks-3node    xplane   aws        eks      v1.18.16     t2.small   4        3           leb     false  1       9       experimental  4 node eks managed by crossplane
+capi-eks            capi     aws        eks      v1.21.10     t2.large   2        3           leb     false  1       9       staging       2 node eks for general purpose
+capi-kubeadm-3node  capi     aws        kubeadm  v1.21.10     t2.medium  3        3           leb     false  1       9       devel,test    3 node kubeadm for dev/test
+xplane-eks-3node    xplane   aws        eks      v1.21.10     t2.small   4        3           leb     false  1       9       experimental  4 node eks managed by crossplane
 ```
 
 ## Bundles
