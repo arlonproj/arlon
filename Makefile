@@ -6,8 +6,9 @@ REPO_ORG ?= arlonproj
 REPO_NAME ?= arlon
 # Image URL to use all building/pushing image targets
 IMG ?= $(REPO_SERVER)/$(REPO_ORG)/$(REPO_NAME)/controller:$(VERSION)
-# Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
-CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
+# Produce CRDs with multiversion enabled for v1 APIs - fixes failure in make test
+# See https://book.kubebuilder.io/reference/generating-crd.html#multiple-versions 
+CRD_OPTIONS ?= "crd"
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
