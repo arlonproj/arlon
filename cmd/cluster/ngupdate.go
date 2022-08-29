@@ -32,8 +32,9 @@ func ngupdateClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
+			selector := "arlon-cluster=" + name + ",arlon-type=cluster-app"
 			apps, err := appIf.List(context.Background(),
-				&argoapp.ApplicationQuery{Selector: "arlon-cluster=" + name + ",arlon-type=cluster-app"})
+				&argoapp.ApplicationQuery{Selector: &selector})
 			if err != nil {
 				return fmt.Errorf("failed to list apps related to cluster: %s", err)
 			}

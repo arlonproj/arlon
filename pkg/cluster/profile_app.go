@@ -37,8 +37,9 @@ func DestroyProfileApps(
 	clusterName string,
 ) error {
 	var err error
+	selector := "arlon-cluster=" + clusterName + ",arlon-type=profile-app"
 	apps, err := appIf.List(context.Background(),
-		&argoapp.ApplicationQuery{Selector: "arlon-cluster=" + clusterName + ",arlon-type=profile-app"})
+		&argoapp.ApplicationQuery{Selector: &selector})
 	for _, app := range apps.Items {
 		cascade := true
 		_, err = appIf.Delete(
