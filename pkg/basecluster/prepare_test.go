@@ -2,12 +2,13 @@ package basecluster
 
 import (
 	"fmt"
-	"github.com/go-git/go-billy/v5/osfs"
-	"github.com/otiai10/copy"
-	"gotest.tools/assert"
 	"os"
 	"path"
 	"testing"
+
+	"github.com/go-git/go-billy/v5/osfs"
+	"github.com/otiai10/copy"
+	"gotest.tools/v3/assert"
 )
 
 type testCase struct {
