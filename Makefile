@@ -78,8 +78,12 @@ build-cli-mac-amd64: fmt vet ## Build CLI binary for Mac (AMD/ Intel CPU)
 
 build-cli-mac-arm64: fmt vet ## Build CLI binary for Mac (Apple Silicon)
 	GOOS=darwin GOARCH=arm64 go build -o bin/arlon main.go
-	
+
+ifeq (GOARCH,"arm64")
 build-cli-mac: build-cli-mac-arm64
+else
+build-cli-mac: build-cli-mac-amd64
+endif
 
 # Arlon has not been tested on Windows yet.
 build-cli-win: fmt vet ## Build CLI binary for Windows.
