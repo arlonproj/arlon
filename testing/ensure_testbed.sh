@@ -152,7 +152,7 @@ tb_cntr_name='kind-arlon-testbed'
 
 if ! kind get clusters | grep ${tb_cntr_name}; then
     echo testbed container not found
-    if ! kind create cluster --name ${tb_cntr_name}; then
+    if ! kind create cluster --config testing/kind_config.yaml --name ${tb_cntr_name}; then
         echo failed to create cluster
         exit 6
     fi
@@ -222,6 +222,12 @@ if ! kubectl get secret argocd-creds -n arlon &> /dev/null ; then
     rm -f ${tmp_config}
 else
     echo argo-creds secret already exists
+fi
+
+# CAPI Docker provider
+if ! kubectl get ns capd-system &> /dev/null ; then
+    echo configuring CAPI Docker provider
+    CLUSTER_TOPOLOGY=true clusterctl init --infrastructure docker
 fi
 
 # Deploy arlon controller
