@@ -284,17 +284,17 @@ fi
 
 if ! arlon clusterspec list|grep capi-kubeadm-3node > /dev/null ; then
     echo creating capi-kubeadm-3node clusterspec
-    arlon clusterspec create capi-kubeadm-3node --api capi --cloud aws --type kubeadm --kubeversion v1.18.16 --nodecount 3 --nodetype t2.medium --tags devel,test --desc "3 node kubeadm for dev/test" --region us-west-2 --sshkey leb
+    arlon clusterspec create capi-kubeadm-3node --api capi --cloud aws --type kubeadm --kubeversion v1.21.10 --nodecount 3 --nodetype t2.medium --tags devel,test --desc "3 node kubeadm for dev/test" --region us-west-2 --sshkey leb
 fi
 
 if ! arlon clusterspec list|grep capi-eks > /dev/null ; then
     echo creating capi-eks clusterspec
-    arlon clusterspec create capi-eks --api capi --cloud aws --type eks --kubeversion v1.18.16 --nodecount 2 --nodetype t2.large --tags staging --desc "2 node eks for general purpose"  --region us-west-2 --sshkey leb
+    arlon clusterspec create capi-eks --api capi --cloud aws --type eks --kubeversion v1.21.10 --nodecount 2 --nodetype t2.large --tags staging --desc "2 node eks for general purpose"  --region us-west-2 --sshkey leb
 fi
 
 if ! arlon clusterspec list|grep xplane-eks-3node > /dev/null ; then
     echo creating xplane-eks-3node clusterspec
-    arlon clusterspec create xplane-eks-3node --api xplane --cloud aws --type eks --kubeversion v1.18.16 --nodecount 4 --nodetype t2.small --tags experimental --desc "4 node eks managed by crossplane"  --region us-west-2 --sshkey leb
+    arlon clusterspec create xplane-eks-3node --api xplane --cloud aws --type eks --kubeversion v1.21.10 --nodecount 4 --nodetype t2.small --tags experimental --desc "4 node eks managed by crossplane"  --region us-west-2 --sshkey leb
 fi
 
 echo --- All done ---
