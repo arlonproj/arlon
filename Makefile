@@ -6,8 +6,9 @@ REPO_ORG ?= arlonproj
 REPO_NAME ?= arlon
 # Image URL to use all building/pushing image targets
 IMG ?= $(REPO_SERVER)/$(REPO_ORG)/$(REPO_NAME)/controller:$(VERSION)
-# Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
-CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
+# Produce CRDs with multiversion enabled for v1 APIs - fixes failure in make test
+# See https://book.kubebuilder.io/reference/generating-crd.html#multiple-versions 
+CRD_OPTIONS ?= "crd"
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -72,11 +73,17 @@ build-cli: fmt vet ## Build CLI binary (with the current OS and CPU architecture
 build-cli-linux: fmt vet ## Build CLI binary for Linux
 	GOOS=linux GOARCH=amd64 go build -o bin/arlon main.go
 
-build-cli-mac: fmt vet ## Build CLI binary for Mac (AMD/ Intel CPU)
+build-cli-mac-amd64: fmt vet ## Build CLI binary for Mac (AMD/ Intel CPU)
 	GOOS=darwin GOARCH=amd64 go build -o bin/arlon main.go
 
-build-cli-mac: fmt vet ## Build CLI binary for Mac (Apple Silicon)
+build-cli-mac-arm64: fmt vet ## Build CLI binary for Mac (Apple Silicon)
 	GOOS=darwin GOARCH=arm64 go build -o bin/arlon main.go
+
+ifeq (GOARCH,"arm64")
+build-cli-mac: build-cli-mac-arm64
+else
+build-cli-mac: build-cli-mac-amd64
+endif
 
 # Arlon has not been tested on Windows yet.
 build-cli-win: fmt vet ## Build CLI binary for Windows.
@@ -112,7 +119,7 @@ undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/confi
 
 CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
 controller-gen: ## Download controller-gen locally if necessary.
-	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.4.1)
+	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.8.0)
 
 KUSTOMIZE = $(shell pwd)/bin/kustomize
 kustomize: ## Download kustomize locally if necessary.
@@ -131,3 +138,6 @@ GOBIN=$(PROJECT_DIR)/bin go install $(2) ;\
 rm -rf $$TMP_DIR ;\
 }
 endef
+
+pkgtest:
+	go test -v ./pkg/...

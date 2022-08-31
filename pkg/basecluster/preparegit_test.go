@@ -2,14 +2,15 @@ package basecluster
 
 import (
 	"errors"
+	"os"
+	"path"
+	"testing"
+
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/gitutils"
 	gogit "github.com/go-git/go-git/v5"
 	"github.com/otiai10/copy"
-	"gotest.tools/assert"
-	"os"
-	"path"
-	"testing"
+	"gotest.tools/v3/assert"
 )
 
 func TestGitPreparation(t *testing.T) {

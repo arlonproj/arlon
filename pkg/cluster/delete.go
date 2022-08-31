@@ -3,6 +3,7 @@ package cluster
 import (
 	"context"
 	"fmt"
+
 	argoclient "github.com/argoproj/argo-cd/v2/pkg/apiclient"
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	restclient "k8s.io/client-go/rest"
@@ -40,8 +41,9 @@ func Delete(
 			})
 		return err
 	}
+	clusterQuery := "arlon-cluster=" + name
 	apps, err := appIf.List(context.Background(),
-		&argoapp.ApplicationQuery{Selector: "arlon-cluster=" + name})
+		&argoapp.ApplicationQuery{Selector: &clusterQuery})
 	if err != nil {
 		return fmt.Errorf("failed to list apps related to cluster: %s", err)
 	}

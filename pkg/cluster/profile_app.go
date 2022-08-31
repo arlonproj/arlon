@@ -3,6 +3,7 @@ package cluster
 import (
 	"context"
 	"fmt"
+
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
@@ -20,7 +21,7 @@ func CreateProfileApp(
 	app := constructProfileApp(profileAppName, argocdNs, clusterName, prof)
 	if createInArgoCd {
 		appCreateRequest := argoapp.ApplicationCreateRequest{
-			Application: *app,
+			Application: app,
 		}
 		_, err := appIf.Create(context.Background(), &appCreateRequest)
 		if err != nil {
@@ -28,4 +29,29 @@ func CreateProfileApp(
 		}
 	}
 	return app, nil
+}
+
+// DestroyProfileApp destroys a profile-app that accompanies an arlon-app for gen2 clusters
+func DestroyProfileApps(
+	appIf argoapp.ApplicationServiceClient,
+	clusterName string,
+) error {
+	var err error
+	selector := "arlon-cluster=" + clusterName + ",arlon-type=profile-app"
+	apps, err := appIf.List(context.Background(),
+		&argoapp.ApplicationQuery{Selector: &selector})
+	for _, app := range apps.Items {
+		cascade := true
+		_, err = appIf.Delete(
+			context.Background(),
+			&argoapp.ApplicationDeleteRequest{
+				Name:    &app.Name,
+				Cascade: &cascade,
+			})
+		if err != nil {
+			return fmt.Errorf("failed to delete related profile app %s: %s",
+				app.Name, err)
+		}
+	}
+	return err
 }
