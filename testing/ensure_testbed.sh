@@ -62,6 +62,11 @@ if ! clusterctl version > /dev/null; then
     exit 3
 fi
 
+# increase limits for Docker provider:
+# https://cluster-api.sigs.k8s.io/user/troubleshooting.html#cluster-api-with-docker----too-many-open-files
+sudo sysctl fs.inotify.max_user_watches=1048576
+sudo sysctl fs.inotify.max_user_instances=8192
+
 if bridge_addr=$(ip addr |grep 'scope global docker0'|awk '{print $2}'|cut -d / -f 1) ; then
     echo docker bridge address is $bridge_addr
 else
