@@ -42,7 +42,7 @@ if ! git version > /dev/null; then
     exit 1
 fi
 
-if ! docker ps > /dev/null; then
+if ! sudo docker ps > /dev/null; then
     echo Docker not installed or operational
     exit 1
 fi
@@ -91,8 +91,8 @@ if [ ! -d "${GIT_ROOT}" ]; then
 fi
 
 gitserver_cntr_name="arlon-testbed-gitserver"
-if ! docker inspect ${gitserver_cntr_name} &> /dev/null ; then
-    if ! docker run -d -v ${GIT_ROOT}:/var/lib/git -p ${git_server_port}:80 --name ${gitserver_cntr_name} --rm cirocosta/gitserver-http > /dev/null ; then
+if ! sudo docker inspect ${gitserver_cntr_name} &> /dev/null ; then
+    if ! sudo docker run -d -v ${GIT_ROOT}:/var/lib/git -p ${git_server_port}:80 --name ${gitserver_cntr_name} --rm cirocosta/gitserver-http > /dev/null ; then
         echo failed to start git server container
         exit 5
     else
