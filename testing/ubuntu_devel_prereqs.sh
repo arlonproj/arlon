@@ -20,3 +20,9 @@ mkdir -p devel
 pushd devel
 git clone https://github.com/arlonproj/arlon.git
 
+cd arlon
+git checkout private/leb/testbed
+go build
+sudo ln -s ~/devel/arlon/arlon /usr/local/bin/arlon
+
+
