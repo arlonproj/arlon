@@ -27,7 +27,7 @@ function wait_until()
 }
 
 arlon_repo=`pwd`
-if ! grep git@github.com:arlonproj/arlon.git .git/config &> /dev/null ; then
+if ! [ -f testing/ensure_testbed.sh ] ; then
     echo "it doesn't look like we are in the arlon repository"
     exit 1
 fi
