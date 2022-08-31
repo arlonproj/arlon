@@ -57,4 +57,24 @@ nameReference:
   fieldSpecs:
   - path: spec/template/spec/bootstrap/configRef/name
     kind: MachineDeployment
+- kind: DockerCluster
+  group: infrastructure.cluster.x-k8s.io
+  version: v1beta1
+  fieldSpecs:
+  - path: spec/infrastructureRef/name
+    kind: Cluster
+- kind: DockerMachine
+  group: infrastructure.cluster.x-k8s.io
+  version: v1beta1
+  fieldSpecs:
+  - path: spec/infrastructureRef/name
+    kind: Machine
+- kind: DockerMachineTemplate
+  group: infrastructure.cluster.x-k8s.io
+  version: v1beta1
+  fieldSpecs:
+  - path: spec/template/spec/infrastructureRef/name
+    kind: MachineDeployment
+  - path: spec/machineTemplate/infrastructureRef/name
+    kind: KubeadmControlPlane
 `
