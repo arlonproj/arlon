@@ -1,9 +1,6 @@
 
 sudo apt -y update
 
-sudo apt -y install docker.io
-sudo usermod -aG docker ${USER}
-
 cd
 mkdir -p downloads
 pushd downloads
@@ -32,3 +29,6 @@ if ! which kind; then
    sudo mv kind /usr/local/bin/
 fi
 
+sudo apt -y install docker.io
+sudo usermod -aG docker ${USER}
+echo "Log out and back in to ensure you can run docker command ..."
