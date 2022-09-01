@@ -8,15 +8,15 @@
 - cd to repo top directory
 - check out `private/leb/testbed` branch (temporary)
 - run: `testing/ubuntu_devel_prereqs.sh`
-- run: `testing/ubuntu_testbed_prereqs.sh`
-- log out and log back in to ensure you have the right permissions to run docker
+- run: `testing/ubuntu_testbed_prereqs.sh` (this step can be run in parallel in a separate window, a few seconds after the previous step)
+- log out and log back in to ensure you have the right permissions to run docker (run `docker ps` to verify)
 - create testbed: `testing/ensure_testbed.sh`
 - optionally run E2E smoke test: testing/test_basecluster_deploy_with_capd.sh
-- optional cleanup: `arlon cluster delete capd-1`. Unfortunately, there is a bug in CAPD provider that won't clean up the last Docker container (used by control plane)
-- to clean up manually the things that CAPD didn't do properly:
+- optional cleanup: `arlon cluster delete capd-1`.
+- Unfortunately, there is a bug in CAPD provider that won't clean up some resources. To clean up manually:
   - get a list of remaining dockermachines: `kubectl -n capd-1 get dockermachine`
-  - for each of those, delete them by editing it: `kubectl -n capd-1 edit dockermachine xxx` to remove all `finalizer`s
-  - verify that all k8s resources got cleaned up: `argocd app list` should produce empty list
-  - clean up docker containers: run `docker ps -a` to see all containers. Delete the ones prefixed with `capd-1-` using `docker stop` and `docker rm`
+  - for each of those, delete them by editing it: `kubectl -n capd-1 edit dockermachine xxx` to remove all finalizers. This should cause the resource to go away.
+  - verify that all k8s resources got cleaned up: `argocd app list` should eventually produce empty list
+  - clean up docker containers: run `docker ps -a` to see all containers. Delete the ones prefixed with `capd-1-` using `docker stop` and `docker rm` (or `docker rm -f`)
 - to clean up the entire testbed, run `testing/teardown_testbed.sh`
 
