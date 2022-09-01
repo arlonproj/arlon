@@ -49,7 +49,7 @@ fi
 arlon cluster create --cluster-name capd-1 --repo-url http://172.17.0.1:8188/myrepo.git --repo-path baseclusters/capd-test --profile dynamic-2-calico
 
 echo '------- waiting for control plane to become ready ---------'
-wait_until 'set -o pipefail; clusterctl -n capd-1 describe cluster capd-1-capi-quickstart|grep ControlPlane|grep True > /dev/null' 10 30
+wait_until 'set -o pipefail; clusterctl -n capd-1 describe cluster capd-1-capi-quickstart|grep ControlPlane|grep True &> /dev/null' 10 30
 
 echo '------- waiting for machinedeployment to become ready (happens when calico is deployed) ---------'
 wait_until 'set -o pipefail; clusterctl -n capd-1 describe cluster capd-1-capi-quickstart|grep MachineDeployment|grep True > /dev/null' 10 60
