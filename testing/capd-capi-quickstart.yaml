@@ -1,0 +1,186 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: capi-quickstart
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+      - 192.168.0.0/16
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: KubeadmControlPlane
+    name: capi-quickstart-control-plane
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: DockerCluster
+    name: capi-quickstart
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: DockerCluster
+metadata:
+  name: capi-quickstart
+spec:
+    controlPlaneEndpoint:
+      host: 172.19.0.4
+      port: 6443
+    loadBalancer: {}
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: KubeadmControlPlane
+metadata:
+  name: capi-quickstart-control-plane
+spec:
+    kubeadmConfigSpec:
+      clusterConfiguration:
+        apiServer:
+          certSANs:
+          - localhost
+          - 127.0.0.1
+          - 0.0.0.0
+          - host.docker.internal
+          extraArgs:
+            admission-control-config-file: /etc/kubernetes/kube-apiserver-admission-pss.yaml
+          extraVolumes:
+          - hostPath: /etc/kubernetes/kube-apiserver-admission-pss.yaml
+            mountPath: /etc/kubernetes/kube-apiserver-admission-pss.yaml
+            name: admission-pss
+            pathType: File
+            readOnly: true
+        controllerManager:
+          extraArgs:
+            enable-hostpath-provisioner: "true"
+        dns: {}
+        etcd:
+          local: {}
+        networking: {}
+        scheduler: {}
+      files:
+      - content: |
+          apiVersion: apiserver.config.k8s.io/v1
+          kind: AdmissionConfiguration
+          plugins:
+          - name: PodSecurity
+            configuration:
+              apiVersion: pod-security.admission.config.k8s.io/v1beta1
+              kind: PodSecurityConfiguration
+              defaults:
+                enforce: "baseline"
+                enforce-version: "latest"
+                audit: "restricted"
+                audit-version: "latest"
+                warn: "restricted"
+                warn-version: "latest"
+              exemptions:
+                usernames: []
+                runtimeClasses: []
+                namespaces: [kube-system]
+        path: /etc/kubernetes/kube-apiserver-admission-pss.yaml
+      format: cloud-config
+      initConfiguration:
+        localAPIEndpoint: {}
+        nodeRegistration:
+          criSocket: unix:///var/run/containerd/containerd.sock
+          kubeletExtraArgs:
+            cgroup-driver: cgroupfs
+            eviction-hard: nodefs.available<0%,nodefs.inodesFree<0%,imagefs.available<0%
+      joinConfiguration:
+        discovery: {}
+        nodeRegistration:
+          criSocket: unix:///var/run/containerd/containerd.sock
+          kubeletExtraArgs:
+            cgroup-driver: cgroupfs
+            eviction-hard: nodefs.available<0%,nodefs.inodesFree<0%,imagefs.available<0%
+    machineTemplate:
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: DockerMachineTemplate
+        name: capi-quickstart-control-plane
+      metadata:
+        labels:
+          cluster.x-k8s.io/cluster-name: capi-quickstart
+    replicas: 1
+    rolloutStrategy:
+      rollingUpdate:
+        maxSurge: 1
+      type: RollingUpdate
+    version: v1.21.10
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: DockerMachineTemplate
+metadata:
+  name: capi-quickstart-control-plane
+spec:
+  template:
+    spec:
+      customImage: kindest/node:v1.21.10
+      extraMounts:
+      - containerPath: /var/run/docker.sock
+        hostPath: /var/run/docker.sock
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: capi-quickstart-md-0
+spec:
+  clusterName: capi-quickstart
+  minReadySeconds: 0
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      cluster.x-k8s.io/cluster-name: capi-quickstart
+      cluster.x-k8s.io/deployment-name: md-0
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        cluster.x-k8s.io/cluster-name: capi-quickstart
+        cluster.x-k8s.io/deployment-name: md-0
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KubeadmConfigTemplate
+          name: capi-quickstart-md-0-bootstrap
+      clusterName: capi-quickstart
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: DockerMachineTemplate
+        name: capi-quickstart-md-0-infra
+      version: v1.21.10
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: DockerMachineTemplate
+metadata:
+  name: capi-quickstart-md-0-infra
+spec:
+  template:
+    spec:
+      customImage: kindest/node:v1.21.10
+      extraMounts:
+      - containerPath: /var/run/docker.sock
+        hostPath: /var/run/docker.sock
+
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: KubeadmConfigTemplate
+metadata:
+  name: capi-quickstart-md-0-bootstrap
+spec:
+  template:
+    spec:
+      format: cloud-config
+      joinConfiguration:
+        discovery: {}
+        nodeRegistration:
+          criSocket: unix:///var/run/containerd/containerd.sock
+          kubeletExtraArgs:
+            cgroup-driver: cgroupfs
+            eviction-hard: nodefs.available<0%,nodefs.inodesFree<0%,imagefs.available<0%
+

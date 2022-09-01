@@ -1,0 +1,11 @@
+contexts:
+- name: argocd-server.argocd.svc.cluster.local
+  server: argocd-server.argocd.svc.cluster.local
+  user: argocd-server.argocd.svc.cluster.local
+current-context: argocd-server.argocd.svc.cluster.local
+servers:
+- grpc-web-root-path: ""
+  insecure: true
+  server: argocd-server.argocd.svc.cluster.local
+users:
+- name: argocd-server.argocd.svc.cluster.local
