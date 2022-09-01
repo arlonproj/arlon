@@ -6,7 +6,6 @@
 - Minimum specs: 8 GB RAM, 2 vCPUs, 30 GB disk (the last one is important)
 - git clone arlon repo
 - cd to repo top directory
-- check out `private/leb/testbed` branch (temporary)
 - run: `testing/ubuntu_devel_prereqs.sh`
 - run: `testing/ubuntu_testbed_prereqs.sh` (this step can be run in parallel in a separate window, a few seconds after starting the previous step)
 - log out and log back in to ensure you have the right permissions to run docker (run `docker ps` to verify)
