@@ -1,9 +1,8 @@
 set -e
 set -o pipefail
 
-cd
 mkdir -p ~/downloads
-pushd downloads
+pushd ~/downloads
 
 # Uninstall go package just in case. Idempotent
 sudo apt -y update
