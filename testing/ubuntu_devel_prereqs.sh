@@ -18,6 +18,9 @@ tar xf go1.19.linux-amd64.tar.gz
 sudo ln -s /home/ubuntu/downloads/go/bin/go /usr/local/bin/go
 sudo ln -s /home/ubuntu/downloads/go/bin/gofmt /usr/local/bin/gofmt
 
+popd
+
+
 go build
 sudo ln -s `pwd`/arlon /usr/local/bin/arlon
 
