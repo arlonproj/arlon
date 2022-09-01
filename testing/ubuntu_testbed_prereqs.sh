@@ -31,4 +31,4 @@ fi
 
 sudo apt -y install docker.io
 sudo usermod -aG docker ${USER}
-echo "Log out and back in to ensure you can run docker command ..."
+echo "Log out and back in or run `newgrp docker` to ensure you can run docker command ..."
