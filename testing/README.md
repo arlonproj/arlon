@@ -8,7 +8,7 @@
 - cd to repo top directory
 - run: `testing/ubuntu_devel_prereqs.sh`
 - run: `testing/ubuntu_testbed_prereqs.sh` (this step can be run in parallel in a separate window, a few seconds after starting the previous step)
-- log out and log back in to ensure you have the right permissions to run docker (run `docker ps` to verify)
+- log out and log back in to ensure you have the right permissions to run docker (run `docker ps` to verify). Alternatively, run `newgrp docker`, which starts a new shell.
 - create testbed: `testing/ensure_testbed.sh`
 - optionally run E2E smoke test: `testing/test_basecluster_deploy_with_capd.sh`. This registers a base cluster that uses CAPD, and deploys a workload cluster.
 - optional cleanup: `arlon cluster delete capd-1`.
