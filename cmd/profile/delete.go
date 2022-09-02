@@ -46,7 +46,5 @@ func deleteProfile(config *restclient.Config, ns string, profileName string) err
 		Name:      profileName,
 	}, &prof)
 	errors.CheckError(err)
-	return ctrl. /*ALT*/ Delete(ctx, &prof, &client.DeleteOptions{})
-	//kubeClient := kubernetes.NewForConfigOrDie(config)
-	//return profile.Delete(kubeClient, ns, profileName)
+	return ctrl.Delete(ctx, &prof, &client.DeleteOptions{})
 }
