@@ -1,10 +1,13 @@
 package profile
 
 import (
+	"context"
 	"fmt"
-	"github.com/arlonproj/arlon/pkg/profile"
+	"github.com/argoproj/argo-cd/v2/util/errors"
+	v1 "github.com/arlonproj/arlon/api/v1"
+	"github.com/arlonproj/arlon/pkg/controller"
 	"github.com/spf13/cobra"
-	"k8s.io/client-go/kubernetes"
+	"k8s.io/apimachinery/pkg/types"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -33,6 +36,16 @@ func deleteProfileCommand() *cobra.Command {
 }
 
 func deleteProfile(config *restclient.Config, ns string, profileName string) error {
-	kubeClient := kubernetes.NewForConfigOrDie(config)
-	return profile.Delete(kubeClient, ns, profileName)
+	ctrl, err := controller.NewClient(config)
+	errors.CheckError(err)
+	ctx := context.Background()
+	var prof v1.Profile
+	err = ctrl.Get(ctx, types.NamespacedName{
+		Namespace: ns,
+		Name:      profileName,
+	}, &prof)
+	errors.CheckError(err)
+	return ctrl. /*ALT*/ Delete(ctx, &prof, nil)
+	//kubeClient := kubernetes.NewForConfigOrDie(config)
+	//return profile.Delete(kubeClient, ns, profileName)
 }
