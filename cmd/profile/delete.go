@@ -10,6 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 import "github.com/argoproj/argo-cd/v2/util/cli"
@@ -45,7 +46,7 @@ func deleteProfile(config *restclient.Config, ns string, profileName string) err
 		Name:      profileName,
 	}, &prof)
 	errors.CheckError(err)
-	return ctrl. /*ALT*/ Delete(ctx, &prof, nil)
+	return ctrl. /*ALT*/ Delete(ctx, &prof, &client.DeleteOptions{})
 	//kubeClient := kubernetes.NewForConfigOrDie(config)
 	//return profile.Delete(kubeClient, ns, profileName)
 }
