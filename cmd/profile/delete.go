@@ -1,16 +1,14 @@
 package profile
 
 import (
-	"context"
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/util/errors"
-	v1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/controller"
+	"github.com/arlonproj/arlon/pkg/profile"
 	"github.com/spf13/cobra"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 import "github.com/argoproj/argo-cd/v2/util/cli"
@@ -28,7 +26,15 @@ func deleteProfileCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get k8s client config: %s", err)
 			}
-			return deleteProfile(config, ns, args[0])
+			profileName := args[0]
+			err = deleteProfile(config, ns, profileName)
+			if err != nil {
+				fmt.Printf("%s not found, assuming legacy profile\n", profileName)
+				// try deleting the legacy profile
+				errLegacy := deleteProfileLegacy(config, ns, profileName)
+				errors.CheckError(errLegacy)
+			}
+			return nil
 		},
 	}
 	clientConfig = cli.AddKubectlFlagsToCmd(command)
@@ -39,13 +45,11 @@ func deleteProfileCommand() *cobra.Command {
 func deleteProfile(config *restclient.Config, ns string, profileName string) error {
 	ctrl, err := controller.NewClient(config)
 	errors.CheckError(err)
-	ctx := context.Background()
-	prof := v1.Profile{
-		TypeMeta: metav1.TypeMeta{},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      profileName,
-			Namespace: ns,
-		},
-	}
-	return ctrl.Delete(ctx, &prof, &client.DeleteOptions{})
+	return profile.Delete(ctrl, ns, profileName)
+
+}
+
+func deleteProfileLegacy(config *restclient.Config, ns string, profileName string) error {
+	kubeClient := kubernetes.NewForConfigOrDie(config)
+	return profile.DeleteLegacy(kubeClient, ns, profileName)
 }
