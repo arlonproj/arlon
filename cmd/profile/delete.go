@@ -7,7 +7,7 @@ import (
 	v1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/controller"
 	"github.com/spf13/cobra"
-	"k8s.io/apimachinery/pkg/types"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -40,11 +40,12 @@ func deleteProfile(config *restclient.Config, ns string, profileName string) err
 	ctrl, err := controller.NewClient(config)
 	errors.CheckError(err)
 	ctx := context.Background()
-	var prof v1.Profile
-	err = ctrl.Get(ctx, types.NamespacedName{
-		Namespace: ns,
-		Name:      profileName,
-	}, &prof)
-	errors.CheckError(err)
+	prof := v1.Profile{
+		TypeMeta: metav1.TypeMeta{},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      profileName,
+			Namespace: ns,
+		},
+	}
 	return ctrl.Delete(ctx, &prof, &client.DeleteOptions{})
 }
