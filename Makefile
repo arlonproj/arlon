@@ -65,6 +65,22 @@ test: manifests generate fmt vet ## Run tests.
 build: generate fmt vet ## Build manager binary.
 	go build -o bin/arlon main.go
 
+# goreleaser can invoke this target to produce binaries for different OS and CPU arch combinations
+build-cli: fmt vet ## Build CLI binary (with the current OS and CPU architecture) from the go env.
+	go build -o bin/arlon main.go
+
+build-cli-linux: fmt vet ## Build CLI binary for Linux
+	GOOS=linux GOARCH=amd64 go build -o bin/arlon main.go
+
+build-cli-mac-amd64: fmt vet ## Build CLI binary for Mac (AMD/ Intel CPU)
+	GOOS=darwin GOARCH=amd64 go build -o bin/arlon main.go
+
+build-cli-mac-arm64: fmt vet ## Build CLI binary for Mac (Apple Silicon)
+	GOOS=darwin GOARCH=arm64 go build -o bin/arlon main.go
+
+build-cli-mac: fmt vet
+	GOOS=darwin go build -o bin/arlon main.go
+
 run: manifests generate fmt vet ## Run a controller from your host.
 	go run ./main.go
 
@@ -95,7 +111,7 @@ undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/confi
 
 CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
 controller-gen: ## Download controller-gen locally if necessary.
-	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.9.0)
+	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.9.2)
 
 KUSTOMIZE = $(shell pwd)/bin/kustomize
 kustomize: ## Download kustomize locally if necessary.
