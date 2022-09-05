@@ -62,6 +62,9 @@ test: manifests generate fmt vet ## Run tests.
 
 ##@ Build
 
+clean:
+	rm -rf ./testbin; rm -rf ./bin
+
 build: generate fmt vet ## Build manager binary.
 	go build -o bin/arlon main.go
 
