@@ -63,7 +63,7 @@ func Create(
 	}
 	if createInArgoCd {
 		appCreateRequest := argoapp.ApplicationCreateRequest{
-			Application: *rootApp,
+			Application: rootApp,
 		}
 		_, err := appIf.Create(context.Background(), &appCreateRequest)
 		if err != nil {

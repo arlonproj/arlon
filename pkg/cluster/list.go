@@ -20,8 +20,9 @@ func List(
 	argocdNs string,
 ) (clist []Cluster, err error) {
 	log := logpkg.GetLogger()
+	query := "managed-by=arlon,arlon-type=cluster"
 	apps, err := appIf.List(context.Background(),
-		&apppkg.ApplicationQuery{Selector: "managed-by=arlon,arlon-type=cluster"})
+		&apppkg.ApplicationQuery{Selector: &query})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list argocd applications: %s", err)
 	}

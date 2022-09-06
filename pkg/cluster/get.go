@@ -21,10 +21,11 @@ func Get(
 	name string,
 ) (cl *Cluster, err error) {
 	log := logpkg.GetLogger()
+	query := "managed-by=arlon,arlon-type=cluster"
 	app, err := appIf.Get(context.Background(),
 		&apppkg.ApplicationQuery{
 			Name:     &name,
-			Selector: "managed-by=arlon,arlon-type=cluster",
+			Selector: &query,
 		})
 	if err == nil {
 		return &Cluster{

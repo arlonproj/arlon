@@ -96,7 +96,7 @@ func ManageExternal(
 	profileAppName := fmt.Sprintf("%s-profile-%s", clusterName, prof.Name)
 	app := constructProfileApp(profileAppName, argocdNs, clusterName, prof)
 	_, err = appIf.Create(context.Background(), &argoapp.ApplicationCreateRequest{
-		Application: *app,
+		Application: app,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to get create profile app: %s", err)
