@@ -62,6 +62,8 @@ test: manifests generate fmt vet ## Run tests.
 	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; export GOARCH=amd64; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR); go test ./... -coverprofile cover.out
 
 ##@ Build
+clean:
+	rm -rf ./testbin; rm -rf ./bin
 
 build: generate fmt vet ## Build manager binary.
 	go build -o bin/arlon main.go
@@ -119,7 +121,7 @@ undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/confi
 
 CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
 controller-gen: ## Download controller-gen locally if necessary.
-	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.8.0)
+	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.9.2)
 
 KUSTOMIZE = $(shell pwd)/bin/kustomize
 kustomize: ## Download kustomize locally if necessary.
