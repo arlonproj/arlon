@@ -41,7 +41,7 @@ func NewCommand() *cobra.Command {
 			// Install kubectl and point it to the kubeconfig
 			_, err = installKubectl()
 			if err == ErrKubectlPresent {
-				fmt.Println(Green("✓") + " kubectl is already present at default(/usr/local/bin/kubectl) location or user specifed location")
+				fmt.Println(Green("✓") + " kubectl is already present at default(" + Red(defaultKubectlPath) + ")location or user specifed location")
 			} else if err != nil {
 				fmt.Println(Red("x ")+"Error while installing kubectl ", err)
 			} else {
@@ -59,7 +59,7 @@ func NewCommand() *cobra.Command {
 			fmt.Println()
 			_, err = installArgoCD()
 			if err == ErrArgoCDPresent {
-				fmt.Println(Green("✓") + " argocd is already present at default(/usr/local/bin/argocd) location or user specifed location")
+				fmt.Println(Green("✓") + " argocd is already present at default(" + Red(defaultArgocdPath) + ")location or user specifed location")
 			} else if err != nil {
 				fmt.Println(Red("x ")+"Error while installing argocd ", err)
 			} else {
@@ -217,7 +217,7 @@ func installArgoCDPlatform() error {
 // Downloads the latest version of argocd
 func downloadArgoCD(osPlatform string) error {
 	var downloadArgoCD string
-	argocdVersion := "v2.2.12"
+	argocdVersion := "v2.4.11"
 	if osPlatform == "windows" {
 		downloadArgoCD = "https://github.com/argoproj/argo-cd/releases/download/" + argocdVersion + "/argocd-" + osPlatform + "-amd64.exe"
 	} else {

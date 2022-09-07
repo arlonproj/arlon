@@ -2,6 +2,8 @@ package clusterspec
 
 import (
 	"fmt"
+
+	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/arlonproj/arlon/pkg/clusterspec"
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/kubernetes"
@@ -9,16 +11,15 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-import "github.com/argoproj/argo-cd/v2/util/cli"
-
 func deleteClusterspecCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
 	var ns string
 	command := &cobra.Command{
-		Use:   "delete",
-		Short: "Delete clusterspec",
-		Long:  "Delete clusterspec",
-		Args:  cobra.ExactArgs(1),
+		Use:     "delete",
+		Short:   "Delete clusterspec",
+		Long:    "Delete clusterspec",
+		Example: "arlon clusterpec delete <clusterspec name> [flags]",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			config, err := clientConfig.ClientConfig()
 			if err != nil {

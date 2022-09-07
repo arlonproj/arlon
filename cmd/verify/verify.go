@@ -25,7 +25,6 @@ var (
 	ErrGit                   = errors.New("git is not installed or missing in your $PATH")
 	ErrArlonNs               = errors.New("arlon is not installed or missing in your $PATH")
 	ErrCapi                  = errors.New("capi services are not installed or missing in your $PATH")
-	ErrCapiCP                = errors.New("error fetching the capi cloudproviders")
 	ErrNs                    = errors.New("failed to get the namespace")
 	Yellow                   = color.New(color.FgHiYellow).SprintFunc()
 	Green                    = color.New(color.FgGreen).SprintFunc()
@@ -87,9 +86,7 @@ func verify(clientConfig clientcmd.ClientConfig, kubeconfigPath string) error {
 
 	// Verify capi status
 	capiStatus, err := verifyCapi(config)
-	if err == ErrCapiCP {
-		fmt.Println(Red("x ")+"Error while verifying capi cloudprovider status: ", err)
-	} else if err == ErrCapi {
+	if err == ErrCapi {
 		fmt.Println(Red("x ")+"Error while verifying capi services status ", err)
 	} else {
 		fmt.Println("Successfully verified capi status")
@@ -175,37 +172,7 @@ func verifyCapi(config *restclient.Config) (bool, error) {
 	if errCapi != nil {
 		return false, ErrCapi
 	}
-
-	// Check for capa-system namespace
-	errCapaCP := checkCapaCloudProvider(config)
-	if errCapaCP == ErrNs {
-		//Check for capz-system incase capa-system is not present
-		errCapaZ := checkCapzCloudProvider(config)
-		if errCapaZ == ErrNs {
-			return false, ErrCapiCP
-		}
-	}
-
 	return true, nil
-
-}
-
-// Function to check capa-system namespace
-func checkCapaCloudProvider(config *restclient.Config) error {
-	errCapa := checkNamespace(config, "capa-system")
-	if errCapa != nil {
-		return errCapa
-	}
-	return nil
-}
-
-// Function to check capz-system namespace
-func checkCapzCloudProvider(config *restclient.Config) error {
-	errCapz := checkNamespace(config, "capz-system")
-	if errCapz != nil {
-		return errCapz
-	}
-	return nil
 }
 
 // Function to check for a particular namespace
