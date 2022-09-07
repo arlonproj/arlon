@@ -2,10 +2,10 @@ package profile
 
 import (
 	"fmt"
-	"github.com/argoproj/argo-cd/v2/util/errors"
 	"github.com/arlonproj/arlon/pkg/controller"
 	"github.com/arlonproj/arlon/pkg/profile"
 	"github.com/spf13/cobra"
+	apierr "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -29,10 +29,15 @@ func deleteProfileCommand() *cobra.Command {
 			profileName := args[0]
 			err = deleteProfile(config, ns, profileName)
 			if err != nil {
+				if !apierr.IsNotFound(err) {
+					return err
+				}
 				fmt.Printf("%s not found, assuming legacy profile\n", profileName)
 				// try deleting the legacy profile
 				errLegacy := deleteProfileLegacy(config, ns, profileName)
-				errors.CheckError(errLegacy)
+				if errLegacy != nil {
+					return errLegacy
+				}
 			}
 			return nil
 		},
@@ -44,7 +49,9 @@ func deleteProfileCommand() *cobra.Command {
 
 func deleteProfile(config *restclient.Config, ns string, profileName string) error {
 	ctrl, err := controller.NewClient(config)
-	errors.CheckError(err)
+	if err != nil {
+		return fmt.Errorf("failed to get controller client: %w", err)
+	}
 	return profile.Delete(ctrl, ns, profileName)
 
 }
