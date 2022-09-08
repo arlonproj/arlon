@@ -3,7 +3,6 @@ package gitrepo
 import (
 	"encoding/json"
 	"fmt"
-
 	argocdio "github.com/argoproj/argo-cd/v2/util/io"
 	"github.com/arlonproj/arlon/pkg/gitrepo"
 	"github.com/spf13/cobra"
@@ -14,11 +13,10 @@ func unregister() *cobra.Command {
 		repoAlias string
 	)
 	command := &cobra.Command{
-		Use:     "unregister",
-		Args:    cobra.ExactArgs(1),
-		Short:   "unregister a previously registered configuration",
-		Long:    "unregister a previously registered configuration",
-		Example: "arlon git unregister <repoAlias>",
+		Use:   "unregister",
+		Args:  cobra.ExactArgs(1),
+		Short: "unregister a previously registered configuration",
+		Long:  "unregister a previously registered configuration",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			repoAlias = args[0]
 			file, err := gitrepo.ReadDefaultConfig()

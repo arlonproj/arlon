@@ -2,13 +2,13 @@ package clusterspec
 
 import (
 	"fmt"
-
-	"github.com/argoproj/argo-cd/v2/util/cli"
 	cspec "github.com/arlonproj/arlon/pkg/clusterspec"
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
+
+import "github.com/argoproj/argo-cd/v2/util/cli"
 
 func updateClusterspecCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
@@ -25,11 +25,10 @@ func updateClusterspecCommand() *cobra.Command {
 	var clusterAutoscalerMinNodes int
 	var clusterAutoscalerMaxNodes int
 	command := &cobra.Command{
-		Use:     "update",
-		Short:   "Update clusterspec",
-		Long:    "Update exisiting clusterspec",
-		Example: "arlon clusterspec update <clusterspec name> [flags]",
-		Args:    cobra.ExactArgs(1),
+		Use:   "update <clusterspec name> [flags]",
+		Short: "Update clusterspec",
+		Long:  "Update clusterspec",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			config, err := clientConfig.ClientConfig()
 			if err != nil {

@@ -2,13 +2,13 @@ package clusterspec
 
 import (
 	"fmt"
-
-	"github.com/argoproj/argo-cd/v2/util/cli"
 	cspec "github.com/arlonproj/arlon/pkg/clusterspec"
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
+
+import "github.com/argoproj/argo-cd/v2/util/cli"
 
 func createClusterspecCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
@@ -28,11 +28,10 @@ func createClusterspecCommand() *cobra.Command {
 	var clusterAutoscalerMinNodes int
 	var clusterAutoscalerMaxNodes int
 	command := &cobra.Command{
-		Use:     "create",
-		Short:   "Create clusterspec",
-		Long:    "Create clusterspec",
-		Args:    cobra.ExactArgs(1),
-		Example: "arlon clusterspec create capi-kubeadm-3node --api capi --cloud aws --type kubeadm --kubeversion v1.21.10 --nodecount 3 --nodetype t2.medium --tags devel,test --region ${CLOUD_REGION} --sshkey ${SSH_KEY_NAME}",
+		Use:   "create",
+		Short: "Create clusterspec",
+		Long:  "Create clusterspec",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			config, err := clientConfig.ClientConfig()
 			if err != nil {
