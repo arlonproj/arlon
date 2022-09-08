@@ -34,9 +34,10 @@ func createClusterCommand() *cobra.Command {
 	var outputYaml bool
 	var profileName string
 	command := &cobra.Command{
-		Use:   "create",
-		Short: "create new cluster from a base",
-		Long:  "create new cluster from a base",
+		Use:     "create",
+		Short:   "create new cluster from a base",
+		Long:    "create new cluster from a base",
+		Example: "arlon cluster create --cluster-name <clustername> --repo-url <repoUrl> --repo-path <pathToDirectory> [--output-yaml] [--profile <profilename>] [--repo-revision <repoRevision>]",
 		RunE: func(c *cobra.Command, args []string) error {
 			if clusterRepoUrl == "" {
 				var err error

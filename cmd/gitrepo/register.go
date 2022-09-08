@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	cmdutil "github.com/argoproj/argo-cd/v2/cmd/util"
 	"github.com/argoproj/argo-cd/v2/pkg/apiclient/repository"
 	"github.com/argoproj/argo-cd/v2/util/cli"
@@ -22,10 +23,11 @@ func register() *cobra.Command {
 		alias    string
 	)
 	command := &cobra.Command{
-		Use:   "register",
-		Short: "register a git repository configuration",
-		Long:  "register a git repository configuration",
-		Args:  cobra.ExactArgs(1),
+		Use:     "register",
+		Short:   "register a git repository configuration",
+		Long:    "register a git repository configuration",
+		Example: "arlon git register <repoUrl> --user <GithubUserName> --alias <repoAlias> --password <GithubPersonalAccessToken",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			var repoOpts cmdutil.RepoOptions
 			repoUrl = args[0]

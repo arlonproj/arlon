@@ -3,8 +3,9 @@ package cluster
 import (
 	_ "embed"
 	"fmt"
-	"github.com/arlonproj/arlon/pkg/gitrepo"
 	"os"
+
+	"github.com/arlonproj/arlon/pkg/gitrepo"
 
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/cli"
@@ -32,9 +33,10 @@ func deployClusterCommand() *cobra.Command {
 	var profileName string
 	var outputYaml bool
 	command := &cobra.Command{
-		Use:   "deploy",
-		Short: "deploy new cluster",
-		Long:  "deploy new cluster",
+		Use:     "deploy",
+		Short:   "deploy new cluster",
+		Long:    "deploy new cluster",
+		Example: "arlon cluster deploy -repo-url ${WORKSPACE_REPO_URL} --cluster-name <clustername> --profile <profilename> --cluster-spec <clusterspec-name>",
 		RunE: func(c *cobra.Command, args []string) error {
 			if repoUrl == "" {
 				var err error
