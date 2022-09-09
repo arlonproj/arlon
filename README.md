@@ -226,8 +226,13 @@ the workspace repository.
 
 # Installation
 
-We plan to add a CLI command to simplify initial setup. Until then, please
-follow these manual instructions.
+Arlon CLI downloads are provided on GitHub. The CLI is not a self-contained standalone executable though. 
+It is required to point the CLI to a management cluster and setup the Arlon controller in this management cluster. 
+
+We plan to add a command line script to simplify initial setup. 
+For a quickstart minimal demonstration setup, follow the instructions to setup a KIND based testbed [here](https://github.com/arlonproj/arlon/blob/main/testing/README.md)
+
+Please follow the manual instructions in this section for a customised setup.
 
 ## Management cluster
 
@@ -282,6 +287,17 @@ the destination file is named `/tmp/config`, it's important for the secret creat
 - Ensure the controller eventually enters the Running state: `watch kubectl -n arlon get pod`
 
 ## Arlon CLI
+Download the CLI for the [latest release](https://github.com/arlonproj/arlon/releases/latest) from GitHub.
+Currently, Linux and MacOS operating systems are supported. 
+Uncompress the tarball, rename it as `arlon` and add to your PATH 
+
+Run `arlon verify` to check for prerequisites. 
+Run `arlon install` to install any missing prerequisites. 
+
+The following instructions are to manually build CLI from this code repository. 
+
+### Building the CLI 
+- Clone this repository and pull the latest version of a branch (main by default)
 - From the top directory, run `make build`
 - Optionally create a symlink from a directory
   (e.g. `/usr/local/bin`) included in your ${PATH} to the `bin/arlon` binary
