@@ -85,7 +85,7 @@ func NewCommand() *cobra.Command {
 // Check if kubectl is installed and if not then install kubectl
 func installKubectl() (bool, error) {
 	var err error
-	log := log.GetLogger()
+	l := log.GetLogger()
 	_, err = exec.LookPath(defaultKubectlPath)
 	if err == nil {
 		return true, ErrKubectlPresent
@@ -98,7 +98,7 @@ func installKubectl() (bool, error) {
 		if errInstallKubectl != nil {
 			return false, ErrKubectlFail
 		} else {
-			log.V(1).Info("Successfully installed kubectl at ", kubectlPath)
+			l.V(1).Info("Successfully installed kubectl at ", kubectlPath)
 			return true, nil
 		}
 	}
@@ -117,7 +117,7 @@ func verifyGit() (bool, error) {
 // Check if argocd is installed and if not, then install argocd
 func installArgoCD() (bool, error) {
 	var err error
-	log := log.GetLogger()
+	l := log.GetLogger()
 	_, err = exec.LookPath(defaultArgocdPath)
 	if err == nil {
 		return true, ErrArgoCDPresent
@@ -131,7 +131,7 @@ func installArgoCD() (bool, error) {
 			fmt.Println(" → Error installing argocd")
 			return false, ErrArgoCDFail
 		} else {
-			log.V(1).Info("Successfully installed argocd at ", argocdPath)
+			l.V(1).Info("Successfully installed argocd at ", argocdPath)
 			return true, nil
 		}
 
