@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os/exec"
 	"runtime"
+	"sigs.k8s.io/cluster-api/cmd/clusterctl/client"
+	"time"
 
 	"github.com/arlonproj/arlon/pkg/log"
 	"github.com/fatih/color"
@@ -22,6 +24,8 @@ var (
 	argocdPath         string
 	defaultKubectlPath = "/usr/local/bin/kubectl"
 	defaultArgocdPath  = "/usr/local/bin/argocd"
+	kubeconfigPath     string
+	capiCoreProvider   = "cluster-api:1.1.5"
 	Yellow             = color.New(color.FgHiYellow).SprintFunc()
 	Green              = color.New(color.FgGreen).SprintFunc()
 	Red                = color.New(color.FgRed).SprintFunc()
@@ -66,11 +70,15 @@ func NewCommand() *cobra.Command {
 				fmt.Println(Green("✓") + " Successfully installed argocd")
 			}
 
+			if err := installCAPI(capiCoreProvider); err != nil {
+				return err
+			}
 			return nil
 		},
 	}
 	command.Flags().StringVar(&kubectlPath, "kubectlPath", defaultKubectlPath, "kubectl download location")
 	command.Flags().StringVar(&argocdPath, "argocdPath", defaultArgocdPath, "argocd download location")
+	command.Flags().StringVar(&kubeconfigPath, "kubeconfig", "", "kubeconfig path for the management cluster")
 	return command
 }
 
@@ -225,6 +233,28 @@ func downloadArgoCD(osPlatform string) error {
 	}
 	_, err := exec.Command("curl", "-o", argocdPath, "-LO", downloadArgoCD).Output()
 	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func installCAPI(ver string) error {
+	c, err := client.New("")
+	if err != nil {
+		return err
+	}
+	options := client.InitOptions{
+		Kubeconfig:              client.Kubeconfig{Path: kubeconfigPath},
+		CoreProvider:            ver,
+		BootstrapProviders:      nil,
+		InfrastructureProviders: nil,
+		ControlPlaneProviders:   nil,
+		TargetNamespace:         "",
+		LogUsageInstructions:    false,
+		WaitProviders:           false,
+		WaitProviderTimeout:     time.Second * 5 * 60, // this is the default for clusterctl
+	}
+	if _, err := c.Init(options); err != nil {
 		return err
 	}
 	return nil
