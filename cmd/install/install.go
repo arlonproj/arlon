@@ -36,9 +36,9 @@ func NewCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:               "install",
 		Short:             "Install required tools for Arlon",
-		Long:              "Install kubectl, Argocd cli, check git cli",
+		Long:              "Install kubectl, Argocd cli, check git cli, and install compatible CAPI version on the management cluster",
 		DisableAutoGenTag: true,
-		Example:           "arlon install --kubectlPath <string> --argocdPath <string>",
+		Example:           "arlon install --kubectlPath <string> --argocdPath <string> --kubeconfigPath /path/to/kubeconfig",
 		RunE: func(c *cobra.Command, args []string) error {
 			fmt.Println("Note: SUDO access is required to install the required tools for Arlon")
 			fmt.Println()
