@@ -71,8 +71,7 @@ func NewCommand() *cobra.Command {
 				fmt.Println(Green("✓") + " Successfully installed argocd")
 			}
 			fmt.Println()
-
-			fmt.Println(white("Installing CAPI..."))
+			fmt.Println(white("Attempting to install CAPI..."))
 			if err := installCAPI(capiCoreProvider); err != nil {
 				return err
 			}
