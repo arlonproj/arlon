@@ -13,6 +13,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	defaultKubectlPath = "/usr/local/bin/kubectl"
+	defaultArgocdPath  = "/usr/local/bin/argocd"
+)
+
 var (
 	ErrKubectlPresent  = errors.New("kubectl is already present at default(/usr/local/bin/kubectl) location or user specifed location")
 	ErrGitPresent      = errors.New("git is already installed")
@@ -22,14 +27,14 @@ var (
 	ErrCurlMissing     = errors.New("please install curl and set it in path")
 	kubectlPath        string
 	argocdPath         string
-	defaultKubectlPath = "/usr/local/bin/kubectl"
-	defaultArgocdPath  = "/usr/local/bin/argocd"
 	kubeconfigPath     string
-	capiCoreProvider   = "cluster-api:v1.1.5"
 	Yellow             = color.New(color.FgHiYellow).SprintFunc()
 	Green              = color.New(color.FgGreen).SprintFunc()
 	Red                = color.New(color.FgRed).SprintFunc()
 	white              = color.New(color.FgHiWhite).SprintFunc()
+	capiCoreProvider   string
+	infraProviders     []string
+	bootstrapProviders []string
 )
 
 func NewCommand() *cobra.Command {
@@ -72,7 +77,7 @@ func NewCommand() *cobra.Command {
 			}
 			fmt.Println()
 			fmt.Println(white("Attempting to install CAPI..."))
-			if err := installCAPI(capiCoreProvider); err != nil {
+			if err := installCAPI(capiCoreProvider, infraProviders, bootstrapProviders); err != nil {
 				return err
 			}
 			fmt.Printf("%s CAPI is installed...\n", Green("✓"))
@@ -82,6 +87,8 @@ func NewCommand() *cobra.Command {
 	command.Flags().StringVar(&kubectlPath, "kubectlPath", defaultKubectlPath, "kubectl download location")
 	command.Flags().StringVar(&argocdPath, "argocdPath", defaultArgocdPath, "argocd download location")
 	command.Flags().StringVar(&kubeconfigPath, "kubeconfigPath", "", "kubeconfig path for the management cluster")
+	command.Flags().StringSliceVar(&infraProviders, "infrastructure", nil, "comma separated list of infrastructure provider components to install alongside CAPI")
+	command.Flags().StringSliceVar(&bootstrapProviders, "bootstrap", nil, "bootstrap provider components to add to the management cluster")
 	_ = command.MarkFlagRequired("kubeconfigPath")
 	return command
 }
@@ -89,7 +96,7 @@ func NewCommand() *cobra.Command {
 // Check if kubectl is installed and if not then install kubectl
 func installKubectl() (bool, error) {
 	var err error
-	l := log.GetLogger()
+	logger := log.GetLogger()
 	_, err = exec.LookPath(defaultKubectlPath)
 	if err == nil {
 		return true, ErrKubectlPresent
@@ -102,7 +109,7 @@ func installKubectl() (bool, error) {
 		if errInstallKubectl != nil {
 			return false, ErrKubectlFail
 		} else {
-			l.V(1).Info("Successfully installed kubectl at ", kubectlPath)
+			logger.V(1).Info("Successfully installed kubectl at ", kubectlPath)
 			return true, nil
 		}
 	}
@@ -121,7 +128,7 @@ func verifyGit() (bool, error) {
 // Check if argocd is installed and if not, then install argocd
 func installArgoCD() (bool, error) {
 	var err error
-	l := log.GetLogger()
+	logger := log.GetLogger()
 	_, err = exec.LookPath(defaultArgocdPath)
 	if err == nil {
 		return true, ErrArgoCDPresent
@@ -135,7 +142,7 @@ func installArgoCD() (bool, error) {
 			fmt.Println(" → Error installing argocd")
 			return false, ErrArgoCDFail
 		} else {
-			l.V(1).Info("Successfully installed argocd at ", argocdPath)
+			logger.V(1).Info("Successfully installed argocd at ", argocdPath)
 			return true, nil
 		}
 
@@ -242,7 +249,7 @@ func downloadArgoCD(osPlatform string) error {
 	return nil
 }
 
-func installCAPI(ver string) error {
+func installCAPI(ver string, infrastructureProviders, bootstrapProviders []string) error {
 	c, err := client.New("")
 	if err != nil {
 		return err
@@ -250,8 +257,8 @@ func installCAPI(ver string) error {
 	options := client.InitOptions{
 		Kubeconfig:              client.Kubeconfig{Path: kubeconfigPath},
 		CoreProvider:            ver,
-		BootstrapProviders:      nil,
-		InfrastructureProviders: nil,
+		BootstrapProviders:      bootstrapProviders,
+		InfrastructureProviders: infrastructureProviders,
 		ControlPlaneProviders:   nil,
 		TargetNamespace:         "",
 		LogUsageInstructions:    true,
