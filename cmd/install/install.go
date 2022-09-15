@@ -76,7 +76,7 @@ func NewCommand() *cobra.Command {
 				fmt.Println(Green("✓") + " Successfully installed argocd")
 			}
 			fmt.Println()
-			fmt.Println(white("Attempting to install CAPI..."))
+			fmt.Printf("Attempting to install %s with infrastructure providers %v and bootstrap providers %v\n", capiCoreProvider, infraProviders, bootstrapProviders)
 			if err := installCAPI(capiCoreProvider, infraProviders, bootstrapProviders); err != nil {
 				return err
 			}
@@ -262,7 +262,7 @@ func installCAPI(ver string, infrastructureProviders, bootstrapProviders []strin
 		ControlPlaneProviders:   nil,
 		TargetNamespace:         "",
 		LogUsageInstructions:    true,
-		WaitProviders:           false,
+		WaitProviders:           true,                 // this is set to false for clusterctl
 		WaitProviderTimeout:     time.Second * 5 * 60, // this is the default for clusterctl
 	}
 	if _, err := c.Init(options); err != nil {
