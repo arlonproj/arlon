@@ -4,7 +4,7 @@ GIT_SHORT_COMMIT := $(shell cd $(REPO_ROOT); git rev-parse --short HEAD)
 REPO_SERVER ?= ghcr.io
 REPO_ORG ?= arlonproj
 REPO_NAME ?= arlon
-CAPI_VERSION := $(shell cat $(REPO_ROOT)$*/.capirc)
+CAPI_VERSION := $(shell cat $(REPO_ROOT)$*/capirc)
 CAPI_LD_FLAG := -X github.com/arlonproj/arlon/cmd/install.capiCoreProvider=$(CAPI_VERSION)
 LD_FLAGS := $(CAPI_LD_FLAG)
 # Image URL to use all building/pushing image targets

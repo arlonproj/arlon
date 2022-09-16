@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"os/exec"
 	"runtime"
-	"sigs.k8s.io/cluster-api/cmd/clusterctl/client"
 	"time"
 
 	"github.com/arlonproj/arlon/pkg/log"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+	clusterctlv1 "sigs.k8s.io/cluster-api/cmd/clusterctl/api/v1alpha3"
+	"sigs.k8s.io/cluster-api/cmd/clusterctl/client"
+	"sigs.k8s.io/cluster-api/cmd/clusterctl/client/cluster"
 )
 
 const (
@@ -31,7 +33,6 @@ var (
 	Yellow             = color.New(color.FgHiYellow).SprintFunc()
 	Green              = color.New(color.FgGreen).SprintFunc()
 	Red                = color.New(color.FgRed).SprintFunc()
-	white              = color.New(color.FgHiWhite).SprintFunc()
 	capiCoreProvider   string
 	infraProviders     []string
 	bootstrapProviders []string
@@ -256,17 +257,33 @@ func installCAPI(ver string, infrastructureProviders, bootstrapProviders []strin
 	}
 	options := client.InitOptions{
 		Kubeconfig:              client.Kubeconfig{Path: kubeconfigPath},
-		CoreProvider:            ver,
 		BootstrapProviders:      bootstrapProviders,
 		InfrastructureProviders: infrastructureProviders,
-		ControlPlaneProviders:   nil,
-		TargetNamespace:         "",
 		LogUsageInstructions:    true,
 		WaitProviders:           true,                 // this is set to false for clusterctl
 		WaitProviderTimeout:     time.Second * 5 * 60, // this is the default for clusterctl
+	}
+	var clusterClientFactory client.ClusterClientFactory
+	clusterClient, err := clusterClientFactory(client.ClusterClientFactoryInput{
+		Kubeconfig: options.Kubeconfig,
+	})
+	if err != nil {
+		return err
+	}
+	if isFirstRun(clusterClient) {
+		options.CoreProvider = ver
 	}
 	if _, err := c.Init(options); err != nil {
 		return err
 	}
 	return nil
+}
+
+func isFirstRun(client cluster.Client) bool {
+	// From `clusterctl` source:
+	// Check if there is already a core provider installed in the cluster
+	// Nb. we are ignoring the error so this operation can support listing images even if there is no an existing management cluster;
+	// in case there is no an existing management cluster, we assume there are no core providers installed in the cluster.
+	currentCoreProvider, _ := client.ProviderInventory().GetDefaultProviderName(clusterctlv1.CoreProviderType)
+	return currentCoreProvider == ""
 }
