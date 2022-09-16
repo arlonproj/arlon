@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 	"runtime"
+	"sigs.k8s.io/cluster-api/cmd/clusterctl/client/config"
 	"time"
 
 	"github.com/arlonproj/arlon/pkg/log"
@@ -263,13 +264,11 @@ func installCAPI(ver string, infrastructureProviders, bootstrapProviders []strin
 		WaitProviders:           true,                 // this is set to false for clusterctl
 		WaitProviderTimeout:     time.Second * 5 * 60, // this is the default for clusterctl
 	}
-	var clusterClientFactory client.ClusterClientFactory
-	clusterClient, err := clusterClientFactory(client.ClusterClientFactoryInput{
-		Kubeconfig: options.Kubeconfig,
-	})
+	clientCfg, err := config.New("")
 	if err != nil {
 		return err
 	}
+	clusterClient := cluster.New(cluster.Kubeconfig(options.Kubeconfig), clientCfg)
 	if isFirstRun(clusterClient) {
 		options.CoreProvider = ver
 	}
