@@ -4,10 +4,10 @@
 
 This Kubernetes cluster hosts the following components:
 - ArgoCD
-- Arlo
+- Arlon
 - Cluster management stacks e.g. Cluster API and/or Crossplane
 
-The Arlo state and controllers reside in the arlo namespace.
+The Arlon state and controllers reside in the arlon namespace.
 
 ## Configuration bundle
 
@@ -60,14 +60,14 @@ It is composed of
   If absent, the profile can only be applied to existing clusters.
 - A list of bundles specifying the configuration to apply onto the cluster
   once it is operational
-- An optional list of `value.yaml` settings for any Helm Chart type bundle
+- An optional list of `values.yaml` settings for any Helm Chart type bundle
   in the bundle list
 
 ## Cluster chart
 
 The cluster chart is a Helm chart that creates (and optionally applies) the
 manifests necessary to create a cluster and deploy desired configurations
-and applications to it. When a user uses Arlo to create and configure a cluster,
+and applications to it. When a user uses Arlon to create and configure a cluster,
 he or she specifies a profile. The profile's cluster specification, bundle
 list and other settings are used to generate values for the chart, and the
 chart is deployed as a Helm release into the *arlo* namespace in the
