@@ -5,15 +5,10 @@ import (
 	"fmt"
 	"os/exec"
 	"runtime"
-	"sigs.k8s.io/cluster-api/cmd/clusterctl/client/config"
-	"time"
 
 	"github.com/arlonproj/arlon/pkg/log"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	clusterctlv1 "sigs.k8s.io/cluster-api/cmd/clusterctl/api/v1alpha3"
-	"sigs.k8s.io/cluster-api/cmd/clusterctl/client"
-	"sigs.k8s.io/cluster-api/cmd/clusterctl/client/cluster"
 )
 
 const (
@@ -78,11 +73,11 @@ func NewCommand() *cobra.Command {
 				fmt.Println(Green("✓") + " Successfully installed argocd")
 			}
 			fmt.Println()
-			fmt.Printf("Attempting to install %s with infrastructure providers %v and bootstrap providers %v\n", capiCoreProvider, infraProviders, bootstrapProviders)
+			/*fmt.Printf("Attempting to install %s with infrastructure providers %v and bootstrap providers %v\n", capiCoreProvider, infraProviders, bootstrapProviders)
 			if err := installCAPI(capiCoreProvider, infraProviders, bootstrapProviders); err != nil {
 				return err
 			}
-			fmt.Printf("%s CAPI is installed...\n", Green("✓"))
+			fmt.Printf("%s CAPI is installed...\n", Green("✓"))*/
 			return nil
 		},
 	}
@@ -156,6 +151,7 @@ func installArgoCD() (bool, error) {
 func installKubectlPlatform() error {
 	var err error
 	osPlatform := runtime.GOOS
+	arch := runtime.GOARCH
 	fmt.Println(" → Installing kubectl")
 	switch osPlatform {
 	case "windows":
@@ -163,14 +159,14 @@ func installKubectlPlatform() error {
 		if err != nil {
 			return ErrCurlMissing
 		}
-		err = downloadKubectlLatest(osPlatform)
+		err = downloadKubectlLatest(osPlatform, arch)
 		if err != nil {
 			fmt.Println(" → Error installing the latest kubectl version")
 			return err
 		}
 		fmt.Println(" → Add kubectl binary to your windows path")
 	default:
-		err = downloadKubectlLatest(osPlatform)
+		err = downloadKubectlLatest(osPlatform, arch)
 		if err != nil {
 			fmt.Println(" → Error installing the latest kubectl version")
 			return err
@@ -185,7 +181,7 @@ func installKubectlPlatform() error {
 }
 
 // Downloads the latest version of kubectl
-func downloadKubectlLatest(osPlatform string) error {
+func downloadKubectlLatest(osPlatform string, arch string) error {
 	latestVersion := "https://storage.googleapis.com/kubernetes-release/release/stable.txt"
 	var err error
 	ver, err := exec.Command("curl", "-sL", latestVersion).Output()
@@ -196,7 +192,7 @@ func downloadKubectlLatest(osPlatform string) error {
 	if osPlatform == "windows" {
 		downloadKubectl = "https://storage.googleapis.com/kubernetes-release/release/" + string(ver) + "/bin/" + osPlatform + "/amd64/kubectl.exe"
 	} else {
-		downloadKubectl = "https://storage.googleapis.com/kubernetes-release/release/" + string(ver) + "/bin/" + osPlatform + "/amd64/kubectl"
+		downloadKubectl = "https://storage.googleapis.com/kubernetes-release/release/" + string(ver) + "/bin/" + osPlatform + "/" + arch + "/kubectl"
 	}
 	_, err = exec.Command("curl", "-o", kubectlPath, "-LO", downloadKubectl).Output()
 	if err != nil {
@@ -209,6 +205,7 @@ func downloadKubectlLatest(osPlatform string) error {
 func installArgoCDPlatform() error {
 	var err error
 	osPlatform := runtime.GOOS
+	arch := runtime.GOARCH
 	fmt.Println(" → Installing argocd")
 	switch osPlatform {
 	case "windows":
@@ -216,13 +213,13 @@ func installArgoCDPlatform() error {
 		if err != nil {
 			return ErrCurlMissing
 		}
-		err = downloadArgoCD(osPlatform)
+		err = downloadArgoCD(osPlatform, arch)
 		if err != nil {
 			fmt.Println(" → Error installing the latest argocd version")
 		}
 		fmt.Println(" → Add argocd binary to your windows path")
 	default:
-		err = downloadArgoCD(osPlatform)
+		err = downloadArgoCD(osPlatform, arch)
 		if err != nil {
 			fmt.Println(" → Error installing the latest argocd version")
 		}
@@ -236,14 +233,15 @@ func installArgoCDPlatform() error {
 }
 
 // Downloads the latest version of argocd
-func downloadArgoCD(osPlatform string) error {
+func downloadArgoCD(osPlatform string, arch string) error {
 	var downloadArgoCD string
 	argocdVersion := "v2.4.11"
 	if osPlatform == "windows" {
 		downloadArgoCD = "https://github.com/argoproj/argo-cd/releases/download/" + argocdVersion + "/argocd-" + osPlatform + "-amd64.exe"
 	} else {
-		downloadArgoCD = "https://github.com/argoproj/argo-cd/releases/download/" + argocdVersion + "/argocd-" + osPlatform + "-amd64"
+		downloadArgoCD = "https://github.com/argoproj/argo-cd/releases/download/" + argocdVersion + "/argocd-" + osPlatform + "-" + arch
 	}
+
 	_, err := exec.Command("curl", "-o", argocdPath, "-LO", downloadArgoCD).Output()
 	if err != nil {
 		return err
@@ -251,7 +249,7 @@ func downloadArgoCD(osPlatform string) error {
 	return nil
 }
 
-func installCAPI(ver string, infrastructureProviders, bootstrapProviders []string) error {
+/*func installCAPI(ver string, infrastructureProviders, bootstrapProviders []string) error {
 	c, err := client.New("")
 	if err != nil {
 		return err
@@ -285,4 +283,4 @@ func isFirstRun(client cluster.Client) bool {
 	// in case there is no an existing management cluster, we assume there are no core providers installed in the cluster.
 	currentCoreProvider, _ := client.ProviderInventory().GetDefaultProviderName(clusterctlv1.CoreProviderType)
 	return currentCoreProvider == ""
-}
+}*/
