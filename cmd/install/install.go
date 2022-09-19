@@ -5,10 +5,20 @@ import (
 	"fmt"
 	"os/exec"
 	"runtime"
+	"sigs.k8s.io/cluster-api/cmd/clusterctl/client/config"
+	"time"
 
 	"github.com/arlonproj/arlon/pkg/log"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+	clusterctlv1 "sigs.k8s.io/cluster-api/cmd/clusterctl/api/v1alpha3"
+	"sigs.k8s.io/cluster-api/cmd/clusterctl/client"
+	"sigs.k8s.io/cluster-api/cmd/clusterctl/client/cluster"
+)
+
+const (
+	defaultKubectlPath = "/usr/local/bin/kubectl"
+	defaultArgocdPath  = "/usr/local/bin/argocd"
 )
 
 var (
@@ -20,20 +30,22 @@ var (
 	ErrCurlMissing     = errors.New("please install curl and set it in path")
 	kubectlPath        string
 	argocdPath         string
-	defaultKubectlPath = "/usr/local/bin/kubectl"
-	defaultArgocdPath  = "/usr/local/bin/argocd"
+	kubeconfigPath     string
 	Yellow             = color.New(color.FgHiYellow).SprintFunc()
 	Green              = color.New(color.FgGreen).SprintFunc()
 	Red                = color.New(color.FgRed).SprintFunc()
+	capiCoreProvider   string
+	infraProviders     []string
+	bootstrapProviders []string
 )
 
 func NewCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:               "install",
 		Short:             "Install required tools for Arlon",
-		Long:              "Install kubectl, Argocd cli, check git cli",
+		Long:              "Install kubectl, Argocd cli, check git cli, and install compatible CAPI version on the management cluster",
 		DisableAutoGenTag: true,
-		Example:           "arlon install --kubectlPath <string> --argocdPath <string>",
+		Example:           "arlon install --kubectlPath <string> --argocdPath <string> --kubeconfigPath /path/to/kubeconfig",
 		RunE: func(c *cobra.Command, args []string) error {
 			fmt.Println("Note: SUDO access is required to install the required tools for Arlon")
 			fmt.Println()
@@ -65,19 +77,28 @@ func NewCommand() *cobra.Command {
 			} else {
 				fmt.Println(Green("✓") + " Successfully installed argocd")
 			}
-
+			fmt.Println()
+			fmt.Printf("Attempting to install %s with infrastructure providers %v and bootstrap providers %v\n", capiCoreProvider, infraProviders, bootstrapProviders)
+			if err := installCAPI(capiCoreProvider, infraProviders, bootstrapProviders); err != nil {
+				return err
+			}
+			fmt.Printf("%s CAPI is installed...\n", Green("✓"))
 			return nil
 		},
 	}
 	command.Flags().StringVar(&kubectlPath, "kubectlPath", defaultKubectlPath, "kubectl download location")
 	command.Flags().StringVar(&argocdPath, "argocdPath", defaultArgocdPath, "argocd download location")
+	command.Flags().StringVar(&kubeconfigPath, "kubeconfigPath", "", "kubeconfig path for the management cluster")
+	command.Flags().StringSliceVar(&infraProviders, "infrastructure", nil, "comma separated list of infrastructure provider components to install alongside CAPI")
+	command.Flags().StringSliceVar(&bootstrapProviders, "bootstrap", nil, "bootstrap provider components to add to the management cluster")
+	_ = command.MarkFlagRequired("kubeconfigPath")
 	return command
 }
 
 // Check if kubectl is installed and if not then install kubectl
 func installKubectl() (bool, error) {
 	var err error
-	log := log.GetLogger()
+	logger := log.GetLogger()
 	_, err = exec.LookPath(defaultKubectlPath)
 	if err == nil {
 		return true, ErrKubectlPresent
@@ -90,7 +111,7 @@ func installKubectl() (bool, error) {
 		if errInstallKubectl != nil {
 			return false, ErrKubectlFail
 		} else {
-			log.V(1).Info("Successfully installed kubectl at ", kubectlPath)
+			logger.V(1).Info("Successfully installed kubectl at ", kubectlPath)
 			return true, nil
 		}
 	}
@@ -109,7 +130,7 @@ func verifyGit() (bool, error) {
 // Check if argocd is installed and if not, then install argocd
 func installArgoCD() (bool, error) {
 	var err error
-	log := log.GetLogger()
+	logger := log.GetLogger()
 	_, err = exec.LookPath(defaultArgocdPath)
 	if err == nil {
 		return true, ErrArgoCDPresent
@@ -123,7 +144,7 @@ func installArgoCD() (bool, error) {
 			fmt.Println(" → Error installing argocd")
 			return false, ErrArgoCDFail
 		} else {
-			log.V(1).Info("Successfully installed argocd at ", argocdPath)
+			logger.V(1).Info("Successfully installed argocd at ", argocdPath)
 			return true, nil
 		}
 
@@ -228,4 +249,40 @@ func downloadArgoCD(osPlatform string) error {
 		return err
 	}
 	return nil
+}
+
+func installCAPI(ver string, infrastructureProviders, bootstrapProviders []string) error {
+	c, err := client.New("")
+	if err != nil {
+		return err
+	}
+	options := client.InitOptions{
+		Kubeconfig:              client.Kubeconfig{Path: kubeconfigPath},
+		BootstrapProviders:      bootstrapProviders,
+		InfrastructureProviders: infrastructureProviders,
+		LogUsageInstructions:    true,
+		WaitProviders:           true,                 // this is set to false for clusterctl
+		WaitProviderTimeout:     time.Second * 5 * 60, // this is the default for clusterctl
+	}
+	clientCfg, err := config.New("")
+	if err != nil {
+		return err
+	}
+	clusterClient := cluster.New(cluster.Kubeconfig(options.Kubeconfig), clientCfg)
+	if isFirstRun(clusterClient) {
+		options.CoreProvider = ver
+	}
+	if _, err := c.Init(options); err != nil {
+		return err
+	}
+	return nil
+}
+
+func isFirstRun(client cluster.Client) bool {
+	// From `clusterctl` source:
+	// Check if there is already a core provider installed in the cluster
+	// Nb. we are ignoring the error so this operation can support listing images even if there is no an existing management cluster;
+	// in case there is no an existing management cluster, we assume there are no core providers installed in the cluster.
+	currentCoreProvider, _ := client.ProviderInventory().GetDefaultProviderName(clusterctlv1.CoreProviderType)
+	return currentCoreProvider == ""
 }

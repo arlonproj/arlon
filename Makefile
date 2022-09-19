@@ -4,6 +4,9 @@ GIT_SHORT_COMMIT := $(shell cd $(REPO_ROOT); git rev-parse --short HEAD)
 REPO_SERVER ?= ghcr.io
 REPO_ORG ?= arlonproj
 REPO_NAME ?= arlon
+CAPI_VERSION := $(shell cat $(REPO_ROOT)$*/capirc)
+CAPI_LD_FLAG := -X github.com/arlonproj/arlon/cmd/install.capiCoreProvider=$(CAPI_VERSION)
+LD_FLAGS := $(CAPI_LD_FLAG)
 # Image URL to use all building/pushing image targets
 IMG ?= $(REPO_SERVER)/$(REPO_ORG)/$(REPO_NAME)/controller:$(VERSION)
 # Produce CRDs with multiversion enabled for v1 APIs - fixes failure in make test
@@ -66,20 +69,20 @@ clean:
 	rm -rf ./testbin; rm -rf ./bin
 
 build: generate fmt vet ## Build manager binary.
-	go build -o bin/arlon main.go
+	go build -o bin/arlon -ldflags '$(LD_FLAGS)' main.go
 
 # goreleaser can invoke this target to produce binaries for different OS and CPU arch combinations
 build-cli: fmt vet ## Build CLI binary (with the current OS and CPU architecture) from the go env.
-	go build -o bin/arlon main.go
+	go build -o bin/arlon -ldflags '$(LD_FLAGS)' main.go
 
 build-cli-linux: fmt vet ## Build CLI binary for Linux
-	GOOS=linux GOARCH=amd64 go build -o bin/arlon main.go
+	GOOS=linux GOARCH=amd64 go build -o bin/arlon -ldflags '$(LD_FLAGS)' main.go
 
 build-cli-mac-amd64: fmt vet ## Build CLI binary for Mac (AMD/ Intel CPU)
-	GOOS=darwin GOARCH=amd64 go build -o bin/arlon main.go
+	GOOS=darwin GOARCH=amd64 go build -o bin/arlon -ldflags '$(LD_FLAGS)' main.go
 
 build-cli-mac-arm64: fmt vet ## Build CLI binary for Mac (Apple Silicon)
-	GOOS=darwin GOARCH=arm64 go build -o bin/arlon main.go
+	GOOS=darwin GOARCH=arm64 go build -o bin/arlon -ldflags '$(LD_FLAGS)' main.go
 
 ifeq (GOARCH,"arm64")
 build-cli-mac: build-cli-mac-arm64
@@ -89,7 +92,7 @@ endif
 
 # Arlon has not been tested on Windows yet.
 build-cli-win: fmt vet ## Build CLI binary for Windows.
-	GOOS=windows GOARCH=amd64 go build -o bin/arlon main.go
+	GOOS=windows GOARCH=amd64 go build -o bin/arlon -ldflags '$(LD_FLAGS)' main.go
 
 run: manifests generate fmt vet ## Run a controller from your host.
 	go run ./main.go
