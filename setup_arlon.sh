@@ -101,15 +101,7 @@ if ! kubectl get ns arlon &> /dev/null ; then
     kubectl create ns arlon
 fi
 
-
-
-mkdir manifests
-cd manifests
-wget -qc https://raw.githubusercontent.com/arlonproj/arlon/main/testing/manifests/argocd-cm.yaml --output-document=argocd-cm.yaml 
-wget -qc https://raw.githubusercontent.com/arlonproj/arlon/main/testing/manifests/argocd-rbac-cm.yaml --output-document=argocd-rbac-cm.yaml 
-cd ..
-kubectl apply -f manifests
-rm -r manifests
+kubectl apply -f testing/manifests/
 
 if ! kubectl get secret argocd-creds -n arlon &> /dev/null ; then
     wait_until "auth_token=$(argocd account generate-token --account arlon)" 2 10
