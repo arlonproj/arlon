@@ -90,11 +90,11 @@ if pkill -f "kubectl port-forward svc/argocd-server" ; then
 fi
 
 wait_until 'set -o pipefail; pwd=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)' 6 20
+forwarding_port=8189
+kubectl port-forward svc/argocd-server -n argocd ${forwarding_port}:443 &>/dev/null &
 
-kubectl port-forward svc/argocd-server -n argocd 8189:443 &>/dev/null &
 
-
-wait_until "argocd login localhost:8189 --username admin --password ${pwd} --insecure" 10 20
+wait_until "argocd login localhost:${forwarding_port} --username admin --password ${pwd} --insecure" 10 20
 
 if ! kubectl get ns arlon &> /dev/null ; then
     echo creating arlon namespace
@@ -163,6 +163,8 @@ clusterawsadm bootstrap iam create-cloudformation-stack
 export AWS_B64ENCODED_CREDENTIALS=$(clusterawsadm bootstrap credentials encode-as-profile)
 
 clusterctl init --infrastructure aws
-echo "Run the below command to use kubectl, argocd, clusterctl, clusterawsadm, arlon (If not already installed)"
+echo "To access ArgoCD UI, run: kubectl port-forward svc/argocd-server -n argocd ${forwarding_port}:443"
+echo "Login as admin: ${pwd} into ArgoCD at http://localhost:${forwarding_port}"
+echo "Run the following command to use kubectl, argocd, clusterctl, clusterawsadm, arlon (If not already installed)"
 echo 'PATH=$PATH:$HOME/.local/bin'
 echo Installation successfull
