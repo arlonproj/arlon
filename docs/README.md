@@ -1,8 +1,7 @@
-# About Arlon
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fplatform9%2Farlon.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fplatform9%2Farlon?ref=badge_shield)
+# Arlon
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Farlonproj%2Farlon.svg?ref=badge_small)
 [![Go Report Card](https://goreportcard.com/badge/github.com/arlonproj/arlon)](https://goreportcard.com/report/github.com/arlonproj/arlon)
 [![Documentation Status](https://readthedocs.org/projects/arlon/badge/?version=latest)](https://arlon.readthedocs.io/en/latest/?badge=latest)
-
 
 Arlon is a lifecycle management and configuration tool for Kubernetes clusters.
 It allows an administrator to compose, deploy and configure a large number of
@@ -12,7 +11,7 @@ actual cluster orchestration: the first two supported API providers are
 Cluster API and Crossplane.
 Arlon uses ArgoCD as the underlying Kubernetes manifest deployment
 and enforcement engine.
-A workload cluster is composed from the following constructs:
+A workload cluster is composed of the following constructs:
 - *Cluster spec*: a description of the infrastructure and external settings of a cluster,
 e.g. Kubernetes version, cloud provider, cluster type, node instance type.
 - *Profile*: a grouping of configuration bundles which will be installed into the cluster
@@ -29,7 +28,7 @@ an RBAC ruleset, an add-on, an application, etc...
 
 # Architecture
 
-![architecture](./architecture_diagram.png)
+![architecture](./docs/architecture_diagram.png)
 
 Arlon is composed of a controller, a library, and a CLI that exposes the library's
 functions as commands. In the future, an API server may be built from
@@ -44,10 +43,10 @@ needed by Arlon, including:
 - The Arlon controller
 - Cluster management API providers: Cluster API or Crossplane
 - Custom resources (CRs) that drive the involved providers and controllers
-- Custom resource definitions (CRDs) for all of the involved CRs
+- Custom resource definitions (CRDs) for all the involved CRs
 
 The user is responsible for supplying the management cluster, and to have
-a access to a kubeconfig granting administrator permissions on the cluster.
+access to a kubeconfig granting administrator permissions on the cluster.
 
 ## Controller
 
@@ -72,6 +71,74 @@ The user is responsible for supplying
 this *workspace repository* (and base paths) hosting those structures.
 Arlon relies on ArgoCD for repository registration, therefore the user should
 register the workspace registry in ArgoCD before referencing it from Arlon data types.
+
+Starting from release v0.9.0, Arlon now includes two commands to help with managing
+various git repository URLs. With these commands in place, the `--repo-url` flag in 
+commands requiring a hosted git repository is no longer needed. A more detailed explanation 
+is given in the next [section](#repo-aliases).
+
+### Repo Aliases
+A repo(repository) alias allows an Arlon user to register a GitHub repository with ArgoCD and store 
+a local configuration file on their system that can be referenced by the CLI to then determine 
+a repository URL and fetch its credentials when needed. All commands that require a repository, support a `--repo-url` 
+flag also support a `repo-alias` flag to specify an alias instead of an alias, such commands will consider the "default" 
+alias to be used when no `--repo-alias` and no `--repo-url` flags are given.
+There are two subcommands i.e., `arlon git register` and 
+`arlon git unregister` which allow for a basic form of git repository context management.
+
+When `arlon git register` is run it requires a repo URL, the username, the access token and 
+an optional alias(which defaults to “default”)- if a “default” alias already exists, the 
+repo isn’t registered with `argocd` and the alias creation fails saying that the default 
+alias already exists otherwise, the repo is registered with `argocd`. 
+Lastly we also write this repository information to the local configuration file. 
+This contains two pieces of information for each repository- it’s URL and the alias.
+The structure of the file is as shown:
+```json
+{
+    "default": {
+        "url": "",
+        "alias": "default"
+    },
+    "repos": [
+        {
+            "url": "",
+            "alias": "default"
+        },
+        {
+            "url": "",
+            "alias": "not_default"
+       }, {}
+    ]
+}
+```
+On running `arlon git unregister ALIAS`, it removes that entry from the configuration file. 
+However, it does NOT remove the repository from `argocd`. When the "default" alias is deleted, 
+we also clear the "default" entry from the JSON file.
+
+#### Examples
+Given below are some examples for registering and unregistering a repository.
+##### Registering Repositories
+Registering a repository requires the repository link, the GitHub username(`--user`), and a personal access token(`--password`).
+When the `--password` flag isn't provided at the command line, the CLI will prompt for a password(this is the recommended approach).
+```shell
+arlon git register https://github.com/GhUser/manifests --user GhUser
+arlon git register https://github.com/GhUser/prod-manifests --user GhUser --alias prod
+```
+For non-interactive registrations, the `--password` flag can be used.
+```shell
+export GH_PAT="..."
+arlon git register https://github.com/GhUser/manifests --user GhUser --password $GH_PAT
+arlon git register https://github.com/GhUser/prod-manifests --user GhUser --alias prod --password $GH_PAT
+```
+
+##### Unregistering Repositories
+Unregistering an alias only requires a positional argument: the repository alias.
+```shell
+# unregister the default alias locally
+arlon git unregister default
+# unregister some other alias locally
+arlon git unregister prod
+```
 
 # Concepts
 
@@ -101,7 +168,7 @@ the bundle at the time the cluster was created, and is not affected by subsequen
 changes to the bundle's manifest data.
 
 ### Dynamic bundle
-A dynamic bunlde contains a reference to the manifest data stored in git.
+A dynamic bundle contains a reference to the manifest data stored in git.
 A dynamic bundle is distinguished
 by having these fields set to non-empty values:
 - git URL of the repo
@@ -159,8 +226,13 @@ the workspace repository.
 
 # Installation
 
-We plan to add a CLI command to simplify initial setup. Until then, please
-follow these manual instructions.
+Arlon CLI downloads are provided on GitHub. The CLI is not a self-contained standalone executable though. 
+It is required to point the CLI to a management cluster and setup the Arlon controller in this management cluster. 
+
+We plan to add a command line script to simplify initial setup. 
+For a quickstart minimal demonstration setup, follow the instructions to setup a KIND based testbed [here](https://github.com/arlonproj/arlon/blob/main/testing/README.md)
+
+Please follow the manual instructions in this section for a customised setup.
 
 ## Management cluster
 
@@ -176,7 +248,7 @@ After this step, you should be logged in as `admin` and a config file was create
   Example: `argocd repo add https://github.com/myname/arlon_workspace --username myname --password secret`.
    -  Note: type `argocd repo add --help` to see all available options.
    -  For Arlon developers, this is not your fork of the Arlon source code repository, 
-       but a separate git repo where some artefacts like profiles created by Arlon will be stored. 
+       but a separate git repo where some artifacts like profiles created by Arlon will be stored. 
 - Highly recommended: [configure a webhook](https://argo-cd.readthedocs.io/en/stable/operator-manual/webhook/)
   to immediately notify ArgoCD of changes to the repo. This will be especially useful
   during the tutorial. Without a webhook, repo changes may take up to 3 minutes
@@ -210,11 +282,22 @@ the destination file is named `/tmp/config`, it's important for the secret creat
   `kubectl -n arlon create secret generic argocd-creds --from-file /tmp/config`
 - Delete the temporary config file
 - Clone the arlon git repo and cd to its top directory
-- Create the `clusterregistrations` CRD: `kubectl apply -f config/crd/bases/core.arlon.io_clusterregistrations.yaml`
+- Create the CRDs: `kubectl apply -f config/crd/bases/`
 - Deploy the controller: `kubectl apply -f deploy/manifests/`
 - Ensure the controller eventually enters the Running state: `watch kubectl -n arlon get pod`
 
 ## Arlon CLI
+Download the CLI for the [latest release](https://github.com/arlonproj/arlon/releases/latest) from GitHub.
+Currently, Linux and MacOS operating systems are supported. 
+Uncompress the tarball, rename it as `arlon` and add to your PATH 
+
+Run `arlon verify` to check for prerequisites. 
+Run `arlon install` to install any missing prerequisites. 
+
+The following instructions are to manually build CLI from this code repository. 
+
+### Building the CLI 
+- Clone this repository and pull the latest version of a branch (main by default)
 - From the top directory, run `make build`
 - Optionally create a symlink from a directory
   (e.g. `/usr/local/bin`) included in your ${PATH} to the `bin/arlon` binary
@@ -254,13 +337,16 @@ I0222 17:31:14.112689   27922 request.go:668] Waited for 1.046146023s due to cli
 
 This assumes that you plan to deploy workload clusters on AWS cloud, with
 Cluster API ("CAPI") as the cluster orchestration API provider.
-Also ensure you have set up a [workspace repository](#workspace-repository)
+Also ensure you have set up a [workspace repository](#workspace-repository),
 and it is registered as a git repo in ArgoCD. The tutorial will assume
 the existence of these environment variables:
 - `${ARLON_REPO}`: where the arlon repo is locally checked out
 - `${WORKSPACE_REPO}`: where the workspace repo is locally checked out
-- `${WORKSPACE_REPO_URL}`: the workspace repo's git URL. It typically looks 
-like `https://github.com/${username}/${reponame}.git`
+- `${WORKSPACE_REPO_URL}`: the workspace repo's git URL. It typically looks like `https://github.com/${username}/${reponame}.git`
+- `${CLOUD_REGION}`: the region where you want to deploy example clusters and workloads (e.g. us-west-2)
+- `${SSH_KEY_NAME}`: the name of a public ssh key name registered in your cloud account, to enable ssh to your cluster nodes
+
+Additionally, for examples assuming `arlon git register`, "default" and a "prod" git repo aliases will also be given.
 
 _Note: for the best experience, make sure your workspace repo is configured
 to send change notifications to ArgoCD via a webhook. See the Installation section for details._
@@ -272,17 +358,18 @@ One of the cluster specs is for an unconfigured API provider (Crossplane);
 this is for illustrative purposes, since we will not use it in this tutorial.
 
 ```
-arlon clusterspec create capi-kubeadm-3node --api capi --cloud aws --type kubeadm --kubeversion v1.18.16 --nodecount 3 --nodetype t2.medium --tags devel,test --desc "3 node kubeadm for dev/test"
-arlon clusterspec create capi-eks --api capi --cloud aws --type eks --kubeversion v1.18.16 --nodecount 2 --nodetype t2.large --tags staging --desc "2 node eks for general purpose"
-arlon clusterspec create xplane-eks-3node --api xplane --cloud aws --type eks --kubeversion v1.18.16 --nodecount 4 --nodetype t2.small --tags experimental --desc "4 node eks managed by crossplane"
+arlon clusterspec create capi-kubeadm-3node --api capi --cloud aws --type kubeadm --kubeversion v1.21.10 --nodecount 3 --nodetype t2.medium --tags devel,test --desc "3 node kubeadm for dev/test" --region ${CLOUD_REGION} --sshkey ${SSH_KEY_NAME}
+arlon clusterspec create capi-eks --api capi --cloud aws --type eks --kubeversion v1.21.10 --nodecount 2 --nodetype t2.large --tags staging --desc "2 node eks for general purpose" --region ${CLOUD_REGION} --sshkey ${SSH_KEY_NAME}
+arlon clusterspec create xplane-eks-3node --api xplane --cloud aws --type eks --kubeversion v1.21.10 --nodecount 4 --nodetype t2.small --tags experimental --desc "4 node eks managed by crossplane" --region ${CLOUD_REGION} --sshkey ${SSH_KEY_NAME}
 ```
+
 Ensure you can now list the cluster specs:
 ```
 $ arlon clusterspec list
-NAME                APIPROV  CLOUDPROV  TYPE     KUBEVERSION  NODETYPE   NODECOUNT  TAGS          DESCRIPTION
-capi-eks            capi     aws        eks      v1.18.16     t2.large   2          staging       2 node eks for general purpose
-capi-kubeadm-3node  capi     aws        kubeadm  v1.18.16     t2.medium  3          devel,test    3 node kubeadm for dev/test
-xplane-eks-3node    xplane   aws        eks      v1.18.16     t2.small   4          experimental  4 node eks managed by crossplane
+NAME                APIPROV  CLOUDPROV  TYPE     KUBEVERSION  NODETYPE   NODECNT  MSTNODECNT  SSHKEY  CAS    CASMIN  CASMAX  TAGS          DESCRIPTION
+capi-eks            capi     aws        eks      v1.21.10     t2.large   2        3           leb     false  1       9       staging       2 node eks for general purpose
+capi-kubeadm-3node  capi     aws        kubeadm  v1.21.10     t2.medium  3        3           leb     false  1       9       devel,test    3 node kubeadm for dev/test
+xplane-eks-3node    xplane   aws        eks      v1.21.10     t2.small   4        3           leb     false  1       9       experimental  4 node eks managed by crossplane
 ```
 
 ## Bundles
@@ -302,15 +389,24 @@ git directory containing the YAML. We could point it directly to the copy in the
 [ArgoCD Example Apps repo](https://github.com/argoproj/argocd-example-apps/tree/master/guestbook),
 but we'll want to make modifications to it, so we instead create a new directory
 to host our own copy in our workspace directory:
-```
+```shell
 cd ${WORKSPACE_REPO}
 mkdir -p bundles/guestbook
 cp ${ARLON_REPO}/examples/bundles/guestbook.yaml bundles/guestbook
 git add bundles/guestbook
 git commit -m "add guestbook"
 git push origin main
-arlon bundle create guestbook-dynamic --tags applications --desc "guestbook app (dynamic)" --repo-url ${WORKSPACE_REPO_URL} --repo-path bundles/guestbook
 ```
+```shell
+arlon bundle create guestbook-dynamic --tags applications --desc "guestbook app (dynamic)" --repo-url ${WORKSPACE_REPO_URL} --repo-path bundles/guestbook
+            # OR
+# using repository aliases
+  # using the default alias
+arlon bundle create guestbook-dynamic --tags applications --desc "guestbook app (dynamic)" --repo-path bundles/guestbook
+  # using the prod alias
+arlon bundle create guestbook-dynamic --tags applications --desc "guestbook app (dynamic)" --repo-path bundles/guestbook --repo-alias prod
+```
+
 
 Next, we create a static bundle for another "dummy" application,
 an Ubuntu pod (OS version: "Xenial") that does nothing but print the date-time
@@ -325,14 +421,22 @@ onto a newly created cluster, so encapsulating the provider as a bundle will
 give us a flexible way to install it. We download a known copy from the
 authoritative source and store it the workspace repo in order to create a
 dynamic bundle from it:
-```
+```shell
 cd ${WORKSPACE_REPO}
 mkdir -p bundles/calico
-curl https://docs.projectcalico.org/v3.21/manifests/calico.yaml -O > bundles/calico/calico.yaml
+curl https://docs.projectcalico.org/v3.21/manifests/calico.yaml -o bundles/calico/calico.yaml
 git add bundles/calico
 git commit -m "add calico"
 git push origin main
-arlon bundle create calico --tags networking,cni --desc "Calico CNI" --repo-url https://github.com/argoproj/argocd-example-apps.git --repo-path bundles/guestbook
+```
+```shell
+arlon bundle create calico --tags networking,cni --desc "Calico CNI" --repo-url ${WORKSPACE_REPO_URL} --repo-path bundles/calico
+            # OR
+# using repository aliases
+  # using the default alias
+arlon bundle create calico --tags networking,cni --desc "Calico CNI" --repo-path bundles/calico
+  # using the prod alias
+arlon bundle create calico --tags networking,cni --desc "Calico CNI" --repo-path bundles/calico --repo-alias prod
 ```
 
 List your bundles to verify they were correctly entered:
@@ -350,7 +454,7 @@ We can now create profiles to group bundles into useful, deployable sets.
 First, create a static profile containing bundles xenial-static and guestbook-static:
 
 ```
-arlon profile create static-1 --bundles guestbook-static,xenial --desc "static profile 1" --tags examples
+arlon profile create static-1 --static --bundles guestbook-static,xenial-static --desc "static profile 1" --tags examples
 ```
 
 Secondly, create a dynamic version of the same profile. We'll store the compiled
@@ -358,9 +462,15 @@ form of the profile in the `profiles/dynamic-1` directory of the workspace repo.
 it manually; instead, the arlon CLI will create it for us, and it will push
 the change to git:
 ```
-arlon profile create dynamic-1 --repo-url ${WORKSPACE_REPO_URL} --repo-base-path profiles --bundles guestbook-static,xenial --desc "dynamic test 1" --tags examples
+arlon profile create dynamic-1 --repo-url ${WORKSPACE_REPO_URL} --repo-base-path profiles --bundles guestbook-static,xenial-static --desc "dynamic test 1" --tags examples
+            # OR
+# using repository aliases
+  # using the default alias
+arlon profile create dynamic-1 --repo-base-path profiles --bundles guestbook-static,xenial-static --desc "dynamic test 1" --tags examples
+  # using the prod alias
+arlon profile create dynamic-1 --repo-alias prod --repo-base-path profiles --bundles guestbook-static,xenial-static --desc "dynamic test 1" --tags examples
 ```
-_Note: the `--repo-base-path profiles` option tells arlon to create the profile
+_Note: the `--repo-base-path profiles` option tells `arlon` to create the profile
 under a base directory `profiles/` (to be created if it doesn't exist). That
 is in fact the default value of that option, so it is not necessary to specify
 it in this case._
@@ -389,18 +499,24 @@ This is not done for `guestbook-dynamic` because it is dynamic.
 Finally, we create another variant of the same profile, with the only difference
 being the addition of Calico bundle. It'll be used on clusters that need a CNI provider:
 ```
-arlon profile create dynamic-2-calico --repo-url ${WORKSPACE_REPO_URL} --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial --desc "dynamic test 1" --tags examples
+arlon profile create dynamic-2-calico --repo-url ${WORKSPACE_REPO_URL} --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial-static --desc "dynamic test 1" --tags examples
+            # OR
+# using repository aliases
+  # using the default alias
+arlon profile create dynamic-2-calico --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial-static --desc "dynamic test 1" --tags examples
+  # using the prod alias
+arlon profile create dynamic-2-calico --repo-alias prod --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial-static --desc "dynamic test 1" --tags examples
 ```
 Listing the profiles should show:
 ```
 $ arlon profile list
-NAME              TYPE     BUNDLES                          REPO-URL               REPO-PATH                  TAGS         DESCRIPTION
-dynamic-1         dynamic  guestbook-static,xenial          ${WORKSPACE_REPO_URL}  profiles/dynamic-1         examples     dynamic test 1
-dynamic-2-calico  dynamic  calico,guestbook-static,xenial   ${WORKSPACE_REPO_URL}  profiles/dynamic-2-calico  examples     dynamic test 1
-static-1          static   guestbook-dynamic,xenial         (N/A)                  (N/A)                      examples     static profile 1
+NAME              TYPE     BUNDLES                                 REPO-URL               REPO-PATH                  TAGS         DESCRIPTION
+dynamic-1         dynamic  guestbook-static,xenial-static          ${WORKSPACE_REPO_URL}  profiles/dynamic-1         examples     dynamic test 1
+dynamic-2-calico  dynamic  calico,guestbook-static,xenial-static   ${WORKSPACE_REPO_URL}  profiles/dynamic-2-calico  examples     dynamic test 1
+static-1          static   guestbook-dynamic,xenial-static         (N/A)                  (N/A)                      examples     static profile 1
 ```
 
-## Clusters
+## Clusters (gen1)
 
 We are now ready to deploy our first cluster. It will be of type EKS. Since
 EKS clusters come configured with pod networking out of the box, we choose
@@ -415,6 +531,12 @@ as it's registered with ArgoCD), but we'll use the workspace cluster for
 convenience:
 ```
 arlon cluster deploy --repo-url ${WORKSPACE_REPO_URL} --cluster-name eks-1 --profile dynamic-1 --cluster-spec capi-eks
+            # OR
+# using repository aliases
+  # using the default alias
+arlon cluster deploy --cluster-name eks-1 --profile dynamic-1 --cluster-spec capi-eks
+  # using the prod alias
+arlon cluster deploy --repo-alias prod --cluster-name eks-1 --profile dynamic-1 --cluster-spec capi-eks
 ```
 The git directory hosting the cluster Helm chart is created as a subdirectory
 of a base path in the repo. The base path can be specified with `--base-path`, but
@@ -524,7 +646,7 @@ from `dynamic-1` by specifying a new bundle set:
 ```
 arlon profile update dynamic-1 --bundles xenial
 ```
-Since the old bundle set was `guestbook-static,xenial`, that command resulted
+Since the old bundle set was `guestbook-static,xenial-static`, that command resulted
 in the removal of `guestbook-static` from the profile.
 In the UI, observe the `eks-1-profile-dynamic-1` app going through Sync
 and Progressing phases, eventually reaching the healthy (green) state.
@@ -628,10 +750,178 @@ This example updates a cluster to use a new profile `my-new-profile`:
 ```
 arlon cluster update eks-1 --profile my-new-profile
 ```
+
+# Next-Generation (gen2) Clusters - New in version 0.9.x
+
+Gen1 clusters are limited in capability by the Helm chart used to deploy the infrastructure resources.
+Advanced Cluster API configurations, such as those using multiple MachinePools, each with different
+instance types, is not supported.
+
+Gen2 clusters solve this problem by allowing you to create workload clusters from a *base cluster*
+that you design and provide in the form of a manifest file stored in a git directory. The manifest
+typically contains multiple related resources that together define an arbitrarily complex cluster.
+If you make subsequent changes to the base cluster, workload clusters originally created from it
+will automatically acquire the changes.
+
+Here is an example of a manifest file that we can use to create a *base cluster*. This manifest file helps in 
+deploying an EKS cluster with 'machine deployment' component from the cluster API (CAPI). This file has been generated by the following command
+
+```shell
+clusterctl generate cluster capi-quickstart --flavor eks \
+  --kubernetes-version v1.24.0 \
+  --control-plane-machine-count=3 \
+  --worker-machine-count=3 \
+  > capi-quickstart.yaml
+```
+
+```yaml
+# YAML
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: capi-quickstart
+  namespace: default
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+      - 192.168.0.0/16
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: AWSManagedControlPlane
+    name: capi-quickstart-control-plane
+  infrastructureRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: AWSManagedControlPlane
+    name: capi-quickstart-control-plane
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: AWSManagedControlPlane
+metadata:
+  name: capi-quickstart-control-plane
+  namespace: default
+spec:
+  region: {REGION}
+  sshKeyName: {SSH_KEYNAME}
+  version: v1.24.0
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: capi-quickstart-md-0
+  namespace: default
+spec:
+  clusterName: capi-quickstart
+  replicas: 3
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: EKSConfigTemplate
+          name: capi-quickstart-md-0
+      clusterName: capi-quickstart
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AWSMachineTemplate
+        name: capi-quickstart-md-0
+      version: v1.24.0
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AWSMachineTemplate
+metadata:
+  name: capi-quickstart-md-0
+  namespace: default
+spec:
+  template:
+    spec:
+      iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
+      instanceType: t2.medium
+      sshKeyName: {SSH_KEYNAME}
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: EKSConfigTemplate
+metadata:
+  name: capi-quickstart-md-0
+  namespace: default
+spec:
+  template: {}
+```
+
+Before a manifest directory can be used as a base cluster, it must first be "prepared" or "prepped"
+by Arlon. The "prep" phase makes minor changes to the directory and manifest to help Arlon deploy
+multiple copies of the cluster without naming conflicts.
+
+To determine if a git directory is eligible to serve as base cluster, run the `basecluster validategit` command:
+```shell
+arlon basecluster validategit --repo-url <repoUrl> --repo-path <pathToDirectory> [--repo-revision revision]
+            # OR
+# using repository aliases
+  # using the default alias
+arlon basecluster validategit --repo-path <pathToDirectory> [--repo-revision revision]
+  # using the prod alias
+arlon basecluster validategit --repo-alias prod --repo-path <pathToDirectory> [--repo-revision revision]
+```
+
+To prepare a git directory to serve as base cluster, use the `basecluster preparegit` command:
+```shell
+arlon basecluster preparegit --repo-url <repoUrl> --repo-path <pathToDirectory> [--repo-revision revision]
+            # OR
+# using repository aliases
+  # using the default alias
+arlon basecluster preparegit --repo-path <pathToDirectory> [--repo-revision revision]
+  # using the prod alias
+arlon basecluster preparegit --repo-alias prod --repo-path <pathToDirectory> [--repo-revision revision]
+```
+
+To create a gen2 workload cluster from the base cluster:
+```shell
+arlon cluster create --cluster-name <clusterName> --repo-url <repoUrl> --repo-path <pathToDirectory> [--output-yaml] [--profile <profileName>] [--repo-revision <repoRevision>]
+            # OR
+# using repository aliases
+  # using the default alias
+arlon cluster create --cluster-name <clusterName> --repo-path <pathToDirectory> [--output-yaml] [--profile <profileName>] [--repo-revision <repoRevision>]
+  # using the prod alias
+arlon cluster create --cluster-name <clusterName> --repo-alias prod --repo-path <pathToDirectory> [--output-yaml] [--profile <profileName>] [--repo-revision <repoRevision>]
+```
+
+To destroy a gen2 workload cluster:
+```
+arlon cluster delete <clusterName>
+```
+
+Arlon creates between 2 and 3 ArgoCD application resources to compose a gen2 cluster (the 3rd application, called "profile app", is used when
+an optional profile is specified at cluster creation time). When you destroy a gen2 cluster, Arlon will find all related ArgoCD applications
+and clean them up.
+
+## Known issues and limitations.
+Gen2 clusters are powerful because the base cluster can be arbitrarily complex and feature rich. Since they are fairly
+new and still evolving, gen2 clusters have several known limitations relative to gen1.
+* You cannot customize/override any property of the base cluster on the fly when creating a workload cluster,
+  which is an exact clone of the base cluster except for the names of its resources and their namespace.
+  The work-around is to make a copy of the base cluster directory, push the new directory, make
+  the desired changes, commit & push the changes, and register the directory as a new base cluster.
+* If you modify and commit a change to one or more properties of the base cluster that the underlying Cluster API provider deems as "immutable", new
+  workload clusters created from the base cluster will have the modified propert(ies), but ArgoCD will flag existing clusters as OutOfSync, since
+  the provider will continually reject attempts to apply the new property values. The existing clusters continue to function, despite appearing unhealthy
+  in the ArgoCD UI and CLI outputs.
+
+Examples of mutable properties in Cluster API resources:
+- Number of replicas (modification will result in a scale-up / down)
+- Kubernetes version (modification will result in an upgrade)
+
+Examples of immutable properties:
+- Most fields of AWSMachineTemplate (instance type, labels, etc...)
+ 
+## For more information
+
+For more details on gen2 clusters, refer to the [design document](docs/baseclusters.md).
+
 # Implementation details
 
-
-## Cluster chart
+## Cluster chart (gen1)
 
 The cluster chart is a Helm chart that creates (and optionally applies) the
 manifests necessary to create a cluster and deploy desired configurations
@@ -643,7 +933,7 @@ management cluster.
 
 Here is a summary of the kinds of resources generated and deployed by the chart:
 - A unique namespace with a name based on the cluster's name. All subsequent
-  resources below are created inside of that namespace.
+  resources below are created inside that namespace.
 - The stack-specific resources to create the cluster (for e.g. Cluster API resources)
 - A `clusterregistration` to automatically register the cluster with ArgoCD
 - A GitRepoDir to automatically create a git repo and/or directory to host a copy
