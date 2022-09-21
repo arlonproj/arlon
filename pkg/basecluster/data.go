@@ -57,6 +57,12 @@ nameReference:
   fieldSpecs:
   - path: spec/template/spec/bootstrap/configRef/name
     kind: MachineDeployment
+- kind: EKSConfigTemplate
+  group: bootstrap.cluster.x-k8s.io
+  version: v1beta1
+  fieldSpecs:
+  - path: spec/template/spec/bootstrap/configRef/name
+    kind: MachineDeployment
 - kind: DockerCluster
   group: infrastructure.cluster.x-k8s.io
   version: v1beta1
