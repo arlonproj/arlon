@@ -31,6 +31,14 @@ nameReference:
   fieldSpecs:
   - path: spec/controlPlaneRef/name
     kind: Cluster
+- kind: AWSManagedControlPlane
+  group: controlplane.cluster.x-k8s.io
+  version: v1beta1
+  fieldSpecs:
+  - path: spec/controlPlaneRef/name
+    kind: Cluster
+  - path: spec/infrastructureRef/name
+    kind: Cluster
 - kind: AWSMachine
   group: infrastructure.cluster.x-k8s.io
   version: v1beta1
