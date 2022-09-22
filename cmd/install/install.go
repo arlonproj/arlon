@@ -251,7 +251,7 @@ func downloadArgoCD(osPlatform string) error {
 	return nil
 }
 
-func installCAPI(ver string, infrastructureProviders, bootstrapProviders []string) error {
+func installCAPI(coreProviderVersion string, infrastructureProviders, bootstrapProviders []string) error {
 	c, err := client.New("")
 	if err != nil {
 		return err
@@ -270,7 +270,7 @@ func installCAPI(ver string, infrastructureProviders, bootstrapProviders []strin
 	}
 	clusterClient := cluster.New(cluster.Kubeconfig(options.Kubeconfig), clientCfg)
 	if isFirstRun(clusterClient) {
-		options.CoreProvider = ver
+		options.CoreProvider = coreProviderVersion
 	}
 	if _, err := c.Init(options); err != nil {
 		return err
