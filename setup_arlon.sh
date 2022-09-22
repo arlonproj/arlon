@@ -131,10 +131,10 @@ echo Arlon controller is up and running
 
 if ! which arlon &> /dev/null; then
     echo Downloading arlon CLI
-    wget -qc https://github.com/arlonproj/arlon/releases/download/v0.9.9/arlon_${arlon_os}_${arlon_arch}_0.9.9.tar.gz
-    tar -xf arlon_${arlon_os}_${arlon_arch}_0.9.9.tar.gz
-    mv arlon_${os}_${arch}_v0.9.9 ${HOME}/.local/bin/arlon
-    rm arlon_${arlon_os}_${arlon_arch}_0.9.9.tar.gz
+    wget -qc https://github.com/arlonproj/arlon/releases/download/v0.9.10/arlon_${arlon_os}_${arlon_arch}_0.9.10.tar.gz
+    tar -xf arlon_${arlon_os}_${arlon_arch}_0.9.10.tar.gz
+    mv arlon_${os}_${arch}_v0.9.10 ${HOME}/.local/bin/arlon
+    rm arlon_${arlon_os}_${arlon_arch}_0.9.10.tar.gz
 fi
 
 
