@@ -10,11 +10,13 @@ on:
     branches:
       - main
       - v0.3
+      - v0.9
   pull_request:
     # The branches below must be a subset of the branches above
     branches:
       - main
       - v0.3
+      - v0.9
   schedule:
     - cron: '28 1 * * 0'
 
