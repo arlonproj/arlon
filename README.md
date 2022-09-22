@@ -116,7 +116,7 @@ However, it does NOT remove the repository from `argocd`. When the "default" ali
 we also clear the "default" entry from the JSON file.
 
 #### Examples
-Given below are some examples for registering an unregistering a repository.
+Given below are some examples for registering and unregistering a repository.
 ##### Registering Repositories
 Registering a repository requires the repository link, the GitHub username(`--user`), and a personal access token(`--password`).
 When the `--password` flag isn't provided at the command line, the CLI will prompt for a password(this is the recommended approach).
@@ -168,7 +168,7 @@ the bundle at the time the cluster was created, and is not affected by subsequen
 changes to the bundle's manifest data.
 
 ### Dynamic bundle
-A dynamic bunlde contains a reference to the manifest data stored in git.
+A dynamic bundle contains a reference to the manifest data stored in git.
 A dynamic bundle is distinguished
 by having these fields set to non-empty values:
 - git URL of the repo
@@ -248,7 +248,7 @@ After this step, you should be logged in as `admin` and a config file was create
   Example: `argocd repo add https://github.com/myname/arlon_workspace --username myname --password secret`.
    -  Note: type `argocd repo add --help` to see all available options.
    -  For Arlon developers, this is not your fork of the Arlon source code repository, 
-       but a separate git repo where some artefacts like profiles created by Arlon will be stored. 
+       but a separate git repo where some artifacts like profiles created by Arlon will be stored. 
 - Highly recommended: [configure a webhook](https://argo-cd.readthedocs.io/en/stable/operator-manual/webhook/)
   to immediately notify ArgoCD of changes to the repo. This will be especially useful
   during the tutorial. Without a webhook, repo changes may take up to 3 minutes
