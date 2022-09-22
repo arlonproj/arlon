@@ -28,7 +28,7 @@ an RBAC ruleset, an add-on, an application, etc...
 
 # Architecture
 
-![architecture](./docs/architecture_diagram.png)
+![architecture](./architecture_diagram.png)
 
 Arlon is composed of a controller, a library, and a CLI that exposes the library's
 functions as commands. In the future, an API server may be built from
@@ -917,7 +917,7 @@ Examples of immutable properties:
  
 ## For more information
 
-For more details on gen2 clusters, refer to the [design document](docs/baseclusters.md).
+For more details on gen2 clusters, refer to the [design document](baseclusters.md).
 
 # Implementation details
 
