@@ -140,7 +140,7 @@ fi
 
 if ! which clusterctl &> /dev/null; then
     echo Downloading clusterctl CLI
-    curl -L -o ${HOME}/.local/bin/clusterctl https://github.com/kubernetes-sigs/cluster-api/releases/download/v1.2.1/clusterctl-${os}-${arch} -o clusterctl
+    curl -L -o ${HOME}/.local/bin/clusterctl https://github.com/kubernetes-sigs/cluster-api/releases/download/v1.1.6/clusterctl-${os}-${arch} -o clusterctl
     chmod +x ${HOME}/.local/bin/clusterctl
 fi
 
