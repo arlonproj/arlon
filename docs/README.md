@@ -919,6 +919,7 @@ Examples of immutable properties:
 
 For more details on gen2 clusters, refer to the [design document](baseclusters.md).
 
+
 # Implementation details
 
 ## Cluster chart (gen1)
