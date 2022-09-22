@@ -68,8 +68,12 @@ test: manifests generate fmt vet ## Run tests.
 clean:
 	rm -rf ./testbin; rm -rf ./bin
 
-build: generate fmt vet ## Build manager binary.
-	go build -o bin/arlon -ldflags '$(LD_FLAGS)' main.go
+build: generate fmt vet cluster-config ## Build manager binary.
+	go build -o bin/arlon main.go
+
+cluster-config:
+	mkdir -p bin
+	tar cvfz bin/setup_arlon.tar.gz ./setup_arlon.sh ./config/crd/bases/*.yaml ./deploy/manifests/*.yaml ./testing/manifests/*.yaml
 
 # goreleaser can invoke this target to produce binaries for different OS and CPU arch combinations
 build-cli: fmt vet ## Build CLI binary (with the current OS and CPU architecture) from the go env.
