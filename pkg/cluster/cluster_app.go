@@ -83,6 +83,12 @@ func constructClusterApp(
 		Kind:         "AWSManagedControlPlane",
 		JSONPointers: []string{"/spec/version"},
 	})
+
+	ignoreDiffs = append(ignoreDiffs, argoappv1.ResourceIgnoreDifferences{
+		Group:        "infrastructure.cluster.x-k8s.io/v1beta1",
+		Kind:         "AWSMachineTemplate",
+		JSONPointers: []string{"/spec"},
+	})
 	app.Spec.IgnoreDifferences = ignoreDiffs
 	app.Spec.Source.Kustomize = &argoappv1.ApplicationSourceKustomize{
 		NamePrefix: clusterName + "-",
