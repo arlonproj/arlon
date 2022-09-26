@@ -85,13 +85,19 @@ func constructClusterApp(
 	})
 
 	ignoreDiffs = append(ignoreDiffs, argoappv1.ResourceIgnoreDifferences{
-		Group:        "infrastructure.cluster.x-k8s.io/v1beta1",
+		Group:        "infrastructure.cluster.x-k8s.io",
 		Kind:         "AWSMachineTemplate",
 		JSONPointers: []string{"/spec"},
 	})
 	app.Spec.IgnoreDifferences = ignoreDiffs
 	app.Spec.Source.Kustomize = &argoappv1.ApplicationSourceKustomize{
 		NamePrefix: clusterName + "-",
+	}
+	app.Spec.SyncPolicy = &argoappv1.SyncPolicy{
+		Automated: &argoappv1.SyncPolicyAutomated{
+			Prune: true,
+		},
+		SyncOptions: []string{"Prune=true", "RespectIgnoreDifferences=true"},
 	}
 	app.Spec.Source.RepoURL = repoUrl
 	app.Spec.Source.TargetRevision = repoRevision
