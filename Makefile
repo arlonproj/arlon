@@ -69,7 +69,7 @@ clean:
 	rm -rf ./testbin; rm -rf ./bin
 
 build: generate fmt vet cluster-config ## Build manager binary.
-	go build --ldflags="-s -w" -o bin/arlon main.go
+	go build -ldflags '$(LD_FLAGS)' -o bin/arlon main.go
 
 cluster-config:
 	mkdir -p bin
