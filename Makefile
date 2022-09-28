@@ -6,7 +6,7 @@ REPO_ORG ?= arlonproj
 REPO_NAME ?= arlon
 CAPI_VERSION := $(shell cat $(REPO_ROOT)$*/capirc)
 CAPI_LD_FLAG := -X github.com/arlonproj/arlon/cmd/install.capiCoreProvider=$(CAPI_VERSION)
-LD_FLAGS := $(CAPI_LD_FLAG)
+LD_FLAGS := $(CAPI_LD_FLAG) -s -w
 # Image URL to use all building/pushing image targets
 IMG ?= $(REPO_SERVER)/$(REPO_ORG)/$(REPO_NAME)/controller:$(VERSION)
 # Produce CRDs with multiversion enabled for v1 APIs - fixes failure in make test
@@ -69,7 +69,7 @@ clean:
 	rm -rf ./testbin; rm -rf ./bin
 
 build: generate fmt vet cluster-config ## Build manager binary.
-	go build -o bin/arlon main.go
+	go build -ldflags '$(LD_FLAGS)' -o bin/arlon main.go
 
 cluster-config:
 	mkdir -p bin
