@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 
 	"github.com/argoproj/pkg/kube/cli"
 	"github.com/fatih/color"
@@ -61,11 +60,6 @@ func verify(clientConfig clientcmd.ClientConfig) error {
 	}
 
 	kubeconfigPath := os.Getenv("KUBECONFIG")
-	if kubeconfigPath == "" {
-		kubeconfigPath = filepath.Join(
-			os.Getenv("HOME"), ".kube", "config",
-		)
-	}
 
 	// Verify kubectl status
 	kubectlStatus, err := verifyKubectl(kubeconfigPath)
