@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/argoproj/pkg/kube/cli"
 	"github.com/fatih/color"
@@ -33,15 +35,14 @@ var (
 
 func NewCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
-	var kubeconfigPath string
 	cmd := &cobra.Command{
 		Use:               "verify",
 		Short:             "Verify if arlon cli can run",
 		Long:              "Verify if required kubectl,argocd,git access is present before profiles and bundles are created",
 		DisableAutoGenTag: true,
-		Example:           "arlonctl verify --kubeconfigPath",
+		Example:           "arlonctl verify",
 		RunE: func(c *cobra.Command, args []string) error {
-			err := verify(clientConfig, kubeconfigPath)
+			err := verify(clientConfig)
 			if err != nil {
 				return err
 			}
@@ -49,15 +50,21 @@ func NewCommand() *cobra.Command {
 		},
 	}
 	clientConfig = cli.AddKubectlFlagsToCmd(cmd)
-	cmd.Flags().StringVar(&kubeconfigPath, "kubeconfigPath", "", "kubeconfig file location")
 	return cmd
 }
 
-func verify(clientConfig clientcmd.ClientConfig, kubeconfigPath string) error {
+func verify(clientConfig clientcmd.ClientConfig) error {
 	var err error
 	config, err := clientConfig.ClientConfig()
 	if err != nil {
 		return fmt.Errorf("failed to get k8s client config")
+	}
+
+	kubeconfigPath := os.Getenv("KUBECONFIG")
+	if kubeconfigPath == "" {
+		kubeconfigPath = filepath.Join(
+			os.Getenv("HOME"), ".kube", "config",
+		)
 	}
 
 	// Verify kubectl status
