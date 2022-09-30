@@ -17,7 +17,7 @@ definition of *tool types*. Consequently, the list of supported bundle
 types mirrors ArgoCD's supported set of manifest-producing tools.
 Each bundle is defined using a Kubernetes ConfigMap resource in the arlo namespace.
 Additionally, a bundle can embed the data itself ("static bundle"), or contain a reference
-to the data ("dynamic bundle"). A reference can be a URL, github location, or Helm repo location.
+to the data ("dynamic bundle"). A reference can be a URL, GitHub location, or Helm repo location.
 The current list of supported bundle types is:
 
 * manifest_inline: a single manifest yaml file embedded in the resource
@@ -31,7 +31,7 @@ The current list of supported bundle types is:
 Bundles can specify an optional *purpose* to help classify and organize them.
 In the future, Arlo may order bundle installation by purpose order (for e.g.
 install bundles with purpose=*networking* before others) but that is not the
-case today. The currenty *suggested* purpose values are:
+case today. The currently *suggested* purpose values are:
 - networking
 - add-on
 - data-service
@@ -75,7 +75,7 @@ management cluster.
 
 Here is a summary of the kinds of resources generated and deployed by the chart:
 - A unique namespace with a name based on the cluster's name. All subsequent
-  resources below are created inside of that namespace.
+  resources below are created inside that namespace.
 - The stack-specific resources to create the cluster (for e.g. Cluster API resources)
 - A ClusterRegistration to automatically register the cluster with ArgoCD
 - A GitRepoDir to automatically create a git repo and/or directory to host a copy
