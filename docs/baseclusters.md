@@ -193,4 +193,7 @@ yet have an exhaustive list).
 - Changing the Kubernetes version of the control plane or data plane *is* supported, so long as the new version
 is supported by the relevant providers. If accepted, such a change will result in a rolling update
 of the corresponding plane.
+- Specific to AWS: the `AWSMachineTemplate.spec` is immutable and a CAPI webhook disallows such updates. The user is advised to not make such modifications to a basecluster manifest.
+In the event that such an event does happen, the user is advised to not manually sync in those changes via `argocd`. If a new cluster with a different `AWSMachineTemplate.spec` is desired,
+the recommended approach is to make a copy of the manifests in the workspace repository and then issue an `arlon cluster create` command which would then consume this manifest.
 
