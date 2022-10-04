@@ -68,12 +68,20 @@ test: manifests generate fmt vet ## Run tests.
 clean:
 	rm -rf ./testbin; rm -rf ./bin
 
+<<<<<<< HEAD
 build: generate fmt vet cluster-config ## Build manager binary.
 	go build -ldflags '$(LD_FLAGS)' -buildmode=pie -o bin/arlon main.go
 
 cluster-config:
 	mkdir -p bin
 	tar cvfz bin/setup_arlon.tar.gz ./setup_arlon.sh ./config/crd/bases/*.yaml ./deploy/manifests/*.yaml ./testing/manifests/*.yaml
+||||||| a04cb84
+build: generate fmt vet ## Build manager binary.
+	go build -o bin/arlon main.go
+=======
+build: generate fmt vet ## Build manager binary.
+	go build -buildmode=pie -o bin/arlon main.go
+>>>>>>> e970086eaebb1c81076a6d5bf9fe83f6e412d7e1
 
 # goreleaser can invoke this target to produce binaries for different OS and CPU arch combinations
 build-cli: fmt vet ## Build CLI binary (with the current OS and CPU architecture) from the go env.
@@ -132,7 +140,7 @@ controller-gen: ## Download controller-gen locally if necessary.
 
 KUSTOMIZE = $(shell pwd)/bin/kustomize
 kustomize: ## Download kustomize locally if necessary.
-	$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v3@v3.9.3)
+	$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v4@v4.5.7)
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
