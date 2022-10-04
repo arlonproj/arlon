@@ -68,7 +68,6 @@ test: manifests generate fmt vet ## Run tests.
 clean:
 	rm -rf ./testbin; rm -rf ./bin
 
-<<<<<<< HEAD
 build: generate fmt vet cluster-config ## Build manager binary.
 	go build -ldflags '$(LD_FLAGS)' -buildmode=pie -o bin/arlon main.go
 
