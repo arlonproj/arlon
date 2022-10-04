@@ -25,7 +25,7 @@ spec:
         - controller
         - --argocd-config-path
         - /.argocd/config
-        image: ghcr.io/arlonproj/arlon/controller:0.9.9
+        image: ghcr.io/arlonproj/arlon/controller:0.10.0
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
