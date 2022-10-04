@@ -69,7 +69,7 @@ clean:
 	rm -rf ./testbin; rm -rf ./bin
 
 build: generate fmt vet cluster-config ## Build manager binary.
-	go build -ldflags '$(LD_FLAGS)' -o bin/arlon main.go
+	go build -ldflags '$(LD_FLAGS)' -buildmode=pie -o bin/arlon main.go
 
 cluster-config:
 	mkdir -p bin
@@ -80,13 +80,13 @@ build-cli: fmt vet ## Build CLI binary (with the current OS and CPU architecture
 	go build -o bin/arlon -ldflags '$(LD_FLAGS)' main.go
 
 build-cli-linux: fmt vet ## Build CLI binary for Linux
-	GOOS=linux GOARCH=amd64 go build -o bin/arlon -ldflags '$(LD_FLAGS)' main.go
+	GOOS=linux GOARCH=amd64 go build -o bin/arlon -ldflags '$(LD_FLAGS)' -buildmode=pie main.go
 
 build-cli-mac-amd64: fmt vet ## Build CLI binary for Mac (AMD/ Intel CPU)
-	GOOS=darwin GOARCH=amd64 go build -o bin/arlon -ldflags '$(LD_FLAGS)' main.go
+	GOOS=darwin GOARCH=amd64 go build -o bin/arlon -ldflags '$(LD_FLAGS)' -buildmode=pie main.go
 
 build-cli-mac-arm64: fmt vet ## Build CLI binary for Mac (Apple Silicon)
-	GOOS=darwin GOARCH=arm64 go build -o bin/arlon -ldflags '$(LD_FLAGS)' main.go
+	GOOS=darwin GOARCH=arm64 go build -o bin/arlon -ldflags '$(LD_FLAGS)' -buildmode=pie main.go
 
 ifeq (GOARCH,"arm64")
 build-cli-mac: build-cli-mac-arm64
@@ -132,7 +132,7 @@ controller-gen: ## Download controller-gen locally if necessary.
 
 KUSTOMIZE = $(shell pwd)/bin/kustomize
 kustomize: ## Download kustomize locally if necessary.
-	$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v4@v4.5.7)
+	$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v3@v3.9.3)
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
