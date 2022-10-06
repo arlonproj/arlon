@@ -1,0 +1,26 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 1800
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  namespace: test-cluster1
+status:
+  controlPlaneReady: true
+  infrastructureReady: true
+  phase: Provisioned
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  namespace: test-cluster1
+status:
+  phase: Running
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: AWSManagedControlPlane
+metadata:
+  namespace: test-cluster1
+status:
+  ready: true
