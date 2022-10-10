@@ -227,10 +227,10 @@ the workspace repository.
 # Installation
 
 Arlon CLI downloads are provided on GitHub. The CLI is not a self-contained standalone executable though. 
-It is required to point the CLI to a management cluster and setup the Arlon controller in this management cluster. 
+It is required to point the CLI to a management cluster and set up the Arlon controller in this management cluster.
 
 We plan to add a command line script to simplify initial setup. 
-For a quickstart minimal demonstration setup, follow the instructions to setup a KIND based testbed [here](https://github.com/arlonproj/arlon/blob/main/testing/README.md)
+For a quickstart minimal demonstration setup, follow the instructions to set up a KIND based testbed [here](https://github.com/arlonproj/arlon/blob/main/testing/README.md)
 
 Please follow the manual instructions in this section for a customised setup.
 
@@ -886,6 +886,18 @@ arlon cluster create --cluster-name <clusterName> --repo-path <pathToDirectory> 
   # using the prod alias
 arlon cluster create --cluster-name <clusterName> --repo-alias prod --repo-path <pathToDirectory> [--output-yaml] [--profile <profileName>] [--repo-revision <repoRevision>]
 ```
+To update the profiles of a gen2 workload cluster:
+```shell
+# To add a new profile to the existing cluster
+arlon cluster ngupdate <clustername> --profile <profilename>
+# To delete an existing profile from the existing cluster
+arlon cluster ngupdate <clustername> --delete-profile <profilename>
+```
+A gen2 cluster can be created without any profile app associated with the cluster. So, the above commands can be used to add a new profile 
+to the existing cluster which will create profile app in argocd along with bundle apps associated with the profile.
+
+An existing profile can be deleted from the cluster as well using the above command. Executing this command will delete the profile app and 
+all the bundles associated with the profile in argocd.
 
 To destroy a gen2 workload cluster:
 ```
