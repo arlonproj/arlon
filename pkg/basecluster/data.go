@@ -19,6 +19,10 @@ nameReference:
     kind: MachineDeployment
   - path: spec/template/spec/clusterName
     kind: MachineDeployment
+  - path: spec/clusterName
+    kind: MachinePool
+  - path: spec/template/spec/clusterName
+    kind: MachinePool
 - kind: AWSCluster
   group: infrastructure.cluster.x-k8s.io
   version: v1beta1
@@ -91,4 +95,10 @@ nameReference:
     kind: MachineDeployment
   - path: spec/machineTemplate/infrastructureRef/name
     kind: KubeadmControlPlane
+- kind: AWSManagedMachinePool
+  group: infrastructure.cluster.x-k8s.io
+  version: v1beta1
+  fieldSpecs:
+  - path: spec/template/spec/infrastructureRef/name
+    kind: MachinePool
 `
