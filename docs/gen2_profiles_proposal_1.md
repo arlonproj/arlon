@@ -14,7 +14,9 @@ Arlon objects.
 
 * Cluster: any cluster registered in ArgoCD. Not limited to clusters created by Arlon.
 
-A cluster is said to be associated with a profile if it is labeled with `arlon.io/profile=<profileName>`.
+Observations:
+- A profile can be associated with any number of applications. And an application can be associated with multiple profiles.
+- A cluster is said to be associated with a profile if it is labeled with `arlon.io/profile=<profileName>`.
 A cluster can be associated with at most one profile. A profile may be associated (attached to) any number of clusters.
 
 ## Usage
