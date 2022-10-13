@@ -87,6 +87,7 @@ with the `arlon.io/profile=<profileName>` key value pair.
 Pros of the design:
 * Lightweight, simple
 * Fully declarative (no new resources introduced, relies entirely on existing ArgoCD resources)
+* Does not require "workspace git repo" since a profile has no compiled component.
 
 Cons:
 * Profiles are not first class objects. A profile can cease to exist if it
