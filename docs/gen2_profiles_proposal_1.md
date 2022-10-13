@@ -103,6 +103,8 @@ Cons:
 * Any limitations of ApplicationSets (for e.g. lack of Sync Wave support?)
 * The lightweight nature of this design may cause some to perceive Arlon's
   contribution to be very minimal (it's a thin wrapper around ArgoCD constructs).
+* Relies on ApplicationSet, which is ArgoCD specific, making it harder to port Arlon
+  to other gitops tools in the future, e.g. Flux. 
 
 Potential solution(s) to the first issue:
 * We could represent Gen2 profiles using a custom resource, either a new type, or by overloading
