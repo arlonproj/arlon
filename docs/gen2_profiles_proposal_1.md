@@ -94,7 +94,7 @@ Cons:
   becomes unreferenced from any application. This can be confusing to users.
   For example, you can't create an empty profile and add apps to it later.
 * A cluster can only have one gen2 profile attached to it. This is a result
-  of the limitated expressiveness of the `matchExpressions` logic.
+  of the limited expressiveness of the `matchExpressions` logic.
   In contrast, any number of gen1 profiles can be attached to a cluster
   (the current implementation only allows one, but could be enhanced to allow many)
 * It's impossible to specify per-cluster overrides for an application.
