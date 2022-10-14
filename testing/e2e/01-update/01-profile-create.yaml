@@ -1,0 +1,4 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  - command: arlon profile create dynamic-1 --repo-url http://172.17.0.1:8188/myrepo.git --repo-base-path profiles --bundles xenial --desc "dynamic test 1" --tags examples

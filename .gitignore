@@ -27,3 +27,6 @@ __debug_bin
 *~
 arlon
 
+# kuttl artifacts
+kubeconfig
+kind-logs-*

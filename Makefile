@@ -150,3 +150,10 @@ endef
 
 pkgtest:
 	go test -v ./pkg/...
+
+test-e2e:
+	./testing/e2e_setup.sh
+	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 00-deploy
+	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 01-update
+	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 02-delete
+	./testing/e2e_setup_teardown.sh

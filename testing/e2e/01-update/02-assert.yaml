@@ -1,0 +1,17 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 150
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  labels:
+    arlon-cluster: test-cluster1
+    arlon-profile: dynamic-1
+    arlon-type: profile-app
+    managed-by: arlon
+  namespace: argocd
+  name: test-cluster1-profile-dynamic-1
+status:
+  health:
+    status: Healthy
