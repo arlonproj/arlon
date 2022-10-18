@@ -93,6 +93,9 @@ Cons:
 * Profiles are not first class objects. A profile can cease to exist if it
   becomes unreferenced from any application. This can be confusing to users.
   For the same reason, you can't create an empty profile and add apps to it later.
+  This can be alleviated by clearly documenting the fact that profiles are just label values.
+  Once the user understand this, everything will become clearer, and the simplicity of
+  the design can begin to outweigh its quirks.
 * A cluster can only have one gen2 profile attached to it. This is a result
   of the limited expressiveness of the `matchExpressions` logic.
   In contrast, any number of gen1 profiles can be attached to a cluster
