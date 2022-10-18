@@ -106,9 +106,50 @@ Cons:
 * Relies on ApplicationSet, which is ArgoCD specific, making it harder to port Arlon
   to other gitops tools in the future, e.g. Flux. 
 
-Potential solution(s) to the first issue:
-* We could represent Gen2 profiles using a custom resource, either a new type, or by overloading
-  the existing Profile CR already used by Gen1. The downside is an increase
-  in implementation complexity, for e.g
-  * where is the source of truth for app-to-profile associations?
-  * what if an app refers to a profile label value not represented by any Profile CR?
+## Potential solutions to the profiles-are-not-firstclass-objects issue:
+
+### The Null App
+
+The Null App (NA) is an Arlon app (applicationset) that belongs
+to (is associated with) all profiles.
+Arlon ensures that the null app always exists and maintains the above invariant.
+When deployed to a cluster, the NA does not change the cluster
+state, so it's a no-OP. A possible implementation is to make the NA deploy the "default" namespace,
+which already exists in all (most?) clusters.
+
+Arlon CLI commands (and possibly APIs) will filter out the NA and automatically create and update it
+as necessary, so the user doesn't see it in practice.
+
+* The NA gets all profile labels, meaning all profiles "contain" the null app.
+* A user can now create an empty profile. Internally, it is added to the NA's label list.
+* When a profile is attached to any cluster, that cluster automatically "gets" the NA (since it's in all profiles), in addition to any other apps associated with the profile.
+* When an app is "added" to a profile, meaning the profile is added to the app's labels list, the profile may not previously exist, therefore the profile is also added to the null app's label list. Therefore, when an app is added to a profile, two apps are modified.
+* When an app is "removed" from a profile, meaning the profile is removed from the app's labels list, no change is made to the null app, therefore the profile remains in the null app's label list. (Actually, this behavior must change to support inconsistent states, see "declarative installation ..." section below.
+
+### Lifecycle operations on profiles
+
+* With the presence of the null app, profiles can appear to be first class objects with defined lifecycle operations.
+
+* Creating an empty profile: a profile is "created" by adding its name to the null app's label list. If it already exists in the null app's list, the app is unmodified. If it already existed in another app's list, then that's fine too. That app is not modified either. At the end of this operation, which is idempotent, the profile is guaranteed to exist in at least one app.
+
+* Deleting a profile: this deletes the profile from all apps in which it appears in the label list. The operation is idempotent. If the profile did not initially exist, a warning will be printed by no error occurs.
+
+
+### Issue: declarative installation and inconsistent states
+
+A user may want to provision profiles and applications in a declarative way, meaning with manifests and "kubectl apply -f". Those manifests contain applicationsets that satisfy the "arlon application" requirement. The user does not know about the null app. Therefore the user's declared applicationsets (with the arlon requirements) will solely completely define the arlon applications and profiles. We assume that the user has no interest in declaratively create empty profiles, only profiles that have at least one associated application.
+
+Arlon must allow a partially inconsistent state, meaning, at any point in time, some profiles may not exist in the null app. This is fine, since the null app's only purpose is to maintain the existence of empty profiles. During an inconsistent state, profiles that exist in some apps but not in the null app are, by definition, existent, since they appear in at least one app. However, one enhancement is necessary on the "remove app from profile" operation: 
+- In addition to removing the profile from the app's label list, the operation must ensure the existence of the profile in null app, meaning add it if it's not already there. This will ensure that at the end of the operation, the profile still exists in the null app. If it no longer exists anywhere else, then by definition it is empty.
+
+## Full Custom Resource
+
+(Under construction)
+
+We could represent Gen2 profiles using a custom resource, either a new type, or by overloading
+the existing Profile CR already used by Gen1. The downside is an increase
+in implementation complexity, for e.g
+* where is the source of truth for app-to-profile associations?
+* what if an app refers to a profile label value not represented by any Profile CR?
+
+A new controller would be most likely need to be developed.
