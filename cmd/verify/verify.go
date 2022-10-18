@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 
 	"github.com/argoproj/pkg/kube/cli"
@@ -16,32 +17,31 @@ import (
 )
 
 var (
-	ErrKubectlInstall        = errors.New("kubectl is not installed or missing in your $PATH")
-	ErrKubeConfigPathMissing = errors.New("kubeconfigPath parameter should be passed to verify kubeconfig access")
-	ErrKubectlSet            = errors.New("error setting kubeconfig")
-	ErrKcPermission          = errors.New("set the kubeconfig or kubeconfig does not have required access")
-	ErrArgoCD                = errors.New("argocd is not installed or missing in your $PATH")
-	ErrArgoCDAuthToken       = errors.New("argocd auth token has expired, login to argocd again")
-	ErrGit                   = errors.New("git is not installed or missing in your $PATH")
-	ErrArlonNs               = errors.New("arlon is not installed or missing in your $PATH")
-	ErrCapi                  = errors.New("capi services are not installed or missing in your $PATH")
-	ErrNs                    = errors.New("failed to get the namespace")
-	Yellow                   = color.New(color.FgHiYellow).SprintFunc()
-	Green                    = color.New(color.FgGreen).SprintFunc()
-	Red                      = color.New(color.FgRed).SprintFunc()
+	ErrKubectlInstall    = errors.New("kubectl is not installed or missing in your $PATH")
+	ErrKubeConfigMissing = errors.New("KUBECONFIG must be set")
+	ErrKubectlSet        = errors.New("error setting kubeconfig")
+	ErrKcPermission      = errors.New("set the kubeconfig or kubeconfig does not have required access")
+	ErrArgoCD            = errors.New("argocd is not installed or missing in your $PATH")
+	ErrArgoCDAuthToken   = errors.New("argocd auth token has expired, login to argocd again")
+	ErrGit               = errors.New("git is not installed or missing in your $PATH")
+	ErrArlonNs           = errors.New("arlon is not installed or missing in your $PATH")
+	ErrCapi              = errors.New("capi services are not installed or missing in your $PATH")
+	ErrNs                = errors.New("failed to get the namespace")
+	Yellow               = color.New(color.FgHiYellow).SprintFunc()
+	Green                = color.New(color.FgGreen).SprintFunc()
+	Red                  = color.New(color.FgRed).SprintFunc()
 )
 
 func NewCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
-	var kubeconfigPath string
 	cmd := &cobra.Command{
 		Use:               "verify",
 		Short:             "Verify if arlon cli can run",
 		Long:              "Verify if required kubectl,argocd,git access is present before profiles and bundles are created",
 		DisableAutoGenTag: true,
-		Example:           "arlonctl verify --kubeconfigPath",
+		Example:           "arlonctl verify",
 		RunE: func(c *cobra.Command, args []string) error {
-			err := verify(clientConfig, kubeconfigPath)
+			err := verify(clientConfig)
 			if err != nil {
 				return err
 			}
@@ -49,16 +49,17 @@ func NewCommand() *cobra.Command {
 		},
 	}
 	clientConfig = cli.AddKubectlFlagsToCmd(cmd)
-	cmd.Flags().StringVar(&kubeconfigPath, "kubeconfigPath", "", "kubeconfig file location")
 	return cmd
 }
 
-func verify(clientConfig clientcmd.ClientConfig, kubeconfigPath string) error {
+func verify(clientConfig clientcmd.ClientConfig) error {
 	var err error
 	config, err := clientConfig.ClientConfig()
 	if err != nil {
 		return fmt.Errorf("failed to get k8s client config")
 	}
+
+	kubeconfigPath := os.Getenv("KUBECONFIG")
 
 	// Verify kubectl status
 	kubectlStatus, err := verifyKubectl(kubeconfigPath)
@@ -117,7 +118,7 @@ func verifyKubectl(kubeconfigPath string) (bool, error) {
 	}
 
 	if len(kubeconfigPath) == 0 {
-		return false, ErrKubeConfigPathMissing
+		return false, ErrKubeConfigMissing
 	}
 
 	//Check if kubeconfig is correct and kubectl commands are functional
