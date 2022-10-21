@@ -1,0 +1,5 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  - script: ../../e2e_external_setup.sh
+  - command: arlon cluster manage kind-external1 dynamic-1

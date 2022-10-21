@@ -1,0 +1,15 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 240
+---
+apiVersion: v1
+kind: Secret
+data:
+  name: a2luZC1leHRlcm5hbDE= # kind-external1 (base64)
+metadata:
+  annotations:
+    managed-by: argocd.argoproj.io
+  labels:
+    argocd.argoproj.io/secret-type: cluster
+  namespace: argocd
+type: Opaque
