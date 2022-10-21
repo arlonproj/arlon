@@ -156,4 +156,7 @@ test-e2e:
 	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 00-deploy
 	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 01-update
 	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 02-delete
+	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 03-manage --kind-context arlon-e2e-testbed --timeout 300
+
+e2e-teardown:
 	./testing/e2e_setup_teardown.sh
