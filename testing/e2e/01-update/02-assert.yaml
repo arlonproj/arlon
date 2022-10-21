@@ -6,12 +6,12 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   labels:
-    arlon-cluster: test-cluster1
+    arlon-cluster: ec2-cluster
     arlon-profile: dynamic-1
     arlon-type: profile-app
     managed-by: arlon
   namespace: argocd
-  name: test-cluster1-profile-dynamic-1
+  name: ec2-cluster-profile-dynamic-1
 status:
   health:
     status: Healthy

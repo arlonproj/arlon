@@ -1,6 +1,6 @@
 apiVersion: kuttl.dev/v1beta1
 kind: TestStep
 commands:
-  - command: arlon cluster delete test-cluster1
+  - command: arlon cluster delete ec2-cluster
   - command: arlon bundle delete xenial
   - command: arlon profile delete dynamic-1
