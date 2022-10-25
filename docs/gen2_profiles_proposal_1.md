@@ -85,14 +85,17 @@ with the `arlon.io/profile=<profileName>` key value pair.
 ## Discussion
 
 Pros of the design:
-* Lightweight, simple
+* Lightweight, elegant, simple
 * Fully declarative (no new resources introduced, relies entirely on existing ArgoCD resources)
 * Does not require "workspace git repo" since a profile has no compiled component.
 
 Cons:
 * Profiles are not first class objects. A profile can cease to exist if it
   becomes unreferenced from any application. This can be confusing to users.
-  For example, you can't create an empty profile and add apps to it later.
+  For the same reason, you can't create an empty profile and add apps to it later.
+  This can be alleviated by clearly documenting the fact that profiles are just label values.
+  Once the user understand this, everything will become clearer, and the simplicity of
+  the design can begin to outweigh its quirks.
 * A cluster can only have one gen2 profile attached to it. This is a result
   of the limited expressiveness of the `matchExpressions` logic.
   In contrast, any number of gen1 profiles can be attached to a cluster
@@ -100,11 +103,12 @@ Cons:
 * It's impossible to specify per-cluster overrides for an application.
   That's because an ApplicationSet can be deployed to multiple clusters if
   they have a matching profile label.
-* Any limitations of ApplicationSets (for e.g. lack of Sync Wave support?)
+  (To be fair, neither gen1 profiles nor gen2 base clusters support cluster overrides either, but for a different reason. This is tracked in a github issue)
+* Any limitations of ApplicationSets (for e.g. lack of Sync Wave support?) will apply to Arlon Apps using gen2 profiles.
 * The lightweight nature of this design may cause some to perceive Arlon's
   contribution to be very minimal (it's a thin wrapper around ArgoCD constructs).
 * Relies on ApplicationSet, which is ArgoCD specific, making it harder to port Arlon
-  to other gitops tools in the future, e.g. Flux. 
+  to other gitops tools in the future, e.g. Flux (Trilok mentioned this, though it's not a strong concern at this point, given how invested we already are in ArgoCD)
 
 ## Potential solutions to the profiles-are-not-firstclass-objects issue:
 
