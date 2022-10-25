@@ -3,7 +3,6 @@ module github.com/arlonproj/arlon
 go 1.19
 
 require (
-	github.com/argoproj-labs/applicationset v0.3.0
 	github.com/argoproj/argo-cd/v2 v2.4.11
 	github.com/aws/aws-sdk-go v1.44.86
 	github.com/deckarep/golang-set v1.8.0

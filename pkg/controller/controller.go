@@ -1,7 +1,7 @@
 package controller
 
 import (
-	appset "github.com/argoproj-labs/applicationset/api/v1alpha1"
+	appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/controllers"
 	"github.com/arlonproj/arlon/pkg/argocd"
