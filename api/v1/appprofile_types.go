@@ -28,14 +28,18 @@ type AppProfileSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of AppProfile. Edit appprofile_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	AppNames []string `json:"appNames,omitempty"`
 }
 
 // AppProfileStatus defines the observed state of AppProfile
 type AppProfileStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	// Health values: healthy, degraded
+	Health string `json:"health,omitempty"`
+	// Names of apps that don't exist
+	InvalidAppNames []string `json:"appNames,omitempty"`
 }
 
 //+kubebuilder:object:root=true
