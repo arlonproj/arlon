@@ -1,4 +1,4 @@
 apiVersion: kuttl.dev/v1beta1
 kind: TestStep
 commands:
-    - command: arlon cluster create --cluster-name ec2cluster --repo-path basecluster/ec2-cluster
+    - command: arlon cluster create --cluster-name ec2-cluster --repo-path basecluster/ec2-cluster
