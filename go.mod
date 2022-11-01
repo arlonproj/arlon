@@ -19,6 +19,7 @@ require (
 	k8s.io/client-go v0.23.10
 	sigs.k8s.io/cluster-api v1.1.5 //v1.1.x will upgrade k8s APIs to v0.23.x
 	sigs.k8s.io/controller-runtime v0.11.2 //v1.11 will upgrade k8s APIs to v0.23.x
+	github.com/deckarep/golang-set v1.8.0
 )
 
 require (

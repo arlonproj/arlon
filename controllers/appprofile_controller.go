@@ -19,12 +19,12 @@ package controllers
 import (
 	"context"
 
+	corev1 "github.com/arlonproj/arlon/api/v1"
+	"github.com/arlonproj/arlon/pkg/appprofile"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
-
-	corev1 "github.com/arlonproj/arlon/api/v1"
 )
 
 // AppProfileReconciler reconciles a AppProfile object
@@ -47,11 +47,11 @@ type AppProfileReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.13.0/pkg/reconcile
 func (r *AppProfileReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	logger := log.FromContext(ctx).WithValues("appprofile", req.NamespacedName)
 
 	// TODO(user): your logic here
 
-	return ctrl.Result{}, nil
+	return appprofile.Reconcile(ctx, r.Client, req, logger)
 }
 
 // SetupWithManager sets up the controller with the Manager.

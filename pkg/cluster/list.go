@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	apppkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	"github.com/arlonproj/arlon/pkg/common"
 	logpkg "github.com/arlonproj/arlon/pkg/log"
@@ -22,9 +21,9 @@ func List(
 ) (clist []Cluster, err error) {
 	log := logpkg.GetLogger()
 	// List legacy clusters (have clusterspec)
-	query := "managed-by=arlon,arlon-type=cluster"
+	query := ArlonGen1ClusterLabelQueryOnArgoApps
 	apps, err := appIf.List(context.Background(),
-		&apppkg.ApplicationQuery{Selector: &query})
+		&argoapp.ApplicationQuery{Selector: &query})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list argocd applications: %s", err)
 	}
@@ -36,9 +35,9 @@ func List(
 		})
 	}
 	// List next-gen clusters (have base cluster)
-	query = "managed-by=arlon,arlon-type=cluster-app"
+	query = ArlonGen2ClusterLabelQueryOnArgoApps
 	apps, err = appIf.List(context.Background(),
-		&apppkg.ApplicationQuery{Selector: &query})
+		&argoapp.ApplicationQuery{Selector: &query})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list next-gen clusters: %s", err)
 	}
@@ -96,7 +95,7 @@ func getMatchingProfileName(
 ) (string, error) {
 	query := "managed-by=arlon,arlon-type=profile-app,arlon-cluster=" + clusterName
 	profileApps, err := appIf.List(context.Background(),
-		&apppkg.ApplicationQuery{
+		&argoapp.ApplicationQuery{
 			Selector: &query,
 		})
 	if err != nil {
