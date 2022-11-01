@@ -18,7 +18,7 @@ package controllers
 
 import (
 	"context"
-
+	"github.com/argoproj/argo-cd/v2/pkg/apiclient"
 	corev1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/appprofile"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -30,7 +30,8 @@ import (
 // AppProfileReconciler reconciles a AppProfile object
 type AppProfileReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme       *runtime.Scheme
+	ArgocdClient apiclient.Client
 }
 
 //+kubebuilder:rbac:groups=core.arlon.io,resources=appprofiles,verbs=get;list;watch;create;update;patch;delete
@@ -51,7 +52,7 @@ func (r *AppProfileReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	// TODO(user): your logic here
 
-	return appprofile.Reconcile(ctx, r.Client, req, logger)
+	return appprofile.Reconcile(ctx, r.Client, r.ArgocdClient, req, logger)
 }
 
 // SetupWithManager sets up the controller with the Manager.

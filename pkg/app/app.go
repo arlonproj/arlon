@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
-	"github.com/arlonproj/arlon/pkg/controller"
+	"github.com/arlonproj/arlon/pkg/ctrlruntimeclient"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/selection"
@@ -17,7 +17,7 @@ import (
 const ProfileLabelKey = "arlon.io/app-profile"
 
 func List(config *restclient.Config, ns string) (apslist []appset.ApplicationSet, err error) {
-	cli, err := controller.NewClient(config)
+	cli, err := ctrlruntimeclient.NewClient(config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get controller runtime client: %s", err)
 	}

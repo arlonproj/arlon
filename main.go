@@ -23,6 +23,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/arlonproj/arlon/cmd/app"
+	"github.com/arlonproj/arlon/cmd/appprofilecontroller"
 	"github.com/arlonproj/arlon/cmd/basecluster"
 	"github.com/arlonproj/arlon/cmd/bundle"
 	"github.com/arlonproj/arlon/cmd/callhomecontroller"
@@ -60,6 +61,7 @@ func main() {
 	command.SilenceUsage = true
 	command.AddCommand(controller.NewCommand())
 	command.AddCommand(callhomecontroller.NewCommand())
+	command.AddCommand(appprofilecontroller.NewCommand())
 	command.AddCommand(list_clusters.NewCommand())
 	command.AddCommand(bundle.NewCommand())
 	command.AddCommand(profile.NewCommand())

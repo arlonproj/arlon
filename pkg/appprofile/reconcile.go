@@ -30,8 +30,8 @@ func init() {
 func Reconcile(
 	ctx context.Context,
 	cli client.Client,
-	req ctrl.Request,
 	argocli argoclient.Client,
+	req ctrl.Request,
 	log logr.Logger,
 ) (ctrl.Result, error) {
 	log.V(1).Info("arlon appprofile")

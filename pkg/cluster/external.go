@@ -3,8 +3,6 @@ package cluster
 import (
 	"context"
 	"fmt"
-	"path"
-
 	argoclient "github.com/argoproj/argo-cd/v2/pkg/apiclient"
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argocluster "github.com/argoproj/argo-cd/v2/pkg/apiclient/cluster"
@@ -12,12 +10,13 @@ import (
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/common"
-	"github.com/arlonproj/arlon/pkg/controller"
+	"github.com/arlonproj/arlon/pkg/ctrlruntimeclient"
 	logpkg "github.com/arlonproj/arlon/pkg/log"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
+	"path"
 	patchclient "sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -90,7 +89,7 @@ func ManageExternal(
 	if lb != "" {
 		return fmt.Errorf("unexpectedly found arlon label in secret")
 	}
-	cli, err := controller.NewClient(config)
+	cli, err := ctrlruntimeclient.NewClient(config)
 	if err != nil {
 		return fmt.Errorf("failed to get controller runtime client: %s", err)
 	}
@@ -217,7 +216,7 @@ func UnmanageExternal(
 	if secr.Labels[clusterTypeLabelKey] != "external" {
 		return fmt.Errorf("secret does not have arlon cluster label")
 	}
-	cli, err := controller.NewClient(config)
+	cli, err := ctrlruntimeclient.NewClient(config)
 	if err != nil {
 		return fmt.Errorf("failed to get controller runtime client: %s", err)
 	}

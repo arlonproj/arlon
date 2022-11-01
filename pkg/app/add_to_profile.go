@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
-	"github.com/arlonproj/arlon/pkg/controller"
+	"github.com/arlonproj/arlon/pkg/ctrlruntimeclient"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	restclient "k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -87,7 +87,7 @@ func getAndValidateApplicationSet(config *restclient.Config,
 	as *appset.ApplicationSet,
 	err error,
 ) {
-	cli, err = controller.NewClient(config)
+	cli, err = ctrlruntimeclient.NewClient(config)
 	if err != nil {
 		err = fmt.Errorf("failed to get controller runtime client: %s", err)
 		return
