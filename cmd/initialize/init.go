@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	e "errors"
 	"fmt"
+	"github.com/argoproj/argo-cd/v2/cmd/argocd/commands"
 	"github.com/arlonproj/arlon/pkg/argocd"
 
 	"github.com/argoproj/argo-cd/v2/pkg/apiclient"
@@ -57,7 +58,7 @@ type porfForwardCallBack func(ctx context.Context, uint162 uint16) error
 func NewCommand() *cobra.Command {
 	var argoCfgPath string
 	var cliConfig clientcmd.ClientConfig
-	_ = "localhost:8080"
+	argoServer := "localhost:8080"
 	cmd := &cobra.Command{
 		Use:   "init",
 		Short: "Run the init command",
@@ -87,16 +88,16 @@ func NewCommand() *cobra.Command {
 				}
 			}
 			cli.AskToProceed("port forwarded??")
-			//c := commands.NewLoginCommand(&apiclient.ClientOptions{
-			//	Insecure: true,
-			//})
-			//password, err := getArgoAdminPassword(ctx, kubeClient, defaultArgoNamespace)
-			//if err != nil {
-			//	return err
-			//}
-			//_ = c.Flag("password").Value.Set(password)
-			//_ = c.Flag("name").Value.Set("admin")
-			//c.Run(cmd, []string{argoServer})
+			c := commands.NewLoginCommand(&apiclient.ClientOptions{
+				Insecure: true,
+			})
+			password, err := getArgoAdminPassword(ctx, kubeClient, defaultArgoNamespace)
+			if err != nil {
+				return err
+			}
+			_ = c.Flag("password").Value.Set(password)
+			_ = c.Flag("name").Value.Set("admin")
+			c.Run(cmd, []string{argoServer})
 			argoClient := argocd.NewArgocdClientOrDie("")
 			//canInstall, err := canInstallArlon(ctx, kubeClient)
 			if err != nil {
