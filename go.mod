@@ -150,7 +150,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20220608161450-d0670ef3b1eb // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
 	golang.org/x/sys v0.1.0 // indirect
-	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
+	golang.org/x/term v0.1.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
@@ -183,8 +183,9 @@ replace (
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/emicklei/go-restful/v3 => github.com/emicklei/go-restful/v3 v3.9.0
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.13.0
-	golang.org/x/net => golang.org/x/net v0.0.0-20220906165146-f3363e06e74c
-	golang.org/x/text => golang.org/x/text v0.3.8
+	golang.org/x/crypto => golang.org/x/crypto v0.1.0
+	golang.org/x/net => golang.org/x/net v0.1.0
+	golang.org/x/text => golang.org/x/text v0.4.0
 	k8s.io/api => k8s.io/api v0.23.13
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.23.13
 	k8s.io/apimachinery => k8s.io/apimachinery v0.23.13
