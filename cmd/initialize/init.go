@@ -3,13 +3,15 @@ package initialize
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	argocdio "github.com/argoproj/argo-cd/v2/util/io"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/spf13/cobra"
 	"io"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/tools/clientcmd"
@@ -22,8 +24,7 @@ const (
 	argocdManifestURL = "https://raw.githubusercontent.com/argoproj/argo-cd/%s/manifests/install.yaml"
 )
 
-var argocdGitTag string
-var errorAlreadyExists = errors.New("already exists")
+var argocdGitTag = "release-2.4"
 
 func NewCommand() *cobra.Command {
 	var argoCfgPath string
@@ -37,8 +38,8 @@ func NewCommand() *cobra.Command {
 			if err != nil {
 				fmt.Println("Cannot initialize argocd client. Argocd may not be installed")
 				// prompt for a message and proceed
-				canInstallArgo := cli.AskToProceed("argo-cd not found, possibly not installed. Proceed to install? [y/n]")
-				if canInstallArgo {
+				//canInstallArgo := cli.AskToProceed("argo-cd not found, possibly not installed. Proceed to install? [y/n]")
+				if true {
 					cfg, err := cliConfig.ClientConfig()
 					if err != nil {
 						return err
@@ -48,6 +49,16 @@ func NewCommand() *cobra.Command {
 						return err
 					}
 					downloadLink := fmt.Sprintf(argocdManifestURL, argocdGitTag)
+					if err := client.Create(cmd.Context(), &v1.Namespace{
+						TypeMeta: metav1.TypeMeta{
+							Kind: "Namespace",
+						},
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "argocd",
+						},
+					}); err != nil {
+						return err
+					}
 					if err := installArgo(downloadLink, client); err != nil {
 						return err
 					}
@@ -56,6 +67,7 @@ func NewCommand() *cobra.Command {
 			return nil
 		},
 	}
+	cliConfig = cli.AddKubectlFlagsToCmd(cmd)
 	cmd.Flags().StringVar(&argoCfgPath, "argo-cfg", "", "Path to argocd configuration file")
 	return cmd
 }
@@ -79,7 +91,7 @@ func installArgo(downloadLink string, client k8sclient.Client) error {
 		}
 	}
 	for _, obj := range resources {
-		err := applyObject(context.Background(), client, obj)
+		err := applyObject(context.Background(), client, obj, "argocd")
 		if err != nil {
 			return err
 		}
@@ -87,9 +99,9 @@ func installArgo(downloadLink string, client k8sclient.Client) error {
 	return nil
 }
 
-func applyObject(ctx context.Context, client k8sclient.Client, object *unstructured.Unstructured) error {
+func applyObject(ctx context.Context, client k8sclient.Client, object *unstructured.Unstructured, namespace string) error {
 	name := object.GetName()
-	namespace := object.GetNamespace()
+	object.SetNamespace(namespace)
 	if name == "" {
 		return fmt.Errorf("object %s has no name", object.GroupVersionKind().String())
 	}
@@ -97,8 +109,8 @@ func applyObject(ctx context.Context, client k8sclient.Client, object *unstructu
 	objDesc := fmt.Sprintf("(%s) %s/%s", groupVersionKind.String(), namespace, name)
 	err := client.Create(ctx, object)
 	if err != nil {
-		if errors.Is(err, errorAlreadyExists) {
-			fmt.Printf("%s already exists", objDesc)
+		if errors.IsAlreadyExists(err) {
+			fmt.Printf("%s already exists\n", objDesc)
 			return nil
 		}
 		return fmt.Errorf("could not create %s. Error: %v", objDesc, err.Error())
