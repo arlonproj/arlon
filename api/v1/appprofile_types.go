@@ -39,7 +39,7 @@ type AppProfileStatus struct {
 	// Health values: healthy, degraded
 	Health string `json:"health,omitempty"`
 	// Names of apps that don't exist
-	InvalidAppNames []string `json:"appNames,omitempty"`
+	InvalidAppNames []string `json:"invalidAppNames,omitempty"`
 }
 
 //+kubebuilder:object:root=true

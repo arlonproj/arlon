@@ -40,10 +40,10 @@ func Reconcile(
 	if err := cli.Get(ctx, req.NamespacedName, &prof); err != nil {
 		if apierrors.IsNotFound(err) {
 			log.Info("appprofile is gone -- ok")
-			// return ctrl.Result{}, nil
+		} else {
+			log.Info(fmt.Sprintf("unable to get appprofile (%s) ... requeuing", err))
+			return ctrl.Result{Requeue: true}, nil
 		}
-		log.Info(fmt.Sprintf("unable to get appprofile (%s) ... requeuing", err))
-		return ctrl.Result{Requeue: true}, nil
 	}
 	return reconcileEverything(ctx, cli, req, argocli, log)
 }
@@ -55,14 +55,14 @@ func reconcileEverything(
 	argocli argoclient.Client,
 	log logr.Logger,
 ) (ctrl.Result, error) {
-
+	log.V(1).Info("--- global reconciliation begin ---")
 	// Get ArgoCD clusters
 	conn, clApi, err := argocli.NewClusterClient()
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("failed to get argocd clusters client: %s", err)
 	}
 	defer conn.Close()
-	argoClusters, err := clApi.List(ctx, nil, nil)
+	argoClusters, err := clApi.List(ctx, &clusterpkg.ClusterQuery{})
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("failed to list argocd clusters client: %s", err)
 	}
@@ -104,7 +104,7 @@ func reconcileEverything(
 
 	// Get profiles
 	var profList arlonv1.AppProfileList
-	err = cli.List(ctx, &profList, nil)
+	err = cli.List(ctx, &profList)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("failed to list app profiles: %s", err)
 	}
@@ -191,6 +191,7 @@ func reconcileEverything(
 			}
 		}
 	}
+	log.V(1).Info("--- global reconciliation end ---")
 	return ctrl.Result{}, nil
 }
 

@@ -14,7 +14,7 @@ import (
 	"text/tabwriter"
 )
 
-const ProfileLabelKey = "arlon.io/app-profile"
+const ProfileLabelKey = "arlon.io/profile"
 
 func List(config *restclient.Config, ns string) (apslist []appset.ApplicationSet, err error) {
 	cli, err := ctrlruntimeclient.NewClient(config)
