@@ -1,4 +1,4 @@
-# Arlo Design and Concepts
+# Arlon Design and Concepts
 
 ## Management cluster
 
