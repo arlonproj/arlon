@@ -18,7 +18,7 @@ if ! which kubectl; then
 fi
 
 if ! which clusterctl; then
-    curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v1.2.2/clusterctl-linux-amd64 -o clusterctl
+    curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v1.2.4/clusterctl-linux-amd64 -o clusterctl
     chmod +x clusterctl
     sudo mv clusterctl /usr/local/bin/
 fi

@@ -73,3 +73,4 @@ spec:
       - name: argocd-creds
         secret:
           secretName: argocd-creds
+          defaultMode: 0400
