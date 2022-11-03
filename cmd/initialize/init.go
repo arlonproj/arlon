@@ -49,14 +49,15 @@ func NewCommand() *cobra.Command {
 						return err
 					}
 					downloadLink := fmt.Sprintf(argocdManifestURL, argocdGitTag)
-					if err := client.Create(cmd.Context(), &v1.Namespace{
+					err = client.Create(cmd.Context(), &v1.Namespace{
 						TypeMeta: metav1.TypeMeta{
 							Kind: "Namespace",
 						},
 						ObjectMeta: metav1.ObjectMeta{
 							Name: "argocd",
 						},
-					}); err != nil {
+					})
+					if err != nil && !errors.IsAlreadyExists(err) {
 						return err
 					}
 					if err := installArgo(downloadLink, client); err != nil {
