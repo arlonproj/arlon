@@ -9,11 +9,14 @@ import (
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/spf13/cobra"
 	"io"
+	apps "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"net/http"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
@@ -21,10 +24,13 @@ import (
 )
 
 const (
-	argocdManifestURL = "https://raw.githubusercontent.com/argoproj/argo-cd/%s/manifests/install.yaml"
+	argocdManifestURL              = "https://raw.githubusercontent.com/argoproj/argo-cd/%s/manifests/install.yaml"
+	defaultArgoNamespace           = "argocd"
+	defaultArgoServerDeployment    = "argocd-server"
+	reasonMinimumReplicasAvailable = "MinimumReplicasAvailable"
 )
 
-var argocdGitTag = "release-2.4"
+var argocdGitTag string
 
 func NewCommand() *cobra.Command {
 	var argoCfgPath string
@@ -38,8 +44,8 @@ func NewCommand() *cobra.Command {
 			if err != nil {
 				fmt.Println("Cannot initialize argocd client. Argocd may not be installed")
 				// prompt for a message and proceed
-				//canInstallArgo := cli.AskToProceed("argo-cd not found, possibly not installed. Proceed to install? [y/n]")
-				if true {
+				canInstallArgo := cli.AskToProceed("argo-cd not found, possibly not installed. Proceed to install? [y/n]")
+				if canInstallArgo {
 					cfg, err := cliConfig.ClientConfig()
 					if err != nil {
 						return err
@@ -54,13 +60,28 @@ func NewCommand() *cobra.Command {
 							Kind: "Namespace",
 						},
 						ObjectMeta: metav1.ObjectMeta{
-							Name: "argocd",
+							Name: defaultArgoNamespace,
 						},
 					})
 					if err != nil && !errors.IsAlreadyExists(err) {
 						return err
 					}
 					if err := installArgo(downloadLink, client); err != nil {
+						return err
+					}
+					kubeClient := kubernetes.NewForConfigOrDie(cfg)
+					err = wait.PollImmediate(time.Second*10, time.Minute*5, func() (bool, error) {
+						fmt.Printf("waiting for argocd-server")
+						var deployment *apps.Deployment
+						d, err := kubeClient.AppsV1().Deployments(defaultArgoNamespace).Get(context.Background(), defaultArgoServerDeployment, metav1.GetOptions{})
+						if err != nil {
+							return false, err
+						}
+						deployment = d
+						condition := getDeploymentCondition(deployment.Status, apps.DeploymentAvailable)
+						return condition != nil && condition.Reason == reasonMinimumReplicasAvailable, nil
+					})
+					if err != nil {
 						return err
 					}
 				}
@@ -73,11 +94,29 @@ func NewCommand() *cobra.Command {
 	return cmd
 }
 
+func shouldInstallArgocd() (bool, error) {
+
+}
+
 func installArgo(downloadLink string, client k8sclient.Client) error {
 	manifest, err := downloadManifest(downloadLink)
 	if err != nil {
 		return err
 	}
+	resources, err := decodeResources(manifest)
+	if err != nil {
+		return err
+	}
+	for _, obj := range resources {
+		err := applyObject(context.Background(), client, obj, defaultArgoNamespace)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func decodeResources(manifest []byte) ([]*unstructured.Unstructured, error) {
 	resources := []*unstructured.Unstructured{}
 	decoder := yaml.NewYAMLOrJSONDecoder(bytes.NewReader(manifest), 4096)
 	for {
@@ -88,16 +127,10 @@ func installArgo(downloadLink string, client k8sclient.Client) error {
 		} else if err == io.EOF {
 			break
 		} else {
-			return err
+			return nil, err
 		}
 	}
-	for _, obj := range resources {
-		err := applyObject(context.Background(), client, obj, "argocd")
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	return resources, nil
 }
 
 func applyObject(ctx context.Context, client k8sclient.Client, object *unstructured.Unstructured, namespace string) error {
@@ -134,4 +167,14 @@ func downloadManifest(link string) ([]byte, error) {
 		return nil, err
 	}
 	return respBytes, nil
+}
+
+func getDeploymentCondition(status apps.DeploymentStatus, condType apps.DeploymentConditionType) *apps.DeploymentCondition {
+	for i := range status.Conditions {
+		c := status.Conditions[i]
+		if c.Type == condType {
+			return &c
+		}
+	}
+	return nil
 }
