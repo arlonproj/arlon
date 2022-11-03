@@ -11,21 +11,16 @@ import (
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	arlonapp "github.com/arlonproj/arlon/pkg/app"
 	arlonclusters "github.com/arlonproj/arlon/pkg/cluster"
-	sets "github.com/deckarep/golang-set"
+	"github.com/arlonproj/arlon/pkg/common"
+	sets "github.com/deckarep/golang-set/v2"
 	"github.com/go-logr/logr"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/selection"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
-
-/*
-func init() {
-	conn, clusterIf := r.ArgocdClient.NewClusterClientOrDie()
-	defer io.Close(conn)
-}
-*/
 
 func Reconcile(
 	ctx context.Context,
@@ -34,7 +29,7 @@ func Reconcile(
 	req ctrl.Request,
 	log logr.Logger,
 ) (ctrl.Result, error) {
-	log.V(1).Info("arlon appprofile")
+	log.V(1).Info("reconciling arlon appprofile")
 	var prof arlonv1.AppProfile
 
 	if err := cli.Get(ctx, req.NamespacedName, &prof); err != nil {
@@ -90,17 +85,19 @@ func reconcileEverything(
 	}
 	sel := labels.NewSelector().Add(*rqmt)
 	err = cli.List(ctx, &appList, &client.ListOptions{
-		Namespace:     req.Namespace,
+		Namespace:     "argocd",
 		LabelSelector: sel,
 	})
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("failed to list applicationsets: %s", err)
 	}
-	validAppNames := sets.NewSet()
+	appToProfiles := make(map[string][]string)
+	validAppNames := sets.NewSet[string]()
 	for _, item := range appList.Items {
 		validAppNames.Add(item.Name)
+		// appToProfiles[item.Name] = []string{}
 	}
-	log.V(1).Info("app names counted", "count", len(appList.Items))
+	log.V(1).Info("apps counted", "count", len(appList.Items))
 
 	// Get profiles
 	var profList arlonv1.AppProfileList
@@ -111,19 +108,22 @@ func reconcileEverything(
 	log.V(1).Info("app profiles counted", "count", len(profList.Items))
 
 	// Reconcile profiles
-	profNames := sets.NewSet()
+	profNames := sets.NewSet[string]()
 	for _, prof := range profList.Items {
 		profNames.Add(prof.Name)
 		dirty := false
-		beforeInvalidNames := invalidAppNamesFromProfile(&prof)
-		afterInvalidNames := sets.NewSet()
+		beforeInvalidNames := sets.NewSet[string](prof.Status.InvalidAppNames...)
+		afterInvalidNames := sets.NewSet[string]()
 		for _, appName := range prof.Spec.AppNames {
 			if !validAppNames.Contains(appName) {
 				afterInvalidNames.Add(appName)
+			} else {
+				// Add this profile to the app's profile list
+				appToProfiles[appName] = append(appToProfiles[appName], prof.Name)
 			}
 		}
 		if !beforeInvalidNames.Equal(afterInvalidNames) {
-			prof.Status.InvalidAppNames = setToStringSlice(afterInvalidNames)
+			prof.Status.InvalidAppNames = afterInvalidNames.ToSlice()
 			dirty = true
 		}
 		beforeHealth := prof.Status.Health
@@ -158,28 +158,36 @@ func reconcileEverything(
 		if arlonClust == nil {
 			// No corresponding arlon cluster. Could be an "external" cluster,
 			// so allow the label to be managed independently.
+			log.V(1).Info("argo cluster has no corresponding arlon cluster, skipping",
+				"argoClusterName", argoClust.Name)
 			continue
-		} else {
-			// Arlon cluster exists. Ensure argocd cluster is labeled identically
-			if arlonClust.Labels == nil {
-				arlonClust.Labels = make(map[string]string)
-			}
-			arlonClustLabel := arlonClust.Labels[arlonapp.ProfileLabelKey]
-			if arlonClustLabel != "" {
-				// Arlon cluster has label
-				if argoClustLabel != arlonClustLabel {
-					log.V(1).Info("updating label on argo cluster to match arlon cluster's",
-						"labelValue", arlonClustLabel)
-					argoClust.Labels[arlonapp.ProfileLabelKey] = arlonClustLabel
-					dirty = true
-				}
-			} else if argoClustLabel != "" {
-				// Arlon cluster has no label but argo cluster has one
-				log.V(1).Info("removing label from argo cluster because arlon cluster has none",
-					"argoClusterName", argoClust.Name)
-				delete(argoClust.Labels, arlonapp.ProfileLabelKey)
+		}
+		// Arlon cluster exists. Ensure argocd cluster is labeled identically
+		if arlonClust.Labels == nil {
+			arlonClust.Labels = make(map[string]string)
+		}
+		arlonClustLabel := arlonClust.Labels[arlonapp.ProfileLabelKey]
+		if arlonClustLabel != "" {
+			// Arlon cluster has label
+			if argoClustLabel != arlonClustLabel {
+				log.V(1).Info("updating label on argo cluster to match arlon cluster's",
+					"clustName", arlonClust.Name,
+					"labelValue", arlonClustLabel)
+				argoClust.Labels[arlonapp.ProfileLabelKey] = arlonClustLabel
 				dirty = true
+			} else {
+				log.V(1).Info("argo and arlon clusters already in sync",
+					"clustName", arlonClust.Name)
 			}
+		} else if argoClustLabel != "" {
+			// Arlon cluster has no label but argo cluster has one
+			log.V(1).Info("removing label from argo cluster because arlon cluster has none",
+				"argoClusterName", argoClust.Name)
+			delete(argoClust.Labels, arlonapp.ProfileLabelKey)
+			dirty = true
+		} else {
+			log.V(1).Info("argo & arlon cluster have no label, skipping",
+				"clustName", arlonClust.Name)
 		}
 		if dirty {
 			_, err = clApi.Update(context.Background(), &clusterpkg.ClusterUpdateRequest{
@@ -191,22 +199,44 @@ func reconcileEverything(
 			}
 		}
 	}
+
+	// Reconcile apps
+	for _, app := range appList.Items {
+		if len(app.Spec.Generators) != 1 {
+			log.Info("invalid application set, has no generators",
+				"appSetName", app.Name)
+			continue
+		}
+		clustGen := app.Spec.Generators[0].Clusters
+		if clustGen == nil {
+			log.Info("invalid application set, generator is not of type 'clusters'",
+				"appSetName", app.Name)
+			continue
+		}
+		if len(clustGen.Selector.MatchExpressions) != 1 {
+			log.Info("invalid application set, unexpected number of matchExpressions",
+				"numMatchExpr", len(clustGen.Selector.MatchExpressions))
+			continue
+		}
+		matchExpr := clustGen.Selector.MatchExpressions[0]
+		if matchExpr.Key != common.ProfileAnnotationKey || matchExpr.Operator != metav1.LabelSelectorOpIn {
+			log.Info("invalid application set, unexpected key or operator",
+				"key", matchExpr.Key, "operator", matchExpr.Operator)
+			continue
+		}
+		beforeLabelValues := sets.NewSet[string](matchExpr.Values...)
+		afterLabelValues := sets.NewSet[string](appToProfiles[app.Name]...)
+		if beforeLabelValues.Equal(afterLabelValues) {
+			continue
+		}
+		log.V(1).Info("updating app's matching expression values",
+			"app", app.Name, "values", appToProfiles[app.Name])
+		clustGen.Selector.MatchExpressions[0].Values = appToProfiles[app.Name]
+		err = cli.Update(ctx, &app)
+		if err != nil {
+			return ctrl.Result{}, fmt.Errorf("failed to update app: %s", err)
+		}
+	}
 	log.V(1).Info("--- global reconciliation end ---")
 	return ctrl.Result{}, nil
-}
-
-func invalidAppNamesFromProfile(prof *arlonv1.AppProfile) sets.Set {
-	appNames := sets.NewSet()
-	for _, appName := range prof.Status.InvalidAppNames {
-		appNames.Add(appName)
-	}
-	return appNames
-}
-
-func setToStringSlice(s sets.Set) []string {
-	var strs []string
-	for elem := range s.Iter() {
-		strs = append(strs, elem.(string))
-	}
-	return strs
 }

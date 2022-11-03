@@ -6,6 +6,7 @@ require (
 	github.com/argoproj/argo-cd/v2 v2.4.11
 	github.com/aws/aws-sdk-go v1.44.86
 	github.com/deckarep/golang-set v1.8.0
+	github.com/deckarep/golang-set/v2 v2.1.0
 	github.com/go-git/go-billy/v5 v5.3.1
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-logr/logr v1.2.3
@@ -19,7 +20,6 @@ require (
 	k8s.io/client-go v0.23.10
 	sigs.k8s.io/cluster-api v1.1.5 //v1.1.x will upgrade k8s APIs to v0.23.x
 	sigs.k8s.io/controller-runtime v0.11.2 //v1.11 will upgrade k8s APIs to v0.23.x
-	github.com/deckarep/golang-set v1.8.0
 )
 
 require (
