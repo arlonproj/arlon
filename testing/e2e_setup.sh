@@ -313,7 +313,8 @@ if ! which kubectl-kuttl &>/dev/null; then
   mv kubectl-kuttl "${HOME}/.local/bin/kubectl-kuttl"
 fi
 
-clusterawsadm bootstrap iam create-cloudformation-stack
+# not needed for us...
+#clusterawsadm bootstrap iam create-cloudformation-stack
 
 export AWS_B64ENCODED_CREDENTIALS=$(clusterawsadm bootstrap credentials encode-as-profile)
 
