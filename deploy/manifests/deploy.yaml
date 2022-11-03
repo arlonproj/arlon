@@ -55,9 +55,8 @@ spec:
           capabilities:
             drop:
             - all
-          readOnlyRootFilesystem: true
-          runAsNonRoot: false
-          runAsUser: 0
+          readOnlyRootFilesystem: false
+          runAsNonRoot: true
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
@@ -74,4 +73,3 @@ spec:
       - name: argocd-creds
         secret:
           secretName: argocd-creds
-          defaultMode: 0400
