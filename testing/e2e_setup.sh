@@ -313,11 +313,12 @@ if ! which kubectl-kuttl &>/dev/null; then
   mv kubectl-kuttl "${HOME}/.local/bin/kubectl-kuttl"
 fi
 
-clusterawsadm bootstrap iam create-cloudformation-stack
+# not needed for us...
+#clusterawsadm bootstrap iam create-cloudformation-stack
 
 export AWS_B64ENCODED_CREDENTIALS=$(clusterawsadm bootstrap credentials encode-as-profile)
 
-clusterctl init --infrastructure aws
+clusterctl init --infrastructure aws --wait-providers
 echo "To access ArgoCD UI, run: kubectl port-forward svc/argocd-server -n argocd ${forwarding_port}:443"
 echo "Login as admin: ${pwd} into ArgoCD at http://localhost:${forwarding_port}"
 echo "Run the following command to use kubectl, argocd, clusterctl, clusterawsadm, arlon (If not already installed)"
