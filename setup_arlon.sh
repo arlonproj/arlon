@@ -19,13 +19,17 @@ function wait_until()
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     os="linux"
+    arlon_os="Linux"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    os="darwin"   
+    os="darwin"
+    arlon_os="Darwin"   
 fi
 cpu=$(uname -m)
 if [[ "$cpu" == "x86_64" ]]; then
+    arlon_arch="x86_64"
     arch="amd64"
 elif [[ "$cpu" == "arm64"* ]]; then
+    arlon_arch="arm64"
     arch="arm64"
 fi
 if [ ! -d "$HOME/.local/bin" ] ; then
@@ -127,8 +131,12 @@ echo Arlon controller is up and running
 
 if ! which arlon &> /dev/null; then
     echo Downloading arlon CLI
-    make build
-    sudo ln -s "$(pwd)/bin/arlon" ${HOME}/.local/bin/arlon
+    latestRelease=$(curl -L -s -H 'Accept: application/json' https://github.com/arlonproj/arlon/releases/latest)
+    latestVersion=$(echo $latestRelease | sed -e 's/.*"tag_name":"\([^"]*\)".*/\1/')
+    wget -qc https://github.com/arlonproj/arlon/releases/download/${latestVersion}/arlon_${arlon_os}_${arlon_arch}_${latestVersion}.tar.gz
+    tar -xf arlon_${arlon_os}_${arlon_arch}_${latestVersion}.tar.gz
+    mv arlon_${os}_${arch}_${latestVersion} ${HOME}/.local/bin/arlon
+    rm arlon_${arlon_os}_${arlon_arch}_${latestVersion}.tar.gz
 fi
 
 
