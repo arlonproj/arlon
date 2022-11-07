@@ -20,6 +20,11 @@ import (
 	"k8s.io/apimachinery/pkg/selection"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sync"
+)
+
+var (
+	mtx sync.Mutex
 )
 
 func Reconcile(
@@ -29,7 +34,7 @@ func Reconcile(
 	req ctrl.Request,
 	log logr.Logger,
 ) (ctrl.Result, error) {
-	log.V(1).Info("reconciling arlon appprofile")
+	log.Info("reconciling arlon appprofile")
 	var prof arlonv1.AppProfile
 
 	if err := cli.Get(ctx, req.NamespacedName, &prof); err != nil {
@@ -40,16 +45,17 @@ func Reconcile(
 			return ctrl.Result{Requeue: true}, nil
 		}
 	}
-	return reconcileEverything(ctx, cli, req, argocli, log)
+	return ReconcileEverything(ctx, cli, argocli, log)
 }
 
-func reconcileEverything(
+func ReconcileEverything(
 	ctx context.Context,
 	cli client.Client,
-	req ctrl.Request,
 	argocli argoclient.Client,
 	log logr.Logger,
 ) (ctrl.Result, error) {
+	mtx.Lock()
+	defer mtx.Unlock()
 	log.V(1).Info("--- global reconciliation begin ---")
 	// Get ArgoCD clusters
 	conn, clApi, err := argocli.NewClusterClient()
@@ -139,11 +145,11 @@ func reconcileEverything(
 		}
 		if dirty {
 			// update profile status
+			log.Info("updating app profile", "profileName", prof.Name)
 			err = cli.Status().Update(ctx, &prof)
 			if err != nil {
 				return ctrl.Result{}, fmt.Errorf("failed to update app profile: %s", err)
 			}
-			log.V(1).Info("updated app profile", "profileName", prof.Name)
 		}
 	}
 
@@ -170,7 +176,7 @@ func reconcileEverything(
 		if arlonClustLabel != "" {
 			// Arlon cluster has label
 			if argoClustLabel != arlonClustLabel {
-				log.V(1).Info("updating label on argo cluster to match arlon cluster's",
+				log.Info("updating label on argo cluster to match arlon cluster's",
 					"clustName", arlonClust.Name,
 					"labelValue", arlonClustLabel)
 				argoClust.Labels[arlonapp.ProfileLabelKey] = arlonClustLabel
@@ -181,7 +187,7 @@ func reconcileEverything(
 			}
 		} else if argoClustLabel != "" {
 			// Arlon cluster has no label but argo cluster has one
-			log.V(1).Info("removing label from argo cluster because arlon cluster has none",
+			log.Info("removing label from argo cluster because arlon cluster has none",
 				"argoClusterName", argoClust.Name)
 			delete(argoClust.Labels, arlonapp.ProfileLabelKey)
 			dirty = true
@@ -195,7 +201,7 @@ func reconcileEverything(
 				UpdatedFields: []string{"labels"},
 			})
 			if err != nil {
-				return ctrl.Result{}, fmt.Errorf("failed to update argocd cluster: %s", err)
+				return ctrl.Result{}, fmt.Errorf("failed to update argo cluster: %s", err)
 			}
 		}
 	}
@@ -229,7 +235,7 @@ func reconcileEverything(
 		if beforeLabelValues.Equal(afterLabelValues) {
 			continue
 		}
-		log.V(1).Info("updating app's matching expression values",
+		log.Info("updating app's matching expression values",
 			"app", app.Name, "values", appToProfiles[app.Name])
 		clustGen.Selector.MatchExpressions[0].Values = appToProfiles[app.Name]
 		err = cli.Update(ctx, &app)

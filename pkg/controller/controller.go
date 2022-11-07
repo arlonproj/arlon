@@ -1,6 +1,7 @@
 package controller
 
 import (
+	argoapp "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/controllers"
@@ -26,6 +27,7 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(arlonv1.AddToScheme(scheme))
 	utilruntime.Must(appset.AddToScheme(scheme))
+	utilruntime.Must(argoapp.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -173,6 +175,23 @@ func StartAppProfileController(argocdConfigPath string, metricsAddr string, prob
 		setupLog.Error(err, "unable to set up controller", "controller", "AppProfile")
 		os.Exit(1)
 	}
+	if err = (&controllers.ApplicationSetReconciler{
+		Client:       mgr.GetClient(),
+		Scheme:       mgr.GetScheme(),
+		ArgocdClient: argocdClient,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to set up controller", "controller", "ApplicationSet")
+		os.Exit(1)
+	}
+	if err = (&controllers.ApplicationReconciler{
+		Client:       mgr.GetClient(),
+		Scheme:       mgr.GetScheme(),
+		ArgocdClient: argocdClient,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to set up controller", "controller", "Application")
+		os.Exit(1)
+	}
+
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
