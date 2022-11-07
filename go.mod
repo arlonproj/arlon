@@ -17,7 +17,7 @@ require (
 	k8s.io/api v0.23.13
 	k8s.io/apimachinery v0.23.13
 	k8s.io/client-go v0.23.13
-	sigs.k8s.io/cluster-api v1.1.5 //v1.1.x will upgrade k8s APIs to v0.23.x
+	sigs.k8s.io/cluster-api v1.1.6 //v1.1.x will upgrade k8s APIs to v0.23.x
 	sigs.k8s.io/controller-runtime v0.11.2 //v1.11 will upgrade k8s APIs to v0.23.x
 )
 
@@ -25,7 +25,7 @@ require (
 	github.com/argoproj/pkg v0.11.1-0.20211203175135-36c59d8fafe0
 	github.com/fatih/color v1.13.0
 	github.com/stretchr/testify v1.8.1
-	gotest.tools/v3 v3.3.0
+	gotest.tools/v3 v3.4.0
 	k8s.io/cli-runtime v0.23.13
 	sigs.k8s.io/kustomize/kyaml v0.13.0
 )
@@ -207,7 +207,6 @@ require (
 replace (
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/emicklei/go-restful/v3 => github.com/emicklei/go-restful/v3 v3.9.0
-	golang.org/x/text => golang.org/x/text v0.3.8
 	k8s.io/api => k8s.io/api v0.23.13
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.23.13
 	k8s.io/apimachinery => k8s.io/apimachinery v0.23.13
