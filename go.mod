@@ -3,7 +3,7 @@ module github.com/arlonproj/arlon
 go 1.19
 
 require (
-	github.com/argoproj/argo-cd/v2 v2.3.11
+	github.com/argoproj/argo-cd/v2 v2.4.16
 	github.com/aws/aws-sdk-go v1.44.131
 	github.com/deckarep/golang-set v1.8.0
 	github.com/go-git/go-billy/v5 v5.3.1
@@ -17,7 +17,7 @@ require (
 	k8s.io/api v0.23.13
 	k8s.io/apimachinery v0.23.13
 	k8s.io/client-go v0.23.13
-	sigs.k8s.io/cluster-api v1.1.5 //v1.1.x will upgrade k8s APIs to v0.23.x
+	sigs.k8s.io/cluster-api v1.1.6 //v1.1.x will upgrade k8s APIs to v0.23.x
 	sigs.k8s.io/controller-runtime v0.11.2 //v1.11 will upgrade k8s APIs to v0.23.x
 )
 
@@ -75,6 +75,7 @@ require (
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-errors/errors v1.0.1 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-logr/zapr v1.2.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.5 // indirect
@@ -159,6 +160,9 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.0 // indirect
 	github.com/xlab/treeprint v0.0.0-20181112141820-a009c3971eca // indirect
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.31.0 // indirect
+	go.opentelemetry.io/otel v1.6.3 // indirect
+	go.opentelemetry.io/otel/trace v1.6.3 // indirect
 	go.starlark.net v0.0.0-20200306205701-8dd3e2ee1dd5 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
