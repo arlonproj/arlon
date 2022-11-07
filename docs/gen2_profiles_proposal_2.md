@@ -30,7 +30,9 @@ labeling is handled slightly differently:
     - The cluster application (named with the workload cluster name)
     - The arlon application (named by appending the -arlon suffix to the cluster application's name)
     - The optional profile application (named by appending -profile suffix to the cluster application's name)
-  - An Arlon Cluster that was successfully depoloyed always has an associated ArgoCD cluster (thanks to the ClusterRegistration mechanism).
+  - The first application (the cluster application) is treated as the anchor for the entire set. When an Arlon Cluster
+    is associated with an AppProfile, the cluster application will be labeled with the AppProfile's name.
+  - An Arlon Cluster that was successfully deployed always has an associated ArgoCD cluster (thanks to the ClusterRegistration mechanism).
  
 * *ArgoCD Cluster*: the set of ArgoCD clusters is a superset of Arlon clusters.
 
@@ -43,6 +45,14 @@ Observations:
 - And an app can be associated with multiple profiles.
 - A cluster is said to be associated with a profile if it is labeled with `arlon.io/profile=<profileName>`.
 - A cluster can be associated with **at most one** profile. A profile may be associated (attached to) any number of clusters.
+
+This table summarizes the actual resources backing the objects:
+| Object Type        | Actual Resource        |
+|--------------------|------------------------|
+| Arlon Application  | ArgoCD ApplicationSet  |
+| AppProfile         | AppProfile             |
+| Arlon Cluster      | ArgoCD Application     |
+| ArgoCD Cluster     | Kubernetes Secret      |
 
 ## Usage
 
