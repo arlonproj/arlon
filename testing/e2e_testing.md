@@ -50,4 +50,4 @@
 
 - Currently, we are running the arlon e2e tests on an ubuntu VM using Github Actions.
 
-- To run the arlon e2e tests, we need to add a new [make target](https://github.com/arlonproj/arlon/blob/main/Makefile#L154) for this new e2e test, which will then be executed in the [e2e test job](https://github.com/arlonproj/arlon/blob/main/.github/workflows/e2e.yaml) in Github Actions
+- To invoke the arlon e2e tests, we are adding a new build target `make test-e2e` This command will execute the [e2e test job](https://github.com/arlonproj/arlon/blob/main/.github/workflows/e2e.yaml) using Github Actions
