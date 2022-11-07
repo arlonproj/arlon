@@ -4,7 +4,11 @@ import (
 	"bytes"
 	"context"
 	_ "embed"
+	"encoding/base64"
+	e "errors"
 	"fmt"
+	"github.com/arlonproj/arlon/pkg/argocd"
+
 	"github.com/argoproj/argo-cd/v2/pkg/apiclient"
 	"github.com/argoproj/argo-cd/v2/pkg/apiclient/account"
 	"github.com/argoproj/argo-cd/v2/util/cli"
@@ -12,7 +16,6 @@ import (
 	"github.com/argoproj/argo-cd/v2/util/localconfig"
 	"github.com/arlonproj/arlon/config"
 	"github.com/arlonproj/arlon/deploy"
-	"github.com/arlonproj/arlon/pkg/argocd"
 	gyaml "github.com/ghodss/yaml"
 	"github.com/spf13/cobra"
 	"io"
@@ -25,8 +28,13 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/portforward"
+	"k8s.io/client-go/transport/spdy"
 	"net/http"
+	"net/url"
+	"os"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 	"strings"
 	"time"
@@ -39,13 +47,17 @@ const (
 	defaultArlonArgoCDUser         = "arlon"
 	defaultArgoServerDeployment    = "argocd-server"
 	reasonMinimumReplicasAvailable = "MinimumReplicasAvailable"
+	argoInitialAdminSecret         = "argocd-initial-admin-secret"
 )
 
 var argocdGitTag string = "release-2.4"
 
+type porfForwardCallBack func(ctx context.Context, uint162 uint16) error
+
 func NewCommand() *cobra.Command {
 	var argoCfgPath string
 	var cliConfig clientcmd.ClientConfig
+	_ = "localhost:8080"
 	cmd := &cobra.Command{
 		Use:   "init",
 		Short: "Run the init command",
@@ -61,7 +73,6 @@ func NewCommand() *cobra.Command {
 				return err
 			}
 			kubeClient := kubernetes.NewForConfigOrDie(cfg)
-
 			//canInstallArgo, err := canInstallArgocd()
 			if err != nil {
 				return err
@@ -75,6 +86,17 @@ func NewCommand() *cobra.Command {
 					}
 				}
 			}
+			cli.AskToProceed("port forwarded??")
+			//c := commands.NewLoginCommand(&apiclient.ClientOptions{
+			//	Insecure: true,
+			//})
+			//password, err := getArgoAdminPassword(ctx, kubeClient, defaultArgoNamespace)
+			//if err != nil {
+			//	return err
+			//}
+			//_ = c.Flag("password").Value.Set(password)
+			//_ = c.Flag("name").Value.Set("admin")
+			//c.Run(cmd, []string{argoServer})
 			argoClient := argocd.NewArgocdClientOrDie("")
 			//canInstall, err := canInstallArlon(ctx, kubeClient)
 			if err != nil {
@@ -96,6 +118,25 @@ func NewCommand() *cobra.Command {
 	cliConfig = cli.AddKubectlFlagsToCmd(cmd)
 	cmd.Flags().StringVar(&argoCfgPath, "argo-cfg", "", "Path to argocd configuration file")
 	return cmd
+}
+
+func getArgoAdminPassword(ctx context.Context, clientset *kubernetes.Clientset, argoNs string) (string, error) {
+	secret, err := clientset.CoreV1().Secrets(defaultArgoNamespace).Get(ctx, argoInitialAdminSecret, metav1.GetOptions{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Secret",
+			APIVersion: "v1",
+		},
+	})
+	if err != nil {
+		return "", err
+	}
+	pass64 := secret.Data["password"]
+	pass := make([]byte, base64.StdEncoding.DecodedLen(len(pass64)))
+	_, err = base64.StdEncoding.Decode(pass, pass64)
+	if err != nil {
+		return "", err
+	}
+	return string(pass), nil
 }
 
 func beginArlonInstall(ctx context.Context, client k8sclient.Client, kubeClient *kubernetes.Clientset, argoClient apiclient.Client, arlonNs, argoNs string) error {
@@ -136,7 +177,6 @@ func beginArlonInstall(ctx context.Context, client k8sclient.Client, kubeClient 
 		return err
 	}
 	fmt.Printf("ConfigMap %s updated\n", cm.GetName())
-
 	rbacCm, err := kubeClient.CoreV1().ConfigMaps(argoNs).Update(ctx, argoRbacCm, metav1.UpdateOptions{})
 	if err != nil {
 		return err
@@ -380,7 +420,8 @@ func createArgoCreds(ctx context.Context, clientset *kubernetes.Clientset, argoC
 	return created, nil
 }
 
-func portForward(ctx context.Context, client kubernetes.Clientset) error {
+func portForward(ctx context.Context, cfg *rest.Config, client kubernetes.Clientset) error {
+	done := make(chan struct{})
 	// use this command to get the argocd pod ➜  ~ kubectl get pods -l app.kubernetes.io/name=argocd-server -o yaml
 	pods, err := client.CoreV1().Pods(defaultArgoNamespace).List(ctx, metav1.ListOptions{
 		LabelSelector: "app.kubernetes.io/name=argocd-server",
@@ -397,13 +438,63 @@ func portForward(ctx context.Context, client kubernetes.Clientset) error {
 	for _, pod := range pods.Items {
 		if strings.Contains(pod.Name, defaultArgoServerDeployment) {
 			// run port forward
-			runPortForward(ctx, client)
+			err := runPortForward(ctx, cfg, pod, defaultArgoNamespace, 8080, func(ctx context.Context, port uint16) error {
+				<-done
+				return nil
+			})
+			if err != nil {
+				return err
+			}
 			break
 		}
 	}
+	// we'll have to control this
+	done <- struct{}{}
 	return nil
 }
 
-func runPortForward(ctx context.Context, client kubernetes.Clientset) {
-
+func runPortForward(ctx context.Context, cfg *rest.Config, pod v1.Pod, argoNs string, hostPort int, cb porfForwardCallBack) error {
+	if pod.Status.Phase != v1.PodRunning {
+		return e.New("argocd-server pod not running")
+	}
+	reqUrl, err := url.Parse(fmt.Sprintf("%s/api/v1/namespaces/%s/pods/%s/portforward", cfg.Host, argoNs, pod.GetName()))
+	if err != nil {
+		return err
+	}
+	transport, upgrader, err := spdy.RoundTripperFor(cfg)
+	if err != nil {
+		return err
+	}
+	stop := make(chan struct{}, 1)
+	ready := make(chan struct{})
+	dialer := spdy.NewDialer(upgrader, &http.Client{
+		Transport: transport,
+		Timeout:   time.Minute * 3,
+	}, http.MethodPost, reqUrl)
+	fw, err := portforward.NewOnAddresses(dialer, []string{"127.0.0.1"}, []string{fmt.Sprintf("%d:%d", 443, hostPort)}, stop, ready, os.Stdout, os.Stderr)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		stop <- struct{}{}
+	}()
+	go func() {
+		_ = fw.ForwardPorts()
+	}()
+	select {
+	case <-ready:
+	case <-ctx.Done():
+		return e.New("failed to port forward")
+	}
+	ports, err := fw.GetPorts()
+	if err != nil {
+		return err
+	}
+	if len(ports) != 1 {
+		return e.New("failed to get ports")
+	}
+	if err := cb(ctx, ports[0].Local); err != nil {
+		return err
+	}
+	return nil
 }
