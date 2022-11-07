@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	_ "embed"
-	"encoding/base64"
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/pkg/apiclient"
 	"github.com/argoproj/argo-cd/v2/pkg/apiclient/account"
@@ -22,12 +21,14 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"net/http"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
+	"strings"
 	"time"
 )
 
@@ -39,19 +40,6 @@ const (
 	defaultArgoServerDeployment    = "argocd-server"
 	reasonMinimumReplicasAvailable = "MinimumReplicasAvailable"
 )
-
-// this is how argocd-creds looks
-//apiVersion: v1
-//data:
-//  config: Y29udGV4dHM6Ci0gbmFtZTogMTI3LjAuMC4xOjgwODAKICBzZXJ2ZXI6IDEyNy4wLjAuMTo4MDgwCiAgdXNlcjogMTI3LjAuMC4xOjgwODAKY3VycmVudC1jb250ZXh0OiAxMjcuMC4wLjE6ODA4MApzZXJ2ZXJzOgotIGdycGMtd2ViLXJvb3QtcGF0aDogIiIKICBpbnNlY3VyZTogdHJ1ZQogIHNlcnZlcjogMTI3LjAuMC4xOjgwODAKdXNlcnM6Ci0gYXV0aC10b2tlbjogZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnBjM01pT2lKaGNtZHZZMlFpTENKemRXSWlPaUpoWkcxcGJqcHNiMmRwYmlJc0ltVjRjQ0k2TVRZMk56WXpNVFUxTkN3aWJtSm1Jam94TmpZM05UUTFNVFUwTENKcFlYUWlPakUyTmpjMU5EVXhOVFFzSW1wMGFTSTZJakkxWmpreFlqUmhMVGMwWW1JdE5HSTVZUzA0TkRRekxUSmpabUU0T0RNME5EYzRNaUo5LjJ6NjJSSGF2T0JTemVFSkR4QUcweWxWZzdKbUcxLXJqYzhNRnJUSk51cjAKICBuYW1lOiAxMjcuMC4wLjE6ODA4MAo=
-//kind: Secret
-//metadata:
-//  creationTimestamp: "2022-11-04T07:01:08Z"
-//  name: argocd-creds
-//  namespace: arlon
-//  resourceVersion: "27314"
-//  uid: 2111435a-b679-4158-b88c-42c181b3f057
-//type: Opaque
 
 var argocdGitTag string = "release-2.4"
 
@@ -74,11 +62,11 @@ func NewCommand() *cobra.Command {
 			}
 			kubeClient := kubernetes.NewForConfigOrDie(cfg)
 
-			canInstallArgo, err := canInstallArgocd()
+			//canInstallArgo, err := canInstallArgocd()
 			if err != nil {
 				return err
 			}
-			if canInstallArgo {
+			if true {
 				fmt.Println("Cannot initialize argocd client. Argocd may not be installed")
 				shouldInstallArgo := cli.AskToProceed("argo-cd not found, possibly not installed. Proceed to install? [y/n]")
 				if shouldInstallArgo {
@@ -87,16 +75,16 @@ func NewCommand() *cobra.Command {
 					}
 				}
 			}
-
 			argoClient := argocd.NewArgocdClientOrDie("")
-			canInstall, err := canInstallArlon(ctx, kubeClient)
+			//canInstall, err := canInstallArlon(ctx, kubeClient)
 			if err != nil {
 				return err
 			}
-			if canInstall {
+			if true {
 				fmt.Println("arlon namespace not found. Arlon controller might not be installed")
-				shouldInstallArlon := cli.AskToProceed("Install arlon controller? [y/n]")
-				if shouldInstallArlon {
+				//shouldInstallArlon := cli.AskToProceed("Install arlon controller? [y/n]")
+				cli.AskToProceed("portforward argo and login using admin credentials")
+				if true {
 					if err := beginArlonInstall(ctx, client, kubeClient, argoClient, defaultArlonNamespace, defaultArgoNamespace); err != nil {
 						return err
 					}
@@ -129,37 +117,27 @@ func beginArlonInstall(ctx context.Context, client k8sclient.Client, kubeClient 
 	} else {
 		fmt.Printf("namespage %s created\n", ns.GetName())
 	}
-	cm, err := kubeClient.CoreV1().ConfigMaps(argoNs).Update(ctx, &v1.ConfigMap{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "ConfigMap",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "argocd-cm",
-		},
-		Immutable: nil,
-		Data: map[string]string{
-			"accounts.arlon": "apiKey, login",
-		},
-		BinaryData: nil,
-	}, metav1.UpdateOptions{})
+	argoCm, err := kubeClient.CoreV1().ConfigMaps(argoNs).Get(ctx, "argocd-cm", metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+	argoCm.Data = map[string]string{
+		"accounts.arlon": "apiKey, login",
+	}
+	argoRbacCm, err := kubeClient.CoreV1().ConfigMaps(argoNs).Get(ctx, "argocd-rbac-cm", metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+	argoRbacCm.Data = map[string]string{
+		"policy.csv": "g, arlon, role:admin",
+	}
+	cm, err := kubeClient.CoreV1().ConfigMaps(argoNs).Update(ctx, argoCm, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
 	fmt.Printf("ConfigMap %s updated\n", cm.GetName())
-	rbacCm, err := kubeClient.CoreV1().ConfigMaps(argoNs).Update(ctx, &v1.ConfigMap{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "ConfigMap",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "argocd-rbac-cm",
-			Namespace: argoNs,
-		},
-		Data: map[string]string{
-			"policy.csv": "g, arlon, role:admin",
-		},
-	}, metav1.UpdateOptions{})
+
+	rbacCm, err := kubeClient.CoreV1().ConfigMaps(argoNs).Update(ctx, argoRbacCm, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
@@ -354,7 +332,7 @@ func createArgoCreds(ctx context.Context, clientset *kubernetes.Clientset, argoC
 	}
 	defaultInClusterUser := fmt.Sprintf("%s.%s.svc.cluster.local", defaultArgoServerDeployment, argoNamespace)
 	argoCfg := localconfig.LocalConfig{
-		CurrentContext: "",
+		CurrentContext: defaultInClusterUser,
 		Contexts: []localconfig.ContextRef{
 			{
 				Name:   defaultInClusterUser,
@@ -380,8 +358,6 @@ func createArgoCreds(ctx context.Context, clientset *kubernetes.Clientset, argoC
 	if err != nil {
 		return nil, err
 	}
-	b64ArgoSecret := make([]byte, base64.StdEncoding.EncodedLen(len(out)))
-	base64.StdEncoding.Encode(b64ArgoSecret, out)
 	secret := v1.Secret{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Secret",
@@ -395,11 +371,39 @@ func createArgoCreds(ctx context.Context, clientset *kubernetes.Clientset, argoC
 		Type: v1.SecretTypeOpaque,
 	}
 	secret.Data = map[string][]byte{
-		"config": b64ArgoSecret,
+		"config": out,
 	}
 	created, err := clientset.CoreV1().Secrets(arlonNamespace).Create(ctx, &secret, metav1.CreateOptions{})
 	if err != nil {
 		return nil, err
 	}
 	return created, nil
+}
+
+func portForward(ctx context.Context, client kubernetes.Clientset) error {
+	// use this command to get the argocd pod ➜  ~ kubectl get pods -l app.kubernetes.io/name=argocd-server -o yaml
+	pods, err := client.CoreV1().Pods(defaultArgoNamespace).List(ctx, metav1.ListOptions{
+		LabelSelector: "app.kubernetes.io/name=argocd-server",
+	})
+	if err != nil {
+		return err
+	}
+	if len(pods.Items) == 0 {
+		return errors.NewNotFound(schema.GroupResource{
+			Group:    "v1",
+			Resource: "pod",
+		}, defaultArgoServerDeployment)
+	}
+	for _, pod := range pods.Items {
+		if strings.Contains(pod.Name, defaultArgoServerDeployment) {
+			// run port forward
+			runPortForward(ctx, client)
+			break
+		}
+	}
+	return nil
+}
+
+func runPortForward(ctx context.Context, client kubernetes.Clientset) {
+
 }
