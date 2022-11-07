@@ -3,7 +3,7 @@ module github.com/arlonproj/arlon
 go 1.19
 
 require (
-	github.com/argoproj/argo-cd/v2 v2.3.11
+	github.com/argoproj/argo-cd/v2 v2.4.16
 	github.com/aws/aws-sdk-go v1.44.86
 	github.com/deckarep/golang-set v1.8.0
 	github.com/go-git/go-billy/v5 v5.3.1
