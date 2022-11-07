@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	_ "embed"
-	"encoding/base64"
 	e "errors"
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/cmd/argocd/commands"
@@ -87,16 +86,21 @@ func NewCommand() *cobra.Command {
 					}
 				}
 			}
+			argoCfg, err := localconfig.DefaultLocalConfigPath()
+			if err != nil {
+				return err
+			}
 			cli.AskToProceed("port forwarded??")
 			c := commands.NewLoginCommand(&apiclient.ClientOptions{
-				Insecure: true,
+				ConfigPath: argoCfg, // we do this because argocd needs to write the local config.
+				Insecure:   true,
 			})
 			password, err := getArgoAdminPassword(ctx, kubeClient, defaultArgoNamespace)
 			if err != nil {
 				return err
 			}
 			_ = c.Flag("password").Value.Set(password)
-			_ = c.Flag("name").Value.Set("admin")
+			_ = c.Flag("username").Value.Set("admin")
 			c.Run(cmd, []string{argoServer})
 			argoClient := argocd.NewArgocdClientOrDie("")
 			//canInstall, err := canInstallArlon(ctx, kubeClient)
@@ -122,7 +126,7 @@ func NewCommand() *cobra.Command {
 }
 
 func getArgoAdminPassword(ctx context.Context, clientset *kubernetes.Clientset, argoNs string) (string, error) {
-	secret, err := clientset.CoreV1().Secrets(defaultArgoNamespace).Get(ctx, argoInitialAdminSecret, metav1.GetOptions{
+	secret, err := clientset.CoreV1().Secrets(argoNs).Get(ctx, argoInitialAdminSecret, metav1.GetOptions{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Secret",
 			APIVersion: "v1",
@@ -132,12 +136,7 @@ func getArgoAdminPassword(ctx context.Context, clientset *kubernetes.Clientset, 
 		return "", err
 	}
 	pass64 := secret.Data["password"]
-	pass := make([]byte, base64.StdEncoding.DecodedLen(len(pass64)))
-	_, err = base64.StdEncoding.Decode(pass, pass64)
-	if err != nil {
-		return "", err
-	}
-	return string(pass), nil
+	return string(pass64), nil
 }
 
 func beginArlonInstall(ctx context.Context, client k8sclient.Client, kubeClient *kubernetes.Clientset, argoClient apiclient.Client, arlonNs, argoNs string) error {
