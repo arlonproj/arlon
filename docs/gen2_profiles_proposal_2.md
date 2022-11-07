@@ -1,23 +1,48 @@
-# Gen2 Profiles - Proposal 1
+# Gen2 Profiles - Proposal 2
 
-In this design proposal, gen2 profiles are completely built on native
-ArgoCD ApplicationSets and resource labels. There are no first-class
-Arlon objects.
-
+This is an update to the previous [Proposal 1 for Gen2 Profiles](gen2_profiles_proposal_1.md) design.
+The main change is the introduction of the new **AppProfile** custom resource,
+which elevates profiles to first-class objects. The rest of the design
+remains mostly unchanged, meaning Arlon apps are still based on ApplicationSets,
+and a cluster is associated with an AppProfile by labeling it, except the
+labeling is handled slightly differently:
+- For Arlon clusters, which are gen2 and therefore represented by an ArgoCD Application resource,
+  the user should label the Application resource, not the corresponding ArgoCD cluster.
+  The new AppProfile controller will then propagate the label to the corresponding ArgoCD cluster.
+  This allows the user to deploy an Arlon cluster, create and populate a profile, and associate
+  the cluster to the profile all in one declarative "apply" operation. (A user can't label
+  an ArgoCD cluster that doesn't exist yet)
+- For non-Arlon clusters, generally referred as "external", the design allows those existing
+  ArgoCD clusters to be labeled directly, but this will be managed outside of the AppProfiles controller
+  and essentially the user's responsibility, and has limitations.
+  
 ## Object model
 
-* Arlon Application: a thin wrapper around an ApplicationSet.
+* *Arlon Application* (or *App* for short): a thin wrapper around an ApplicationSet.
   An ApplicationSet is an Arlon Application if it has the `managed-by=arlon` label.
 
-* Profile name: any unique label value that appears in the `spec.generators[0].clusters.selector.matchExpressions.values[]`
-  array of at least one Arlon application.
+* *App Profile*: a uniquely named set of Arlon Applications. It is backed by a new custom resource and CRD.
+  (The resource is named **AppProfile** to distinguish it from the gen1 **Profile** resource. Even though
+  gen1 profiles will deprecated and eventually retired, the naming scheme avoids conflicts during the transition).
 
-* Cluster: any cluster registered in ArgoCD. Not limited to clusters created by Arlon.
+- *Arlon Cluster*: a gen2 cluster created by Arlon.
+  - As a reminder, it is represented by between 2 and 3 ArgoCD Application resources:
+    - The cluster application (named with the workload cluster name)
+    - The arlon application (named by appending the -arlon suffix to the cluster application's name)
+    - The optional profile application (named by appending -profile suffix to the cluster application's name)
+  - An Arlon Cluster that was successfully depoloyed always has an associated ArgoCD cluster (thanks to the ClusterRegistration mechanism).
+ 
+* *ArgoCD Cluster*: the set of ArgoCD clusters is a superset of Arlon clusters.
+
+* *External Cluster*: any ArgoCD cluster that was not created by Arlon.
+  So essentially `External Clusters Set = ArgoCD Clusters Set - Arlon Clusters Set`.
+  A user may want to associate an external cluster with an app profile.
 
 Observations:
-- A profile can be associated with any number of applications. And an application can be associated with multiple profiles.
+- An app profile can be associated with (or "contain") any number of applications
+- And an app can be associated with multiple profiles.
 - A cluster is said to be associated with a profile if it is labeled with `arlon.io/profile=<profileName>`.
-A cluster can be associated with at most one profile. A profile may be associated (attached to) any number of clusters.
+- A cluster can be associated with **at most one** profile. A profile may be associated (attached to) any number of clusters.
 
 ## Usage
 
