@@ -5,16 +5,7 @@ The main change is the introduction of the new **AppProfile** custom resource,
 which elevates profiles to first-class objects. The rest of the design
 remains mostly unchanged, meaning Arlon apps are still based on ApplicationSets,
 and a cluster is associated with an AppProfile by labeling it, except the
-labeling is handled slightly differently:
-- For Arlon clusters, which are gen2 and therefore represented by an ArgoCD Application resource,
-  the user should label the Application resource, not the corresponding ArgoCD cluster.
-  The new AppProfile controller will then propagate the label to the corresponding ArgoCD cluster.
-  This allows the user to deploy an Arlon cluster, create and populate a profile, and associate
-  the cluster to the profile all in one declarative "apply" operation. (A user can't label
-  an ArgoCD cluster that doesn't exist yet)
-- For non-Arlon clusters, generally referred as "external", the design allows those existing
-  ArgoCD clusters to be labeled directly, but this will be managed outside of the AppProfiles controller
-  and essentially the user's responsibility, and has limitations.
+labeling is handled slightly differently (see [Labeling Algorithm](#Labeling-Algorithm)).
   
 ## Object model
 
@@ -53,6 +44,18 @@ This table summarizes the actual resources backing the objects:
 | AppProfile         | AppProfile             |
 | Arlon Cluster      | ArgoCD Application     |
 | ArgoCD Cluster     | Kubernetes Secret      |
+
+## Labeling Algorithm
+
+- For an Arlon cluster, which is anchored by an ArgoCD Application resource,
+  the user should label the Application resource, not the corresponding ArgoCD cluster.
+  The new AppProfile controller will propagate the label to the corresponding ArgoCD cluster.
+  This allows the user to deploy an Arlon cluster, create and populate a profile, and associate
+  the cluster to the profile all in one declarative "apply" operation. (A user can't label
+  an ArgoCD cluster that doesn't exist yet)
+- For non-Arlon clusters, generally referred as "external", the design allows those existing
+  ArgoCD clusters to be labeled directly, but this will be managed outside of the AppProfiles controller
+  and essentially the user's responsibility, and has limitations.
 
 ## Usage
 
