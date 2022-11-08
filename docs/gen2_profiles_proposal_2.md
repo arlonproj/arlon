@@ -132,43 +132,82 @@ spec:
           prune: true
 ```
   
-### Managing profiles
+### Managing Application Profiles
 
-Profiles are not first class objects. They only exist as labels referenced
-by applications and placed on clusters. If a particular profile label value is not referenced from
-any application, it does not exist.
+An AppProfile is a new custom resource with a simple spec: a list of Arlon Application names:
+```
+apiVersion: core.arlon.io/v1
+kind: AppProfile
+metadata:
+  name: engineering
+  namespace: arlon
+spec:
+  appNames:
+  - guestbook
+  - wordpress
+  - nginx
+status:
+  health: degraded
+  invalidAppNames:
+  - wordpress
+  - nginx
+```
 
-`arlon ngprofile list` shows the current list of profiles, the applications
-associated with each profile, and the clusters currently using each profile.
-The list is constructed
-by scanning all applications and determining the unique set of labels
-referenced in the `matchExpressions.values[]` array of each.
+* The resource also has a Status field that the controller updates.
+* The `Status.health` subfield is either `healthy` or `degraded`. Degraded means that one or more specified apps don't exist.
+* The `Status.invalidAppNames` indicates which app names are invalid, if any.
 
-To create a profile that doesn't exist yet, it needs to be added to at least
-one application's label set. This is conceptually achieved by "adding the app to the profile":
+The presence of the `Status` section is a result of the decision to validate the profile asynchronously and allow invalid app
+names to be specified. This generally results in a simpler design, and follows the Kubernetes philosophy of allowing a user
+to specify any `spec` and report status later, after reconciliation. The alternative would have been to validate the app names
+synchronously using a webhook. This alternative was not currently chosen due to the complexity of webhook devopment and testing,
+but may be reconsidered in the future if a good use case arises.
 
-`arlon app addtoprofile <appName> <profileName>`
+- Updating a profile's `Spec.appNames` can have immediate side effects:
+  corresponding ArgoCD Applications can be deployed or destroyed in any clusters labeled with the profile name,
+  as soon as the controller finishes reconciliation.
+- To list profiles: `kubectl -n arlon get appprofiles`
+- To delete a profile: `kubectl -n arlon delete appprofile <name>`. As expected, this command can have immediate effects on impacted clusters.
 
-Conversely, a profile label can be removed from an application by
-"removing the app from the profile":
-
-`arlon app removefromprofile <appname> <profileName>`
-
-Caution: this can cause the profile to cease to exist if that was the last app referencing it.
-
-### Associating profiles with clusters
+### Associating profiles with Arlon clusters
 
 A cluster can have at most one profile attached to it.
-To attach a profile to a cluster:
 
-`arlon nprofile attach <profilename> <clustername>`
+- To attach a profile to an Arlon cluster, simply label the corresponding anchor ArgoCD Application as follows:
+  - `kubectl -n argocd label application --overwrite <clusterName> arlon.io/profile=<profileName>`
+- To detach, remove the label:
+  - `kubectl -n argocd label application <clusterName> arlon.io/profile-`
 
-Similarly, to detach:
+In addition to those raw kubectl commands, we propose to add arlon CLI commands and APIs to slightly simplify the task
+and abstract out the labeling.
 
-`arlon nprofile detach <profilename> <clustername>`
+### Associating profiles with external clusters (experimental, not tested yet)
 
-Internally, an attach operation simply labels the cluster (via ArgoCD API)
-with the `arlon.io/profile=<profileName>` key value pair.
+An external cluster does not have an Arlon representation (meaning there is no "anchor" ArgoCD Application with the same name).
+It can still be associated with an AppProfile by labeling the raw ArgoCD cluster:
+- Unfortunately as of ArgoCD 2.4, there is no argocd CLI command to label a cluster
+- A user can still manually label the **secret** resource where ArgoCD stores the cluster's metadata and credentials. This requires some work,
+  as those secrets are named using an non-obvious convention.
+- The best thing Arlon should do is to provide dedicated CLI commands and APIs to simplify this task.
+
+## Application Overrides
+
+Given that an Arlon Application is just a specialized ApplicationSet, it inherits an ApplicationSet's
+ability to specify a full ArgoCD Application spec, and this spec can contain overrides for Helm charts.
+- This does mean that every different permutation of override values requires a new ApplicationSet, and therefore Arlon Application.
+- This may be acceptable if we accept that an Arlon Application is not a true application, but rather, an intermediate object that points
+  to the true application source residing in Git. The intermediate object can be viewed as a customization or specialization of the
+  application source, so it's ok to have multiple intermediate objects, each holding a different set of customizations.
+
+## Issues & Limitations
+
+The remaining issues & limitations raised in Proposal 1 still apply:
+- Only one profile per cluster
+- Inherits any limitations of ApplicationSets
+- Does not support ApplicationSets with other types of generators
+- Makes Arlon even more dependent on ArgoCD technology
+- There is no way to create a per-cluster application override, unless the user creates a unique and dedicated Arlon Application for
+  the cluster, places it in a dedicated profile, and applies the profile to the cluster.
 
 ## Appendix A: Reconciliation Algorithm
 
