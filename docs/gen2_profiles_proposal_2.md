@@ -74,7 +74,7 @@ A new controller was developed to not only reconcile AppProfiles, but also clust
   - `controllers/applicationset_controller.go`
 
 The reconciliation algorithm is complex due to the number of interdependent resources.
-See [Appendix A: Reconciliation Algorithm](#Reconciliation-Algorithm) for details.
+See [Appendix A: Reconciliation Algorithm](#Appendix-A:-Reconciliation-Algorithm) for details.
 
 ## Usage
 
