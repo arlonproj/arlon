@@ -47,6 +47,9 @@ This table summarizes the actual resources backing the objects:
 
 ## Labeling Algorithm
 
+Just like in proposal 1, associating a cluster with an app profile is done by labeling the cluster
+with the profile's name, and ensuring that that name is included in the corresponding ApplicationSet's
+`matchExpressions` values list. But there are some differences:
 - For an Arlon cluster, which is anchored by an ArgoCD Application resource,
   the user should label the Application resource, not the corresponding ArgoCD cluster.
   The new AppProfile controller will propagate the label to the corresponding ArgoCD cluster.
