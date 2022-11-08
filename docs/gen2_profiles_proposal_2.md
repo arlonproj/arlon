@@ -72,7 +72,8 @@ A new controller was developed to not only reconcile AppProfiles, but also clust
   ArgoCD ApplicationSets (representing Arlon apps) with the relationships defined by AppProfiles:
   - `controllers/application_controller.go`
   - `controllers/applicationset_controller.go`
-
+- The new logic will be eventually merged into the main controller. In the prototype, it is available as a separate CLI command
+  to simplify testing: `arlon appprofile-controller`.
 The reconciliation algorithm is complex due to the number of interdependent resources.
 See [Appendix A: Reconciliation Algorithm](#Appendix-A-Reconciliation-Algorithm) for details.
 
