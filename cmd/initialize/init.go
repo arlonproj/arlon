@@ -41,13 +41,14 @@ import (
 )
 
 const (
-	argocdManifestURL              = "https://raw.githubusercontent.com/argoproj/argo-cd/%s/manifests/install.yaml"
-	defaultArgoNamespace           = "argocd"
-	defaultArlonNamespace          = "arlon"
-	defaultArlonArgoCDUser         = "arlon"
-	defaultArgoServerDeployment    = "argocd-server"
-	reasonMinimumReplicasAvailable = "MinimumReplicasAvailable"
-	argoInitialAdminSecret         = "argocd-initial-admin-secret"
+	argocdManifestURL                = "https://raw.githubusercontent.com/argoproj/argo-cd/%s/manifests/install.yaml"
+	defaultArgoNamespace             = "argocd"
+	defaultArlonNamespace            = "arlon"
+	defaultArlonArgoCDUser           = "arlon"
+	defaultArgoServerDeployment      = "argocd-server"
+	defaultArlonControllerDeployment = "arlon-controller"
+	reasonMinimumReplicasAvailable   = "MinimumReplicasAvailable"
+	argoInitialAdminSecret           = "argocd-initial-admin-secret"
 )
 
 type porfForwardCfg struct {
@@ -60,12 +61,12 @@ type porfForwardCfg struct {
 	clientset  *kubernetes.Clientset
 }
 
-var argocdGitTag string = "release-2.4"
+var argocdGitTag string
 
 type portForwardCallBack func(ctx context.Context, localPort uint16) error
 
 func NewCommand() *cobra.Command {
-	var argoCfgPath string
+	var noConfirm bool
 	var cliConfig clientcmd.ClientConfig
 	argoServer := "127.0.0.1:8080"
 	cmd := &cobra.Command{
@@ -83,13 +84,16 @@ func NewCommand() *cobra.Command {
 				return err
 			}
 			kubeClient := kubernetes.NewForConfigOrDie(cfg)
-			//canInstallArgo, err := canInstallArgocd()
+			canInstallArgo, err := canInstallArgocd(ctx, kubeClient, defaultArgoNamespace)
 			if err != nil {
 				return err
 			}
-			if true {
-				fmt.Println("Cannot initialize argocd client. Argocd may not be installed")
-				shouldInstallArgo := cli.AskToProceed("argo-cd not found, possibly not installed. Proceed to install? [y/n]")
+			if canInstallArgo {
+				fmt.Println("Cannot find argocd-server deployment. Argocd may not be installed")
+				shouldInstallArgo := true
+				if !noConfirm {
+					shouldInstallArgo = cli.AskToProceed("argo-cd not found, possibly not installed. Proceed to install? [y/n]")
+				}
 				if shouldInstallArgo {
 					if err := beginArgoCDInstall(ctx, client, kubeClient); err != nil {
 						return err
@@ -100,42 +104,54 @@ func NewCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			err = portForward(&porfForwardCfg{
-				ctx:        ctx,
-				hostPort:   8080,
-				remotePort: 8080,
-				callback: func() portForwardCallBack {
-					return func(ctx context.Context, localPort uint16) error {
-						c := commands.NewLoginCommand(&apiclient.ClientOptions{
-							ConfigPath: argoCfg, // we do this because argocd needs to write the local config.
-							Insecure:   true,
-						})
-						password, err := getArgoAdminPassword(ctx, kubeClient, defaultArgoNamespace)
-						if err != nil {
-							return err
-						}
-						_ = c.Flag("password").Value.Set(password)
-						_ = c.Flag("username").Value.Set("admin")
-						c.Run(cmd, []string{argoServer})
-						argoClient := argocd.NewArgocdClientOrDie("")
-						if err := beginArlonInstall(ctx, client, kubeClient, argoClient, defaultArlonNamespace, defaultArgoNamespace); err != nil {
-							return err
-						}
-						return nil
-					}
-				}(),
-				restCfg:   cfg,
-				kClient:   client,
-				clientset: kubeClient,
-			}, defaultArgoNamespace, defaultArlonNamespace)
+			canInstallArlonController, err := canInstallArlon(ctx, kubeClient, defaultArlonNamespace)
 			if err != nil {
 				return err
+			}
+			if canInstallArlonController {
+				shouldInstallArlon := true
+				if !noConfirm {
+					shouldInstallArlon = cli.AskToProceed("arlon namespace not found. Install arlon controller?[y/n]")
+				}
+				if shouldInstallArlon {
+					err = portForward(&porfForwardCfg{
+						ctx:        ctx,
+						hostPort:   8080,
+						remotePort: 8080,
+						callback: func() portForwardCallBack {
+							return func(ctx context.Context, localPort uint16) error {
+								c := commands.NewLoginCommand(&apiclient.ClientOptions{
+									ConfigPath: argoCfg, // we do this because argocd needs to write the local config.
+									Insecure:   true,
+								})
+								password, err := getArgoAdminPassword(ctx, kubeClient, defaultArgoNamespace)
+								if err != nil {
+									return err
+								}
+								_ = c.Flag("password").Value.Set(password)
+								_ = c.Flag("username").Value.Set("admin")
+								c.Run(cmd, []string{argoServer})
+								argoClient := argocd.NewArgocdClientOrDie("")
+								if err := beginArlonInstall(ctx, client, kubeClient, argoClient, defaultArlonNamespace, defaultArgoNamespace); err != nil {
+									return err
+								}
+								return nil
+							}
+						}(),
+						restCfg:   cfg,
+						kClient:   client,
+						clientset: kubeClient,
+					}, defaultArgoNamespace)
+					if err != nil {
+						return err
+					}
+				}
 			}
 			return nil
 		},
 	}
+	cmd.Flags().BoolVarP(&noConfirm, "no-confirm", "y", false, "this flag disables the prompts for argocd and arlon installation on the management cluster")
 	cliConfig = cli.AddKubectlFlagsToCmd(cmd)
-	cmd.Flags().StringVar(&argoCfgPath, "argo-cfg", "", "Path to argocd configuration file")
 	return cmd
 }
 
@@ -244,6 +260,20 @@ func beginArlonInstall(ctx context.Context, client k8sclient.Client, kubeClient 
 			}
 		}
 	}
+	err = wait.PollImmediate(time.Second*10, time.Minute*5, func() (bool, error) {
+		fmt.Printf("waiting for arlon-controller\n")
+		var deployment *apps.Deployment
+		d, err := kubeClient.AppsV1().Deployments(arlonNs).Get(ctx, defaultArlonControllerDeployment, metav1.GetOptions{})
+		if err != nil {
+			return false, err
+		}
+		deployment = d
+		condition := getDeploymentCondition(deployment.Status, apps.DeploymentAvailable)
+		return condition != nil && condition.Reason == reasonMinimumReplicasAvailable, nil
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -264,7 +294,7 @@ func beginArgoCDInstall(ctx context.Context, client k8sclient.Client, kubeClient
 		return err
 	}
 	err = wait.PollImmediate(time.Second*10, time.Minute*5, func() (bool, error) {
-		fmt.Printf("waiting for argocd-server")
+		fmt.Printf("waiting for argocd-server\n")
 		var deployment *apps.Deployment
 		d, err := kubeClient.AppsV1().Deployments(defaultArgoNamespace).Get(ctx, defaultArgoServerDeployment, metav1.GetOptions{})
 		if err != nil {
@@ -280,15 +310,28 @@ func beginArgoCDInstall(ctx context.Context, client k8sclient.Client, kubeClient
 	return nil
 }
 
-func canInstallArgocd() (bool, error) {
-	return true, nil
-}
-
-func canInstallArlon(ctx context.Context, kubeClient *kubernetes.Clientset) (bool, error) {
-	if _, err := kubeClient.CoreV1().Namespaces().Get(ctx, defaultArlonNamespace, metav1.GetOptions{}); err != nil {
+func canInstallArgocd(ctx context.Context, clientset *kubernetes.Clientset, argoNs string) (bool, error) {
+	_, err := clientset.AppsV1().Deployments(argoNs).Get(ctx, defaultArgoServerDeployment, metav1.GetOptions{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Deployment",
+			APIVersion: "v1",
+		},
+	})
+	if err != nil {
 		if errors.IsNotFound(err) {
 			return true, nil
 		}
+		return false, err
+	}
+	return false, nil
+}
+
+func canInstallArlon(ctx context.Context, kubeClient *kubernetes.Clientset, arlonNs string) (bool, error) {
+	if _, err := kubeClient.CoreV1().Namespaces().Get(ctx, arlonNs, metav1.GetOptions{}); err != nil {
+		if errors.IsNotFound(err) {
+			return true, nil
+		}
+		return false, err
 	}
 	return false, nil
 }
@@ -434,7 +477,7 @@ func createArgoCreds(ctx context.Context, clientset *kubernetes.Clientset, argoC
 	return created, nil
 }
 
-func portForward(args *porfForwardCfg, argoNs, arlonNs string) error {
+func portForward(args *porfForwardCfg, argoNs string) error {
 	// use this command to get the argocd pod ➜  ~ kubectl get pods -l app.kubernetes.io/name=argocd-server -o yaml
 	pods, err := args.clientset.CoreV1().Pods(argoNs).List(args.ctx, metav1.ListOptions{
 		LabelSelector: "app.kubernetes.io/name=argocd-server",
@@ -457,7 +500,7 @@ func portForward(args *porfForwardCfg, argoNs, arlonNs string) error {
 			}
 		}
 	}
-	runPortForward(args, pods.Items[podIdx], argoNs)
+	err = runPortForward(args, pods.Items[podIdx], argoNs)
 	if err != nil {
 		return err
 	}
