@@ -78,18 +78,35 @@ See [Appendix A: Reconciliation Algorithm](#Appendix-A-Reconciliation-Algorithm)
 
 ## Usage
 
-### Managing applications
+Since all objects direcly map to Kubernetes resources, the user can in theory manage everything
+with `kubectl [create/apply/edit/delete/lebel]`. However, the arlon CLI and API are still useful
+for some things as explained below.
 
-`arlon app list` shows the current list of Arlon applications.
-It is initially empty.
+### Creating an initial Arlon Application
 
-The prototype does not currently support direct Arlon application creation.
-(This is easy to add later as a new command)
-An Arlon app has to be created manually by one of these methods:
-- Create a new ApplicationSet from a YAML file with
-  - The `managed-by=arlon` label
-  - The spec as follows:
+Even though an Arlon app is directly represented by an ApplicationSet, the resource has strict
+requirements, so it's easiest to create it with the help of the future `arlon app create`, which can
+create the resource directly or dump its YAML to standard out. (This command is not yet implemented
+in the initial Proposal 2 prototype).
+
+The requirements on the ApplicationSet are:
+- Must have the `arlon-type=application` label.
+- The spec's `generators` section must use a single generator with a `matchExpressions` selector with
+  the `arlon.io/profile` key and `In` as operator.  (Note: the `values` field will later be
+  set the AppProfile controller, automatically)
+- The spec's `template` section must templatize the generated ArgoCD application names
+  based on the workload cluster name. The user is free to configure the template's
+  `spec` subsection to target any manifest or Helm chart in git.
+
+Example:
 ```
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  labels:
+    arlon-type: application
+  name: guestbook
+  namespace: argocd
 spec:
   generators:
   - clusters:
@@ -98,9 +115,23 @@ spec:
         - key: arlon.io/profile
           operator: In
           values: []
+  template:
+    metadata:
+      name: '{{name}}-appset-guestbook'
+    spec:
+      destination:
+        namespace: default
+        server: '{{server}}'
+      project: default
+      source:
+        path: guestbook
+        repoURL: https://github.com/argoproj/argocd-example-apps/
+        targetRevision: HEAD
+      syncPolicy:
+        automated:
+          prune: true
 ```
-- Modify an existing ApplicationSet with the above requirements
-
+  
 ### Managing profiles
 
 Profiles are not first class objects. They only exist as labels referenced
