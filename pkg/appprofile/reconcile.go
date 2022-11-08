@@ -78,9 +78,9 @@ func ReconcileEverything(
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("failed to list argocd applications: %s", err)
 	}
-	arlonClusterMap := make(map[string]*argoappapi.Application)
+	arlonClusterMap := make(map[string]argoappapi.Application)
 	for _, arlonClust := range arlonClusters.Items {
-		arlonClusterMap[arlonClust.Name] = &arlonClust
+		arlonClusterMap[arlonClust.Name] = arlonClust
 	}
 
 	// Get applications (applicationsets managed by Arlon)
@@ -160,8 +160,8 @@ func ReconcileEverything(
 		}
 		argoClustLabel := argoClust.Labels[arlonapp.ProfileLabelKey]
 		dirty := false
-		arlonClust := arlonClusterMap[argoClust.Name]
-		if arlonClust == nil {
+		arlonClust, ok := arlonClusterMap[argoClust.Name]
+		if !ok {
 			// No corresponding arlon cluster. Could be an "external" cluster,
 			// so allow the label to be managed independently.
 			log.V(1).Info("argo cluster has no corresponding arlon cluster, skipping",
