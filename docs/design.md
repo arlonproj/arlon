@@ -3,6 +3,7 @@
 ## Management cluster
 
 This Kubernetes cluster hosts the following components:
+
 - ArgoCD
 - Arlon
 - Cluster management stacks e.g. Cluster API and/or Crossplane
@@ -29,19 +30,21 @@ The current list of supported bundle types is:
 ### Bundle purpose
 
 Bundles can specify an optional *purpose* to help classify and organize them.
-In the future, Arlo may order bundle installation by purpose order (for e.g.
+In the future, Arlon may order bundle installation by purpose order (for e.g.
 install bundles with purpose=*networking* before others) but that is not the
 case today. The currently *suggested* purpose values are:
-- networking
-- add-on
-- data-service
-- application
+
+* networking
+* add-on
+* data-service
+* application
 
 
 ## Cluster specification
 
 A cluster specification contains desired settings when creating a new cluster.
 They currently include:
+
 - Stack: the cluster provisioning stack, for e.g. *cluster-api* or *crossplane*
 - Provider: the specific cluster management provider under that stack,
   if applicable. Example:
@@ -55,6 +58,7 @@ They currently include:
 
 A profile expresses a desired configuration for a Kubernetes cluster.
 It is composed of
+
 - An optional Cluster Specification. If specified, it allows the profile
   to be used to create new clusters.
   If absent, the profile can only be applied to existing clusters.
@@ -70,7 +74,7 @@ manifests necessary to create a cluster and deploy desired configurations
 and applications to it. When a user uses Arlon to create and configure a cluster,
 he or she specifies a profile. The profile's cluster specification, bundle
 list and other settings are used to generate values for the chart, and the
-chart is deployed as a Helm release into the *arlo* namespace in the
+chart is deployed as a Helm release into the *arlon* namespace in the
 management cluster.
 
 Here is a summary of the kinds of resources generated and deployed by the chart:
