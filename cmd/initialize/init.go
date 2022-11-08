@@ -50,14 +50,24 @@ const (
 	argoInitialAdminSecret         = "argocd-initial-admin-secret"
 )
 
+type porfForwardCfg struct {
+	ctx        context.Context
+	hostPort   uint16
+	remotePort uint16
+	callback   portForwardCallBack
+	restCfg    *rest.Config
+	kClient    k8sclient.Client
+	clientset  *kubernetes.Clientset
+}
+
 var argocdGitTag string = "release-2.4"
 
-type porfForwardCallBack func(ctx context.Context, uint162 uint16) error
+type portForwardCallBack func(ctx context.Context, localPort uint16) error
 
 func NewCommand() *cobra.Command {
 	var argoCfgPath string
 	var cliConfig clientcmd.ClientConfig
-	argoServer := "localhost:8080"
+	argoServer := "127.0.0.1:8080"
 	cmd := &cobra.Command{
 		Use:   "init",
 		Short: "Run the init command",
@@ -90,32 +100,36 @@ func NewCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			cli.AskToProceed("port forwarded??")
-			c := commands.NewLoginCommand(&apiclient.ClientOptions{
-				ConfigPath: argoCfg, // we do this because argocd needs to write the local config.
-				Insecure:   true,
-			})
-			password, err := getArgoAdminPassword(ctx, kubeClient, defaultArgoNamespace)
-			if err != nil {
-				return err
-			}
-			_ = c.Flag("password").Value.Set(password)
-			_ = c.Flag("username").Value.Set("admin")
-			c.Run(cmd, []string{argoServer})
-			argoClient := argocd.NewArgocdClientOrDie("")
-			//canInstall, err := canInstallArlon(ctx, kubeClient)
-			if err != nil {
-				return err
-			}
-			if true {
-				fmt.Println("arlon namespace not found. Arlon controller might not be installed")
-				//shouldInstallArlon := cli.AskToProceed("Install arlon controller? [y/n]")
-				cli.AskToProceed("portforward argo and login using admin credentials")
-				if true {
-					if err := beginArlonInstall(ctx, client, kubeClient, argoClient, defaultArlonNamespace, defaultArgoNamespace); err != nil {
-						return err
+			err = portForward(&porfForwardCfg{
+				ctx:        ctx,
+				hostPort:   8080,
+				remotePort: 8080,
+				callback: func() portForwardCallBack {
+					return func(ctx context.Context, localPort uint16) error {
+						c := commands.NewLoginCommand(&apiclient.ClientOptions{
+							ConfigPath: argoCfg, // we do this because argocd needs to write the local config.
+							Insecure:   true,
+						})
+						password, err := getArgoAdminPassword(ctx, kubeClient, defaultArgoNamespace)
+						if err != nil {
+							return err
+						}
+						_ = c.Flag("password").Value.Set(password)
+						_ = c.Flag("username").Value.Set("admin")
+						c.Run(cmd, []string{argoServer})
+						argoClient := argocd.NewArgocdClientOrDie("")
+						if err := beginArlonInstall(ctx, client, kubeClient, argoClient, defaultArlonNamespace, defaultArgoNamespace); err != nil {
+							return err
+						}
+						return nil
 					}
-				}
+				}(),
+				restCfg:   cfg,
+				kClient:   client,
+				clientset: kubeClient,
+			}, defaultArgoNamespace, defaultArlonNamespace)
+			if err != nil {
+				return err
 			}
 			return nil
 		},
@@ -330,7 +344,7 @@ func applyObject(ctx context.Context, client k8sclient.Client, object *unstructu
 		}
 		return fmt.Errorf("could not create %s. Error: %v", objDesc, err.Error())
 	}
-	fmt.Printf("successfully created %s", objDesc)
+	fmt.Printf("successfully created %s\n", objDesc)
 	return nil
 }
 
@@ -420,10 +434,9 @@ func createArgoCreds(ctx context.Context, clientset *kubernetes.Clientset, argoC
 	return created, nil
 }
 
-func portForward(ctx context.Context, cfg *rest.Config, client kubernetes.Clientset) error {
-	done := make(chan struct{})
+func portForward(args *porfForwardCfg, argoNs, arlonNs string) error {
 	// use this command to get the argocd pod ➜  ~ kubectl get pods -l app.kubernetes.io/name=argocd-server -o yaml
-	pods, err := client.CoreV1().Pods(defaultArgoNamespace).List(ctx, metav1.ListOptions{
+	pods, err := args.clientset.CoreV1().Pods(argoNs).List(args.ctx, metav1.ListOptions{
 		LabelSelector: "app.kubernetes.io/name=argocd-server",
 	})
 	if err != nil {
@@ -435,33 +448,28 @@ func portForward(ctx context.Context, cfg *rest.Config, client kubernetes.Client
 			Resource: "pod",
 		}, defaultArgoServerDeployment)
 	}
-	for _, pod := range pods.Items {
+	var podIdx int
+	for idx, pod := range pods.Items {
 		if strings.Contains(pod.Name, defaultArgoServerDeployment) {
-			// run port forward
-			err := runPortForward(ctx, cfg, pod, defaultArgoNamespace, 8080, func(ctx context.Context, port uint16) error {
-				<-done
-				return nil
-			})
-			if err != nil {
-				return err
+			if pod.Status.Phase == v1.PodRunning {
+				podIdx = idx
+				break
 			}
-			break
 		}
 	}
-	// we'll have to control this
-	done <- struct{}{}
-	return nil
-}
-
-func runPortForward(ctx context.Context, cfg *rest.Config, pod v1.Pod, argoNs string, hostPort int, cb porfForwardCallBack) error {
-	if pod.Status.Phase != v1.PodRunning {
-		return e.New("argocd-server pod not running")
-	}
-	reqUrl, err := url.Parse(fmt.Sprintf("%s/api/v1/namespaces/%s/pods/%s/portforward", cfg.Host, argoNs, pod.GetName()))
+	runPortForward(args, pods.Items[podIdx], argoNs)
 	if err != nil {
 		return err
 	}
-	transport, upgrader, err := spdy.RoundTripperFor(cfg)
+	return nil
+}
+
+func runPortForward(args *porfForwardCfg, pod v1.Pod, argoNs string) error {
+	reqUrl, err := url.Parse(fmt.Sprintf("%s/api/v1/namespaces/%s/pods/%s/portforward", args.restCfg.Host, argoNs, pod.GetName()))
+	if err != nil {
+		return err
+	}
+	transport, upgrader, err := spdy.RoundTripperFor(args.restCfg)
 	if err != nil {
 		return err
 	}
@@ -471,7 +479,7 @@ func runPortForward(ctx context.Context, cfg *rest.Config, pod v1.Pod, argoNs st
 		Transport: transport,
 		Timeout:   time.Minute * 3,
 	}, http.MethodPost, reqUrl)
-	fw, err := portforward.NewOnAddresses(dialer, []string{"127.0.0.1"}, []string{fmt.Sprintf("%d:%d", 443, hostPort)}, stop, ready, os.Stdout, os.Stderr)
+	fw, err := portforward.NewOnAddresses(dialer, []string{"127.0.0.1"}, []string{fmt.Sprintf("%d:%d", args.hostPort, args.remotePort)}, stop, ready, os.Stdout, os.Stderr)
 	if err != nil {
 		return err
 	}
@@ -481,11 +489,7 @@ func runPortForward(ctx context.Context, cfg *rest.Config, pod v1.Pod, argoNs st
 	go func() {
 		_ = fw.ForwardPorts()
 	}()
-	select {
-	case <-ready:
-	case <-ctx.Done():
-		return e.New("failed to port forward")
-	}
+	<-ready
 	ports, err := fw.GetPorts()
 	if err != nil {
 		return err
@@ -493,7 +497,7 @@ func runPortForward(ctx context.Context, cfg *rest.Config, pod v1.Pod, argoNs st
 	if len(ports) != 1 {
 		return e.New("failed to get ports")
 	}
-	if err := cb(ctx, ports[0].Local); err != nil {
+	if err := args.callback(args.ctx, ports[0].Local); err != nil {
 		return err
 	}
 	return nil
