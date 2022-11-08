@@ -22,7 +22,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     arlon_os="Linux"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     os="darwin"
-    arlon_os="Darwin"   
+    arlon_os="Darwin"
 fi
 cpu=$(uname -m)
 if [[ "$cpu" == "x86_64" ]]; then
