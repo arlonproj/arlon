@@ -24,9 +24,9 @@ require (
 require (
 	github.com/argoproj/pkg v0.11.1-0.20211203175135-36c59d8fafe0
 	github.com/fatih/color v1.13.0
+	github.com/ghodss/yaml v1.0.0
 	github.com/stretchr/testify v1.8.1
 	gotest.tools/v3 v3.4.0
-	github.com/ghodss/yaml v1.0.0
 	k8s.io/cli-runtime v0.23.13
 	sigs.k8s.io/kustomize/kyaml v0.13.0
 )
