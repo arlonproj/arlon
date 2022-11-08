@@ -6,6 +6,9 @@ which elevates profiles to first-class objects. The rest of the design
 remains mostly unchanged, meaning Arlon apps are still based on ApplicationSets,
 and a cluster is associated with an AppProfile by labeling it, except the
 labeling is handled slightly differently (see [Labeling Algorithm](#Labeling-Algorithm)).
+AppProfiles are now the source of truth for profile-to-app mappings.
+A new controller was introduced to reconcile not only AppProfiles,
+but clusters and ApplicationSets as well since they are all inter linked.
   
 ## Object model
 
@@ -59,6 +62,19 @@ with the profile's name, and ensuring that that name is included in the correspo
 - For non-Arlon clusters, generally referred as "external", the design allows those existing
   ArgoCD clusters to be labeled directly, but this will be managed outside of the AppProfiles controller
   and essentially the user's responsibility, and has limitations.
+
+## Controller
+
+A new controller was developed to not only reconcile AppProfiles, but also clusters and ApplicationSets
+(those representing Arlon Applications) since they are now all inter linked through profiles.
+- The main controller logic resides in `pkg/appprofile/reconcile.go` and `controllers/appprofile_controller.go`.
+- Additionally, logic was added to reconcile ArgoCD applications (representing Arlon clusters) and
+  ArgoCD ApplicationSets (representing Arlon apps) with the relationships defined by AppProfiles:
+  - `controllers/application_controller.go`
+  - `controllers/applicationset_controller.go`
+
+The reconciliation algorithm is complex due to the number of interdependent resources.
+See [Appendix A: Reconciliation Algorithm](#Reconciliation-Algorithm) for details.
 
 ## Usage
 
@@ -123,78 +139,39 @@ Similarly, to detach:
 Internally, an attach operation simply labels the cluster (via ArgoCD API)
 with the `arlon.io/profile=<profileName>` key value pair.
 
-## Discussion
+## Appendix A: Reconciliation Algorithm
 
-Pros of the design:
-* Lightweight, elegant, simple
-* Fully declarative (no new resources introduced, relies entirely on existing ArgoCD resources)
-* Does not require "workspace git repo" since a profile has no compiled component.
+Its pseudocode looks something like:
+```
+Algorithm for ReconcileEverything
+Get all arlon apps, profiles, gen2 clusters, and argocd clusters. Build relationship maps.
+For each profile
+If a named app doesn't exist, add it to temporary Status.InvalidAppNames
+Set Status.health based on # of invalid app names
+Update profile only if InvalidAppNames has changed
+For each ArgoCD cluster
+If a corresponding Arlon cluster (application resource) exists
+If arlon cluster is labeled
+If profile exists, update argocd cluster's label
+Else, remove label from argocd cluster if one exists
+Else, remove label from argocd cluster if one exists
+Else
+This is a potential "external" cluster. It may or may not have a profile label. The label is managed independently by user or arlon CLI/API, so leave it alone.
+For each Arlon app (applicationset)
+Set matchExpressions labels list to empty
+For each profile
+If profile contains app, then add profile to matchExpressions label list
+If list has changed, then update app resource
 
-Cons:
-* Profiles are not first class objects. A profile can cease to exist if it
-  becomes unreferenced from any application. This can be confusing to users.
-  For the same reason, you can't create an empty profile and add apps to it later.
-  This can be alleviated by clearly documenting the fact that profiles are just label values.
-  Once the user understand this, everything will become clearer, and the simplicity of
-  the design can begin to outweigh its quirks.
-* A cluster can only have one gen2 profile attached to it. This is a result
-  of the limited expressiveness of the `matchExpressions` logic.
-  In contrast, any number of gen1 profiles can be attached to a cluster
-  (the current implementation only allows one, but could be enhanced to allow many)
-* It's impossible to specify per-cluster overrides for an application.
-  That's because an ApplicationSet can be deployed to multiple clusters if
-  they have a matching profile label.
-  (To be fair, neither gen1 profiles nor gen2 base clusters support cluster overrides either, but for a different reason. This is tracked in a github issue)
-* Any limitations of ApplicationSets (for e.g. lack of Sync Wave support?) will apply to Arlon Apps using gen2 profiles.
-* The lightweight nature of this design may cause some to perceive Arlon's
-  contribution to be very minimal (it's a thin wrapper around ArgoCD constructs).
-* Relies on ApplicationSet, which is ArgoCD specific, making it harder to port Arlon
-  to other gitops tools in the future, e.g. Flux (Trilok mentioned this, though it's not a strong concern at this point, given how invested we already are in ArgoCD)
+Reconcile algorithm for each resource type:
+Profile: ReconcileEverything
+Possible side effects
+One or more profiles' InvalidAppNames and Status.Health can change (triggering reconciliation again?)
+One or more apps (applicationsets) can change in their matchExpressions (also triggering reconciliation)
+One or more argocd clusters may get relabeled (including label removed)
+App (applicationset)
+Any user change to matchExpressions will get overwritten by reconciliation
+Arlon cluster (application resource)
+Any label change will propagate to corresponding ArgoCD cluster if exists
+```
 
-## Potential solutions to the profiles-are-not-firstclass-objects issue:
-
-### The Null App
-
-The Null App (NA) is an Arlon app (applicationset) that belongs
-to (is associated with) all profiles.
-Arlon ensures that the null app always exists and maintains the above invariant.
-When deployed to a cluster, the NA does not change the cluster
-state, so it's a no-OP. A possible implementation is to make the NA deploy the "default" namespace,
-which already exists in all (most?) clusters.
-
-Arlon CLI commands (and possibly APIs) will filter out the NA and automatically create and update it
-as necessary, so the user doesn't see it in practice.
-
-* The NA gets all profile labels, meaning all profiles "contain" the null app.
-* A user can now create an empty profile. Internally, it is added to the NA's label list.
-* When a profile is attached to any cluster, that cluster automatically "gets" the NA (since it's in all profiles), in addition to any other apps associated with the profile.
-* When an app is "added" to a profile, meaning the profile is added to the app's labels list, the profile may not previously exist, therefore the profile is also added to the null app's label list. Therefore, when an app is added to a profile, two apps are modified.
-* When an app is "removed" from a profile, meaning the profile is removed from the app's labels list, no change is made to the null app, therefore the profile remains in the null app's label list. (Actually, this behavior must change to support inconsistent states, see "declarative installation ..." section below.
-
-### Lifecycle operations on profiles
-
-* With the presence of the null app, profiles can appear to be first class objects with defined lifecycle operations.
-
-* Creating an empty profile: a profile is "created" by adding its name to the null app's label list. If it already exists in the null app's list, the app is unmodified. If it already existed in another app's list, then that's fine too. That app is not modified either. At the end of this operation, which is idempotent, the profile is guaranteed to exist in at least one app.
-
-* Deleting a profile: this deletes the profile from all apps in which it appears in the label list. The operation is idempotent. If the profile did not initially exist, a warning will be printed by no error occurs.
-
-
-### Issue: declarative installation and inconsistent states
-
-A user may want to provision profiles and applications in a declarative way, meaning with manifests and "kubectl apply -f". Those manifests contain applicationsets that satisfy the "arlon application" requirement. The user does not know about the null app. Therefore the user's declared applicationsets (with the arlon requirements) will solely completely define the arlon applications and profiles. We assume that the user has no interest in declaratively create empty profiles, only profiles that have at least one associated application.
-
-Arlon must allow a partially inconsistent state, meaning, at any point in time, some profiles may not exist in the null app. This is fine, since the null app's only purpose is to maintain the existence of empty profiles. During an inconsistent state, profiles that exist in some apps but not in the null app are, by definition, existent, since they appear in at least one app. However, one enhancement is necessary on the "remove app from profile" operation: 
-- In addition to removing the profile from the app's label list, the operation must ensure the existence of the profile in null app, meaning add it if it's not already there. This will ensure that at the end of the operation, the profile still exists in the null app. If it no longer exists anywhere else, then by definition it is empty.
-
-## Full Custom Resource
-
-(Under construction)
-
-We could represent Gen2 profiles using a custom resource, either a new type, or by overloading
-the existing Profile CR already used by Gen1. The downside is an increase
-in implementation complexity, for e.g
-* where is the source of truth for app-to-profile associations?
-* what if an app refers to a profile label value not represented by any Profile CR?
-
-A new controller would be most likely need to be developed.
