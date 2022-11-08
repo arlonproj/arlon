@@ -172,7 +172,10 @@ but may be reconsidered in the future if a good use case arises.
 
 ### Associating profiles with Arlon clusters
 
-A cluster can have at most one profile attached to it.
+A cluster can have at most one profile attached to it. The labeling mechanism can be viewed as an internal
+Arlon implementation detail, and it will be hidden from users with `arlon` CLI providing commands to
+attach/detach profiles to/from clusters,
+but until that's implemented, the user can achieve the same effect by using Kubernetes labeling directly:
 
 - To attach a profile to an Arlon cluster, simply label the corresponding anchor ArgoCD Application as follows:
   - `kubectl -n argocd label application --overwrite <clusterName> arlon.io/profile=<profileName>`
@@ -191,12 +194,28 @@ It can still be associated with an AppProfile by labeling the raw ArgoCD cluster
   as those secrets are named using an non-obvious convention.
 - The best thing Arlon should do is to provide dedicated CLI commands and APIs to simplify this task.
 
+## Fully declarative initialization
+
+Now that all Arlon concepts are represented by declarative resources, it is now possible to provision a complete set of resources
+with a single `kubectl apply -f` on a file or folder of manifests. In particular, we can now develop a fully self-contained
+demo folder that contains all of these resources containing references to each other:
+- App Profiles
+- Apps
+- Arlon Clusters
+ 
+The user can then `kubectl apply -f` the whole folder and observe the automatic creation of the cluster(s), profiles, and apps.
+
+(Note: the workload clusters need a base cluster in git. This can be supplied by the Arlon repo itself. This does point to
+an issue that may become a problem later on: base clusters don't have a representation today. There is no registration
+mechanism for them. The user is expected to "know" where his/her base clusters reside, and is responsible for specifying
+their git location when creating new workload clusters)
+
 ## Application Overrides
 
 Given that an Arlon Application is just a specialized ApplicationSet, it inherits an ApplicationSet's
 ability to specify a full ArgoCD Application spec, and this spec can contain overrides for Helm charts.
 - This does mean that every different permutation of override values requires a new ApplicationSet, and therefore Arlon Application.
-- This may be acceptable if we accept that an Arlon Application is not a true application, but rather, an intermediate object that points
+- This may be reasonable if we accept that an Arlon Application is not a true application, but rather, an intermediate object that points
   to the true application source residing in Git. The intermediate object can be viewed as a customization or specialization of the
   application source, so it's ok to have multiple intermediate objects, each holding a different set of customizations.
 
