@@ -141,37 +141,7 @@ with the `arlon.io/profile=<profileName>` key value pair.
 
 ## Appendix A: Reconciliation Algorithm
 
-Its pseudocode looks something like:
-```
-Algorithm for ReconcileEverything
-Get all arlon apps, profiles, gen2 clusters, and argocd clusters. Build relationship maps.
-For each profile
-If a named app doesn't exist, add it to temporary Status.InvalidAppNames
-Set Status.health based on # of invalid app names
-Update profile only if InvalidAppNames has changed
-For each ArgoCD cluster
-If a corresponding Arlon cluster (application resource) exists
-If arlon cluster is labeled
-If profile exists, update argocd cluster's label
-Else, remove label from argocd cluster if one exists
-Else, remove label from argocd cluster if one exists
-Else
-This is a potential "external" cluster. It may or may not have a profile label. The label is managed independently by user or arlon CLI/API, so leave it alone.
-For each Arlon app (applicationset)
-Set matchExpressions labels list to empty
-For each profile
-If profile contains app, then add profile to matchExpressions label list
-If list has changed, then update app resource
+The pseudocode looks something like:
 
-Reconcile algorithm for each resource type:
-Profile: ReconcileEverything
-Possible side effects
-One or more profiles' InvalidAppNames and Status.Health can change (triggering reconciliation again?)
-One or more apps (applicationsets) can change in their matchExpressions (also triggering reconciliation)
-One or more argocd clusters may get relabeled (including label removed)
-App (applicationset)
-Any user change to matchExpressions will get overwritten by reconciliation
-Arlon cluster (application resource)
-Any label change will propagate to corresponding ArgoCD cluster if exists
-```
+![image](arlon-gen2-profiles-reconc-algo.png)
 
