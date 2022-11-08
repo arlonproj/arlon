@@ -1,3 +1,13 @@
+# Prerequisites 
+
+Documentation for Arlon is written in Markdown format, and generated using the mkdocs sitegenerator. 
+The theme mkdocs-material has been used, and docs from the main branch are published to a `GitHub pages` site.
+
+* Install Python 3.x (3.8 or later recommended. 3.11 has been tested)
+* Install the pip python package manager for Python 3. 
+* Install the Python modules mentioned in docs/requirements.txt 
+* Run `mkdocs serve` to test any local changes to docs, and commit them using git workflow
+
 # Help with MkDocs
 Welcome to Arlon documentation with MkDocs
 
