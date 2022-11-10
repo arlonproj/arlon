@@ -9,6 +9,4 @@ var (
 	YAMLrbacCHC []byte
 	//go:embed manifests/rbac_clusterregistration.yaml
 	YAMLrbacClusterReg []byte
-	//go:embed manifests/webhook/webhook.yaml
-	YAMLwebhook []byte
 )

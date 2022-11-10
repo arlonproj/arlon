@@ -226,7 +226,6 @@ func beginArlonInstall(ctx context.Context, client k8sclient.Client, kubeClient 
 		deploy.YAMLdeploy,
 		deploy.YAMLrbacCHC,
 		deploy.YAMLrbacClusterReg,
-		deploy.YAMLwebhook,
 	}
 	decodedCrds := [][]*unstructured.Unstructured{}
 	for _, crd := range crds {
