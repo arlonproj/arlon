@@ -18,6 +18,7 @@ package main
 
 import (
 	"flag"
+	"github.com/arlonproj/arlon/cmd/initialize"
 	"os"
 
 	"github.com/arlonproj/arlon/cmd/basecluster"
@@ -67,6 +68,7 @@ func main() {
 	command.AddCommand(gitrepo.NewCommand())
 	command.AddCommand(verify.NewCommand())
 	command.AddCommand(install.NewCommand())
+	command.AddCommand(initialize.NewCommand())
 
 	opts := zap.Options{
 		Development: true,
