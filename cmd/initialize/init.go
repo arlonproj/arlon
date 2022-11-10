@@ -92,7 +92,7 @@ func NewCommand() *cobra.Command {
 				fmt.Println("Cannot find argocd-server deployment. Argocd may not be installed")
 				shouldInstallArgo := true
 				if !noConfirm {
-					shouldInstallArgo = cli.AskToProceed("argo-cd not found, possibly not installed. Proceed to install? [y/n]")
+					shouldInstallArgo = cli.AskToProceed("ArgoCD not found, possibly not installed. Proceed to install? [y/n]")
 				}
 				if shouldInstallArgo {
 					if err := beginArgoCDInstall(ctx, client, kubeClient); err != nil {
