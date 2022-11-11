@@ -55,7 +55,7 @@ spec:
           capabilities:
             drop:
             - all
-          readOnlyRootFilesystem: true
+          readOnlyRootFilesystem: false
           runAsNonRoot: false
           runAsUser: 0
         terminationMessagePath: /dev/termination-log
