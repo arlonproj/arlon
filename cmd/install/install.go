@@ -50,7 +50,12 @@ func NewCommand() *cobra.Command {
 		Short:             "Install required tools for Arlon",
 		Long:              "Install kubectl, Argocd cli, check git cli, and install compatible CAPI version on the management cluster",
 		DisableAutoGenTag: true,
-		Example:           "arlon install --kubectlPath <string> --argocdPath <string> --kubeconfigPath /path/to/kubeconfig",
+		Example: `arlon install --kubectlPath <string> --argocdPath <string> --kubeconfigPath /path/to/kubeconfig # install CAPI core provider and CLI tools, with the given argocd path and kubeconfig path
+				  arlon install # installs CLI tools and CAPI
+				  arlon install --tools-only # installs only the CLI tools
+				  arlon install --capi-only # installs only CAPI
+				  arlon install --capi-only --infrastructure aws # installs CAPA provider on the management cluster
+		`,
 		RunE: func(c *cobra.Command, args []string) error {
 			// Install kubectl and point it to the kubeconfig
 			isCapiOnly, _ := strconv.ParseBool(c.Flag("capi-only").Value.String())
