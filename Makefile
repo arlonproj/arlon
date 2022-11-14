@@ -157,8 +157,11 @@ test-e2e:
 	./testing/e2e_setup.sh
 	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 00-deploy
 	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 01-update
-	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 02-delete
-	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 03-manage --kind-context arlon-e2e-testbed --timeout 300
+	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 02-linkedupdate
+	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 03-linkedbundleupdate
+	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 04-linkedprofileupdate
+	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 05-delete
+	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 06-manage --kind-context arlon-e2e-testbed --timeout 300
 
 e2e-teardown:
 	./testing/e2e_setup_teardown.sh

@@ -260,7 +260,8 @@ if [ ! -d "${workspace_repo}" ]; then
 else
   echo git repo already cloned
 fi
-
+echo printing the current directory
+ls
 pushd ${workspace_repo}
 if ! test -f README.md; then
   echo adding README.md and creating main branch
@@ -313,7 +314,7 @@ if ! which kubectl-kuttl &>/dev/null; then
   mv kubectl-kuttl "${HOME}/.local/bin/kubectl-kuttl"
 fi
 
-# not needed for us...
+# not needed for us...	
 #clusterawsadm bootstrap iam create-cloudformation-stack
 
 export AWS_B64ENCODED_CREDENTIALS=$(clusterawsadm bootstrap credentials encode-as-profile)
@@ -345,6 +346,17 @@ if ! arlon bundle list | grep xenial >/dev/null; then
   cp "${arlon_repo}/examples/bundles/xenial.yaml" bundles/xenial
   git add bundles/xenial
   git commit -m "add xenial bundle"
+  git push "http://${GIT_USER}:${GIT_PASSWORD}@localhost:${git_server_port}/${GIT_USER}/myrepo.git"
+  popd
+fi
+
+if ! arlon bundle list | grep guestbook >/dev/null; then
+  echo "Adding guestbook manifests"
+  pushd ${workspace_repo}
+  mkdir -p bundles/guestbook
+  cp "${arlon_repo}/examples/bundles/guestbook.yaml" bundles/guestbook
+  git add bundles/guestbook
+  git commit -m "add guestbook bundle"
   git push "http://${GIT_USER}:${GIT_PASSWORD}@localhost:${git_server_port}/${GIT_USER}/myrepo.git"
   popd
 fi
