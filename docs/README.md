@@ -1,9 +1,4 @@
 
-<!-- [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Farlonproj%2Farlon.svg?ref=badge_small)](https://app.fossa.com/api/projects/git%2Bgithub.com%2Farlonproj%2Farlon.svg?ref=badge_small) -->
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fplatform9%2Farlon.svg?type=small)](https://app.fossa.com/projects/git%2Bgithub.com%2Fplatform9%2Farlon?ref=badge_small)
-[![Go Report Card](https://goreportcard.com/badge/github.com/arlonproj/arlon)](https://goreportcard.com/report/github.com/arlonproj/arlon)
-[![Documentation Status](https://readthedocs.org/projects/arlon/badge/?version=latest)](https://arlon.readthedocs.io/en/latest/?badge=latest)
-
 # Introduction 
 # ![logo](./images/logo_arlon.svg)
 Arlon is a lifecycle management and configuration tool for Kubernetes clusters.
@@ -38,5 +33,3 @@ an RBAC ruleset, an add-on, an application, etc...
 
 
 
-## License
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fplatform9%2Farlon.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fplatform9%2Farlon?ref=badge_large)
