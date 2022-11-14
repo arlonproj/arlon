@@ -6,9 +6,11 @@ REPO_ORG ?= arlonproj
 REPO_NAME ?= arlon
 CAPI_VERSION := $(shell cat $(REPO_ROOT)$*/capirc)
 ARGO_VERSION := $(shell cat $(REPO_ROOT)$*/argorc)
+ARLON_CLI_VERSION := $(shell cat $(REPO_ROOT)$*/version)
 CAPI_LD_FLAG := -X github.com/arlonproj/arlon/cmd/install.capiCoreProvider=$(CAPI_VERSION)
 ARGO_LD_FLAG := -X github.com/arlonproj/arlon/cmd/initialize.argocdGitTag=$(ARGO_VERSION)
-LD_FLAGS := $(CAPI_LD_FLAG) $(ARGO_LD_FLAG) -s -w
+ARLON_CLI_LD_FLAG := -X github.com/arlonproj/arlon/cmd/version.cliVersion=$(ARLON_CLI_VERSION)
+LD_FLAGS := $(CAPI_LD_FLAG) $(ARGO_LD_FLAG) $(ARLON_CLI_LD_FLAG) -s -w
 # Image URL to use all building/pushing image targets
 IMG ?= $(REPO_SERVER)/$(REPO_ORG)/$(REPO_NAME)/controller:$(VERSION)
 # Produce CRDs with multiversion enabled for v1 APIs - fixes failure in make test
