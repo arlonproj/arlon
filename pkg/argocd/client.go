@@ -8,12 +8,20 @@ import (
 )
 
 func NewArgocdClientOrDie(argocdConfigPath string) apiclient.Client {
+	client, err := NewArgocdClient(argocdConfigPath)
+	errors.CheckError(err)
+	return client
+}
+
+func NewArgocdClient(argocdConfigPath string) (apiclient.Client, error) {
 	if argocdConfigPath == "" {
 		var err error
 		argocdConfigPath, err = localconfig.DefaultLocalConfigPath()
-		errors.CheckError(err)
+		if err != nil {
+			return nil, err
+		}
 	}
 	var argocdCliOpts apiclient.ClientOptions
 	argocdCliOpts.ConfigPath = argocdConfigPath
-	return argocdclient.NewClientOrDie(&argocdCliOpts)
+	return argocdclient.NewClient(&argocdCliOpts)
 }

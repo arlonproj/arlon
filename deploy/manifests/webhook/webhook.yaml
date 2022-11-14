@@ -23,7 +23,7 @@ spec:
       - command:
         - /arlon
         - webhook
-        image: ghcr.io/arlonproj/arlon/controller:0.9.0
+        image: ghcr.io/arlonproj/arlon/controller:0.9.12
         imagePullPolicy: Always
         name: arlon-webhook
         ports:
