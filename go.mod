@@ -23,6 +23,7 @@ require (
 
 require (
 	github.com/argoproj/pkg v0.11.1-0.20211203175135-36c59d8fafe0
+	github.com/blang/semver v3.5.1+incompatible
 	github.com/fatih/color v1.13.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/stretchr/testify v1.8.1
@@ -63,7 +64,6 @@ require (
 	github.com/argoproj/notifications-engine v0.3.1-0.20220430155844-567361917320 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/bombsimon/logrusr/v2 v2.0.1 // indirect
 	github.com/bradleyfalzon/ghinstallation/v2 v2.0.4 // indirect
 	github.com/casbin/casbin/v2 v2.39.1 // indirect
