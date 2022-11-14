@@ -12,7 +12,7 @@ func NewCommand() *cobra.Command {
 		Use:   "version",
 		Short: "check for arlon CLI version",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("CLI Version: %s\n", cliVersion)
+			fmt.Printf("Arlon CLI Version: %s\n", cliVersion)
 		},
 	}
 	cmd.AddCommand(check())
