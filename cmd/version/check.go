@@ -17,7 +17,6 @@ func check() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client := http.Client{Timeout: time.Minute * 3}
 			reqUrl := fmt.Sprintf("https://raw.githubusercontent.com/arlonproj/arlon/v%s/version", strings.Join(strings.Split(cliVersion, ".")[:2], "."))
-			fmt.Println(reqUrl)
 			req, err := http.NewRequest(http.MethodGet, reqUrl, nil)
 			if err != nil {
 				return err
