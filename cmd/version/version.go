@@ -15,5 +15,6 @@ func NewCommand() *cobra.Command {
 			fmt.Printf("CLI Version: %s\n", cliVersion)
 		},
 	}
+	cmd.AddCommand(check())
 	return cmd
 }
