@@ -7,6 +7,15 @@ type InstallerService interface {
 	Bootstrap() error
 }
 
+type ErrBootstrap struct {
+	HardFail bool
+	Message  string
+}
+
+func (e *ErrBootstrap) Error() string {
+	return e.Message
+}
+
 func NewInstallerService(provider string) (InstallerService, error) {
 	switch provider {
 	case "aws":

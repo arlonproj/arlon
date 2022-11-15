@@ -3,6 +3,7 @@ package install
 import (
 	"errors"
 	"fmt"
+	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/arlonproj/arlon/pkg/install"
 	"os/exec"
 	"runtime"
@@ -291,6 +292,18 @@ func installCAPI(coreProviderVersion string, infrastructureProviders, bootstrapP
 			return err
 		}
 		if err := installer.Bootstrap(); err != nil {
+			var errBootstrap *install.ErrBootstrap
+			if errors.As(err, &errBootstrap) {
+				if errBootstrap.HardFail {
+					return errBootstrap
+				}
+				if !errBootstrap.HardFail {
+					if !cli.AskToProceed(fmt.Sprintf("%s failed to perform bootstrap steps for %s\n. Continue(CAPI provider may not succeed)?[y/n]", Yellow("Warning"), name)) {
+						return errBootstrap
+					}
+					continue
+				}
+			}
 			return err
 		}
 	}

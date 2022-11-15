@@ -1,8 +1,6 @@
 package install
 
 import (
-	"errors"
-	"fmt"
 	"github.com/spf13/cobra"
 	"os"
 	"sigs.k8s.io/cluster-api-provider-aws/cmd/clusterawsadm/cmd/bootstrap/credentials"
@@ -23,16 +21,29 @@ type awsInstaller struct {
 
 func (a *awsInstaller) EnsureRequisites() error {
 	if _, ok := os.LookupEnv(envRegion); !ok {
-		return errors.New("AWS_REGION environment variable not set")
+		return &ErrBootstrap{
+			HardFail: true,
+			Message:  "AWS_REGION environment variable not set",
+		}
 	}
 	if _, ok := os.LookupEnv(envAccessKeyID); !ok {
-		return errors.New("AWS_ACCESS_KEY_ID environment variable not set")
+		return &ErrBootstrap{
+			HardFail: true,
+			Message:  "AWS_ACCESS_KEY_ID environment variable not set",
+		}
 	}
 	if _, ok := os.LookupEnv(envSecretAccessKey); !ok {
-		return errors.New("AWS_SECRET_ACCESS_KEY environment variable not set")
+		return &ErrBootstrap{
+			HardFail: true,
+			Message:  "AWS_SECRET_ACCESS_KEY environment variable not set",
+		}
 	}
 	if _, ok := os.LookupEnv(envSessionToken); !ok {
-		fmt.Printf("%s environment variable not set, assuming no MFA has been setup\n", envSessionToken)
+		return &ErrBootstrap{
+			HardFail: false,
+			Message:  "AWS_SESSION_TOKEN environment variable not set, assuming no MFA has been setup",
+		}
+
 	}
 	return nil
 }
@@ -48,7 +59,10 @@ func (a *awsInstaller) Bootstrap() error {
 	}
 	err := cloudFormationStackCreateCmd.RunE(rootCmd, []string{})
 	if err != nil {
-		return err
+		return &ErrBootstrap{
+			HardFail: false,
+			Message:  err.Error(),
+		}
 	}
 	credRootCmd := credentials.RootCmd()
 	var encodeAsProfileCmd *cobra.Command
