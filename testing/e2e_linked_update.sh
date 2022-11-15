@@ -12,6 +12,7 @@ export git_server_port=8188
 export GIT_CLONE_ROOT=/tmp/arlon-testbed-git-clone
 export workspace_repo_url="http://localhost:${git_server_port}/${GIT_USER}/myrepo.git"
 export workspace_repo="${GIT_CLONE_ROOT}/myrepo"
+#updating guestbook bundle replicas to 3 from 1
 cd ${workspace_repo}
 git pull
 cd bundles/guestbook
@@ -21,8 +22,8 @@ git commit -m "added 3 replica line"
 git push "http://${GIT_USER}:${GIT_PASSWORD}@localhost:${git_server_port}/${GIT_USER}/myrepo.git"
 cd ${dir}
 
-cp ~/.kube/temp.config ~/.kube/config
-rm -rf /home/runner/work/arlon/arlon/kubeconfig
+cp ~/.kube/temp.config ~/.kube/config #Placing back the ~/.kube/config back in it's place
+rm -rf /home/runner/work/arlon/arlon/kubeconfig #Removing ec2-cluster config at $KUBECONFIG
 
 
 
