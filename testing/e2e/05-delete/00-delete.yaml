@@ -3,4 +3,4 @@ kind: TestStep
 commands:
   - command: arlon cluster delete ec2-cluster
   - command: arlon bundle delete xenial
-  - command: arlon profile delete dynamic-1
+  - command: arlon profile delete dynamic-2

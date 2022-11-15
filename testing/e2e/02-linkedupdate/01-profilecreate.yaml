@@ -1,0 +1,4 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  - command: arlon profile create dynamic-2 --repo-base-path profiles --bundles guestbook --desc "dynamic test 2" --tags examples

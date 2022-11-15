@@ -1,0 +1,4 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  - command: arlon bundle create guestbook --tags test,guestbook --desc "Guestbook pod" --repo-path bundles/guestbook

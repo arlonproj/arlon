@@ -1,0 +1,25 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 600
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guestbook-ui
+  namespace: default
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 3
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: guestbook-ui
+  template:
+    metadata:
+      labels:
+        app: guestbook-ui
+status:
+  availableReplicas: 3
+  readyReplicas: 3
+  replicas: 3
+  updatedReplicas: 3

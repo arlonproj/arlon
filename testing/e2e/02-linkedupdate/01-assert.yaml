@@ -1,0 +1,8 @@
+apiVersion: core.arlon.io/v1
+kind: Profile
+metadata:
+  namespace: arlon
+  name: dynamic-2
+spec:
+  bundles:
+    - guestbook
