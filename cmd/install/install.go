@@ -47,6 +47,7 @@ func NewCommand() *cobra.Command {
 	var (
 		toolsOnly bool
 		capiOnly  bool
+		noConfirm bool
 	)
 	command := &cobra.Command{
 		Use:               "install",
@@ -81,6 +82,7 @@ func NewCommand() *cobra.Command {
 			return nil
 		},
 	}
+	command.Flags().BoolVarP(&noConfirm, "no-confirm", "y", false, "this flag disables prompts, all prompts are assumed to be answered as \"yes\"")
 	command.Flags().StringVar(&kubectlPath, "kubectlPath", defaultKubectlPath, "kubectl download location")
 	command.Flags().StringVar(&argocdPath, "argocdPath", defaultArgocdPath, "argocd download location")
 	command.Flags().StringVar(&kubeconfigPath, "kubeconfigPath", "", "kubeconfig path for the management cluster")
