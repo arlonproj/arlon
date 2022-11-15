@@ -3,10 +3,11 @@ package install
 import (
 	"errors"
 	"fmt"
+	"github.com/arlonproj/arlon/pkg/install"
 	"os/exec"
 	"runtime"
-	"sigs.k8s.io/cluster-api/cmd/clusterctl/client/config"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/arlonproj/arlon/pkg/log"
@@ -15,6 +16,7 @@ import (
 	clusterctlv1 "sigs.k8s.io/cluster-api/cmd/clusterctl/api/v1alpha3"
 	"sigs.k8s.io/cluster-api/cmd/clusterctl/client"
 	"sigs.k8s.io/cluster-api/cmd/clusterctl/client/cluster"
+	"sigs.k8s.io/cluster-api/cmd/clusterctl/client/config"
 )
 
 const (
@@ -275,6 +277,23 @@ func downloadArgoCD(osPlatform string) error {
 }
 
 func installCAPI(coreProviderVersion string, infrastructureProviders, bootstrapProviders []string) error {
+	var providerNames []string
+	for _, provider := range infrastructureProviders {
+		providerName := strings.Split(provider, ":")
+		providerNames = append(providerNames, providerName[0])
+	}
+	for _, name := range providerNames {
+		installer, err := install.NewInstallerService(name)
+		if err != nil {
+			return err
+		}
+		if err := installer.EnsureRequisites(); err != nil {
+			return err
+		}
+		if err := installer.Bootstrap(); err != nil {
+			return err
+		}
+	}
 	c, err := client.New("")
 	if err != nil {
 		return err
