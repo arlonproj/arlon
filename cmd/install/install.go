@@ -286,7 +286,19 @@ func installCAPI(coreProviderVersion string, infrastructureProviders, bootstrapP
 	for _, name := range providerNames {
 		installer, err := install.NewInstallerService(name)
 		if err != nil {
-			return err
+			var errBootstrap *install.ErrBootstrap
+			if errors.As(err, &errBootstrap) {
+				if errBootstrap.HardFail {
+					return errBootstrap
+				}
+				if !errBootstrap.HardFail {
+					if !cli.AskToProceed(fmt.Sprintf("%s failed to perform bootstrap steps for %s\n. Continue(CAPI provider may not succeed)?[y/n]", Yellow("Warning"), name)) {
+						return errBootstrap
+					}
+				}
+			} else {
+				return err
+			}
 		}
 		if err := installer.EnsureRequisites(); err != nil {
 			return err
