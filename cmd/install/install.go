@@ -25,6 +25,7 @@ const (
 	defaultArgocdPath  = "/usr/local/bin/argocd"
 )
 
+// by default, we install aws and docker. We also have --infrastructure flag to take user input
 var (
 	ErrKubectlPresent  = errors.New("kubectl is already present at default(/usr/local/bin/kubectl) location or user specifed location")
 	ErrGitPresent      = errors.New("git is already installed")
@@ -288,6 +289,9 @@ func installCAPI(coreProviderVersion string, infrastructureProviders, bootstrapP
 	for _, name := range providerNames {
 		installer, err := install.NewInstallerService(name)
 		if err != nil {
+			return err
+		}
+		if err := installer.EnsureRequisites(); err != nil {
 			var errBootstrap *install.ErrBootstrap
 			if errors.As(err, &errBootstrap) {
 				if errBootstrap.HardFail {
@@ -301,9 +305,6 @@ func installCAPI(coreProviderVersion string, infrastructureProviders, bootstrapP
 			} else {
 				return err
 			}
-		}
-		if err := installer.EnsureRequisites(); err != nil {
-			return err
 		}
 		if err := installer.Bootstrap(); err != nil {
 			var errBootstrap *install.ErrBootstrap
