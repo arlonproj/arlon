@@ -1,11 +1,10 @@
 package install
 
 import (
+	"flag"
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
-	"sigs.k8s.io/cluster-api-provider-aws/cmd/clusterawsadm/cmd/bootstrap/credentials"
-	"sigs.k8s.io/cluster-api-provider-aws/cmd/clusterawsadm/cmd/bootstrap/iam"
+	"sigs.k8s.io/cluster-api-provider-aws/cmd/clusterawsadm/cmd"
 	credentials2 "sigs.k8s.io/cluster-api-provider-aws/cmd/clusterawsadm/credentials"
 )
 
@@ -72,32 +71,17 @@ func (a *awsInstaller) EnsureRequisites() error {
 }
 
 func (a *awsInstaller) Bootstrap() error {
-	rootCmd := iam.RootCmd()
-	var cloudFormationStackCreateCmd *cobra.Command
-	for _, cmd := range rootCmd.Commands() {
-		if cmd.Name() == "create-cloudformation-stack" {
-			cloudFormationStackCreateCmd = cmd
-			break
-		}
-	}
-	err := cloudFormationStackCreateCmd.RunE(rootCmd, []string{})
-	if err != nil {
-		return &ErrBootstrap{
-			HardFail: false,
-			Message:  err.Error(),
-		}
-	}
-	credRootCmd := credentials.RootCmd()
-	var encodeAsProfileCmd *cobra.Command
-	for _, cmd := range rootCmd.Commands() {
-		if cmd.Name() == "encode-as-profile" {
-			encodeAsProfileCmd = cmd
-			break
-		}
-	}
-	if err := encodeAsProfileCmd.RunE(credRootCmd, []string{}); err != nil {
+	ogArgs := os.Args
+	os.Args = []string{"clusterawsadm", "bootstrap", "iam", "create-cloudformation-stack"}
+	if err := flag.CommandLine.Parse([]string{}); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(os.Stderr, "")
 		return err
 	}
+	rootCmd := cmd.RootCmd()
+	rootCmd.SilenceUsage = true
+	_ = rootCmd.Execute()
+	os.Args = ogArgs
 	region := os.Getenv(envRegion)
 	awsCreds, err := credentials2.NewAWSCredentialFromDefaultChain(region)
 	if err != nil {

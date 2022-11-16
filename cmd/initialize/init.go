@@ -3,9 +3,17 @@ package initialize
 import (
 	"bytes"
 	"context"
-	_ "embed"
 	e "errors"
 	"fmt"
+	"github.com/arlonproj/arlon/cmd/install"
+	"io"
+	"net/http"
+	"net/url"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/argoproj/argo-cd/v2/cmd/argocd/commands"
 	"github.com/argoproj/argo-cd/v2/pkg/apiclient"
@@ -13,8 +21,8 @@ import (
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	argocdio "github.com/argoproj/argo-cd/v2/util/io"
 	"github.com/argoproj/argo-cd/v2/util/localconfig"
+	"github.com/arlonproj/arlon/cmd/basecluster"
 	"github.com/arlonproj/arlon/cmd/gitrepo"
-	"github.com/arlonproj/arlon/cmd/install"
 	"github.com/arlonproj/arlon/config"
 	"github.com/arlonproj/arlon/deploy"
 	"github.com/arlonproj/arlon/pkg/argocd"
@@ -22,7 +30,6 @@ import (
 	gyaml "github.com/ghodss/yaml"
 	gogit "github.com/go-git/go-git/v5"
 	"github.com/spf13/cobra"
-	"io"
 	apps "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -36,14 +43,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/portforward"
 	"k8s.io/client-go/transport/spdy"
-	"net/http"
-	"net/url"
-	"os"
-	"path/filepath"
 	clusterctl "sigs.k8s.io/cluster-api/cmd/clusterctl/client"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
-	"strings"
-	"time"
 )
 
 const (
@@ -166,7 +167,7 @@ func NewCommand() *cobra.Command {
 			}
 			installCmd := install.NewCommand()
 			_ = installCmd.Flag("capi-only").Value.Set("true")
-			if err := installCmd.RunE(cmd, []string{}); err != nil {
+			if err := installCmd.RunE(installCmd, []string{}); err != nil {
 				return err
 			}
 			err = portForward(&porfForwardCfg{
@@ -215,6 +216,7 @@ func NewCommand() *cobra.Command {
 					name:             "docker-example",
 					manifestFileName: "capd.yaml",
 					provider:         "docker",
+					flavor:           "development",
 				},
 				{
 					repoPath:         filepath.Join(exampleDir, baseclusterDir, "aws"),
@@ -238,7 +240,19 @@ func NewCommand() *cobra.Command {
 				if err := pushManifests(repoUrl, gitUser, password, b.repoPath, manifest, b.manifestFileName); err != nil {
 					return err
 				}
-				fmt.Printf("to deploy a cluster on %s infrastructure run `arlon cluster create --cluster-name docker-example --repo-path %s`\n", b.provider, filepath.Join(b.repoPath, b.manifestFileName))
+				bcl := basecluster.NewCommand()
+				var prepCmd *cobra.Command
+				for _, c := range bcl.Commands() {
+					if c.Name() == "preparegit" {
+						prepCmd = c
+						break
+					}
+				}
+				_ = prepCmd.Flag("repo-path").Value.Set(b.repoPath)
+				if err := prepCmd.RunE(prepCmd, []string{}); err != nil {
+					return err
+				}
+				fmt.Printf("to deploy a cluster on %s infrastructure run `arlon cluster create --cluster-name %s --repo-path %s`\n", b.provider, b.repoPath)
 			}
 			fmt.Printf("basecluster manifests pushed to %s\n", repoUrl)
 			return nil
