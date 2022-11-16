@@ -5,7 +5,7 @@ Arlon CLI downloads are provided on GitHub. The CLI is not a self-contained stan
 It is required to point the CLI to a management cluster and set up the Arlon controller in this management cluster.
 
 We plan to add a command line script to simplify initial setup. 
-For a quickstart minimal demonstration setup, follow the instructions to set up a KIND based testbed [here](https://github.com/arlonproj/arlon/blob/main/testing/README.md)
+For a quickstart minimal demonstration setup, follow the instructions to set up a KIND based testbed with Arlon and ArgoCD running  [here](https://github.com/arlonproj/arlon/blob/main/testing/README.md)
 
 Please follow the manual instructions in this section for a customised setup.
 
