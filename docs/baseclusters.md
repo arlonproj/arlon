@@ -28,7 +28,7 @@ This example shows a base cluster named `capi-quickstart` used to deploy two wor
 clusters `cluster-a` and `cluster-b`. Additionally, `cluster-a` is given profile `xxx`,
 while `cluster-b` is given profile `yyy`.
 
-![architecture](arlon_gen2.png)
+![architecture](./images/arlon_gen2.png)
 
 ## Base Cluster
 
