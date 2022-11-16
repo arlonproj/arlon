@@ -56,7 +56,7 @@ and does not change over time even when the static bundle is updated.
 (Note: the contents of some of those bundles referenced by the static
 profile may however change over time if they are dynamic).
 A static profile is stored as an item
-in the Arlon database (specifically, as a configmap in the Management Cluster).
+in the Arlon database (specifically, as a CR in the Management Cluster).
 
 ### Dynamic profile
 A dynamic profile, on the other hand, has two components: the specification
