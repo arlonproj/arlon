@@ -15,6 +15,7 @@ import (
 )
 
 const ProfileLabelKey = "arlon.io/profile"
+const ProfilesAnnotationKey = "arlon.io/profiles"
 
 func List(config *restclient.Config, ns string) (apslist []appset.ApplicationSet, err error) {
 	cli, err := ctrlruntimeclient.NewClient(config)
