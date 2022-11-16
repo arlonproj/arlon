@@ -22,6 +22,7 @@ require (
 )
 
 require (
+	github.com/Azure/go-autorest/autorest/to v0.4.0
 	github.com/argoproj/pkg v0.11.1-0.20211203175135-36c59d8fafe0
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/fatih/color v1.13.0
