@@ -1,6 +1,7 @@
 package install
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 	"os"
 	"sigs.k8s.io/cluster-api-provider-aws/cmd/clusterawsadm/cmd/bootstrap/credentials"
@@ -9,41 +10,63 @@ import (
 )
 
 const (
-	envRegion          = "AWS_REGION"
-	envAccessKeyID     = "AWS_ACCESS_KEY_ID"
-	envSecretAccessKey = "AWS_SECRET_ACCESS_KEY"
-	envSessionToken    = "AWS_SESSION_TOKEN"
-	envAWSB64Creds     = "AWS_B64ENCODED_CREDENTIALS"
+	envRegion           = "AWS_REGION"
+	envAccessKeyID      = "AWS_ACCESS_KEY_ID"
+	envSecretAccessKey  = "AWS_SECRET_ACCESS_KEY"
+	envSessionToken     = "AWS_SESSION_TOKEN"
+	envSSHKeyName       = "AWS_SSH_KEY_NAME"
+	envCtrlPlaneMachine = "AWS_CONTROL_PLANE_MACHINE_TYPE"
+	envNodeMachine      = "AWS_NODE_MACHINE_TYPE"
+	envAWSB64Creds      = "AWS_B64ENCODED_CREDENTIALS"
 )
 
 type awsInstaller struct {
 }
 
 func (a *awsInstaller) EnsureRequisites() error {
-	if _, ok := os.LookupEnv(envRegion); !ok {
-		return &ErrBootstrap{
-			HardFail: true,
-			Message:  "AWS_REGION environment variable not set",
-		}
+	requiredEnvs := []struct {
+		name     string
+		hardFail bool
+	}{
+		{
+			name:     envRegion,
+			hardFail: true,
+		},
+		{
+			name:     envAccessKeyID,
+			hardFail: true,
+		},
+		{
+			name:     envSecretAccessKey,
+			hardFail: true,
+		},
+		{
+			name:     envSessionToken,
+			hardFail: false,
+		},
+		{
+			name:     envSSHKeyName,
+			hardFail: true,
+		},
+		{
+			name:     envCtrlPlaneMachine,
+			hardFail: true,
+		},
+		{
+			name:     envNodeMachine,
+			hardFail: true,
+		},
 	}
-	if _, ok := os.LookupEnv(envAccessKeyID); !ok {
-		return &ErrBootstrap{
-			HardFail: true,
-			Message:  "AWS_ACCESS_KEY_ID environment variable not set",
+	for _, env := range requiredEnvs {
+		if val := os.Getenv(env.name); len(val) == 0 {
+			if env.hardFail {
+				return &ErrBootstrap{
+					HardFail: env.hardFail,
+					Message:  fmt.Sprintf("%s environment variable not set", env.name),
+				}
+			}
+			fmt.Printf("%s environment variable not set\n", env.name)
 		}
-	}
-	if _, ok := os.LookupEnv(envSecretAccessKey); !ok {
-		return &ErrBootstrap{
-			HardFail: true,
-			Message:  "AWS_SECRET_ACCESS_KEY environment variable not set",
-		}
-	}
-	if _, ok := os.LookupEnv(envSessionToken); !ok {
-		return &ErrBootstrap{
-			HardFail: false,
-			Message:  "AWS_SESSION_TOKEN environment variable not set, assuming no MFA has been setup",
-		}
-
 	}
 	return nil
 }

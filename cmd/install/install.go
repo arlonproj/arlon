@@ -87,7 +87,7 @@ func NewCommand() *cobra.Command {
 	command.Flags().StringVar(&kubectlPath, "kubectlPath", defaultKubectlPath, "kubectl download location")
 	command.Flags().StringVar(&argocdPath, "argocdPath", defaultArgocdPath, "argocd download location")
 	command.Flags().StringVar(&kubeconfigPath, "kubeconfigPath", "", "kubeconfig path for the management cluster")
-	command.Flags().StringSliceVar(&infraProviders, "infrastructure", nil, "comma separated list of infrastructure provider components to install alongside CAPI")
+	command.Flags().StringSliceVar(&infraProviders, "infrastructure", []string{"aws", "docker"}, "comma separated list of infrastructure provider components to install alongside CAPI")
 	command.Flags().StringSliceVar(&bootstrapProviders, "bootstrap", nil, "bootstrap provider components to add to the management cluster")
 	command.Flags().BoolVarP(&toolsOnly, "tools-only", "t", false, "set this flag to install only CLI tools")
 	command.Flags().BoolVarP(&capiOnly, "capi-only", "c", false, "set this flag to install only CAPI on the management cluster")

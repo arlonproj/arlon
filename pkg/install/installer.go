@@ -20,6 +20,8 @@ func NewInstallerService(provider string) (InstallerService, error) {
 	switch provider {
 	case "aws":
 		return &awsInstaller{}, nil
+	case "docker":
+		return &dockerInstaller{}, nil
 	default:
 		return nil, errors.New("invalid provider")
 	}

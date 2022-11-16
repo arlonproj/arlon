@@ -6,17 +6,21 @@ import (
 	_ "embed"
 	e "errors"
 	"fmt"
+	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/argoproj/argo-cd/v2/cmd/argocd/commands"
-	"github.com/arlonproj/arlon/pkg/argocd"
-
 	"github.com/argoproj/argo-cd/v2/pkg/apiclient"
 	"github.com/argoproj/argo-cd/v2/pkg/apiclient/account"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	argocdio "github.com/argoproj/argo-cd/v2/util/io"
 	"github.com/argoproj/argo-cd/v2/util/localconfig"
+	"github.com/arlonproj/arlon/cmd/gitrepo"
+	"github.com/arlonproj/arlon/cmd/install"
 	"github.com/arlonproj/arlon/config"
 	"github.com/arlonproj/arlon/deploy"
+	"github.com/arlonproj/arlon/pkg/argocd"
+	"github.com/arlonproj/arlon/pkg/gitutils"
 	gyaml "github.com/ghodss/yaml"
+	gogit "github.com/go-git/go-git/v5"
 	"github.com/spf13/cobra"
 	"io"
 	apps "k8s.io/api/apps/v1"
@@ -35,20 +39,28 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
+	clusterctl "sigs.k8s.io/cluster-api/cmd/clusterctl/client"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 	"strings"
 	"time"
 )
 
 const (
-	argocdManifestURL                = "https://raw.githubusercontent.com/argoproj/argo-cd/%s/manifests/install.yaml"
-	defaultArgoNamespace             = "argocd"
-	defaultArlonNamespace            = "arlon"
-	defaultArlonArgoCDUser           = "arlon"
-	defaultArgoServerDeployment      = "argocd-server"
-	defaultArlonControllerDeployment = "arlon-controller"
-	reasonMinimumReplicasAvailable   = "MinimumReplicasAvailable"
-	argoInitialAdminSecret           = "argocd-initial-admin-secret"
+	argocdManifestURL                      = "https://raw.githubusercontent.com/argoproj/argo-cd/%s/manifests/install.yaml"
+	defaultArgoNamespace                   = "argocd"
+	defaultArlonNamespace                  = "arlon"
+	defaultArlonArgoCDUser                 = "arlon"
+	defaultArgoServerDeployment            = "argocd-server"
+	defaultArlonControllerDeployment       = "arlon-controller"
+	reasonMinimumReplicasAvailable         = "MinimumReplicasAvailable"
+	argoInitialAdminSecret                 = "argocd-initial-admin-secret"
+	argoServer                             = "127.0.0.1:8080"
+	exampleDir                             = "examples"
+	baseclusterDir                         = "baseclusters"
+	defaultCtrlPlaneCount            int64 = 2
+	defaultWorkerCount               int64 = 3
+	defaultK8sVersion                      = "1.23.11"
 )
 
 type porfForwardCfg struct {
@@ -66,9 +78,14 @@ var argocdGitTag string
 type portForwardCallBack func(ctx context.Context, localPort uint16) error
 
 func NewCommand() *cobra.Command {
-	var noConfirm bool
-	var cliConfig clientcmd.ClientConfig
-	argoServer := "127.0.0.1:8080"
+	var (
+		noConfirm   bool
+		cliConfig   clientcmd.ClientConfig
+		addExamples bool
+		gitUser     string
+		password    string
+		repoUrl     string
+	)
 	cmd := &cobra.Command{
 		Use:   "init",
 		Short: "Run the init command",
@@ -147,10 +164,91 @@ func NewCommand() *cobra.Command {
 					}
 				}
 			}
+			installCmd := install.NewCommand()
+			_ = installCmd.Flag("capi-only").Value.Set("true")
+			if err := installCmd.RunE(cmd, []string{}); err != nil {
+				return err
+			}
+			err = portForward(&porfForwardCfg{
+				ctx:        ctx,
+				hostPort:   8080,
+				remotePort: 8080,
+				callback: func(ctx context.Context, localPort uint16) error {
+					gitrepoCmd := gitrepo.NewCommand()
+					var registerCmd *cobra.Command
+					for _, c := range gitrepoCmd.Commands() {
+						if c.Name() == "register" {
+							registerCmd = c
+							break
+						}
+					}
+					if len(repoUrl) == 0 {
+						return e.New("repoUrl not set")
+					}
+					_ = registerCmd.Flag("user").Value.Set(gitUser)
+					_ = registerCmd.Flag("password").Value.Set(password)
+					err = registerCmd.RunE(cmd, []string{repoUrl})
+					if err != nil {
+						return err
+					}
+					return nil
+				},
+				restCfg:   cfg,
+				kClient:   client,
+				clientset: kubeClient,
+			}, defaultArgoNamespace)
+			if err != nil {
+				return err
+			}
+			if !addExamples {
+				return nil
+			}
+			baseClusterArgs := []struct {
+				repoPath         string
+				name             string
+				manifestFileName string
+				provider         string
+				flavor           string
+			}{
+				{
+					repoPath:         filepath.Join(exampleDir, baseclusterDir, "docker"),
+					name:             "docker-example",
+					manifestFileName: "capd.yaml",
+					provider:         "docker",
+				},
+				{
+					repoPath:         filepath.Join(exampleDir, baseclusterDir, "aws"),
+					name:             "aws-example",
+					manifestFileName: "capa.yaml",
+					provider:         "aws",
+				},
+				{
+					repoPath:         filepath.Join(exampleDir, baseclusterDir, "aws-eks"),
+					name:             "aws-eks-example",
+					manifestFileName: "capa-eks.yaml",
+					provider:         "aws",
+					flavor:           "eks",
+				},
+			}
+			for _, b := range baseClusterArgs {
+				manifest, err := runGenerateClusterTemplate(b.name, defaultK8sVersion, b.provider, b.flavor)
+				if err != nil {
+					return err
+				}
+				if err := pushManifests(repoUrl, gitUser, password, b.repoPath, manifest, b.manifestFileName); err != nil {
+					return err
+				}
+				fmt.Printf("to deploy a cluster on %s infrastructure run `arlon cluster create --cluster-name docker-example --repo-path %s`\n", b.provider, filepath.Join(b.repoPath, b.manifestFileName))
+			}
+			fmt.Printf("basecluster manifests pushed to %s\n", repoUrl)
 			return nil
 		},
 	}
 	cmd.Flags().BoolVarP(&noConfirm, "no-confirm", "y", false, "this flag disables the prompts for argocd and arlon installation on the management cluster")
+	cmd.Flags().BoolVarP(&addExamples, "examples", "e", false, "this flag adds example base cluster manifests")
+	cmd.Flags().StringVar(&gitUser, "username", "", "the git username for the workspace repository")
+	cmd.Flags().StringVar(&password, "password", "", "the password for git user")
+	cmd.Flags().StringVar(&repoUrl, "repoUrl", "", "URL for the workspace repository")
 	cliConfig = cli.AddKubectlFlagsToCmd(cmd)
 	return cmd
 }
@@ -540,6 +638,82 @@ func runPortForward(args *porfForwardCfg, pod v1.Pod, argoNs string) error {
 		return e.New("failed to get ports")
 	}
 	if err := args.callback(args.ctx, ports[0].Local); err != nil {
+		return err
+	}
+	return nil
+}
+
+// from `clusterctl` source, had to copy it over because `clusterctl` only outputs to STDOUT :( Will add an issue on GH for this
+func runGenerateClusterTemplate(clusterName, k8sVersion, infraProvider, flavor string) ([]byte, error) {
+	c, err := clusterctl.New("")
+	if err != nil {
+		return nil, err
+	}
+	templateOpts := clusterctl.GetClusterTemplateOptions{
+		ClusterName:              clusterName,
+		KubernetesVersion:        k8sVersion,
+		ControlPlaneMachineCount: to.Int64Ptr(defaultCtrlPlaneCount),
+		WorkerMachineCount:       to.Int64Ptr(defaultWorkerCount),
+		ProviderRepositorySource: &clusterctl.ProviderRepositorySourceOptions{
+			InfrastructureProvider: infraProvider,
+			Flavor:                 flavor,
+		},
+	}
+	templ, err := c.GetClusterTemplate(templateOpts)
+	if err != nil {
+		return nil, err
+	}
+	printer := clusterctl.YamlPrinter(templ)
+	out, err := printer.Yaml()
+	if err != nil {
+		return nil, err
+	}
+	out = append(out, '\n')
+	return out, nil
+}
+
+func pushManifests(repoUrl string, user string, password string, repoPath string, manifestData []byte, manifestName string) error {
+	repo, tmpDir, auth, err := argocd.CloneRepo(&argocd.RepoCreds{
+		Url:      repoUrl,
+		Username: user,
+		Password: password,
+	}, repoUrl, "main")
+	if err != nil {
+		return err
+	}
+	defer func(path string) {
+		_ = os.RemoveAll(path)
+	}(tmpDir)
+	wt, err := repo.Worktree()
+	if err != nil {
+		return err
+	}
+	fs := wt.Filesystem
+	err = os.MkdirAll(filepath.Join(tmpDir, repoPath), 0755)
+	if err != nil {
+		return err
+	}
+	f, err := fs.OpenFile(filepath.Join(repoPath, manifestName), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	if err != nil {
+		return err
+	}
+	defer argocdio.Close(f)
+	_, err = f.Write(manifestData)
+	if err != nil {
+		return err
+	}
+	changed, err := gitutils.CommitChanges(tmpDir, wt, fmt.Sprintf("add %s", filepath.Join(repoPath, manifestName)))
+	if err != nil {
+		return err
+	}
+	if !changed {
+		return nil
+	}
+	if err := repo.Push(&gogit.PushOptions{
+		RemoteName: gogit.DefaultRemoteName,
+		Auth:       auth,
+		CABundle:   nil,
+	}); err != nil {
 		return err
 	}
 	return nil
