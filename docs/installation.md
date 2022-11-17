@@ -42,14 +42,10 @@ kind: ConfigMap
 [...]
 ```
 - Generate an account token: `argocd account generate-token --account arlon`
-- Make a temporary copy of the config file: `cp ${HOME}/.config/argocd/config /tmp/config` then
+- Make a temporary copy of this [config-file](https://github.com/arlonproj/arlon/blob/main/testing/argocd-config-for-controller.template.yaml) in `/tmp/config` then
   edit it to replace the value of `auth-token` with the token from
   the previous step. Save changes. This file will be used to configure the Arlon
   controller's ArgoCD credentials during the next steps.
-
-NOTE: _On some operating systems, including Linux, it's possible the source configuration
-file is located at `${HOME}/.argocd/config` instead. In any case, ensure that
-the destination file is named `/tmp/config`, it's important for the secret creation step below_.
 
 ## Arlon controller
 - Create the arlon namespace: `kubectl create ns arlon`

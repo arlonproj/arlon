@@ -40,9 +40,9 @@ case today. The currently *suggested* purpose values are:
 * application
 
 
-## Cluster specification
+## Clusterspec
 
-A cluster specification contains desired settings when creating a new cluster.
+A clusterspec contains desired settings when creating a new cluster.
 They currently include:
 
 - Stack: the cluster provisioning stack, for e.g. *cluster-api* or *crossplane*
@@ -59,7 +59,7 @@ They currently include:
 A profile expresses a desired configuration for a Kubernetes cluster.
 It is composed of
 
-- An optional Cluster Specification. If specified, it allows the profile
+- An optional clusterspec. If specified, it allows the profile
   to be used to create new clusters.
   If absent, the profile can only be applied to existing clusters.
 - A list of bundles specifying the configuration to apply onto the cluster
@@ -72,7 +72,7 @@ It is composed of
 The cluster chart is a Helm chart that creates (and optionally applies) the
 manifests necessary to create a cluster and deploy desired configurations
 and applications to it. When a user uses Arlon to create and configure a cluster,
-he or she specifies a profile. The profile's cluster specification, bundle
+he or she specifies a profile. The profile's clusterspec, bundle
 list and other settings are used to generate values for the chart, and the
 chart is deployed as a Helm release into the *arlon* namespace in the
 management cluster.
