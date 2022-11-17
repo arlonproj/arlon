@@ -277,6 +277,7 @@ func NewCommand() *cobra.Command {
 	cmd.Flags().StringVar(&gitUser, "username", "", "the git username for the workspace repository")
 	cmd.Flags().StringVar(&password, "password", "", "the password for git user")
 	cmd.Flags().StringVar(&repoUrl, "repoUrl", "", "URL for the workspace repository")
+	cmd.MarkFlagsRequiredTogether("examples", "username", "password", "repoUrl")
 	cliConfig = cli.AddKubectlFlagsToCmd(cmd)
 	return cmd
 }
