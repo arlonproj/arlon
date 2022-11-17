@@ -5,7 +5,7 @@ import (
 	"context"
 	e "errors"
 	"fmt"
-	"github.com/arlonproj/arlon/cmd/install"
+	gitrepo2 "github.com/arlonproj/arlon/pkg/gitrepo"
 	"io"
 	"net/http"
 	"net/url"
@@ -23,6 +23,7 @@ import (
 	"github.com/argoproj/argo-cd/v2/util/localconfig"
 	"github.com/arlonproj/arlon/cmd/basecluster"
 	"github.com/arlonproj/arlon/cmd/gitrepo"
+	"github.com/arlonproj/arlon/cmd/install"
 	"github.com/arlonproj/arlon/config"
 	"github.com/arlonproj/arlon/deploy"
 	"github.com/arlonproj/arlon/pkg/argocd"
@@ -183,6 +184,19 @@ func NewCommand() *cobra.Command {
 							break
 						}
 					}
+					fmt.Println("clearing arlon repoctx file")
+					path, err := gitrepo2.GetRepoCfgPath()
+					if err != nil {
+						return err
+					}
+					if err := os.Remove(path); err != nil {
+						var errPath *os.PathError
+						if e.As(err, &errPath) {
+							if errPath != os.ErrNotExist {
+								return err
+							}
+						}
+					}
 					if len(repoUrl) == 0 {
 						return e.New("repoUrl not set")
 					}
@@ -252,7 +266,7 @@ func NewCommand() *cobra.Command {
 				if err := prepCmd.RunE(prepCmd, []string{}); err != nil {
 					return err
 				}
-				fmt.Printf("to deploy a cluster on %s infrastructure run `arlon cluster create --cluster-name %s --repo-path %s`\n", b.provider, b.repoPath)
+				fmt.Printf("to deploy a cluster on %s infrastructure run `arlon cluster create --cluster-name %s --repo-path %s`\n", b.provider, b.name, b.repoPath)
 			}
 			fmt.Printf("basecluster manifests pushed to %s\n", repoUrl)
 			return nil

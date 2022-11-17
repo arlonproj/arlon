@@ -75,7 +75,7 @@ func NewCommand() *cobra.Command {
 			fmt.Println()
 			if isCapiOnly {
 				fmt.Printf("Attempting to install %s with infrastructure providers %v and bootstrap providers %v\n", capiCoreProvider, infraProviders, bootstrapProviders)
-				if err := installCAPI(capiCoreProvider, infraProviders, bootstrapProviders); err != nil {
+				if err := installCAPI(capiCoreProvider, infraProviders, bootstrapProviders, noConfirm); err != nil {
 					return err
 				}
 				fmt.Printf("%s CAPI is installed...\n", Green("✓"))
@@ -280,14 +280,14 @@ func downloadArgoCD(osPlatform string) error {
 	return nil
 }
 
-func installCAPI(coreProviderVersion string, infrastructureProviders, bootstrapProviders []string) error {
+func installCAPI(coreProviderVersion string, infrastructureProviders, bootstrapProviders []string, noConfirm bool) error {
 	var providerNames []string
 	for _, provider := range infrastructureProviders {
 		providerName := strings.Split(provider, ":")
 		providerNames = append(providerNames, providerName[0])
 	}
 	for _, name := range providerNames {
-		installer, err := install.NewInstallerService(name)
+		installer, err := install.NewInstallerService(name, noConfirm)
 		if err != nil {
 			return err
 		}

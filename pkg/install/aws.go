@@ -3,6 +3,7 @@ package install
 import (
 	"flag"
 	"fmt"
+	"github.com/argoproj/argo-cd/v2/util/cli"
 	"os"
 	"sigs.k8s.io/cluster-api-provider-aws/cmd/clusterawsadm/cmd"
 	credentials2 "sigs.k8s.io/cluster-api-provider-aws/cmd/clusterawsadm/credentials"
@@ -20,12 +21,14 @@ const (
 )
 
 type awsInstaller struct {
+	silence bool
 }
 
 func (a *awsInstaller) EnsureRequisites() error {
 	requiredEnvs := []struct {
 		name     string
 		hardFail bool
+		msg      string
 	}{
 		{
 			name:     envRegion,
@@ -42,6 +45,7 @@ func (a *awsInstaller) EnsureRequisites() error {
 		{
 			name:     envSessionToken,
 			hardFail: false,
+			msg:      fmt.Sprintf("%s environment variable not set. MFA enabled accounts will not work.", envSessionToken),
 		},
 		{
 			name:     envSSHKeyName,
@@ -64,7 +68,12 @@ func (a *awsInstaller) EnsureRequisites() error {
 					Message:  fmt.Sprintf("%s environment variable not set", env.name),
 				}
 			}
-			fmt.Printf("%s environment variable not set\n", env.name)
+			if !a.recoverOnFail(env.msg) {
+				return &ErrBootstrap{
+					HardFail: true,
+					Message:  fmt.Sprintf("%s environment variable not set", env.name),
+				}
+			}
 		}
 	}
 	return nil
@@ -72,16 +81,23 @@ func (a *awsInstaller) EnsureRequisites() error {
 
 func (a *awsInstaller) Bootstrap() error {
 	ogArgs := os.Args
+	defer func() {
+		os.Args = ogArgs
+	}()
 	os.Args = []string{"clusterawsadm", "bootstrap", "iam", "create-cloudformation-stack"}
 	if err := flag.CommandLine.Parse([]string{}); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		fmt.Fprintln(os.Stderr, "")
+		_, _ = fmt.Fprintln(os.Stderr, err)
+		_, _ = fmt.Fprintln(os.Stderr, "")
 		return err
 	}
 	rootCmd := cmd.RootCmd()
 	rootCmd.SilenceUsage = true
-	_ = rootCmd.Execute()
-	os.Args = ogArgs
+	err := rootCmd.Execute()
+	if err != nil {
+		if !a.recoverOnFail("Error when creating cloud-formation-stack and IAM roles. This may be caused by pre-existing IAM roles and may result in a working installation.") {
+			return err
+		}
+	}
 	region := os.Getenv(envRegion)
 	awsCreds, err := credentials2.NewAWSCredentialFromDefaultChain(region)
 	if err != nil {
@@ -95,4 +111,12 @@ func (a *awsInstaller) Bootstrap() error {
 		return err
 	}
 	return nil
+}
+
+func (a *awsInstaller) recoverOnFail(message string) bool {
+	if !a.silence {
+		m := fmt.Sprintf("%s. Continue?[y/n]", message)
+		return cli.AskToProceed(m)
+	}
+	return true
 }

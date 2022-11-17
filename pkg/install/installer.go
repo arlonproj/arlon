@@ -5,6 +5,7 @@ import "errors"
 type InstallerService interface {
 	EnsureRequisites() error
 	Bootstrap() error
+	recoverOnFail(message string) bool
 }
 
 type ErrBootstrap struct {
@@ -16,10 +17,10 @@ func (e *ErrBootstrap) Error() string {
 	return e.Message
 }
 
-func NewInstallerService(provider string) (InstallerService, error) {
+func NewInstallerService(provider string, silence bool) (InstallerService, error) {
 	switch provider {
 	case "aws":
-		return &awsInstaller{}, nil
+		return &awsInstaller{silence: silence}, nil
 	case "docker":
 		return &dockerInstaller{}, nil
 	default:
