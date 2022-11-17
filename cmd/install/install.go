@@ -3,14 +3,14 @@ package install
 import (
 	"errors"
 	"fmt"
-	"github.com/argoproj/argo-cd/v2/util/cli"
-	"github.com/arlonproj/arlon/pkg/install"
 	"os/exec"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/argoproj/argo-cd/v2/util/cli"
+	"github.com/arlonproj/arlon/pkg/install"
 	"github.com/arlonproj/arlon/pkg/log"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
