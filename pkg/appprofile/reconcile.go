@@ -256,7 +256,7 @@ func ReconcileEverything(
 			continue // no update needed
 		}
 		// Update applicationset's generator with new element list
-		var newElems []apiextensionsv1.JSON
+		newElems := []apiextensionsv1.JSON{}
 		for clustName := range afterClusters.Iter() {
 			jsonStr := fmt.Sprintf(`{"cluster":"%s", "url":"%s"}`,
 				clustName, clustNameToUrl[clustName])
@@ -284,6 +284,9 @@ func updateProfileToClustersMap(
 	}
 	profiles := strings.Split(commaSeparatedProfileNames, ",")
 	for _, profile := range profiles {
+		if profileToClusters[profile] == nil {
+			profileToClusters[profile] = sets.NewSet[string]()
+		}
 		profileToClusters[profile].Add(clustName)
 	}
 }

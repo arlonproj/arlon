@@ -52,10 +52,7 @@ type ApplicationReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.13.0/pkg/reconcile
 func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	logger := log.FromContext(ctx).WithValues("appprofile", req.NamespacedName)
-
-	// TODO(user): your logic here
-
+	logger := log.FromContext(ctx)
 	return reconcileApplication(ctx, r.Client, r.ArgocdClient, req, logger)
 }
 
@@ -73,7 +70,6 @@ func reconcileApplication(
 	req ctrl.Request,
 	log logr.Logger,
 ) (ctrl.Result, error) {
-	log.Info("reconciling application (possible arlon cluster)")
 	var app argoapp.Application
 
 	if err := cli.Get(ctx, req.NamespacedName, &app); err != nil {
@@ -90,5 +86,6 @@ func reconcileApplication(
 		log.V(1).Info("application is not an arlon cluster, skipping...")
 		return ctrl.Result{}, nil
 	}
+	log.Info("reconciling application implementing arlon cluster")
 	return appprofile.ReconcileEverything(ctx, cli, argocli, log)
 }
