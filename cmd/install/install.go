@@ -5,16 +5,19 @@ import (
 	"fmt"
 	"os/exec"
 	"runtime"
-	"sigs.k8s.io/cluster-api/cmd/clusterctl/client/config"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/argoproj/argo-cd/v2/util/cli"
+	"github.com/arlonproj/arlon/pkg/install"
 	"github.com/arlonproj/arlon/pkg/log"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	clusterctlv1 "sigs.k8s.io/cluster-api/cmd/clusterctl/api/v1alpha3"
 	"sigs.k8s.io/cluster-api/cmd/clusterctl/client"
 	"sigs.k8s.io/cluster-api/cmd/clusterctl/client/cluster"
+	"sigs.k8s.io/cluster-api/cmd/clusterctl/client/config"
 )
 
 const (
@@ -22,6 +25,7 @@ const (
 	defaultArgocdPath  = "/usr/local/bin/argocd"
 )
 
+// by default, we install aws and docker. We also have --infrastructure flag to take user input
 var (
 	ErrKubectlPresent  = errors.New("kubectl is already present at default(/usr/local/bin/kubectl) location or user specifed location")
 	ErrGitPresent      = errors.New("git is already installed")
@@ -44,6 +48,7 @@ func NewCommand() *cobra.Command {
 	var (
 		toolsOnly bool
 		capiOnly  bool
+		noConfirm bool
 	)
 	command := &cobra.Command{
 		Use:               "install",
@@ -70,7 +75,7 @@ func NewCommand() *cobra.Command {
 			fmt.Println()
 			if isCapiOnly {
 				fmt.Printf("Attempting to install %s with infrastructure providers %v and bootstrap providers %v\n", capiCoreProvider, infraProviders, bootstrapProviders)
-				if err := installCAPI(capiCoreProvider, infraProviders, bootstrapProviders); err != nil {
+				if err := installCAPI(capiCoreProvider, infraProviders, bootstrapProviders, noConfirm); err != nil {
 					return err
 				}
 				fmt.Printf("%s CAPI is installed...\n", Green("✓"))
@@ -78,10 +83,11 @@ func NewCommand() *cobra.Command {
 			return nil
 		},
 	}
+	command.Flags().BoolVarP(&noConfirm, "no-confirm", "y", false, "this flag disables prompts, all prompts are assumed to be answered as \"yes\"")
 	command.Flags().StringVar(&kubectlPath, "kubectlPath", defaultKubectlPath, "kubectl download location")
 	command.Flags().StringVar(&argocdPath, "argocdPath", defaultArgocdPath, "argocd download location")
 	command.Flags().StringVar(&kubeconfigPath, "kubeconfigPath", "", "kubeconfig path for the management cluster")
-	command.Flags().StringSliceVar(&infraProviders, "infrastructure", nil, "comma separated list of infrastructure provider components to install alongside CAPI")
+	command.Flags().StringSliceVar(&infraProviders, "infrastructure", []string{"aws", "docker"}, "comma separated list of infrastructure provider components to install alongside CAPI")
 	command.Flags().StringSliceVar(&bootstrapProviders, "bootstrap", nil, "bootstrap provider components to add to the management cluster")
 	command.Flags().BoolVarP(&toolsOnly, "tools-only", "t", false, "set this flag to install only CLI tools")
 	command.Flags().BoolVarP(&capiOnly, "capi-only", "c", false, "set this flag to install only CAPI on the management cluster")
@@ -274,7 +280,48 @@ func downloadArgoCD(osPlatform string) error {
 	return nil
 }
 
-func installCAPI(coreProviderVersion string, infrastructureProviders, bootstrapProviders []string) error {
+func installCAPI(coreProviderVersion string, infrastructureProviders, bootstrapProviders []string, noConfirm bool) error {
+	var providerNames []string
+	for _, provider := range infrastructureProviders {
+		providerName := strings.Split(provider, ":")
+		providerNames = append(providerNames, providerName[0])
+	}
+	for _, name := range providerNames {
+		installer, err := install.NewInstallerService(name, noConfirm)
+		if err != nil {
+			return err
+		}
+		if err := installer.EnsureRequisites(); err != nil {
+			var errBootstrap *install.ErrBootstrap
+			if errors.As(err, &errBootstrap) {
+				if errBootstrap.HardFail {
+					return errBootstrap
+				}
+				if !errBootstrap.HardFail {
+					if !cli.AskToProceed(fmt.Sprintf("%s failed to perform bootstrap steps for %s\n. Continue(CAPI provider may not succeed)?[y/n]", Yellow("Warning"), name)) {
+						return errBootstrap
+					}
+				}
+			} else {
+				return err
+			}
+		}
+		if err := installer.Bootstrap(); err != nil {
+			var errBootstrap *install.ErrBootstrap
+			if errors.As(err, &errBootstrap) {
+				if errBootstrap.HardFail {
+					return errBootstrap
+				}
+				if !errBootstrap.HardFail {
+					if !cli.AskToProceed(fmt.Sprintf("%s failed to perform bootstrap steps for %s\n. Continue(CAPI provider may not succeed)?[y/n]", Yellow("Warning"), name)) {
+						return errBootstrap
+					}
+					continue
+				}
+			}
+			return err
+		}
+	}
 	c, err := client.New("")
 	if err != nil {
 		return err

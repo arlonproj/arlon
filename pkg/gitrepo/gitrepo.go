@@ -34,7 +34,7 @@ var (
 	ErrOverwriteCfg = errors.New("cannot overwrite config file")
 )
 
-func getRepoCfgPath() (string, error) {
+func GetRepoCfgPath() (string, error) {
 	argoDir, err := localconfig.DefaultConfigDir()
 	if err != nil {
 		return "", err
@@ -117,7 +117,7 @@ func GetRepoUrl(repoAlias string) (string, error) {
 }
 
 func ReadDefaultConfig() (*os.File, error) {
-	cfgFile, err := getRepoCfgPath()
+	cfgFile, err := GetRepoCfgPath()
 	if err != nil {
 		return nil, err
 	}
