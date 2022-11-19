@@ -60,7 +60,7 @@ const (
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.10.0/pkg/reconcile
 func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := log.FromContext(ctx).WithValues("callhomeconfig", req.NamespacedName)
+	log := log.FromContext(ctx)
 	log.V(1).Info("arlon callhomeconfig")
 	var chc arlonv1.CallHomeConfig
 

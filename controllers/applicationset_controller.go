@@ -52,7 +52,7 @@ type ApplicationSetReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.13.0/pkg/reconcile
 func (r *ApplicationSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	logger := log.FromContext(ctx).WithValues("appprofile", req.NamespacedName)
+	logger := log.FromContext(ctx)
 
 	// TODO(user): your logic here
 
