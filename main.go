@@ -18,9 +18,8 @@ package main
 
 import (
 	"flag"
+	"go.uber.org/zap/zapcore"
 	"os"
-
-	"github.com/spf13/cobra"
 
 	"github.com/arlonproj/arlon/cmd/app"
 	"github.com/arlonproj/arlon/cmd/appprofilecontroller"
@@ -37,6 +36,7 @@ import (
 	"github.com/arlonproj/arlon/cmd/profile"
 	"github.com/arlonproj/arlon/cmd/verify"
 	"github.com/arlonproj/arlon/cmd/webhook"
+	"github.com/spf13/cobra"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -77,6 +77,7 @@ func main() {
 
 	opts := zap.Options{
 		Development: true,
+		TimeEncoder: zapcore.RFC3339NanoTimeEncoder,
 	}
 	opts.BindFlags(flag.CommandLine)
 	// override default log level, which is initially set to 'debug'
