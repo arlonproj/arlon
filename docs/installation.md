@@ -6,7 +6,7 @@ It is required to point the CLI to a management cluster and set up the Arlon con
 
 For a quickstart minimal demonstration setup, follow the instructions to set up a KIND based testbed with Arlon and ArgoCD running  [here](https://github.com/arlonproj/arlon/blob/main/testing/README.md).
 
-Please follow the manual instructions in this section for a customised setup.
+Please follow the manual instructions in [this](#customised-setup) section for a customised setup or refer the instructions for automated installation [here](#automatic-setup).
 
 # Customised Setup
 ## Management cluster
