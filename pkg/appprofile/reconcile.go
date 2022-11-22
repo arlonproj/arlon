@@ -66,14 +66,15 @@ func ReconcileEverything(
 	defer conn.Close()
 	argoClusters, err := clApi.List(ctx, &clusterpkg.ClusterQuery{})
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("failed to list argocd clusters client: %s", err)
+		return ctrl.Result{}, fmt.Errorf("failed to list argocd clusters: %s", err)
 	}
 
 	// Get arlon clusters (argocd applications)
-	conn, appApi, err := argocli.NewApplicationClient()
+	conn2, appApi, err := argocli.NewApplicationClient()
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("failed to get argocd clusters client: %s", err)
+		return ctrl.Result{}, fmt.Errorf("failed to get argocd application client: %s", err)
 	}
+	defer conn2.Close()
 	query := arlonclusters.ArlonGen2ClusterLabelQueryOnArgoApps
 	arlonClusters, err := appApi.List(ctx, &argoapp.ApplicationQuery{Selector: &query})
 	if err != nil {
