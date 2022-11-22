@@ -4,11 +4,11 @@
 Arlon CLI downloads are provided on GitHub. The CLI is not a self-contained standalone executable though. 
 It is required to point the CLI to a management cluster and set up the Arlon controller in this management cluster.
 
-We plan to add a command line script to simplify initial setup. 
-For a quickstart minimal demonstration setup, follow the instructions to set up a KIND based testbed with Arlon and ArgoCD running  [here](https://github.com/arlonproj/arlon/blob/main/testing/README.md)
+For a quickstart minimal demonstration setup, follow the instructions to set up a KIND based testbed with Arlon and ArgoCD running  [here](https://github.com/arlonproj/arlon/blob/main/testing/README.md).
 
-Please follow the manual instructions in this section for a customised setup.
+Please follow the manual instructions in [this](#customised-setup) section for a customised setup or refer the instructions for automated installation [here](#automatic-setup).
 
+# Customised Setup
 ## Management cluster
 
 You can use any Kubernetes cluster that you have admin access to. Ensure:
@@ -109,3 +109,21 @@ cluster can noticeably slow down kubectl, and you may see a warning that looks l
 ```
 I0222 17:31:14.112689   27922 request.go:668] Waited for 1.046146023s due to client-side throttling, not priority and fairness, request: GET:https://AA61XXXXXXXXXXX.gr7.us-west-2.eks.amazonaws.com/apis/servicediscovery.aws.crossplane.io/v1alpha1?timeout=32s
 ``` 
+
+
+# Automatic Setup
+Arlon CLI provides an `init` command to install "itself" on a management cluster.
+This command performs a basic setup of `argocd`(if needed) and `arlon` controller.
+If `argocd` is already installed, it assumes that `admin` password is the same as 
+in `argocd-initial-admin-secret` ConfigMap and that `argocd` resides in the `argocd` namespace.
+Similar assumptions are made for detecting Arlon installation as well: assuming that 
+the existence of `arlon` namespace means Arlon controller exists.
+To install Arlon controller using the init command these pre-requisites need to be met:
+- A valid kubeconfig pointing to the management cluster.
+- A hosted Git repository with at least a `README` file present.
+- Pre-requisites for supported CAPI infrastructure providers(AWS and Docker as of now).
+
+To start the installation process, simply run `arlon init -e --username <GIT_USER> --repoURL <WORKSPACE_URL> --password <GIT_PASSWORD> --examples -y`.
+This installs the controller, argocd(if not already present) `-e` flag adds basecluster manifests to the <WORKSPACE_URL> for 
+using the given credentials. To not add examples, just remove the `-e` flag. `-y` flag refers to silent installation, which is 
+useful for scripts. For an interactive installation, exclude the `-y` or `--no-confirm` flag.
