@@ -58,7 +58,7 @@ if [ -z "${AWS_NODE_MACHINE_TYPE}" ]; then
 fi
 
 if [ -z "${AWS_SSH_KEY_NAME}" ]; then
-  echo "Set the AWS_NODE_MACHINE_TYPE env variable"
+  echo "Set the AWS_SSH_KEY_NAME env variable"
   exit
 fi
 
