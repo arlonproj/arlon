@@ -10,7 +10,7 @@ typically contains multiple related resources that together define an arbitraril
 If you make subsequent changes to the base cluster, workload clusters originally created from it
 will automatically acquire the changes.
 
-### Creating a capi cluster manifest
+### Creating Cluster-API cluster manifest
 #### MachineDeployment
 
 Here is an example of a manifest file that we can use to create a *base cluster*. This manifest file helps in
