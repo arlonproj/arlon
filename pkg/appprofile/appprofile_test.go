@@ -402,6 +402,25 @@ func TestAppProfileReconcileEverything(t *testing.T) {
 	assert.True(t, arlonAppTargetsTheseClusters(t, "autocad", []string{"arlon-cluster-3"}))
 	assert.True(t, arlonAppTargetsTheseClusters(t, "teamcity", []string{"arlon-cluster-3"}))
 
+	// annotate external cluster
+	annotateArgoCluster(t, "external-cluster", "engineering,qa,marketing")
+	reconcile(t, mcr, mac, log)
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-1", []string{}))
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-1", []string{}))
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-2", []string{}))
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-3", []string{"engineering"}))
+	assert.True(t, argoClusterHasProfiles(t, "external-cluster", []string{"marketing", "qa", "engineering"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "wordpress", []string{"external-cluster"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "mysql", []string{"external-cluster"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "autocad", []string{"external-cluster", "arlon-cluster-3"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "teamcity", []string{"external-cluster", "arlon-cluster-3"}))
+
+	// remove all apps, ensure invalidAppNames correctly updated
+	gApplicationSetList.Items = nil
+	reconcile(t, mcr, mac, log)
+	ensureProfileInvalidApps(t, "marketing", []string{"wordpress", "nonexistent-1", "mysql"})
+	ensureProfileInvalidApps(t, "engineering", []string{"autocad", "teamcity"})
+	ensureProfileInvalidApps(t, "qa", []string{"mysql", "teamcity"})
 	dumpProfiles(t)
 	dumpClusters(t)
 	dumpApplicationSets(t)
@@ -462,6 +481,17 @@ func annotateArlonCluster(t *testing.T, clustName string, commaSeparatedProfiles
 	t.Errorf("failed to find arlon cluster with name %s", clustName)
 }
 
+func annotateArgoCluster(t *testing.T, clustName string, commaSeparatedProfiles string) {
+	for i, clust := range gClusterList.Items {
+		if clust.Name == clustName {
+			gClusterList.Items[i].Annotations = make(map[string]string)
+			gClusterList.Items[i].Annotations[arlonapp.ProfilesAnnotationKey] = commaSeparatedProfiles
+			return
+		}
+	}
+	t.Errorf("failed to find argo cluster with name %s", clustName)
+}
+
 func stringSetsEqual(s1 []string, s2 []string) bool {
 	set1 := sets.NewSet[string](s1...)
 	set2 := sets.NewSet[string](s2...)
@@ -490,4 +520,22 @@ func arlonAppTargetsTheseClusters(t *testing.T, appName string, clustNames []str
 	}
 	t.Fatalf("failed to find arlon app with name %s", appName)
 	return false
+}
+
+func ensureProfileInvalidApps(t *testing.T, profName string, desiredInvApps []string) {
+	desiredSet := sets.NewSet[string](desiredInvApps...)
+	actualSet := sets.NewSet[string]()
+	for _, prof := range gProfileList.Items {
+		if prof.Name == profName {
+			for _, invAppName := range prof.Status.InvalidAppNames {
+				actualSet.Add(invAppName)
+			}
+			assert.True(t, desiredSet.Equal(actualSet))
+			expectedHealth := "healthy"
+			if len(prof.Status.InvalidAppNames) > 0 {
+				expectedHealth = "degraded"
+			}
+			assert.Equal(t, prof.Status.Health, expectedHealth, "unexpected health status")
+		}
+	}
 }
