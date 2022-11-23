@@ -107,7 +107,7 @@ nameReference:
     kind: MachinePool
 - kind: AWSMachinePool
   group: infrastructure.cluster.x-k8s.io
-  version: v1beta1
+  version: v1beta2
   fieldSpecs:
   - path: spec/template/spec/infrastructureRef/name
     kind: MachinePool
