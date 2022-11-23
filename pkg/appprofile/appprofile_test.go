@@ -9,7 +9,9 @@ import (
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
+	arlonapp "github.com/arlonproj/arlon/pkg/app"
 	sets "github.com/deckarep/golang-set/v2"
+	"github.com/go-logr/logr"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
@@ -17,6 +19,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"strings"
 	"testing"
 )
 
@@ -56,24 +59,40 @@ var (
 )
 
 func init() {
+	// ArgoCD clusters
 	gClusterList = &v1alpha1.ClusterList{
 		Items: []v1alpha1.Cluster{
 			{
-				Name:   "cluster-1",
-				Server: "cluster-1.local",
+				Name:   "arlon-cluster-1",
+				Server: "arlon-cluster-1.local",
 			},
 			{
-				Name:   "cluster-2",
-				Server: "cluster-2.local",
+				Name:   "external-cluster",
+				Server: "external-cluster.local",
+			},
+			{
+				Name:   "arlon-cluster-2",
+				Server: "arlon-cluster-2.local",
+				Annotations: map[string]string{
+					"arlon.io/profiles": "marketing,qa",
+				},
+			},
+			{
+				Name:   "arlon-cluster-3",
+				Server: "arlon-cluster-3.local",
+				Annotations: map[string]string{
+					"arlon.io/profiles": "engineering,marketing",
+				},
 			},
 		},
 	}
 
+	// applications representing Arlon clusters
 	gApplicationList = &v1alpha1.ApplicationList{
 		Items: []v1alpha1.Application{
 			{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: "clust-2",
+					Name: "arlon-cluster-2",
 					Labels: map[string]string{
 						"arlon-type": "cluster-app",
 						"managed-by": "arlon",
@@ -82,7 +101,16 @@ func init() {
 			},
 			{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: "clust-1",
+					Name: "arlon-cluster-1",
+					Labels: map[string]string{
+						"arlon-type": "cluster-app",
+						"managed-by": "arlon",
+					},
+				},
+			},
+			{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "arlon-cluster-3",
 					Labels: map[string]string{
 						"arlon-type": "cluster-app",
 						"managed-by": "arlon",
@@ -92,6 +120,7 @@ func init() {
 		},
 	}
 
+	// ApplicationSets representing Arlon apps
 	gApplicationSetList = &appset.ApplicationSetList{
 		Items: []appset.ApplicationSet{
 			{
@@ -157,6 +186,7 @@ func init() {
 		},
 	}
 
+	// Arlon App Profiles
 	gProfileList = &arlonv1.AppProfileList{
 		Items: []arlonv1.AppProfile{
 			{
@@ -205,6 +235,17 @@ func (mcsc *mockClusterSvcClient) List(ctx context.Context,
 	return gClusterList, nil
 }
 
+func (mcsc *mockClusterSvcClient) Update(ctx context.Context,
+	in *clusterpkg.ClusterUpdateRequest,
+	opts ...grpc.CallOption) (*v1alpha1.Cluster, error) {
+	clust := lookupArgoCluster(in.Cluster.Name)
+	if clust == nil {
+		return nil, fmt.Errorf("cluster not found")
+	}
+	*clust = *in.Cluster
+	return nil, nil
+}
+
 func (masc *mockApplicationSvcClient) List(ctx context.Context,
 	in *applicationpkg.ApplicationQuery,
 	opts ...grpc.CallOption) (*v1alpha1.ApplicationList, error) {
@@ -228,6 +269,20 @@ func (mcrc *mockCtrlRuntClient) List(ctx context.Context,
 
 type mockStatusWriter struct {
 	client.StatusWriter
+}
+
+func (mcrc *mockCtrlRuntClient) Update(ctx context.Context,
+	obj client.Object, opts ...client.UpdateOption) error {
+	pAppSet, ok := obj.(*appset.ApplicationSet)
+	if !ok {
+		return fmt.Errorf("can't update any object type other than ApplicationSet")
+	}
+	pCurrent := lookupApplicationSet(pAppSet.Name)
+	if pCurrent == nil {
+		return fmt.Errorf("no application set with name %s", pAppSet.Name)
+	}
+	*pCurrent = *pAppSet
+	return nil
 }
 
 func (mcrc *mockCtrlRuntClient) Status() client.StatusWriter {
@@ -256,29 +311,100 @@ func lookupProfile(name string) *arlonv1.AppProfile {
 	return nil
 }
 
+func lookupArgoCluster(name string) *v1alpha1.Cluster {
+	for i, clust := range gClusterList.Items {
+		if clust.Name == name {
+			return &gClusterList.Items[i]
+		}
+	}
+	return nil
+}
+
+func lookupApplicationSet(name string) *appset.ApplicationSet {
+	for i, aps := range gApplicationSetList.Items {
+		if aps.Name == name {
+			return &gApplicationSetList.Items[i]
+		}
+	}
+	return nil
+}
+
 func TestAppProfileReconcileEverything(t *testing.T) {
-	logr := zap.New(zap.UseFlagOptions(&zap.Options{
+	log := zap.New(zap.UseFlagOptions(&zap.Options{
 		Development: true,
 		TimeEncoder: zapcore.RFC3339NanoTimeEncoder,
 	}))
 	var mcr *mockCtrlRuntClient
 	var mac *mockArgoClient
-	_, err := ReconcileEverything(nil, mcr, mac, logr)
-	if err != nil {
-		t.Errorf("reconcile error: %s", err)
-	}
+
+	reconcile(t, mcr, mac, log)
 	assert.Equal(t, gProfileList.Items[0].Status.Health, "degraded")
 	assert.True(t, stringSetsEqual(gProfileList.Items[0].Status.InvalidAppNames, []string{"nonexistent-1"}))
 	assert.Equal(t, gProfileList.Items[1].Status.Health, "degraded")
 	assert.True(t, stringSetsEqual(gProfileList.Items[1].Status.InvalidAppNames, []string{"nonexistent-1", "nonexistent-2"}))
 	assert.Equal(t, gProfileList.Items[2].Status.Health, "healthy")
+	// annotation was removed from clusters 2 and 3 because corresponding
+	// arlon cluster had none
+	assert.True(t, argoClusterHasProfiles(2, nil))
+	assert.True(t, argoClusterHasProfiles(3, nil))
+
+	// annotate arlon cluster 1
+	annotateArlonCluster(t, "arlon-cluster-1", "foo,marketing")
+	reconcile(t, mcr, mac, log)
+	assert.True(t, argoClusterHasProfiles(0, []string{"marketing", "foo"}))
+
 	dumpProfiles(t)
+	dumpClusters(t)
+	dumpApplicationSets(t)
+}
+
+func reconcile(t *testing.T, mcr *mockCtrlRuntClient, mac *mockArgoClient, log logr.Logger) {
+	_, err := ReconcileEverything(nil, mcr, mac, log)
+	if err != nil {
+		t.Fatalf("reconcile error: %s", err)
+	}
 }
 
 func dumpProfiles(t *testing.T) {
 	for _, prof := range gProfileList.Items {
 		t.Log("profile:", prof)
 	}
+}
+
+func dumpClusters(t *testing.T) {
+	for _, cluster := range gClusterList.Items {
+		t.Log("cluster:", cluster)
+	}
+}
+
+func dumpApplicationSets(t *testing.T) {
+	for _, a := range gApplicationSetList.Items {
+		t.Log("applicationset:", a)
+	}
+}
+
+func argoClusterHasProfiles(clustIdx int, profiles []string) bool {
+	specifiedSet := sets.NewSet[string](profiles...)
+	actualSet := sets.NewSet[string]()
+	ann := gClusterList.Items[clustIdx].Annotations
+	if ann != nil && ann[arlonapp.ProfilesAnnotationKey] != "" {
+		profNames := strings.Split(ann[arlonapp.ProfilesAnnotationKey], ",")
+		for _, profName := range profNames {
+			actualSet.Add(profName)
+		}
+	}
+	return actualSet.Equal(specifiedSet)
+}
+
+func annotateArlonCluster(t *testing.T, clustName string, commaSeparatedProfiles string) {
+	for i, clust := range gApplicationList.Items {
+		if clust.Name == clustName {
+			gApplicationList.Items[i].Annotations = make(map[string]string)
+			gApplicationList.Items[i].Annotations[arlonapp.ProfilesAnnotationKey] = commaSeparatedProfiles
+			return
+		}
+	}
+	t.Errorf("failed to find arlon cluster with name %s", clustName)
 }
 
 func stringSetsEqual(s1 []string, s2 []string) bool {
