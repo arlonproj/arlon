@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc"
 	"io"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/json"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"strings"
@@ -155,7 +156,7 @@ func init() {
 			},
 			{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: "petclinic",
+					Name: "autocad",
 					Labels: map[string]string{
 						"arlon-type": "application",
 					},
@@ -209,7 +210,7 @@ func init() {
 					AppNames: []string{
 						"mysql",
 						"nonexistent-2",
-						"petclinic",
+						"autocad",
 						"nonexistent-1",
 					},
 				},
@@ -345,13 +346,61 @@ func TestAppProfileReconcileEverything(t *testing.T) {
 	assert.Equal(t, gProfileList.Items[2].Status.Health, "healthy")
 	// annotation was removed from clusters 2 and 3 because corresponding
 	// arlon cluster had none
-	assert.True(t, argoClusterHasProfiles(2, nil))
-	assert.True(t, argoClusterHasProfiles(3, nil))
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-2", nil))
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-3", nil))
 
 	// annotate arlon cluster 1
 	annotateArlonCluster(t, "arlon-cluster-1", "foo,marketing")
 	reconcile(t, mcr, mac, log)
-	assert.True(t, argoClusterHasProfiles(0, []string{"marketing", "foo"}))
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-1", []string{"marketing", "foo"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "wordpress", []string{"arlon-cluster-1"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "mysql", []string{"arlon-cluster-1"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "autocad", []string{}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "teamcity", []string{}))
+
+	// add engineering to arlon cluster 1, qa to arlon cluster 2
+	annotateArlonCluster(t, "arlon-cluster-1", "marketing,foo,engineering")
+	annotateArlonCluster(t, "arlon-cluster-2", "qa")
+	reconcile(t, mcr, mac, log)
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-1", []string{"engineering", "marketing", "foo"}))
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-2", []string{"qa"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "wordpress", []string{"arlon-cluster-1"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "mysql", []string{"arlon-cluster-2", "arlon-cluster-1"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "autocad", []string{"arlon-cluster-1"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "teamcity", []string{"arlon-cluster-2"}))
+
+	// add teamcity to engineering and remove mysql from it
+	gProfileList.Items[1].Spec.AppNames = []string{"teamcity", "autocad"}
+	reconcile(t, mcr, mac, log)
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-1", []string{"engineering", "marketing", "foo"}))
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-2", []string{"qa"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "wordpress", []string{"arlon-cluster-1"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "mysql", []string{"arlon-cluster-2", "arlon-cluster-1"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "autocad", []string{"arlon-cluster-1"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "teamcity", []string{"arlon-cluster-2", "arlon-cluster-1"}))
+
+	// remove all profiles from cluster 1, and attach engineering to cluster 3
+	annotateArlonCluster(t, "arlon-cluster-1", "")
+	annotateArlonCluster(t, "arlon-cluster-3", "engineering")
+	reconcile(t, mcr, mac, log)
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-1", []string{}))
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-2", []string{"qa"}))
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-3", []string{"engineering"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "wordpress", []string{}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "mysql", []string{"arlon-cluster-2"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "autocad", []string{"arlon-cluster-3"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "teamcity", []string{"arlon-cluster-2", "arlon-cluster-3"}))
+
+	// remove all profiles from cluster 2
+	annotateArlonCluster(t, "arlon-cluster-2", "")
+	reconcile(t, mcr, mac, log)
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-1", []string{}))
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-2", []string{}))
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-3", []string{"engineering"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "wordpress", []string{}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "mysql", []string{}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "autocad", []string{"arlon-cluster-3"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "teamcity", []string{"arlon-cluster-3"}))
 
 	dumpProfiles(t)
 	dumpClusters(t)
@@ -383,17 +432,23 @@ func dumpApplicationSets(t *testing.T) {
 	}
 }
 
-func argoClusterHasProfiles(clustIdx int, profiles []string) bool {
+func argoClusterHasProfiles(t *testing.T, clustName string, profiles []string) bool {
 	specifiedSet := sets.NewSet[string](profiles...)
 	actualSet := sets.NewSet[string]()
-	ann := gClusterList.Items[clustIdx].Annotations
-	if ann != nil && ann[arlonapp.ProfilesAnnotationKey] != "" {
-		profNames := strings.Split(ann[arlonapp.ProfilesAnnotationKey], ",")
-		for _, profName := range profNames {
-			actualSet.Add(profName)
+	for i, clust := range gClusterList.Items {
+		if clust.Name == clustName {
+			ann := gClusterList.Items[i].Annotations
+			if ann != nil && ann[arlonapp.ProfilesAnnotationKey] != "" {
+				profNames := strings.Split(ann[arlonapp.ProfilesAnnotationKey], ",")
+				for _, profName := range profNames {
+					actualSet.Add(profName)
+				}
+			}
+			return actualSet.Equal(specifiedSet)
 		}
 	}
-	return actualSet.Equal(specifiedSet)
+	t.Errorf("failed to find argocd cluster with name %s", clustName)
+	return false
 }
 
 func annotateArlonCluster(t *testing.T, clustName string, commaSeparatedProfiles string) {
@@ -411,4 +466,28 @@ func stringSetsEqual(s1 []string, s2 []string) bool {
 	set1 := sets.NewSet[string](s1...)
 	set2 := sets.NewSet[string](s2...)
 	return set1.Equal(set2)
+}
+
+func arlonAppTargetsTheseClusters(t *testing.T, appName string, clustNames []string) bool {
+	desiredClustNames := sets.NewSet[string](clustNames...)
+	for _, app := range gApplicationSetList.Items {
+		if app.Name == appName {
+			actualClustNames := sets.NewSet[string]()
+			for _, elem := range app.Spec.Generators[0].List.Elements {
+				var element map[string]interface{}
+				if err := json.Unmarshal(elem.Raw, &element); err != nil {
+					t.Fatalf("failed to unmarshal json: %s", err)
+				}
+				val, ok := element["cluster"]
+				if !ok {
+					t.Fatalf("applicationset %s has an element with no cluster key", appName)
+				}
+				clustName := val.(string)
+				actualClustNames.Add(clustName)
+			}
+			return desiredClustNames.Equal(actualClustNames)
+		}
+	}
+	t.Fatalf("failed to find arlon app with name %s", appName)
+	return false
 }
