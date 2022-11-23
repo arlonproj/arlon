@@ -1,6 +1,6 @@
 apiVersion: kuttl.dev/v1beta1
 kind: TestAssert
-timeout: 1800
+timeout: 3600
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster
