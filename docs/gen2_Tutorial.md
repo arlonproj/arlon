@@ -11,6 +11,10 @@ If you make subsequent changes to the base cluster, workload clusters originally
 will automatically acquire the changes.
 
 ### Creating Cluster-API cluster manifest
+
+Note: The CAPA version used here is v2.0 and the manifests created here are in accordance with this version. Do make sure that you use CAPA v2.0+ for cluster manifest generation using clusterctl.
+
+The compatibility matrix for Cluster API provider and CAPA versions [here] (<https://github.com/kubernetes-sigs/cluster-api-provider-aws#compatibility-with-cluster-api-and-kubernetes-versions>)
 #### MachineDeployment
 
 Here is an example of a manifest file that we can use to create a *base cluster*. This manifest file helps in
