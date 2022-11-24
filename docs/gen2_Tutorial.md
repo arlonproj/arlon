@@ -205,7 +205,7 @@ Before a manifest directory can be used as a base cluster, it must first be "pre
 by Arlon. The "prep" phase makes minor changes to the directory and manifest to help Arlon deploy
 multiple copies of the cluster without naming conflicts.
 
-#### Manifest directory preparation:
+#### manifest directory preparation
 To prepare a git directory to serve as base cluster, use the `basecluster preparegit` command:
 
 ```shell
@@ -218,7 +218,7 @@ arlon basecluster preparegit --repo-path <pathToDirectory> [--repo-revision revi
 arlon basecluster preparegit --repo-alias prod --repo-path <pathToDirectory> [--repo-revision revision]
 ```
 
-#### Manifest directory validation:
+#### manifest directory validation
 Post the successful preparation of the basecluster manifest directory using `basecluster preparegit`, the basecluster manifest directory needs to be validated before the basecluster is created.
 
 To determine if a git directory is eligible to serve as base cluster, run the `basecluster validategit` command:
@@ -232,7 +232,7 @@ arlon basecluster validategit --repo-path <pathToDirectory> [--repo-revision rev
   # using the prod alias
 arlon basecluster validategit --repo-alias prod --repo-path <pathToDirectory> [--repo-revision revision]
 ```
-#### gen2 cluster creation:
+#### gen2 cluster creation
 To create a gen2 workload cluster from the base cluster:
 
 ```shell
