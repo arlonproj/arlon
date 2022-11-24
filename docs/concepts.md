@@ -92,6 +92,7 @@ They currently include:
 - The initial (worker) node count
 - The Kubernetes version
 
-## Baseclusters
+## Base cluster
 
 To know more about basecluster (Arlon gen2 clusters), read it [here](https://github.com/arlonproj/arlon/blob/main/docs/baseclusters.md)
+ 

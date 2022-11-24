@@ -1,4 +1,4 @@
-# Tutorial
+# Tutorial (gen1)
 
 This assumes that you plan to deploy workload clusters on AWS cloud, with
 Cluster API ("CAPI") as the cluster orchestration API provider.
