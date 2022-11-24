@@ -72,9 +72,7 @@ arlon basecluster preparegit --repo-url <repoUrl> --repo-path <pathToDirectory> 
 This pushes a commit to the repo with these changes:
 
 - A `kustomization.yaml` file is added to the directory to make the manifest customizable by Kustomize.
-- A `configurations.yaml` file is added to configure the [namereference](https://github.com/kubernetes-sigs/kustomize/blob/master/examples/transformerconfigs/README.md#name-reference-transformer) 
-Kustomize plugin which ensures `reference` fields are correctly set when pointing to resource names 
-that ArgoCD will modify using the Kustomize [nameprefix](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/nameprefix/)
+- A `configurations.yaml` file is added to configure the [namereference](https://github.com/kubernetes-sigs/kustomize/blob/master/examples/transformerconfigs/README.md#name-reference-transformer) Kustomize plugin which ensures `reference` fields are correctly set when pointing to resource names that ArgoCD will modify using the Kustomize [nameprefix](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/nameprefix/)
 mechanism. The content of the file is sourced from this [Scott Lowe blog article](https://blog.scottlowe.org/2021/10/11/kustomize-transformer-configurations-for-cluster-api-v1beta1/).
 - All `namespace` properties in the cluster manifest are removed to allow Kustomize to override the
 namespace of all resources.
@@ -140,7 +138,7 @@ ClusterRegistration and associated RBAC rules.
 The application spec's ApplicationSource points to the existing Arlon Helm chart
 located here by default:
 
-- Repo: https://github.com/arlonproj/arlon.git
+- Repo: [https://github.com/arlonproj/arlon.git](https://github.com/arlonproj/arlon.git)
 - Revision: private/leb/gen2 (IMPORTANT: NEEDS TO CHANGE TO STABLE BRANCH OR TAG)
 - Path: pkg/cluster/manifests
 

@@ -212,7 +212,7 @@ accepts a git URL and path for this git location. Any git repo can be used (so l
 as it's registered with ArgoCD), but we'll use the workspace cluster for
 convenience:
 
-```
+```shell
 arlon cluster deploy --repo-url ${WORKSPACE_REPO_URL} --cluster-name eks-1 --profile dynamic-1 --cluster-spec capi-eks
             # OR
 # using repository aliases
@@ -221,12 +221,14 @@ arlon cluster deploy --cluster-name eks-1 --profile dynamic-1 --cluster-spec cap
   # using the prod alias
 arlon cluster deploy --repo-alias prod --cluster-name eks-1 --profile dynamic-1 --cluster-spec capi-eks
 ```
+
 The git directory hosting the cluster Helm chart is created as a subdirectory
 of a base path in the repo. The base path can be specified with `--base-path`, but
 we'll leave it unspecified in order to use the default value of `clusters`.
 Consequently, this example produces the directory `clusters/eks-1/` in the repo.
 To verify its presence:
-```
+
+```shell
 $ cd ${WORKSPACE_REPO}
 $ git pull
 $ tree clusters/eks-1
@@ -254,12 +256,14 @@ clusters/eks-1
     │   └── rbac.yaml
     └── values.yaml
 ```
+
 The chart contains several subcharts under `mgmt/charts/`,
 one for each supported type of cluster. Only one of them will be enabled,
 in this case `capi-aws-eks` (Cluster API on AWS with type EKS).
 
 At this point, the cluster is provisioning and can be seen in arlon and AWS EKS:
-```
+
+```shell
 $ arlon cluster list
 NAME       CLUSTERSPEC  PROFILE  
 eks-1      capi-eks     dynamic-1
@@ -332,9 +336,11 @@ dynamic profiles, since this will help understand the relationship between
 profiles and bundles.
 To illustrate how a profile can be updated, we remove `guestbook-static` bundle
 from `dynamic-1` by specifying a new bundle set:
-```
+
+```shell
 arlon profile update dynamic-1 --bundles xenial
 ```
+
 Since the old bundle set was `guestbook-static,xenial-static`, that command resulted
 in the removal of `guestbook-static` from the profile.
 In the UI, observe the `eks-1-profile-dynamic-1` app going through Sync
@@ -412,9 +418,7 @@ changed clusterspec._
 A change in `kubernetesVersion` will result in a cluster upgrade/downgrade.
 There are some restrictions and caveats you need to be aware of:
 
-- The specific Kubernetes version must be supported by the particular 
-  implementation and release of the underlying cluster orchestration API provider,
-  cloud, and cluster type.
+- The specific Kubernetes version must be supported by the particular implementation and release of the underlying cluster orchestration API provider cloud, and cluster type.
 - In general, the control plane will be upgraded first
 - Existing nodes are not typically not upgraded to the new Kubernetes version.
   Only new nodes (added as part of manual `nodeCount` change or autoscaling)

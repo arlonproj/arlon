@@ -1,7 +1,7 @@
 
 # Installation
 
-Arlon CLI downloads are provided on GitHub. The CLI is not a self-contained standalone executable though. 
+Arlon CLI downloads are provided on GitHub. The CLI is not a self-contained standalone executable though.
 It is required to point the CLI to a management cluster and set up the Arlon controller in this management cluster.
 
 For a quickstart minimal demonstration setup, follow the instructions to set up a KIND based testbed with Arlon and ArgoCD running  [here](https://github.com/arlonproj/arlon/blob/main/testing/README.md).
@@ -24,12 +24,12 @@ After this step, you should be logged in as `admin` and a config file was create
 - Create your workspace repository in your git provider if necessary, then register it.
   Example: `argocd repo add https://github.com/myname/arlon_workspace --username myname --password secret`.
    --  Note: type `argocd repo add --help` to see all available options.
-   --  For Arlon developers, this is not your fork of the Arlon source code repository, 
-       but a separate git repo where some artifacts like profiles created by Arlon will be stored. 
+   --  For Arlon developers, this is not your fork of the Arlon source code repository,
+       but a separate git repo where some artifacts like profiles created by Arlon will be stored.
 - Highly recommended: [configure a webhook](https://argo-cd.readthedocs.io/en/stable/operator-manual/webhook/)
   to immediately notify ArgoCD of changes to the repo. This will be especially useful
   during the tutorial. Without a webhook, repo changes may take up to 3 minutes
-  to be detected, delaying cluster configuration updates. 
+  to be detected, delaying cluster configuration updates.
 - [Create a local user](https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/) named `arlon` with the `apiKey` capability.
   This involves editing the `argocd-cm` ConfigMap using `kubectl`.
 - Adjust the RBAC settings to grant admin permissions to the `arlon` user.
@@ -65,15 +65,15 @@ kind: ConfigMap
 ## Arlon CLI
 
 Download the CLI for the [latest release](https://github.com/arlonproj/arlon/releases/latest) from GitHub.
-Currently, Linux and MacOS operating systems are supported. 
-Uncompress the tarball, rename it as `arlon` and add to your PATH 
+Currently, Linux and MacOS operating systems are supported.
+Uncompress the tarball, rename it as `arlon` and add to your PATH
 
-Run `arlon verify` to check for prerequisites. 
-Run `arlon install` to install any missing prerequisites. 
+Run `arlon verify` to check for prerequisites.
+Run `arlon install` to install any missing prerequisites.
 
-The following instructions are to manually build CLI from this code repository. 
+The following instructions are to manually build CLI from this code repository.
 
-### Building the CLI 
+### Building the CLI
 
 - Clone this repository and pull the latest version of a branch (main by default)
 - From the top directory, run `make build`
@@ -128,6 +128,6 @@ To install Arlon controller using the init command these pre-requisites need to 
 - Pre-requisites for supported CAPI infrastructure providers(AWS and Docker as of now).
 
 To start the installation process, simply run `arlon init -e --username <GIT_USER> --repoURL <WORKSPACE_URL> --password <GIT_PASSWORD> --examples -y`.
-This installs the controller, argocd(if not already present) `-e` flag adds basecluster manifests to the <WORKSPACE_URL> for using the given credentials. To not add examples, just remove the `-e` flag. 
-The `-y` flag refers to silent installation, which is useful for scripts. 
+This installs the controller, argocd(if not already present) `-e` flag adds basecluster manifests to the <WORKSPACE_URL> for using the given credentials. To not add examples, just remove the `-e` flag.
+The `-y` flag refers to silent installation, which is useful for scripts.
 For an interactive installation, exclude the `-y` or `--no-confirm` flag.

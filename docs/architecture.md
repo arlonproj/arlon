@@ -48,10 +48,8 @@ this *workspace repository* (and base paths) hosting those structures.
 Arlon relies on ArgoCD for repository registration, therefore the user should
 register the workspace registry in ArgoCD before referencing it from Arlon data types.
 
-Starting from release v0.9.0, Arlon now includes two commands to help with managing
-various git repository URLs. With these commands in place, the `--repo-url` flag in 
-commands requiring a hosted git repository is no longer needed. A more detailed explanation 
-is given in the next [section](#repo-aliases).
+Starting from release v0.9.0, Arlon now includes two commands to help with managing various git repository URLs. With these commands in place, the `--repo-url` flag in commands requiring a hosted git repository is no longer needed.
+A more detailed explanation is given in the next [section](#repo-aliases).
 
 ### Repo Aliases
 
