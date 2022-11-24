@@ -30,7 +30,7 @@ require (
 	github.com/stretchr/testify v1.8.1
 	gotest.tools/v3 v3.4.0
 	k8s.io/cli-runtime v0.23.13
-	sigs.k8s.io/cluster-api-provider-aws v1.5.1
+	sigs.k8s.io/cluster-api-provider-aws v1.5.2
 	sigs.k8s.io/kustomize/kyaml v0.13.0
 )
 
