@@ -91,3 +91,7 @@ They currently include:
 - The (worker) node instance type
 - The initial (worker) node count
 - The Kubernetes version
+
+## Baseclusters
+
+To know more about basecluster (Arlon gen2 clusters), read it [here](https://github.com/arlonproj/arlon/blob/main/docs/baseclusters.md)

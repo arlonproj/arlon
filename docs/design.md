@@ -40,10 +40,13 @@ case today. The currently *suggested* purpose values are:
 * application
 
 
-## Clusterspec
+## Cluster Specification
 
-A clusterspec contains desired settings when creating a new cluster.
-They currently include:
+A clusterspec contains desired settings when creating a new cluster. For gen1 clusters, this Cluster Specification is called [ClusterSpec](https://github.com/arlonproj/arlon/blob/main/docs/concepts.md#cluster-spec) and for gen2 clusters, this is the [Basecluster manifest](https://github.com/arlonproj/arlon/blob/main/docs/baseclusters.md). 
+
+The main difference in these cluster specifications is that basecluster manifests allow users to deploy arbitrarily complex clusters using the full Cluster API feature set.This is also closer to the gitops and declarative style of cluster creation.
+
+Clusterspec currently includes:
 
 - Stack: the cluster provisioning stack, for e.g. *cluster-api* or *crossplane*
 - Provider: the specific cluster management provider under that stack,
@@ -53,6 +56,13 @@ They currently include:
   the control plane and the initial number of nodes of the data plane.
 - The pod networking technology (under discussion: this may be moved to a
   bundle because most if not all CNI providers can be installed as manifests)  
+
+Basecluster manifest consists of : 
+
+- A predefined list of Cluster API objects; Cluster, Machines, Machine Deployments, etc. to be deployed in the current namespace.
+- The specific infrastructure provider to be used (e.g aws).ß
+- Kubernetes verion
+- Cluster templates/ flavors that need to be used for creating the cluster manifest (e.g eks, eks-managedmachinepool).
 
 ## Profile
 
