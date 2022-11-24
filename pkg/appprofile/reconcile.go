@@ -115,12 +115,12 @@ func ReconcileEverything(
 
 	// Reconcile clusters
 	profileToClusters := make(map[string]sets.Set[string])
-	clustNameToUrl := make(map[string]string)
+	clustNameToServer := make(map[string]string)
 	for _, argoClust := range argoClusters.Items {
 		if argoClust.Annotations == nil {
 			argoClust.Annotations = make(map[string]string)
 		}
-		clustNameToUrl[argoClust.Name] = argoClust.Server
+		clustNameToServer[argoClust.Name] = argoClust.Server
 		argoClustAnnotation := argoClust.Annotations[arlonapp.ProfilesAnnotationKey]
 		dirty := false
 		arlonClust, ok := arlonClusterMap[argoClust.Name]
@@ -259,8 +259,8 @@ func ReconcileEverything(
 		// Update applicationset's generator with new element list
 		newElems := []apiextensionsv1.JSON{}
 		for clustName := range afterClusters.Iter() {
-			jsonStr := fmt.Sprintf(`{"cluster":"%s", "url":"%s"}`,
-				clustName, clustNameToUrl[clustName])
+			jsonStr := fmt.Sprintf(`{"cluster_name":"%s", "cluster_server":"%s"}`,
+				clustName, clustNameToServer[clustName])
 			newElems = append(newElems, apiextensionsv1.JSON{Raw: []byte(jsonStr)})
 		}
 		app.Spec.Generators[0].List.Elements = newElems

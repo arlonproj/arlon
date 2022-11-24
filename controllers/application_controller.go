@@ -86,6 +86,6 @@ func reconcileApplication(
 		log.V(1).Info("application is not an arlon cluster, skipping...")
 		return ctrl.Result{}, nil
 	}
-	log.Info("reconciling application implementing arlon cluster")
+	log.V(1).Info("reconciling application implementing arlon cluster")
 	return appprofile.ReconcileEverything(ctx, cli, argocli, log)
 }

@@ -508,7 +508,7 @@ func arlonAppTargetsTheseClusters(t *testing.T, appName string, clustNames []str
 				if err := json.Unmarshal(elem.Raw, &element); err != nil {
 					t.Fatalf("failed to unmarshal json: %s", err)
 				}
-				val, ok := element["cluster"]
+				val, ok := element["cluster_name"]
 				if !ok {
 					t.Fatalf("applicationset %s has an element with no cluster key", appName)
 				}
