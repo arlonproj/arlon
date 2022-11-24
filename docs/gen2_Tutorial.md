@@ -205,18 +205,7 @@ Before a manifest directory can be used as a base cluster, it must first be "pre
 by Arlon. The "prep" phase makes minor changes to the directory and manifest to help Arlon deploy
 multiple copies of the cluster without naming conflicts.
 
-To determine if a git directory is eligible to serve as base cluster, run the `basecluster validategit` command:
-
-```shell
-arlon basecluster validategit --repo-url <repoUrl> --repo-path <pathToDirectory> [--repo-revision revision]
-            # OR
-# using repository aliases
-  # using the default alias
-arlon basecluster validategit --repo-path <pathToDirectory> [--repo-revision revision]
-  # using the prod alias
-arlon basecluster validategit --repo-alias prod --repo-path <pathToDirectory> [--repo-revision revision]
-```
-
+#### Manifest directory preparation:
 To prepare a git directory to serve as base cluster, use the `basecluster preparegit` command:
 
 ```shell
@@ -229,6 +218,21 @@ arlon basecluster preparegit --repo-path <pathToDirectory> [--repo-revision revi
 arlon basecluster preparegit --repo-alias prod --repo-path <pathToDirectory> [--repo-revision revision]
 ```
 
+#### Manifest directory validation:
+Post the successful preparation of the basecluster manifest directory using `basecluster preparegit`, the basecluster manifest directory needs to be validated before the basecluster is created.
+
+To determine if a git directory is eligible to serve as base cluster, run the `basecluster validategit` command:
+
+```shell
+arlon basecluster validategit --repo-url <repoUrl> --repo-path <pathToDirectory> [--repo-revision revision]
+            # OR
+# using repository aliases
+  # using the default alias
+arlon basecluster validategit --repo-path <pathToDirectory> [--repo-revision revision]
+  # using the prod alias
+arlon basecluster validategit --repo-alias prod --repo-path <pathToDirectory> [--repo-revision revision]
+```
+#### gen2 cluster creation:
 To create a gen2 workload cluster from the base cluster:
 
 ```shell
