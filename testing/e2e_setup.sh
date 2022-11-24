@@ -260,8 +260,6 @@ if [ ! -d "${workspace_repo}" ]; then
 else
   echo git repo already cloned
 fi
-echo printing the current directory
-ls
 pushd ${workspace_repo}
 if ! test -f README.md; then
   echo adding README.md and creating main branch
