@@ -23,7 +23,7 @@ func List(config *restclient.Config, ns string) (apslist []appset.ApplicationSet
 		return nil, fmt.Errorf("failed to get controller runtime client: %s", err)
 	}
 	var asl appset.ApplicationSetList
-	req, err := labels.NewRequirement("managed-by", selection.In, []string{"arlon"})
+	req, err := labels.NewRequirement("arlon-type", selection.In, []string{"application"})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create requirement: %s", err)
 	}

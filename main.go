@@ -22,6 +22,7 @@ import (
 	"os"
 
 	"github.com/arlonproj/arlon/cmd/app"
+	"github.com/arlonproj/arlon/cmd/appprofile"
 	"github.com/arlonproj/arlon/cmd/appprofilecontroller"
 	"github.com/arlonproj/arlon/cmd/basecluster"
 	"github.com/arlonproj/arlon/cmd/bundle"
@@ -73,6 +74,7 @@ func main() {
 	command.AddCommand(verify.NewCommand())
 	command.AddCommand(install.NewCommand())
 	command.AddCommand(app.NewCommand())
+	command.AddCommand(appprofile.NewCommand())
 	command.AddCommand(ngprofile.NewCommand())
 
 	opts := zap.Options{
