@@ -31,3 +31,6 @@ arlon
 # kuttl artifacts
 kubeconfig
 kind-logs-*
+
+#
+venv
