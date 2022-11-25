@@ -153,7 +153,7 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/${
 
 if ! argocd &>/dev/null; then
   echo downloading argocd CLI
-  curl -sSL -o "${HOME}/.local/bin/argocd" "https://github.com/argoproj/argo-cd/releases/v2.4.17/download/argocd-${os}-${arch}"
+  curl -sSL -o "${HOME}/.local/bin/argocd" "https://github.com/argoproj/argo-cd/releases/download/v2.4.17/argocd-${os}-${arch}"
   chmod +x "${HOME}/.local/bin/argocd"
 fi
 
