@@ -101,4 +101,4 @@ They currently include:
 
 ## Base cluster
 
-To know more about basecluster (Arlon gen2 clusters), read it [here](https://arlon.readthedocs.io/en/main/baseclusters)
+To know more about basecluster (Arlon gen2 clusters), read it [here](./baseclusters.md)
