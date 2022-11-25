@@ -304,7 +304,7 @@ cluster and its configuration contents. The next level app `eks-1-profile-dynami
 represents the profile, and its children apps `eks-1-guestbook-static` and `eks-1-xenial`
 correspond to the bundles.
 
-_Note: The overall tree-like organization of the apps and their health status
+Note: The overall tree-like organization of the apps and their health status
 can be visually observed in the ArgoCD web user interface._
 
 The cluster is fully deployed once those apps are all `Synced` and `Healthy`.
