@@ -58,7 +58,7 @@ if [ -z "${AWS_NODE_MACHINE_TYPE}" ]; then
 fi
 
 if [ -z "${AWS_SSH_KEY_NAME}" ]; then
-  echo "Set the AWS_NODE_MACHINE_TYPE env variable"
+  echo "Set the AWS_SSH_KEY_NAME env variable"
   exit
 fi
 
@@ -260,8 +260,6 @@ if [ ! -d "${workspace_repo}" ]; then
 else
   echo git repo already cloned
 fi
-echo printing the current directory
-ls
 pushd ${workspace_repo}
 if ! test -f README.md; then
   echo adding README.md and creating main branch
