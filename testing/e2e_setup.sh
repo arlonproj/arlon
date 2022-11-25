@@ -308,10 +308,8 @@ fi
 
 if ! which kubectl-kuttl &>/dev/null; then
   echo Downloading kuttl plugin to run e2e tests
-  curl -s -LO "https://github.com/kudobuilder/kuttl/releases/download/v0.14.0/kubectl-kuttl_0.14.0_${os}_${cpu}"
-  mv "kubectl-kuttl_0.13.0_${os}_${cpu}" "kubectl-kuttl"
-  chmod +x kubectl-kuttl
-  mv kubectl-kuttl "${HOME}/.local/bin/kubectl-kuttl"
+  curl -s -Lo "${HOME}/.local/bin/kubectl-kuttl" "https://github.com/kudobuilder/kuttl/releases/download/v0.14.0/kubectl-kuttl_0.14.0_${os}_${cpu}"
+  chmod +x "${HOME}/.local/bin/kubectl-kuttl"
 fi
 
 # not needed for us...	
