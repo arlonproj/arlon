@@ -28,7 +28,8 @@ an RBAC ruleset, an add-on, an application, etc...
 
 * [Concepts](./concepts.md) 
 * [Installation](./installation.md)
-* [Tutorial](./tutorial.md)
+* [Tutorial (gen-1)](./tutorial.md)
+* [Tutorial (gen-2)](./gen2_Tutorial.md)
 * [Architecture](./architecture.md)
 
 
