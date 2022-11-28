@@ -313,7 +313,7 @@ fi
 # not needed for us...	
 #clusterawsadm bootstrap iam create-cloudformation-stack
 
-export EXP_MACHINE_POOL=true.
+export EXP_MACHINE_POOL=true
 export AWS_B64ENCODED_CREDENTIALS=$(clusterawsadm bootstrap credentials encode-as-profile)
 
 clusterctl init --infrastructure aws --wait-providers
