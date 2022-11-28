@@ -21,5 +21,6 @@ func NewCommand() *cobra.Command {
 	command.AddCommand(getClusterCommand())
 	command.AddCommand(deleteClusterCommand())
 	command.AddCommand(ngupdateClusterCommand())
+	command.AddCommand(setAppProfilesCommand())
 	return command
 }
