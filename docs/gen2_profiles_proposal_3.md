@@ -35,3 +35,11 @@ to add the ability to associate (attach) multiple AppProfiles to a cluster.
   * `arlon cluster setappprofiles <clusterName> <commaSeparatedAppProfileNames` allows
      a user to set the list of app profiles associated with a cluster. Setting the
      list to an empty string removes all app profiles from the cluster.
+  * No CRUD operations are provided for Arlon AppProfile resources since they are simple
+    resources that are best manipulated and applied as manifests with `kubectl`.
+    The one exception is `arlon appprofile list`, which is a convenience and shows
+    the list of apps for each AppProfile, and the `Status.healthy` field.
+
+## Testing
+
+The reconciliation algorithm is tested by a comprensive unit test located at `pkg/appprofile/appprofile_test.go`
