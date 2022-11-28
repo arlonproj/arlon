@@ -318,7 +318,7 @@ metadata:
 spec: {}
 ```
 
-### gen2 cluster creation using Arlon
+## gen2 cluster creation using Arlon
 
 This manifest file needs to be pushed to the workspace repository before the manifest directory is prepped and then validated.
 
@@ -326,7 +326,7 @@ Before a manifest directory can be used as a base cluster, it must first be "pre
 by Arlon. The "prep" phase makes minor changes to the directory and manifest to help Arlon deploy
 multiple copies of the cluster without naming conflicts.
 
-### manifest directory preparation
+## manifest directory preparation
 
 To prepare a git directory to serve as base cluster, use the `basecluster preparegit` command:
 
@@ -340,7 +340,7 @@ arlon basecluster preparegit --repo-path <pathToDirectory> [--repo-revision revi
 arlon basecluster preparegit --repo-alias prod --repo-path <pathToDirectory> [--repo-revision revision]
 ```
 
-### manifest directory validation
+## manifest directory validation
 
 Post the successful preparation of the basecluster manifest directory using `basecluster preparegit`, the basecluster manifest directory needs to be validated before the basecluster is created.
 
@@ -356,7 +356,7 @@ arlon basecluster validategit --repo-path <pathToDirectory> [--repo-revision rev
 arlon basecluster validategit --repo-alias prod --repo-path <pathToDirectory> [--repo-revision revision]
 ```
 
-### gen2 cluster creation
+## gen2 cluster creation
 
 To create a gen2 workload cluster from the base cluster:
 
@@ -370,7 +370,7 @@ arlon cluster create --cluster-name <clusterName> --repo-path <pathToDirectory> 
 arlon cluster create --cluster-name <clusterName> --repo-alias prod --repo-path <pathToDirectory> [--output-yaml] [--profile <profileName>] [--repo-revision <repoRevision>]
 ```
 
-### gen2 cluster update
+## gen2 cluster update
 
 To update the profiles of a gen2 workload cluster:
 
@@ -387,7 +387,7 @@ to the existing cluster which will create profile app in argocd along with bundl
 An existing profile can be deleted from the cluster as well using the above command. Executing this command will delete the profile app and
 all the bundles associated with the profile in argocd.
 
-### gen2 cluster deletion
+## gen2 cluster deletion
 
 To destroy a gen2 workload cluster:
 
@@ -399,7 +399,7 @@ Arlon creates between 2 and 3 ArgoCD application resources to compose a gen2 clu
 an optional profile is specified at cluster creation time). When you destroy a gen2 cluster, Arlon will find all related ArgoCD applications
 and clean them up.
 
-### Known issues and limitations
+## Known issues and limitations
 
 Gen2 clusters are powerful because the base cluster can be arbitrarily complex and feature rich. Since they are fairly
 new and still evolving, gen2 clusters have several known limitations relative to gen1.
@@ -422,6 +422,6 @@ Examples of immutable properties:
 
 * Most fields of AWSMachineTemplate (instance type, labels, etc...)
 
-### For more information
+## For more information
 
 For more details on gen2 clusters, refer to the [design document](baseclusters.md).
