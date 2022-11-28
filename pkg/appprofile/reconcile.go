@@ -242,7 +242,7 @@ func ReconcileEverything(
 				break
 			}
 			for key, value := range element {
-				if key == "cluster" {
+				if key == "cluster_name" {
 					clust, ok := value.(string)
 					if !ok {
 						log.Info("value of cluster key is not a string", "appSetName", app.Name)
