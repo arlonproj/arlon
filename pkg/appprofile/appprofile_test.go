@@ -184,6 +184,21 @@ func init() {
 					},
 				},
 			},
+			{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "app-not-used-anywhere",
+					Labels: map[string]string{
+						"arlon-type": "application",
+					},
+				},
+				Spec: appset.ApplicationSetSpec{
+					Generators: []appset.ApplicationSetGenerator{
+						{
+							List: &appset.ListGenerator{},
+						},
+					},
+				},
+			},
 		},
 	}
 
@@ -415,11 +430,24 @@ func TestAppProfileReconcileEverything(t *testing.T) {
 	assert.True(t, arlonAppTargetsTheseClusters(t, "autocad", []string{"external-cluster", "arlon-cluster-3"}))
 	assert.True(t, arlonAppTargetsTheseClusters(t, "teamcity", []string{"external-cluster", "arlon-cluster-3"}))
 
+	// remove autocad from all profiles
+	gProfileList.Items[1].Spec.AppNames = []string{"teamcity"} // engineering
+	reconcile(t, mcr, mac, log)
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-1", []string{}))
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-1", []string{}))
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-2", []string{}))
+	assert.True(t, argoClusterHasProfiles(t, "arlon-cluster-3", []string{"engineering"}))
+	assert.True(t, argoClusterHasProfiles(t, "external-cluster", []string{"marketing", "qa", "engineering"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "wordpress", []string{"external-cluster"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "mysql", []string{"external-cluster"}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "autocad", []string{}))
+	assert.True(t, arlonAppTargetsTheseClusters(t, "teamcity", []string{"external-cluster", "arlon-cluster-3"}))
+
 	// remove all apps, ensure invalidAppNames correctly updated
 	gApplicationSetList.Items = nil
 	reconcile(t, mcr, mac, log)
 	ensureProfileInvalidApps(t, "marketing", []string{"wordpress", "nonexistent-1", "mysql"})
-	ensureProfileInvalidApps(t, "engineering", []string{"autocad", "teamcity"})
+	ensureProfileInvalidApps(t, "engineering", []string{"teamcity"})
 	ensureProfileInvalidApps(t, "qa", []string{"mysql", "teamcity"})
 	dumpProfiles(t)
 	dumpClusters(t)

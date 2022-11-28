@@ -253,6 +253,9 @@ func ReconcileEverything(
 			}
 		}
 		afterClusters := appToClusters[app.Name]
+		if afterClusters == nil {
+			afterClusters = sets.NewSet[string]()
+		}
 		if afterClusters.Equal(beforeClusters) {
 			continue // no update needed
 		}
