@@ -86,7 +86,7 @@ PATH=$PATH:$HOME/.local/bin
 
 # Check for Kind and docker
 if ! which kind; then
-  curl -Lo ./kind "https://kind.sigs.k8s.io/dl/v0.14.0/kind-${os}-${arch}"
+  curl -Lo ./kind "https://kind.sigs.k8s.io/dl/v0.17.0/kind-${os}-${arch}"
   chmod +x ./kind
   mv ./kind /usr/local/bin/kind
 fi
@@ -153,7 +153,7 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/${
 
 if ! argocd &>/dev/null; then
   echo downloading argocd CLI
-  curl -sSL -o "${HOME}/.local/bin/argocd" "https://github.com/argoproj/argo-cd/releases/latest/download/argocd-${os}-${arch}"
+  curl -sSL -o "${HOME}/.local/bin/argocd" "https://github.com/argoproj/argo-cd/releases/download/v2.4.17/argocd-${os}-${arch}"
   chmod +x "${HOME}/.local/bin/argocd"
 fi
 
@@ -306,10 +306,8 @@ fi
 
 if ! which kubectl-kuttl &>/dev/null; then
   echo Downloading kuttl plugin to run e2e tests
-  curl -s -LO "https://github.com/kudobuilder/kuttl/releases/download/v0.13.0/kubectl-kuttl_0.13.0_${os}_${cpu}"
-  mv "kubectl-kuttl_0.13.0_${os}_${cpu}" "kubectl-kuttl"
-  chmod +x kubectl-kuttl
-  mv kubectl-kuttl "${HOME}/.local/bin/kubectl-kuttl"
+  curl -s -Lo "${HOME}/.local/bin/kubectl-kuttl" "https://github.com/kudobuilder/kuttl/releases/download/v0.14.0/kubectl-kuttl_0.14.0_${os}_${cpu}"
+  chmod +x "${HOME}/.local/bin/kubectl-kuttl"
 fi
 
 # not needed for us...	
