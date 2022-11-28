@@ -38,6 +38,8 @@ func List(config *restclient.Config, ns string) (apslist []appset.ApplicationSet
 	return asl.Items, nil
 }
 
+// -----------------------------------------------------------------------------
+
 func Create(
 	ns string,
 	name string,
@@ -96,4 +98,29 @@ func Create(
 		}
 	}
 	return aps
+}
+
+// -----------------------------------------------------------------------------
+
+func Delete(config *restclient.Config, ns string, name string) error {
+	cli, err := ctrlruntimeclient.NewClient(config)
+	if err != nil {
+		return fmt.Errorf("failed to get controller runtime client: %s", err)
+	}
+	var app appset.ApplicationSet
+	err = cli.Get(context.Background(), client.ObjectKey{
+		Name:      name,
+		Namespace: ns,
+	}, &app)
+	if err != nil {
+		return fmt.Errorf("failed to get applicationset: %s", err)
+	}
+	if app.Labels["arlon-type"] != "application" {
+		return fmt.Errorf("applicationset %s is not an arlon app", name)
+	}
+	err = cli.Delete(context.Background(), &app)
+	if err != nil {
+		return fmt.Errorf("failed to delete applicationset: %s", err)
+	}
+	return nil
 }
