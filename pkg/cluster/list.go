@@ -3,6 +3,8 @@ package cluster
 import (
 	"context"
 	"fmt"
+	"github.com/arlonproj/arlon/pkg/app"
+	"strings"
 
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	"github.com/arlonproj/arlon/pkg/common"
@@ -56,6 +58,7 @@ func List(
 				RepoRevision: a.Annotations[baseClusterRepoRevisionAnnotation],
 				RepoPath:     a.Annotations[baseClusterRepoPathAnnotation],
 			},
+			AppProfiles: strings.Split(a.Annotations[app.ProfilesAnnotationKey], ","),
 		})
 	}
 
