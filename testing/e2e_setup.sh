@@ -313,6 +313,7 @@ fi
 # not needed for us...	
 #clusterawsadm bootstrap iam create-cloudformation-stack
 
+export EXP_MACHINE_POOL=true.
 export AWS_B64ENCODED_CREDENTIALS=$(clusterawsadm bootstrap credentials encode-as-profile)
 
 clusterctl init --infrastructure aws --wait-providers
@@ -321,13 +322,6 @@ echo "Login as admin: ${pwd} into ArgoCD at http://localhost:${forwarding_port}"
 echo "Run the following command to use kubectl, argocd, clusterctl, clusterawsadm, arlon (If not already installed)"
 echo 'PATH=$PATH:$HOME/.local/bin'
 echo Installation successfull
-
-clusterctl generate cluster capi-quickstart --flavor eks \
-  --kubernetes-version v1.23.10 \
-  --control-plane-machine-count=3 \
-  --worker-machine-count=2 \
-  --infrastructure aws \
-  >${arlon_repo}/testing/capi-quickstart-e2e-test.yaml
 
 repodir="${GIT_CLONE_ROOT}/myrepo"
 
