@@ -313,6 +313,7 @@ fi
 # not needed for us...	
 #clusterawsadm bootstrap iam create-cloudformation-stack
 
+echo "Enabling MachinePool Feature Gate for e2e tests"
 export EXP_MACHINE_POOL=true
 export AWS_B64ENCODED_CREDENTIALS=$(clusterawsadm bootstrap credentials encode-as-profile)
 
