@@ -40,7 +40,8 @@ nav:
     - Base clusters: 'baseclusters.md'
     - Architecture: 'architecture.md'
     - Installation: 'installation.md'
-    - Tutorial: 'tutorial.md'        
+    - Tutorial (gen1): 'tutorial.md' 
+    - Tutorial (gen2): 'gen2_Tutorial.md'       
     - Development:
       - Setup: 'dev_setup.md'
       - E2E Tests: 'e2e_testing.md'

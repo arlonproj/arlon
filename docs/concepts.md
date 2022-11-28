@@ -19,15 +19,18 @@ types mirrors ArgoCD's supported set of manifest-producing tools.
 Each bundle is defined using a Kubernetes ConfigMap resource in the arlon namespace.
 
 ### Static bundle
+
 A static bundle embeds the manifest's YAML data itself ("static bundle").
 A cluster consuming a static bundle will always have a snapshot copy of
 the bundle at the time the cluster was created, and is not affected by subsequent
 changes to the bundle's manifest data.
 
 ### Dynamic bundle
+
 A dynamic bundle contains a reference to the manifest data stored in git.
 A dynamic bundle is distinguished
 by having these fields set to non-empty values:
+
 - git URL of the repo
 - Directory path within the repo
 
@@ -39,6 +42,7 @@ When the user updates a dynamic bundle in git, all clusters consuming that bundl
 (through a profile specified at cluster creation time) will acquire the change.
 
 ### Other properties
+
 A bundle can also have a comma-separated list of tags, and a description.
 Tags can be useful for classifying bundles, for e.g. by type
 ("addon", "cni", "rbac", "app").
@@ -50,6 +54,7 @@ It is just a set of references to bundles (static, dynamic, or a combination).
 A profile can be static or dynamic.
 
 ### Static profile
+
 When a cluster consumes a static profile
 at creation time, the set of bundles for the cluster is fixed at that time
 and does not change over time even when the static bundle is updated.
@@ -59,6 +64,7 @@ A static profile is stored as an item
 in the Arlon database (specifically, as a CR in the Management Cluster).
 
 ### Dynamic profile
+
 A dynamic profile, on the other hand, has two components: the specification
 stored in the Arlon database, and a *compiled* component living in the workspace
 repository at a path specified by the user.
@@ -85,9 +91,14 @@ the workspace repository.
 
 A cluster spec contains desired settings when creating a new cluster.
 They currently include:
+
 - API Provider: the cluster orchestration technology. Supported values are `CAPI` (Cluster API) and `xplane` (Crossplane)
 - Cloud Provider: the infrastructure cloud provider. The currently supported values is `aws`, with `gcp` and `azure` support coming later.
 - Type: the cluster type. Some API providers support more than one type. On `aws` cloud, Cluster API supports `kubeadm` and `eks`, whereas Crossplane only supports `eks`.
 - The (worker) node instance type
 - The initial (worker) node count
 - The Kubernetes version
+
+## Base cluster
+
+To know more about basecluster (Arlon gen2 clusters), read it [here](./baseclusters.md)

@@ -35,6 +35,7 @@ while `cluster-b` is given profile `yyy`.
 A base cluster serves as a base for creating new workload clusters. The workload clusters
 are all exact copies of the base cluster, meaning that they acquire all unmodified resources of the
 base cluster, except for:
+
 - resource names, which are prefixed during the cluster creation process to make them unique to avoid conflicts
 - the namespace, which is set to a new namespace unique to the workload cluster
 
@@ -54,22 +55,24 @@ the proper credentials for read/write access.
 
 To check whether the git directory is a compliant Arlon base cluster,
 the user runs:
-```
+
+```shell
 arlon basecluster validategit --repo-url <repoUrl> --repo-path <pathToDirectory> [--repo-revision revision]  
 ```
+
 *Note: if --repo-revision is not specified, it defaults to main.*
 
 The command produces an error the first time because the git directory has not yet been "prepped".
 To "prep" the directory to become a compliant Arlon base cluster, the user runs:
-```
+
+```shell
 arlon basecluster preparegit --repo-url <repoUrl> --repo-path <pathToDirectory> [--repo-revision revision]  
 ```
 
 This pushes a commit to the repo with these changes:
+
 - A `kustomization.yaml` file is added to the directory to make the manifest customizable by Kustomize.
-- A `configurations.yaml` file is added to configure the [namereference](https://github.com/kubernetes-sigs/kustomize/blob/master/examples/transformerconfigs/README.md#name-reference-transformer) 
-Kustomize plugin which ensures `reference` fields are correctly set when pointing to resource names 
-that ArgoCD will modify using the Kustomize [nameprefix](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/nameprefix/)
+- A `configurations.yaml` file is added to configure the [namereference](https://github.com/kubernetes-sigs/kustomize/blob/master/examples/transformerconfigs/README.md#name-reference-transformer) Kustomize plugin which ensures `reference` fields are correctly set when pointing to resource names that ArgoCD will modify using the Kustomize [nameprefix](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/nameprefix/)
 mechanism. The content of the file is sourced from this [Scott Lowe blog article](https://blog.scottlowe.org/2021/10/11/kustomize-transformer-configurations-for-cluster-api-v1beta1/).
 - All `namespace` properties in the cluster manifest are removed to allow Kustomize to override the
 namespace of all resources.
@@ -85,11 +88,13 @@ Use `arlon cluster create` to create a next-gen workload cluster from a base clu
 The command creates between 2 and 3 (depending on whether a profile is used)
 ArgoCD application resources that together
 make up the cluster and its contents. The general usage is:
-```
+
+```shell
 arlon cluster create --cluster-name <clusterName> --repo-url <repoUrl> --repo-path <pathToDirectory> [--output-yaml] [--profile <profileName>] [--repo-revision <repoRevision>]
 ```
 
 The command supports two modes of operation:
+
 - With `--output-yaml`: output a list of YAML resources that you can inspect, save to a file, or pipe to `kubectl apply -f`
 - Without `--output-yaml`: create the application resources directly in the management cluster currently referenced by your KUBECONFIG and context.  
 
@@ -110,6 +115,7 @@ It is named directly from the workload cluster name.
 
 The application's spec uses a ApplicationSourceKustomize that points to the base cluster's git
 directory. The spec ensures that all deployed resources are configured to:
+
 - Reside in the `cluster-a` namespace, which is deployed by the *arlon app* (see below).
 This achieved by setting `app.Spec.Destination.Namespace` to the workload cluster's name
   (*this only works if the resources do not specify an explicit namespace; this requirement is
@@ -122,6 +128,7 @@ the workload cluster name plus a hyphen.
 
 The `cluster-a-arlon` application is the *arlon app* for the cluster.
 It is resposible for deploying:
+
 - The `cluster-a` namespace, which holds most resources related to this workload cluster,
 such as the Cluster API manifests deployed by the cluster app.
 - Resources required to register the workload cluster with argocd when available:
@@ -130,7 +137,8 @@ ClusterRegistration and associated RBAC rules.
 
 The application spec's ApplicationSource points to the existing Arlon Helm chart
 located here by default:
-- Repo: https://github.com/arlonproj/arlon.git
+
+- Repo: [https://github.com/arlonproj/arlon.git](https://github.com/arlonproj/arlon.git)
 - Revision: private/leb/gen2 (IMPORTANT: NEEDS TO CHANGE TO STABLE BRANCH OR TAG)
 - Path: pkg/cluster/manifests
 
@@ -141,6 +149,7 @@ be deployed by the cluster app.
 
 **Important issue**: as described above, the application source resides in the public Arlon repo.
 To avoid breaking user's deployed clusters, the source must be stable and not change!
+
 - This probably means a particular Arlon release should point the source to a stable tag (not even a branch?)
 - As an alternative, during Arlon setup, allow the user to copy the Helm chart into a private repo,
   and point the source there.
@@ -161,6 +170,7 @@ requires deleting all of its applications. To facilitate this, the 2 or 3 applic
 by `arlon cluster create` are automatically labeled with `arlon-cluster=<clusterName>`.
 
 The user has two options for destroying a next-gen cluster:
+
 - The easiest way: `arlon cluster delete <clusterName>`. This command automatically detects a next-gen
 cluster and cleans up all related applications.
 - A more manual way: `kubectl delete application -l arlon-cluster=<clusterName>`
@@ -171,7 +181,7 @@ A base cluster lives in git and is shared by all workload clusters created from 
 This is sometimes referred to as *Linked Mode*.
 Any git update to the cluster can affect the associated workload clusters, therefore
 such updates must be planned and managed with care; there is a real risk of such an
-update breaking existing clusters. 
+update breaking existing clusters.
 
 - By default, a workload's cluster *cluster app* is configured with auto-sync, meaning ArgoCD will
 immediately apply any changes in the base cluster to the deployed Cluster API cluster resources.
@@ -184,6 +194,7 @@ created from that base cluster.
 
 The controllers for Cluster API and its providers disallow changes to some fields belonging
 to already-deployed resources.
+
 - For example, changing the base cluster name (`medata.Name` of the `Cluster` resource) will have disastrous consequences on already-deployed
 clusters, causing many resources to enter the OutOfSync state and never recover because ArgoCD
 fails to apply the changes (they are rejected by the controllers). Consequently, a user should never
@@ -196,4 +207,3 @@ of the corresponding plane.
 - Specific to AWS: the `AWSMachineTemplate.spec` is immutable and a CAPI webhook disallows such updates. The user is advised to not make such modifications to a basecluster manifest.
 In the event that such an event does happen, the user is advised to not manually sync in those changes via `argocd`. If a new cluster with a different `AWSMachineTemplate.spec` is desired,
 the recommended approach is to make a copy of the manifests in the workspace repository and then issue an `arlon cluster create` command which would then consume this manifest.
-
