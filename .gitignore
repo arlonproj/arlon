@@ -26,4 +26,7 @@ testbin/*
 *~
 .vscode
 arlon
+venv
 
+# macos
+.DS_Store
