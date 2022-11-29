@@ -318,8 +318,7 @@ fi
 
 # Substituting the environment variables in e2e test manifest file
 e2eTemplate=${arlon_repo}/testing/capi-quickstart-e2e-template.yaml
-manifestfile${arlon_repo}/testing/capi-quickstart-e2e-test.yaml
-touch ${manifestfile}
+manifestfile=${arlon_repo}/testing/capi-quickstart-e2e-test.yaml
 envsubst < ${e2eTemplate} > ${manifestfile}
 
 # not needed for us...	
