@@ -310,10 +310,19 @@ if ! which kubectl-kuttl &>/dev/null; then
   chmod +x "${HOME}/.local/bin/kubectl-kuttl"
 fi
 
+if ! which envsubst &> /dev/null; then
+  echo Downloading envsubst plugin to run e2e tests
+  sudo apt-get install gettext-base
+fi
+
+# Substituting the environment variables in e2e test manifest file
+e2eTemplate=${arlon_repo}/testing/capi-quickstart-e2e-template.yaml
+manifestfile${arlon_repo}/testing/capi-quickstart-e2e-test.yaml
+envsubst < ${e2eTemplate} > ${manifestfile}
+
 # not needed for us...	
 #clusterawsadm bootstrap iam create-cloudformation-stack
-
-echo "Enabling MachinePool Feature Gate for e2e tests"
+echo "Enabling MachinePool Feature Gate for running e2e tests"
 export EXP_MACHINE_POOL=true
 export AWS_B64ENCODED_CREDENTIALS=$(clusterawsadm bootstrap credentials encode-as-profile)
 
