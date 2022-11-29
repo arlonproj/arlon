@@ -24,3 +24,17 @@ metadata:
   namespace: ec2-cluster
 status:
   ready: true
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+kind: AWSMachinePool
+metadata:
+  namespace: ec2-cluster
+status:
+  ready: true
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+kind: AWSManagedMachinePool
+metadata:
+  namespace: ec2-cluster
+status:
+  ready: true
