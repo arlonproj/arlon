@@ -312,12 +312,14 @@ fi
 
 if ! which envsubst &> /dev/null; then
   echo Downloading envsubst plugin to run e2e tests
-  sudo apt-get install gettext-base
+  curl -Lo "${HOME}/.local/bin/envsubst" https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m`
+  chmod +x "${HOME}/.local/bin/envsubst"
 fi
 
 # Substituting the environment variables in e2e test manifest file
 e2eTemplate=${arlon_repo}/testing/capi-quickstart-e2e-template.yaml
 manifestfile${arlon_repo}/testing/capi-quickstart-e2e-test.yaml
+touch ${manifestfile}
 envsubst < ${e2eTemplate} > ${manifestfile}
 
 # not needed for us...	
