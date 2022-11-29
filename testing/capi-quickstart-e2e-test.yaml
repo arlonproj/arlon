@@ -30,9 +30,9 @@ metadata:
   name: capi-quickstart-control-plane
   namespace: default
 spec:
-  region: us-west-2
-  sshKeyName: shaunak-key-2
-  version: v1.22.0
+  region: ${AWS_REGION}
+  sshKeyName: ${AWS_SSH_KEY_NAME}
+  version: v1.23.10
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
 kind: AWSManagedMachinePool
@@ -42,7 +42,7 @@ metadata:
 spec: 
   scaling:
      minSize: 0
-     maxSize: 5
+     maxSize: 10
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
 kind: AWSMachinePool
@@ -52,8 +52,8 @@ metadata:
 spec:
   awsLaunchTemplate:
     iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
-    instanceType: t2.medium
-    sshKeyName: shaunak-key-2
+    instanceType: ${AWS_NODE_MACHINE_TYPE}
+    sshKeyName: ${AWS_SSH_KEY_NAME}
   maxSize: 10
   minSize: 1
 ---
@@ -77,7 +77,7 @@ spec:
         apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
         kind: AWSMachinePool
         name: capi-quickstart-pool-1
-      version: v1.22.0
+      version: v1.23.10
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachinePool
@@ -126,7 +126,7 @@ spec:
         apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
         kind: AWSMachineTemplate
         name: capi-quickstart-md-0
-      version: v1.22.0
+      version: v1.23.10
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
 kind: AWSMachineTemplate
@@ -137,8 +137,8 @@ spec:
   template:
     spec:
       iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
-      instanceType: t2.medium
-      sshKeyName: shaunak-key-2
+      instanceType: ${AWS_NODE_MACHINE_TYPE}
+      sshKeyName: ${AWS_SSH_KEY_NAME}
 ---
 apiVersion: bootstrap.cluster.x-k8s.io/v1beta2
 kind: EKSConfigTemplate
