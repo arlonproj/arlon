@@ -79,6 +79,14 @@ nameReference:
     kind: KubeadmControlPlane
 - kind: AWSMachineTemplate
   group: infrastructure.cluster.x-k8s.io
+  version: v1beta2
+  fieldSpecs:
+  - path: spec/template/spec/infrastructureRef/name
+    kind: MachineDeployment
+  - path: spec/machineTemplate/infrastructureRef/name
+    kind: KubeadmControlPlane
+- kind: AWSMachineTemplate
+  group: infrastructure.cluster.x-k8s.io
   version: v1beta1
   fieldSpecs:
   - path: spec/template/spec/infrastructureRef/name
