@@ -25,6 +25,8 @@ jobs:
         cache: true
     - name: Build
       run: go build -v ./...
+    - name: Unit tests
+      run: go test ./pkg/...
   deploy:
     runs-on: ubuntu-latest
     steps:
