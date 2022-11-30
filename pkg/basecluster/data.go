@@ -67,6 +67,16 @@ nameReference:
   fieldSpecs:
   - path: spec/bootstrap/configRef/name
     kind: Machine
+  - path: spec/template/spec/bootstrap/configRef/name
+    kind: MachinePool
+- kind: AWSMachineTemplate
+  group: infrastructure.cluster.x-k8s.io
+  version: v1beta2
+  fieldSpecs:
+  - path: spec/template/spec/infrastructureRef/name
+    kind: MachineDeployment
+  - path: spec/machineTemplate/infrastructureRef/name
+    kind: KubeadmControlPlane
 - kind: AWSMachineTemplate
   group: infrastructure.cluster.x-k8s.io
   version: v1beta2
@@ -144,5 +154,11 @@ nameReference:
   version: v1beta1
   fieldSpecs:
   - path: spec/template/spec/infrastructureRef/name
+    kind: MachinePool
+- kind: EKSConfig
+  group: bootstrap.cluster.x-k8s.io
+  version: v1beta2
+  fieldSpecs:
+  - path: spec/template/spec/bootstrap/configRef/name
     kind: MachinePool
 `
