@@ -85,6 +85,9 @@ clean:
 build: generate fmt vet cluster-config ## Build manager binary.
 	go build -ldflags '$(LD_FLAGS)' -o bin/arlon main.go
 
+unittests:
+	go test ./pkg/...
+
 cluster-config:
 	mkdir -p bin
 	tar cvfz bin/setup_arlon.tar.gz ./setup_arlon.sh ./config/crd/bases/*.yaml ./deploy/manifests/*.yaml ./testing/manifests/*.yaml
