@@ -34,7 +34,6 @@ import (
 	"github.com/arlonproj/arlon/cmd/initialize"
 	"github.com/arlonproj/arlon/cmd/install"
 	"github.com/arlonproj/arlon/cmd/list_clusters"
-	"github.com/arlonproj/arlon/cmd/ngprofile"
 	"github.com/arlonproj/arlon/cmd/profile"
 	"github.com/arlonproj/arlon/cmd/verify"
 	"github.com/arlonproj/arlon/cmd/version"
@@ -77,7 +76,6 @@ func main() {
 	command.AddCommand(install.NewCommand())
 	command.AddCommand(app.NewCommand())
 	command.AddCommand(appprofile.NewCommand())
-	command.AddCommand(ngprofile.NewCommand())
 	command.AddCommand(initialize.NewCommand())
 	command.AddCommand(version.NewCommand())
 
