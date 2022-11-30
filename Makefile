@@ -5,8 +5,12 @@ REPO_SERVER ?= ghcr.io
 REPO_ORG ?= arlonproj
 REPO_NAME ?= arlon
 CAPI_VERSION := $(shell cat $(REPO_ROOT)$*/capirc)
+ARGO_VERSION := $(shell cat $(REPO_ROOT)$*/argorc)
+ARLON_CLI_VERSION := $(shell cat $(REPO_ROOT)$*/version)
 CAPI_LD_FLAG := -X github.com/arlonproj/arlon/cmd/install.capiCoreProvider=$(CAPI_VERSION)
-LD_FLAGS := $(CAPI_LD_FLAG) -s -w
+ARGO_LD_FLAG := -X github.com/arlonproj/arlon/cmd/initialize.argocdGitTag=$(ARGO_VERSION)
+ARLON_CLI_LD_FLAG := -X github.com/arlonproj/arlon/cmd/version.cliVersion=$(ARLON_CLI_VERSION)
+LD_FLAGS := $(CAPI_LD_FLAG) $(ARGO_LD_FLAG) $(ARLON_CLI_LD_FLAG) -s -w
 # Image URL to use all building/pushing image targets
 IMG ?= $(REPO_SERVER)/$(REPO_ORG)/$(REPO_NAME)/controller:$(VERSION)
 # Produce CRDs with multiversion enabled for v1 APIs - fixes failure in make test
@@ -142,7 +146,7 @@ $(CONTROLLER_GEN): $(LOCALBIN)
 
 KUSTOMIZE = $(shell pwd)/bin/kustomize
 kustomize: ## Download kustomize locally if necessary.
-	$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v3@v3.9.3)
+	$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v4@v4.5.7)
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
@@ -165,5 +169,11 @@ test-e2e:
 	./testing/e2e_setup.sh
 	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 00-deploy
 	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 01-update
-	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 02-delete
+	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 02-linkedupdate
+	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 03-linkedbundleupdate
+	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 04-linkedprofileupdate
+	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 05-delete
+	kubectl kuttl test --start-kind=false ./testing/e2e/ --test 06-manage --kind-context arlon-e2e-testbed --timeout 300
+
+e2e-teardown:
 	./testing/e2e_setup_teardown.sh

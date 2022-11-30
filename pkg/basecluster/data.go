@@ -19,6 +19,10 @@ nameReference:
     kind: MachineDeployment
   - path: spec/template/spec/clusterName
     kind: MachineDeployment
+  - path: spec/clusterName
+    kind: MachinePool
+  - path: spec/template/spec/clusterName
+    kind: MachinePool
 - kind: AWSCluster
   group: infrastructure.cluster.x-k8s.io
   version: v1beta1
@@ -39,6 +43,18 @@ nameReference:
     kind: Cluster
   - path: spec/infrastructureRef/name
     kind: Cluster
+- kind: AWSManagedControlPlane
+  group: controlplane.cluster.x-k8s.io
+  version: v1beta2
+  fieldSpecs:
+  - path: spec/controlPlaneRef/name
+    kind: Cluster
+- kind: AWSManagedCluster
+  group: infrastructure.cluster.x-k8s.io
+  version: v1beta2
+  fieldSpecs:
+  - path: spec/infrastructureRef/name
+    kind: Cluster
 - kind: AWSMachine
   group: infrastructure.cluster.x-k8s.io
   version: v1beta1
@@ -53,6 +69,14 @@ nameReference:
     kind: Machine
 - kind: AWSMachineTemplate
   group: infrastructure.cluster.x-k8s.io
+  version: v1beta2
+  fieldSpecs:
+  - path: spec/template/spec/infrastructureRef/name
+    kind: MachineDeployment
+  - path: spec/machineTemplate/infrastructureRef/name
+    kind: KubeadmControlPlane
+- kind: AWSMachineTemplate
+  group: infrastructure.cluster.x-k8s.io
   version: v1beta1
   fieldSpecs:
   - path: spec/template/spec/infrastructureRef/name
@@ -62,6 +86,12 @@ nameReference:
 - kind: KubeadmConfigTemplate
   group: bootstrap.cluster.x-k8s.io
   version: v1beta1
+  fieldSpecs:
+  - path: spec/template/spec/bootstrap/configRef/name
+    kind: MachineDeployment
+- kind: EKSConfigTemplate
+  group: bootstrap.cluster.x-k8s.io
+  version: v1beta2
   fieldSpecs:
   - path: spec/template/spec/bootstrap/configRef/name
     kind: MachineDeployment
@@ -91,4 +121,28 @@ nameReference:
     kind: MachineDeployment
   - path: spec/machineTemplate/infrastructureRef/name
     kind: KubeadmControlPlane
+- kind: AWSManagedMachinePool
+  group: infrastructure.cluster.x-k8s.io
+  version: v1beta2
+  fieldSpecs:
+  - path: spec/template/spec/infrastructureRef/name
+    kind: MachinePool
+- kind: AWSManagedMachinePool
+  group: infrastructure.cluster.x-k8s.io
+  version: v1beta1
+  fieldSpecs:
+  - path: spec/template/spec/infrastructureRef/name
+    kind: MachinePool
+- kind: AWSMachinePool
+  group: infrastructure.cluster.x-k8s.io
+  version: v1beta2
+  fieldSpecs:
+  - path: spec/template/spec/infrastructureRef/name
+    kind: MachinePool
+- kind: AWSMachinePool
+  group: infrastructure.cluster.x-k8s.io
+  version: v1beta1
+  fieldSpecs:
+  - path: spec/template/spec/infrastructureRef/name
+    kind: MachinePool
 `

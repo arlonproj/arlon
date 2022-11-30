@@ -1,5 +1,5 @@
 # Build the manager binary
-FROM golang:1.19.1 as builder
+FROM golang:1.19.3 as builder
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
@@ -15,6 +15,8 @@ COPY api/ api/
 COPY controllers/ controllers/
 COPY pkg/ pkg/
 COPY cmd/ cmd/
+COPY deploy/ deploy/
+COPY config/ config/
 
 # Build
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o arlon main.go

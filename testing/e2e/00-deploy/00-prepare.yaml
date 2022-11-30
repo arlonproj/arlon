@@ -1,4 +1,4 @@
 apiVersion: kuttl.dev/v1beta1
 kind: TestStep
 commands:
-  - command: arlon basecluster preparegit --repo-url http://172.17.0.1:8188/myrepo.git --repo-path basecluster/test-cluster1
+  - command: arlon basecluster preparegit --repo-path basecluster/ec2-cluster

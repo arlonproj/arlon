@@ -1,4 +1,5 @@
-
+# macos
+.DS_Store
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -30,3 +31,6 @@ arlon
 # kuttl artifacts
 kubeconfig
 kind-logs-*
+
+#
+venv

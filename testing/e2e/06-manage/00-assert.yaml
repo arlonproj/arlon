@@ -1,0 +1,50 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 180
+---
+apiVersion: v1
+kind: Secret
+data:
+  name: a2luZC1leHRlcm5hbDE= # kind-external1 (base64)
+metadata:
+  annotations:
+    arlon.io/profile: dynamic-1
+    arlon.io/profile-app: kind-external1-profile-dynamic-1
+  labels:
+    arlon.io/cluster-type: external
+  namespace: argocd
+type: Opaque
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    arlon.io/profile: dynamic-1
+  name: kind-external1-profile-dynamic-1
+  namespace: argocd
+spec:
+  destination:
+    namespace: argocd
+status:
+  health:
+    status: Healthy
+  operationState:
+    phase: Succeeded
+  sync:
+    status: Synced
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kind-external1-xenial
+  namespace: argocd
+spec:
+  destination:
+    name: kind-external1
+status:
+  health:
+    status: Healthy
+  operationState:
+    phase: Succeeded
+  sync:
+    status: Synced

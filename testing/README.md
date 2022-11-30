@@ -18,4 +18,3 @@
   - verify that all k8s resources got cleaned up: `argocd app list` should eventually produce empty list
   - clean up docker containers: run `docker ps -a` to see all containers. Delete the ones prefixed with `capd-1-` using `docker stop` and `docker rm` (or `docker rm -f`)
 - to clean up the entire testbed, run `testing/teardown_testbed.sh`
-
