@@ -2,7 +2,6 @@ package cluster
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
@@ -16,10 +15,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
-)
-
-var (
-	ErrArgocdToken = errors.New("Login to ArgoCD again")
 )
 
 func Create(
@@ -51,8 +46,8 @@ func Create(
 		return nil, fmt.Errorf("failed to get grpc status from error")
 	}
 	if grpcStatus.Code() != grpccodes.NotFound {
-		return nil, fmt.Errorf("unexpected cluster application error code: %d, %s",
-			grpcStatus.Code(), ErrArgocdToken)
+		return nil, fmt.Errorf("unexpected cluster application error code: %d",
+			grpcStatus.Code())
 	}
 	var cm *v1.ConfigMap
 	if clusterSpecName != "" {

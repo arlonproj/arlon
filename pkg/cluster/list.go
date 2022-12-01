@@ -26,7 +26,7 @@ func List(
 	apps, err := appIf.List(context.Background(),
 		&apppkg.ApplicationQuery{Selector: &query})
 	if err != nil {
-		return nil, fmt.Errorf("failed to list argocd applications: %s, %s", err, ErrArgocdToken)
+		return nil, fmt.Errorf("failed to list argocd applications: %s", err)
 	}
 	for _, a := range apps.Items {
 		clist = append(clist, Cluster{

@@ -36,7 +36,7 @@ func ManageExternal(
 	log := logpkg.GetLogger()
 	conn, appIf, err := argoIf.NewApplicationClient()
 	if err != nil {
-		return fmt.Errorf("failed to get argocd application client: %s, %s", err, ErrArgocdToken)
+		return fmt.Errorf("failed to get argocd application client: %s", err)
 	}
 	defer conn.Close()
 	clist, err := List(appIf, config, argocdNs)
@@ -187,7 +187,7 @@ func UnmanageExternal(
 ) error {
 	conn, appIf, err := argoIf.NewApplicationClient()
 	if err != nil {
-		return fmt.Errorf("failed to get argocd application client: %s %s", err, ErrArgocdToken)
+		return fmt.Errorf("failed to get argocd application client: %s", err)
 	}
 	defer conn.Close()
 	foundCluster, err := Get(appIf, config, argocdNs, clusterName)

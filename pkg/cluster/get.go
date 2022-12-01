@@ -54,7 +54,7 @@ func Get(
 			Name: &name,
 		})
 	if err != nil {
-		return nil, fmt.Errorf("failed to get argocd application: %s, %s", err, ErrArgocdToken)
+		return nil, fmt.Errorf("failed to get argocd application: %s", err)
 	}
 	typ := app.Labels["arlon-type"]
 	if typ == "cluster" {
