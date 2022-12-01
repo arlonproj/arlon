@@ -1,7 +1,16 @@
-# Cluster Overrides - Proposal
-This is a design proposal for gen2 cluster overrides. As of now, we have 2 different approaches discussed for overriding the clusters. This proposal is for the kustomize approach. In the kustomize approach, we create an overlay folder parallel to the basecluster folder which contains folders named with the cluster name. These cluster named folders contain the specific overrides to the cluster. An example of the folder structure is as belows:
+# Gen2 Cluster Overrides - Proposal
+This is a design proposal doc for gen2 cluster overrides. Right now, according to our gen2 design, we can deploy multiple clusters with same specifications from one base cluster. But what if we want to deploy cluster with a different sshkeyname from the same manifest?. To allow deploying clusters with different specifications from the same base clsuter we are introducing the concept of clusteroverrides. So, clusteroverrides is being able to deploy clusters with different specs using same manifest and overriding the specs which we want to change.
 
-### A folder directory layout
+We have 2 different approches to override in a cluster:
+
+1. Converting the git repo where base cluster is present to helm charts
+2. Overriding specifies fields using kustomize
+
+In the first approach, We first let user upload the base manifest in the repo and deploy the cluster from it and then convert it into helm chart, so that we will be able to override fields in the manifest. The downside of this approach is that we don't have a specific template for base manifest, a user can use any form of the template in which case we will not be able to convert the manifest to heml chart.
+
+So, continuing with the 2nd approach, in the kustomize approach, we create an overlay folder parallel to the basecluster folder which contains folders named with the cluster name. These cluster named folders contain the specific override files to the cluster. An example of the folder structure is as belows:
+
+### A directory layout
 
     .
     ├── Basecluster                  # Basecluster folder(Contains base manifest)
@@ -10,18 +19,15 @@ This is a design proposal for gen2 cluster overrides. As of now, we have 2 diffe
         ├── Cluster2                 # Contains overrides corresponding to cluster2
 
 
-In the argocd app, instead of where previously we used to point our path to the basemanifest folder we will point it to the specific cluster folder in overlays folder.
+### Let's consider an example case to understand the kustomize approach
 
-This will help argocd to create a manifest which has all the overrides specific to a cluster roped in.
-
-###Let's consider an example case to understand the information
-
-1. Three different clusters on AWS are needed. The management cluster already exists.
+1. Let's consider three different clusters on AWS. The management cluster already exists.
 
 2. Two of these clusters will run in the AWS “us-west-2” region, while the third will run in the “us-east-2” region.
 
 3. One of the two “us-west-2” clusters will use larger instance types to accommodate more resource-intensive workloads.
 
+Now, we need to get our gitrepo ready by pushing the basemanifest into a folder named base and for overriding, we need to create a folder for each cluster with the cluster name and place them in overlays folder which is parallel to the base folder
 ## Setting up the Directory Structure
 
 To accommodate this use case, we will need to use a directory structure that supports the use of kustomize overlays. Therefore, the directory structure would look like this for the project:
@@ -35,9 +41,16 @@ To accommodate this use case, we will need to use a directory structure that sup
 
 The base directory will store the base manifest for the final Cluster API manifests, as well as a kustomization.yaml file that identifies these Cluster API manifests as resources for kustomize to use.
 
-Every overlay subdirectory will include a customization as well. The base resources will be patched using the yaml file and different patch files to create the final manifests.
+The contents of kustomize file in base folder is as follows:
 
-## Creating the overlays
+```
+resources:
+- basemanifest.yaml
+```
+
+The kustomization.yaml states that the resources for cluster is in basemanifest.yaml file
+
+## What consists in the cluster named folders?
 
 The intriguing parts begin with the overlays. You will need to provide the cluster-specific patches kustomize will use to generate the YAML for each cluster in its own directory under the overlays directory.
 
