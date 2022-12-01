@@ -21,7 +21,7 @@ func Delete(
 	//log := logpkg.GetLogger()
 	conn, appIf, err := argoIf.NewApplicationClient()
 	if err != nil {
-		return fmt.Errorf("failed to get argocd application client: %s", err)
+		return fmt.Errorf("failed to get argocd application client: %s, %s", err, ErrArgocdToken)
 	}
 	defer conn.Close()
 	clust, err := Get(appIf, config, argocdNs, name)

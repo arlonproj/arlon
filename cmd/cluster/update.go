@@ -3,6 +3,8 @@ package cluster
 import (
 	_ "embed"
 	"fmt"
+	"os"
+
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/arlonproj/arlon/pkg/argocd"
@@ -12,7 +14,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/client-go/tools/clientcmd"
-	"os"
 )
 
 func updateClusterCommand() *cobra.Command {
@@ -38,7 +39,7 @@ func updateClusterCommand() *cobra.Command {
 			clusterName := args[0]
 			clust, err := cluster.Get(appIf, config, argocdNs, clusterName)
 			if err != nil {
-				return fmt.Errorf("failed to get clust: %s", err)
+				return fmt.Errorf("failed to get cluster: %s", err)
 			}
 			if clust.IsExternal {
 				if clusterSpecName != "" {

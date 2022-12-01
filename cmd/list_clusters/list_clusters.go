@@ -3,14 +3,15 @@ package list_clusters
 import (
 	"context"
 	"fmt"
+	"os"
+	"text/tabwriter"
+
 	clusterpkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/cluster"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/errors"
 	"github.com/argoproj/argo-cd/v2/util/io"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/spf13/cobra"
-	"os"
-	"text/tabwriter"
 )
 
 func NewCommand() *cobra.Command {
@@ -30,6 +31,9 @@ func listClusters() {
 	conn, clusterIf := argocd.NewArgocdClientOrDie("").NewClusterClientOrDie()
 	defer io.Close(conn)
 	clusters, err := clusterIf.List(context.Background(), &clusterpkg.ClusterQuery{})
+	if err != nil {
+		fmt.Println("argocd auth token has expired, Login to ArgoCD again")
+	}
 	errors.CheckError(err)
 	printClusterTable(clusters.Items)
 }

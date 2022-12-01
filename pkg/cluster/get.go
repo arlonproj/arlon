@@ -3,6 +3,7 @@ package cluster
 import (
 	"context"
 	"fmt"
+
 	apppkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	"github.com/arlonproj/arlon/pkg/common"
@@ -53,7 +54,7 @@ func Get(
 			Name: &name,
 		})
 	if err != nil {
-		return nil, fmt.Errorf("failed to get argocd application: %s", err)
+		return nil, fmt.Errorf("failed to get argocd application: %s, %s", err, ErrArgocdToken)
 	}
 	typ := app.Labels["arlon-type"]
 	if typ == "cluster" {

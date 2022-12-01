@@ -36,7 +36,7 @@ func ngupdateClusterCommand() *cobra.Command {
 			apps, err := appIf.List(context.Background(),
 				&argoapp.ApplicationQuery{Selector: &selector})
 			if err != nil {
-				return fmt.Errorf("failed to list apps related to cluster: %s", err)
+				return fmt.Errorf("failed to list apps related to cluster: %s, %s", err, ErrArgocdToken)
 			}
 			if len(apps.Items) == 0 {
 				return fmt.Errorf("Failed to get the given cluster")

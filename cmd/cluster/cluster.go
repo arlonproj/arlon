@@ -1,6 +1,14 @@
 package cluster
 
-import "github.com/spf13/cobra"
+import (
+	"errors"
+
+	"github.com/spf13/cobra"
+)
+
+var (
+	ErrArgocdToken = errors.New("Login to ArgoCD again")
+)
 
 func NewCommand() *cobra.Command {
 	command := &cobra.Command{
