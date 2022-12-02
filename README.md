@@ -892,7 +892,7 @@ To update the profiles of a gen2 workload cluster:
 arlon cluster ngupdate <clustername> --profile <profilename>
 
 # To delete an existing profile from the existing cluster
-arlon cluster ngupdate <clustername> --delete-profile <profilename>
+arlon cluster ngupdate <clustername> --delete-profile
 ```
 A gen2 cluster can be created without any profile app associated with the cluster. So, the above commands can be used to add a new profile 
 to the existing cluster which will create profile app in argocd along with bundle apps associated with the profile.
