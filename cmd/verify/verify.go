@@ -22,7 +22,7 @@ var (
 	ErrKubectlSet        = errors.New("error setting kubeconfig")
 	ErrKcPermission      = errors.New("set the kubeconfig or kubeconfig does not have required access")
 	ErrArgoCD            = errors.New("argocd is not installed or missing in your $PATH")
-	ErrArgoCDAuthToken   = errors.New("argocd auth token has expired, login to argocd again")
+	ErrArgoCDAuthToken   = errors.New("ArgoCD authentication token has expired. Login to ArgoCD again")
 	ErrGit               = errors.New("git is not installed or missing in your $PATH")
 	ErrArlonNs           = errors.New("arlon is not installed or missing in your $PATH")
 	ErrCapi              = errors.New("capi services are not installed or missing in your $PATH")

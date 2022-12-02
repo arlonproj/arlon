@@ -1,6 +1,15 @@
 package cluster
 
-import "github.com/spf13/cobra"
+import (
+	"context"
+	"fmt"
+	"os"
+
+	apppkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
+	"github.com/argoproj/argo-cd/v2/util/io"
+	"github.com/arlonproj/arlon/pkg/argocd"
+	"github.com/spf13/cobra"
+)
 
 func NewCommand() *cobra.Command {
 	command := &cobra.Command{
@@ -8,6 +17,7 @@ func NewCommand() *cobra.Command {
 		Short:             "Manage clusters",
 		Long:              "Manage clusters",
 		DisableAutoGenTag: true,
+		PersistentPreRun:  checkForArgocd,
 		Run: func(c *cobra.Command, args []string) {
 			c.Usage()
 		},
@@ -22,4 +32,15 @@ func NewCommand() *cobra.Command {
 	command.AddCommand(deleteClusterCommand())
 	command.AddCommand(ngupdateClusterCommand())
 	return command
+}
+
+func checkForArgocd(c *cobra.Command, args []string) {
+	conn, appIf := argocd.NewArgocdClientOrDie("").NewApplicationClientOrDie()
+	defer io.Close(conn)
+	query := "managed-by=arlon,arlon-type=cluster"
+	_, err := appIf.List(context.Background(), &apppkg.ApplicationQuery{Selector: &query})
+	if err != nil {
+		fmt.Println("ArgoCD auth token has expired....Login to ArgoCD again")
+		os.Exit(1)
+	}
 }
