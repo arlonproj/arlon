@@ -6,7 +6,6 @@ import (
 	"os"
 	"text/tabwriter"
 
-	apppkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	clusterpkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/cluster"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/errors"
@@ -21,7 +20,6 @@ func NewCommand() *cobra.Command {
 		Short:             "List the clusters registered with ArgoCD",
 		Long:              "List the clusters registered with ArgoCD",
 		DisableAutoGenTag: true,
-		PersistentPreRun:  checkForArgocd,
 		Run: func(c *cobra.Command, args []string) {
 			listClusters()
 		},
@@ -50,15 +48,4 @@ func printClusterTable(clusters []argoappv1.Cluster) {
 		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", server, c.Name, c.ServerVersion, c.ConnectionState.Status, c.ConnectionState.Message)
 	}
 	_ = w.Flush()
-}
-
-func checkForArgocd(c *cobra.Command, args []string) {
-	conn, appIf := argocd.NewArgocdClientOrDie("").NewApplicationClientOrDie()
-	defer io.Close(conn)
-	query := "managed-by=arlon,arlon-type=cluster"
-	_, err := appIf.List(context.Background(), &apppkg.ApplicationQuery{Selector: &query})
-	if err != nil {
-		fmt.Println("ArgoCD auth token has expired....Login to ArgoCD again")
-		os.Exit(1)
-	}
 }
