@@ -27,3 +27,9 @@ __debug_bin
 *~
 arlon
 
+#macos
+.DS_Store
+
+#python
+venv
+

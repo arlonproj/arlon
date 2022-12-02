@@ -1,6 +1,7 @@
 package cluster
 
 import (
+	"errors"
 	"fmt"
 
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
@@ -22,6 +23,9 @@ func NgUpdate(
 	prof, err := profile.Get(config, profileName, arlonNs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get profile: %s", err)
+	}
+	if prof.Spec.RepoUrl == "" {
+		return nil, errors.New("RepoUrl empty, static profiles are unsupported")
 	}
 	err = DestroyProfileApps(appIf, clusterName)
 	if err != nil {

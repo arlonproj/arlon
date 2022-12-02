@@ -5,13 +5,15 @@ The most significant change is the *Base Cluster* construct, which replaces the 
 To distinguish them from current generation
 clusters, the ones deployed from a base cluster are called next-gen clusters.
 
+**NB: Base clusters only support dynamic profiles.**
+
 ## Goals
 
 - Allow users to deploy arbitrarily complex clusters using the full Cluster API feature set.
 - Fully declarative and gitops compatible: a cluster deployment should be composed of one or more
 self-sufficient manifests that the user can choose to either apply directly (via kubectl) or store in
 git for later-stage deployment by a gitops tool (mainly ArgoCD).
-- Support Linked Mode update: an update to the the base cluster should
+- Support Linked Mode update: an update to the base cluster should
 automatically propagate to all workload clusters deployed from it.
 
 ## Profile support
