@@ -1,10 +1,10 @@
 # Next-Generation (gen2) Clusters - New in version 0.9.x
 
-Gen1 clusters are limited in capability by the Helm chart used to deploy the infrastructure resources.
+gen1 clusters are limited in capability by the Helm chart used to deploy the infrastructure resources.
 Advanced Cluster API configurations, such as those using multiple MachinePools, each with different
 instance types, is not supported.
 
-Gen2 clusters solve this problem by allowing you to create workload clusters from a *base cluster*
+gen2 clusters solve this problem by allowing you to create workload clusters from a *base cluster*
 that you design and provide in the form of a manifest file stored in a git directory. The manifest
 typically contains multiple related resources that together define an arbitrarily complex cluster.
 If you make subsequent changes to the base cluster, workload clusters originally created from it
@@ -376,11 +376,13 @@ To update the profiles of a gen2 workload cluster:
 # To add a new profile to the existing cluster
 arlon cluster ngupdate <clustername> --profile <profilename>
 # To delete an existing profile from the existing cluster
-arlon cluster ngupdate <clustername> --delete-profile <profilename>
+arlon cluster ngupdate <clustername> --delete-profile=true/false
 ```
 
 A gen2 cluster can be created without any profile app associated with the cluster. So, the above commands can be used to add a new profile
 to the existing cluster which will create profile app in argocd along with bundle apps associated with the profile.
+
+Note: For gen-2 clusters, only dynamic profiles are supported and can be associated with the cluster.
 
 An existing profile can be deleted from the cluster as well using the above command. Executing this command will delete the profile app and
 all the bundles associated with the profile in argocd.
