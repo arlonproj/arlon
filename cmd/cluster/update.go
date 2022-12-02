@@ -39,7 +39,7 @@ func updateClusterCommand() *cobra.Command {
 			clusterName := args[0]
 			clust, err := cluster.Get(appIf, config, argocdNs, clusterName)
 			if err != nil {
-				return fmt.Errorf("failed to get cluster: %s", err)
+				return fmt.Errorf("failed to update cluster: %s", err)
 			}
 			if clust.IsExternal {
 				if clusterSpecName != "" {
