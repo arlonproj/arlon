@@ -10,6 +10,8 @@ typically contains multiple related resources that together define an arbitraril
 If you make subsequent changes to the base cluster, workload clusters originally created from it
 will automatically acquire the changes.
 
+**NB: Base clusters only support dynamic profiles.**
+
 ## Creating Cluster-API cluster manifest
 
 Note: The CAPA version used here is v2.0 and the manifests created here are in accordance with this version.
@@ -376,7 +378,7 @@ To update the profiles of a gen2 workload cluster:
 # To add a new profile to the existing cluster
 arlon cluster ngupdate <clustername> --profile <profilename>
 # To delete an existing profile from the existing cluster
-arlon cluster ngupdate <clustername> --delete-profile <profilename>
+arlon cluster ngupdate <clustername> --delete-profile
 ```
 
 A gen2 cluster can be created without any profile app associated with the cluster. So, the above commands can be used to add a new profile
