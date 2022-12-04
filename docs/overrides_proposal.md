@@ -93,3 +93,12 @@ Using this particular approach the present basecluster approach will need to tak
 In this approach, Instead of the configurations.yaml(Needed for name suffix), we will have a folder for each cluster and argocd path pointing to the cluster folder. This will help us in skipping the name suffix method we were using before.
 
 We will be able to basically override any of the field in manifest without any limitations before creating a cluster using this approach.
+
+### UX(User experience):
+
+A user can override a cluster using flags while creating a cluster. Example of a command:
+
+```arlon cluster create <cluster name> --repo-url <repo url> --repo-path <repo path> --sshkey <ssh key name> --replicas <replicas> --nodetype <node type>```
+
+A user can use any of the above flags to override the specific parameter in the final manifest file created. 
+If a user doesn't provide any flag for overriding, cluster will be created with the default parameters which are in the basemanifest file uploaded by the user.
