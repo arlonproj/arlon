@@ -146,7 +146,7 @@ fi
 
 argocd_git_tag="${ARGOCD_GIT_TAG}"
 if [ -z "${argocd_git_tag}" ]; then
-  argocd_git_tag="release-2.4"
+  argocd_git_tag="release-2.5"
 fi
 echo applying argocd manifest from git tag: ${argocd_git_tag}
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/${argocd_git_tag}/manifests/install.yaml >/dev/null

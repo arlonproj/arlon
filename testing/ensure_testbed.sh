@@ -4,7 +4,7 @@
 # GIT_SERVER_PORT         8188
 # GIT_ROOT                /tmp/arlon-testbed-git
 # GIT_CLONE_ROOT          /tmp/arlon-testbed-git-clone
-# ARGOCD_GIT_TAG          release-2.4
+# ARGOCD_GIT_TAG          release-2.5
 # ARGOCD_CONFIG_FILE      Create new one under /tmp
 # ARGGOCD_FORWARDING_PORT 8189
 
@@ -181,7 +181,7 @@ fi
 
 argocd_git_tag=${ARGOCD_GIT_TAG}
 if [ -z "${argocd_git_tag}" ]; then
-    argocd_git_tag="release-2.4"
+    argocd_git_tag="release-2.5"
 fi
 echo applying argocd manifest from git tag: ${argocd_git_tag}
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/${argocd_git_tag}/manifests/install.yaml > /dev/null
