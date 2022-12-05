@@ -1,0 +1,52 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: my-cluster
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+      - 192.168.0.0/16
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: AWSManagedControlPlane
+    name: my-cluster-control-plane
+  infrastructureRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: AWSManagedControlPlane
+    name: my-cluster-control-plane
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: AWSManagedControlPlane
+metadata:
+  name: my-cluster-control-plane
+spec:
+  region: us-west-1
+  sshKeyName: leb
+  version: v1.22.0
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachinePool
+metadata:
+  name: my-cluster-pool-0
+spec:
+  clusterName: my-cluster
+  replicas: 2
+  template:
+    spec:
+      bootstrap:
+        dataSecretName: ""
+      clusterName: my-cluster
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AWSManagedMachinePool
+        name: my-cluster-pool-0
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AWSManagedMachinePool
+metadata:
+  name: my-cluster-pool-0
+spec:
+  scaling:
+    maxSize: 5
+    minSize: 0
