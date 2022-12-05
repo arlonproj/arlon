@@ -327,7 +327,7 @@ echo "Enabling MachinePool Feature Gate for running e2e tests"
 export EXP_MACHINE_POOL=true
 export AWS_B64ENCODED_CREDENTIALS=$(clusterawsadm bootstrap credentials encode-as-profile)
 
-clusterctl init --infrastructure aws --wait-providers
+clusterctl init --infrastructure aws:v2.0.1 --wait-providers
 echo "To access ArgoCD UI, run: kubectl port-forward svc/argocd-server -n argocd ${forwarding_port}:443"
 echo "Login as admin: ${pwd} into ArgoCD at http://localhost:${forwarding_port}"
 echo "Run the following command to use kubectl, argocd, clusterctl, clusterawsadm, arlon (If not already installed)"
