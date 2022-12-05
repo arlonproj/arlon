@@ -22,7 +22,6 @@ metadata:
   name: my-cluster-control-plane
 spec:
   region: us-west-1
-  sshKeyName: leb
   version: v1.22.0
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
