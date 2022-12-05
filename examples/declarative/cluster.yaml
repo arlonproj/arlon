@@ -22,7 +22,7 @@ spec:
       - name: global.kubeconfigSecretKeyName
         value: value
       - name: global.innerClusterNameWithDashSuffix
-        value: my-cluster-
+        value: mycluster-
     path: pkg/cluster/manifests
     repoURL: https://github.com/arlonproj/arlon.git
     targetRevision: v0.9.0
@@ -46,7 +46,7 @@ kind: Application
 metadata:
   annotations:
     arlon.io/profiles: frontend,backend
-    arlon.io/basecluster-name: my-cluster
+    arlon.io/basecluster-name: mycluster
     arlon.io/basecluster-repo-path: examples/clustertemplates/eks-managed-mpool
     arlon.io/basecluster-repo-revision: private/leb/multiprofiles
     arlon.io/basecluster-repo-url: https://github.com/arlonproj/arlon.git
