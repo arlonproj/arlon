@@ -96,9 +96,10 @@ We will be able to basically override any of the field in manifest without any l
 
 ### UX(User experience):
 
-A user can override a cluster using flags while creating a cluster. Example of a command:
+To provide a user the freedom to completely override any part of the base manifest, we ask the user to point to a yaml file in which the fields have been overridden. 
 
-```arlon cluster create <cluster name> --repo-url <repo url> --repo-path <repo path> --sshkey <ssh key name> --replicas <replicas> --nodetype <node type> --ducloudprovider <DU cloud provider>```
+This would be easier to user as well because he/she would generate the manifest file anyway. So, they need to make changes to the already generated and point it. 
 
-A user can use any of the above flags to override the specific parameter in the final manifest file created. 
-If a user doesn't provide any flag for overriding, cluster will be created with the default parameters which are in the basemanifest file uploaded by the user.
+But we should even take care of the point that the base manifest in the git and the overriden manifest file are comparable. Example of a command:
+
+```arlon cluster create <cluster name> --repo-url <repo url> --repo-path <repo path> --overrides <path to overriden manifest file>```
