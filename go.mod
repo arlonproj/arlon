@@ -270,7 +270,7 @@ replace (
 	//https://github.com/golang/go/issues/33546#issuecomment-519656923
 	//taken from argoproj/argo-cd tag=release-2.5
 	github.com/go-check/check => github.com/go-check/check v0.0.0-20180628173108-788fd7840127
-	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.13.0
+	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.14.0
 	golang.org/x/crypto => golang.org/x/crypto v0.3.0
 	k8s.io/api => k8s.io/api v0.24.8
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.24.8
