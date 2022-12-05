@@ -62,7 +62,7 @@ const (
 	baseclusterDir                         = "baseclusters"
 	defaultCtrlPlaneCount            int64 = 2
 	defaultWorkerCount               int64 = 3
-	defaultK8sVersion                      = "1.23.14"
+	defaultK8sVersion                      = "1.25.4"
 )
 
 type porfForwardCfg struct {

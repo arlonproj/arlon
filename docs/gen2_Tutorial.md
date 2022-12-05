@@ -27,7 +27,7 @@ deploying an EKS cluster with 'machine deployment' component from the cluster AP
 
 ```shell
 clusterctl generate cluster capi-quickstart --flavor eks \
-  --kubernetes-version v1.24.0 \
+  --kubernetes-version v1.25.4 \
   --control-plane-machine-count=3 \
   --worker-machine-count=3 \
   > capi-quickstart.yaml
@@ -68,7 +68,7 @@ metadata:
 spec:
   region: {REGION}
   sshKeyName: {SSH_KEYNAME}
-  version: v1.24.0
+  version: v1.25.4
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachineDeployment
@@ -92,7 +92,7 @@ spec:
         apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
         kind: AWSMachineTemplate
         name: capi-quickstart-md-0
-      version: v1.24.0
+      version: v1.25.4
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
 kind: AWSMachineTemplate
