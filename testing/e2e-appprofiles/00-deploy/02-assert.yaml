@@ -23,7 +23,11 @@ kind: MachinePool
 metadata:
   namespace: example-1
 status:
-  ready: true
+  bootstrapReady: true
+  infrastructureReady: true
+  phase: Running
+  readyReplicas: 2
+  availableReplicas: 2
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: AWSManagedMachinePool
