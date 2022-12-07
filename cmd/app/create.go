@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	_ "embed"
 	"fmt"
 	appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
 	"github.com/arlonproj/arlon/pkg/app"
