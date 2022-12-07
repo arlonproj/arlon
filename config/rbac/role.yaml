@@ -8,6 +8,32 @@ rules:
 - apiGroups:
   - core.arlon.io
   resources:
+  - appprofiles
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.arlon.io
+  resources:
+  - appprofiles/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.arlon.io
+  resources:
+  - appprofiles/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - core.arlon.io
+  resources:
   - callhomeconfigs
   verbs:
   - create

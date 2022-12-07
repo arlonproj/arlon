@@ -1,0 +1,68 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  labels:
+    arlon-type: application
+  name: guestbook
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements: []
+        template:
+          metadata: {}
+          spec:
+            destination: {}
+            project: ""
+            source:
+              repoURL: ""
+  template:
+    metadata:
+      name: '{{cluster_name}}-app-guestbook'
+    spec:
+      destination:
+        namespace: default
+        server: '{{cluster_server}}'
+      project: default
+      source:
+        path: guestbook
+        repoURL: https://github.com/argoproj/argocd-example-apps
+        targetRevision: HEAD
+      syncPolicy:
+        automated:
+          prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  labels:
+    arlon-type: application
+    managed-by: arlon
+  name: redis
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements: []
+        template:
+          metadata: {}
+          spec:
+            destination: {}
+            project: ""
+            source:
+              repoURL: ""
+  template:
+    metadata:
+      name: '{{cluster_name}}-app-redis'
+    spec:
+      destination:
+        namespace: default
+        server: '{{cluster_server}}'
+      project: default
+      source:
+        path: bitnami/redis
+        repoURL: https://github.com/bitnami/charts
+        targetRevision: main
+      syncPolicy:
+        automated:
+          prune: true

@@ -1,0 +1,27 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: appprofile-updater
+rules:
+  - apiGroups: ["core.arlon.io"]
+    resources: ["appprofiles", "appprofiles/status"]
+    verbs: ["get", "watch", "list", "update", "patch"]
+  - apiGroups: ["argoproj.io"]
+    resources: ["applications"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: ["argoproj.io"]
+    resources: ["applicationsets"]
+    verbs: ["get", "watch", "list", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: arlon-appprofile-writer
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: arlon
+roleRef:
+  kind: ClusterRole
+  name: appprofile-updater
+  apiGroup: rbac.authorization.k8s.io

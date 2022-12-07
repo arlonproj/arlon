@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/arlonproj/arlon/pkg/ctrlruntimeclient"
 	"strings"
 
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/bundle"
-	"github.com/arlonproj/arlon/pkg/controller"
 	sets "github.com/deckarep/golang-set"
 	v1 "k8s.io/api/core/v1"
 	apierr "k8s.io/apimachinery/pkg/api/errors"
@@ -31,7 +31,7 @@ var (
 // -----------------------------------------------------------------------------
 
 func List(config *restclient.Config, ns string) (plist []AugmentedProfile, err error) {
-	cli, err := controller.NewClient(config)
+	cli, err := ctrlruntimeclient.NewClient(config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get controller runtime client: %s", err)
 	}
@@ -98,7 +98,7 @@ func FromConfigMap(cm *v1.ConfigMap) (*arlonv1.Profile, error) {
 // -----------------------------------------------------------------------------
 
 func Get(config *restclient.Config, name string, ns string) (*arlonv1.Profile, error) {
-	cli, err := controller.NewClient(config)
+	cli, err := ctrlruntimeclient.NewClient(config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get controller runtime client: %s", err)
 	}

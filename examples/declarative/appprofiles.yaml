@@ -1,0 +1,19 @@
+apiVersion: core.arlon.io/v1
+kind: AppProfile
+metadata:
+  name: frontend
+  namespace: arlon
+spec:
+  appNames:
+  - guestbook
+  - nonexistent-1
+---
+apiVersion: core.arlon.io/v1
+kind: AppProfile
+metadata:
+  name: backend
+  namespace: arlon
+spec:
+  appNames:
+  - redis
+  - nonexistent-2

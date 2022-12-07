@@ -1,0 +1,5 @@
+resources:
+- manifest.yaml
+
+configurations:
+- configurations.yaml

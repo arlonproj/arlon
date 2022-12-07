@@ -32,7 +32,7 @@ func ConstructRootApp(
 	app := &argoappv1.Application{
 		TypeMeta: v1.TypeMeta{
 			Kind:       application.ApplicationKind,
-			APIVersion: application.Group + "/v1alpha1",
+			APIVersion: application.Group + "/" + argoappv1.SchemeGroupVersion.Version,
 		},
 		ObjectMeta: v1.ObjectMeta{
 			Name:      appName,

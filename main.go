@@ -20,7 +20,12 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"go.uber.org/zap/zapcore"
 	"os"
+
+	"github.com/arlonproj/arlon/cmd/app"
+	"github.com/arlonproj/arlon/cmd/appprofile"
+	"github.com/arlonproj/arlon/cmd/appprofilecontroller"
 
 	apppkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	"github.com/argoproj/argo-cd/v2/util/io"
@@ -65,6 +70,7 @@ func main() {
 	command.SilenceUsage = true
 	command.AddCommand(controller.NewCommand())
 	command.AddCommand(callhomecontroller.NewCommand())
+	command.AddCommand(appprofilecontroller.NewCommand())
 	command.AddCommand(list_clusters.NewCommand())
 	command.AddCommand(bundle.NewCommand())
 	command.AddCommand(profile.NewCommand())
@@ -75,11 +81,14 @@ func main() {
 	command.AddCommand(gitrepo.NewCommand())
 	command.AddCommand(verify.NewCommand())
 	command.AddCommand(install.NewCommand())
+	command.AddCommand(app.NewCommand())
+	command.AddCommand(appprofile.NewCommand())
 	command.AddCommand(initialize.NewCommand())
 	command.AddCommand(version.NewCommand())
 
 	opts := zap.Options{
 		Development: true,
+		TimeEncoder: zapcore.RFC3339NanoTimeEncoder,
 	}
 	opts.BindFlags(flag.CommandLine)
 	// override default log level, which is initially set to 'debug'
