@@ -19,6 +19,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"k8s.io/kubernetes/pkg/apis/core"
 	"time"
 
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
@@ -64,6 +65,7 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	log.V(1).Info("arlon callhomeconfig")
 	var chc arlonv1.CallHomeConfig
 	fmt.Printf("CHC called with params: req: %+v\n", req)
+	//req{namespace:cas-cl, name:cluster-autoscaler }
 	if err := r.Get(ctx, req.NamespacedName, &chc); err != nil {
 		if apierrors.IsNotFound(err) {
 			log.Info("callhomeconfig is gone -- ok")
@@ -73,6 +75,18 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		return ctrl.Result{Requeue: true}, nil
 	}
 	fmt.Printf("CHC looks like: %+v\n", chc)
+	//	CHC looks like:
+	//	ObjectMeta:{
+	//		Name:cluster-autoscaler,
+	//		GenerateName: Namespace:cas-cl,
+	//		Labels:map[app.kubernetes.io/instance:cas-cl]
+	// 		Spec:{ServiceAccountName:cluster-autoscaler,
+	//			  KubeconfigSecretName:cas-cl-kubeconfig,
+	//			  KubeconfigSecretKeyName:value,
+	//			  TargetNamespace:kube-system,
+	//			  TargetSecretName:cluster-autoscaler-management-kubeconfig,
+	//			  TargetSecretKeyName:kubeconfig ManagementClusterUrl:https://127.0.0.1:33365}
+
 	if chc.Status.State == "complete" {
 		log.V(1).Info("callhomeconfig is already complete")
 		return ctrl.Result{}, nil
@@ -82,6 +96,7 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		return ctrl.Result{}, nil
 	}
 	var secret corev1.Secret
+	// get workload cluster kubeconfig secret
 	secretNamespacedName := types.NamespacedName{
 		Namespace: req.NamespacedName.Namespace,
 		Name:      chc.Spec.KubeconfigSecretName,
@@ -100,18 +115,21 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			fmt.Sprintf("secret subkey %s does not exist",
 				chc.Spec.KubeconfigSecretKeyName), ctrl.Result{})
 	}
+	// rest config
 	conf, err := clientcmd.RESTConfigFromKubeConfig(data)
 	if err != nil {
 		return updateCallHomeConfigState(r, log, &chc, "error",
 			fmt.Sprintf("failed to read kubeconfig from secret: %s", err),
 			ctrl.Result{})
 	}
+	// clientset to communicate with it
 	clientset, err := kubernetes.NewForConfig(conf)
 	if err != nil {
 		return updateCallHomeConfigState(r, log, &chc, "error",
 			fmt.Sprintf("failed to get clientset from config: %s", err),
 			ctrl.Result{})
 	}
+	// get the secret.... in workload cluster
 	secretsApi := clientset.CoreV1().Secrets(chc.Spec.TargetNamespace)
 	_, err = secretsApi.Get(context.Background(), chc.Spec.TargetSecretName,
 		metav1.GetOptions{})
@@ -128,7 +146,7 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	// read the service account token
 	var sa corev1.ServiceAccount
 	namespacedName := types.NamespacedName{
-		Namespace: req.Namespace,
+		Namespace: req.Namespace, //req{namespace:cas-cl, name:cluster-autoscaler}
 		Name:      chc.Spec.ServiceAccountName,
 	}
 	if err := r.Get(ctx, namespacedName, &sa); err != nil {
@@ -140,28 +158,45 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			fmt.Sprintf("unexpected error getting service account: %s", err),
 			ctrl.Result{})
 	}
-	if len(sa.Secrets) < 1 {
-		return retryLater(r, log, &chc, "serviceaccount",
-			namespacedName.Name, "does not have a token")
-	}
-	tokenSecretName := sa.Secrets[0]
-	var token corev1.Secret
+	var kubeconfigSecret corev1.Secret
 	if err := r.Get(ctx, types.NamespacedName{
 		Namespace: req.Namespace,
-		Name:      tokenSecretName.Name,
-	}, &token); err != nil {
+		Name:      "cluster-autoscaler-mgmt-kubeconfig",
+	}, &kubeconfigSecret); err != nil {
 		if apierrors.IsNotFound(err) {
-			return retryLater(r, log, &chc, "token secret",
-				tokenSecretName.Name, "does not exist yet")
+			return retryLater(r, log, &chc, "secret",
+				namespacedName.Name, "does not exist yet")
 		}
 		return updateCallHomeConfigState(r, log, &chc, "error",
 			fmt.Sprintf("unexpected error getting service account: %s", err),
 			ctrl.Result{})
 	}
+	if len(kubeconfigSecret.Data["token"]) == 0 {
+		return retryLater(r, log, &chc, "secret",
+			namespacedName.Name, "does not have a token")
+	}
+	//if len(sa.Secrets) < 1 {
+	//	return retryLater(r, log, &chc, "serviceaccount",
+	//		namespacedName.Name, "does not have a token")
+	//}
+	//tokenSecretName := sa.Secrets[0]
+	//var token corev1.Secret
+	//if err := r.Get(ctx, types.NamespacedName{
+	//	Namespace: req.Namespace,
+	//	Name:      tokenSecretName.Name,
+	//}, &token); err != nil {
+	//	if apierrors.IsNotFound(err) {
+	//		return retryLater(r, log, &chc, "token secret",
+	//			tokenSecretName.Name, "does not exist yet")
+	//	}
+	//	return updateCallHomeConfigState(r, log, &chc, "error",
+	//		fmt.Sprintf("unexpected error getting service account: %s", err),
+	//		ctrl.Result{})
+	//}
 	cfg := clientcmdapi.NewConfig()
 	clst := clientcmdapi.NewCluster()
 	clst.Server = chc.Spec.ManagementClusterUrl
-	clst.CertificateAuthorityData = token.Data["ca.crt"]
+	clst.CertificateAuthorityData = kubeconfigSecret.Data["ca.crt"]
 	if clst.CertificateAuthorityData == nil {
 		return updateCallHomeConfigState(r, log, &chc, "error",
 			"token secret does not have ca.crt",
@@ -169,12 +204,12 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	}
 	cfg.Clusters["management"] = clst
 	user := clientcmdapi.NewAuthInfo()
-	if token.Data["token"] == nil {
+	if kubeconfigSecret.Data["token"] == nil {
 		return updateCallHomeConfigState(r, log, &chc, "error",
 			"token secret does not have token",
 			ctrl.Result{})
 	}
-	user.Token = string(token.Data["token"])
+	user.Token = string(kubeconfigSecret.Data["token"])
 	cfg.AuthInfos["sa"] = user
 	contx := clientcmdapi.NewContext()
 	contx.Cluster = "management"
@@ -190,8 +225,12 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			ctrl.Result{})
 	}
 	newSecr := corev1.Secret{
+		Type: corev1.SecretType(core.SecretTypeServiceAccountToken),
 		ObjectMeta: metav1.ObjectMeta{
 			Name: chc.Spec.TargetSecretName,
+			Annotations: map[string]string{
+				"kubernetes.io/service-account.name": chc.Spec.ServiceAccountName,
+			},
 		},
 		Data: map[string][]byte{
 			chc.Spec.TargetSecretKeyName: kubeconfigData,
