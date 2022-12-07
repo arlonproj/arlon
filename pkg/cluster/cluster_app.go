@@ -67,7 +67,6 @@ func constructClusterApp(
 		},
 	}
 	var ignoreDiffs []argoappv1.ResourceIgnoreDifferences
-
 	// If used, cluster autoscaler will change replicas so ignore it
 	ignoreDiffs = append(ignoreDiffs, argoappv1.ResourceIgnoreDifferences{
 		Group:        "cluster.x-k8s.io",
@@ -90,9 +89,7 @@ func constructClusterApp(
 		JSONPointers: []string{"/spec"},
 	})
 	app.Spec.IgnoreDifferences = ignoreDiffs
-	app.Spec.Source.Kustomize = &argoappv1.ApplicationSourceKustomize{
-		NamePrefix: clusterName + "-",
-	}
+	app.Spec.Source.Kustomize = &argoappv1.ApplicationSourceKustomize{}
 	app.Spec.SyncPolicy = &argoappv1.SyncPolicy{
 		Automated: &argoappv1.SyncPolicyAutomated{
 			Prune: true,
