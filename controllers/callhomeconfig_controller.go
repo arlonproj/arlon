@@ -63,7 +63,7 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	log := log.FromContext(ctx).WithValues("callhomeconfig", req.NamespacedName)
 	log.V(1).Info("arlon callhomeconfig")
 	var chc arlonv1.CallHomeConfig
-
+	fmt.Printf("CHC called with params: req: %+v\n", req)
 	if err := r.Get(ctx, req.NamespacedName, &chc); err != nil {
 		if apierrors.IsNotFound(err) {
 			log.Info("callhomeconfig is gone -- ok")
@@ -72,6 +72,7 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		log.Info(fmt.Sprintf("unable to get callhomeconfig (%s) ... requeuing", err))
 		return ctrl.Result{Requeue: true}, nil
 	}
+	fmt.Printf("CHC looks like: %+v\n", chc)
 	if chc.Status.State == "complete" {
 		log.V(1).Info("callhomeconfig is already complete")
 		return ctrl.Result{}, nil
