@@ -1,3 +1,11 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: {{ .Values.global.clusterName }}
+  name:  cluster-autoscaler-mgmt-kubeconfig
+  annotations:
+    kubernetes.io/service-account.name: cluster-autoscaler
+type: kubernetes.io/service-account-token
 ---
 apiVersion: v1
 kind: ServiceAccount
