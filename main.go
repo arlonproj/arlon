@@ -17,13 +17,18 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"flag"
+	"fmt"
 	"go.uber.org/zap/zapcore"
 	"os"
 
 	"github.com/arlonproj/arlon/cmd/app"
 	"github.com/arlonproj/arlon/cmd/appprofile"
 	"github.com/arlonproj/arlon/cmd/appprofilecontroller"
+
+	apppkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
+	"github.com/argoproj/argo-cd/v2/util/io"
 	"github.com/arlonproj/arlon/cmd/basecluster"
 	"github.com/arlonproj/arlon/cmd/bundle"
 	"github.com/arlonproj/arlon/cmd/callhomecontroller"
@@ -38,6 +43,7 @@ import (
 	"github.com/arlonproj/arlon/cmd/verify"
 	"github.com/arlonproj/arlon/cmd/version"
 	"github.com/arlonproj/arlon/cmd/webhook"
+	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/spf13/cobra"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -55,6 +61,7 @@ func main() {
 		Short:             "Run the Arlon program",
 		Long:              "Run the Arlon program",
 		DisableAutoGenTag: true,
+		PersistentPreRun:  checkForArgocd,
 		Run: func(c *cobra.Command, args []string) {
 			c.Println(c.UsageString())
 		},
@@ -93,5 +100,18 @@ func main() {
 	command.SetArgs(args)
 	if err := command.Execute(); err != nil {
 		os.Exit(1)
+	}
+}
+
+func checkForArgocd(cmd *cobra.Command, args []string) {
+	if cmd.Name() == "cluster" || cmd.Name() == "listclusters" {
+		conn, appIf := argocd.NewArgocdClientOrDie("").NewApplicationClientOrDie()
+		defer io.Close(conn)
+		query := "managed-by=arlon,arlon-type=cluster"
+		_, err := appIf.List(context.Background(), &apppkg.ApplicationQuery{Selector: &query})
+		if err != nil {
+			fmt.Println("ArgoCD auth token has expired....Login to ArgoCD again")
+			os.Exit(1)
+		}
 	}
 }

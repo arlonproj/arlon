@@ -3,14 +3,15 @@ package list_clusters
 import (
 	"context"
 	"fmt"
+	"os"
+	"text/tabwriter"
+
 	clusterpkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/cluster"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/errors"
 	"github.com/argoproj/argo-cd/v2/util/io"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/spf13/cobra"
-	"os"
-	"text/tabwriter"
 )
 
 func NewCommand() *cobra.Command {
