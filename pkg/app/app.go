@@ -14,7 +14,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-const ProfileLabelKey = "arlon.io/profile"
 const ProfilesAnnotationKey = "arlon.io/profiles"
 
 func List(config *restclient.Config, ns string) (apslist []appset.ApplicationSet, err error) {
