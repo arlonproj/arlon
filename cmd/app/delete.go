@@ -1,7 +1,6 @@
 package app
 
 import (
-	_ "embed"
 	"fmt"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/arlonproj/arlon/pkg/app"
