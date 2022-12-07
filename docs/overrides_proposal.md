@@ -103,3 +103,13 @@ This would be easier to user as well because he/she would generate the manifest 
 But we should even take care of the point that the base manifest in the git and the overriden manifest file are comparable. Example of a command:
 
 ```arlon cluster create <cluster name> --repo-url <repo url> --repo-path <repo path> --overrides <path to overriden manifest file>```
+
+## Limitations:
+
+- Manifests (base and overlays) for the base cluster as well as workload clusters reside in the same repository. This means those who create the workload cluster will need write access to the base cluster repository which might not be the case in enterprises.
+- So, if we consider having the manifests (base and overlays) are in different repositories, they will need a link to each other and as of now, if we update the base cluster while having manifest in one repo and patches in another repo. Argocd will not be able to take up the updated changes in base manifest
+  
+- The main goal of gen2 clusters was to remove the dependency on git to store metadata and make the clusters completely declarative unlike gen1 clusters. But here, we re-introduce a dependency on Arlon API (library) and git (state in git with dir structure)
+- Although, we can try to make this approach declarative by introducing another controller (CRD) but this would increase the whole complexity of the issue and arlon.
+  
+- Using this approach, we might not be able to prefix a name in the base manifest which is an issue because, Some resources generate external resources, like AWS load balancer and we need to avoid naming conflict - hence name prefix (not sufficient) + name reference in gen2 is required
