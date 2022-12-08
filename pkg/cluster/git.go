@@ -204,11 +204,6 @@ func DeployPatchToGit(
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}
-
-	_, err = gitutils.CommitChanges(tmpDir, wt, "deploy arlon cluster "+clusterPath)
-	if err != nil {
-		return fmt.Errorf("failed to commit changes: %s", err)
-	}
 	var file billy.File
 	fs := wt.Filesystem
 	file, err = fs.Create(path.Join(clusterPath, "configurations.yaml"))
@@ -219,6 +214,10 @@ func DeployPatchToGit(
 	_ = file.Close()
 	if err != nil {
 		return fmt.Errorf("failed to write to configurations.yaml: %s", err)
+	}
+	_, err = gitutils.CommitChanges(tmpDir, wt, "deploy arlon cluster "+clusterPath)
+	if err != nil {
+		return fmt.Errorf("failed to commit changes: %s", err)
 	}
 	err = repo.Push(&gogit.PushOptions{
 		RemoteName: gogit.DefaultRemoteName,
