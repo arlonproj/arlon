@@ -3,6 +3,9 @@ package cluster
 import (
 	"embed"
 	"fmt"
+	"path"
+	"text/template"
+
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/bundle"
@@ -10,8 +13,6 @@ import (
 	logpkg "github.com/arlonproj/arlon/pkg/log"
 	"github.com/arlonproj/arlon/pkg/profile"
 	gogit "github.com/go-git/go-git/v5"
-	"path"
-	"text/template"
 )
 
 //go:embed manifests/*
@@ -168,3 +169,57 @@ func ProcessDynamicProfile(
 }
 
 // -----------------------------------------------------------------------------
+func DeployPatchToGit(
+	creds *argocd.RepoCreds,
+	argocdNs string,
+	clusterName string,
+	repoUrl string,
+	repoBranch string,
+	basePath string,
+) error {
+	log := logpkg.GetLogger()
+	repo, tmpDir, auth, err := argocd.CloneRepo(creds, repoUrl, repoBranch)
+	if err != nil {
+		return fmt.Errorf("failed to clone repo: %s", err)
+	}
+	clusterPath := clusterPathFromBasePath(basePath, clusterName)
+	wt, err := repo.Worktree()
+	if err != nil {
+		return fmt.Errorf("failed to get repo worktree: %s", err)
+	}
+	// remove old data if directory exists, we'll regenerate everything
+	fileInfo, err := wt.Filesystem.Lstat(clusterPath)
+	if err == nil {
+		if !fileInfo.IsDir() {
+			return fmt.Errorf("unexpected file type for %s", clusterPath)
+		}
+		_, err = wt.Remove(clusterPath)
+		if err != nil {
+			return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
+		}
+	}
+	err = gitutils.CopyManifests(wt, content, ".", clusterPath)
+	if err != nil {
+		return fmt.Errorf("failed to copy embedded content: %s", err)
+	}
+
+	changed, err := gitutils.CommitChanges(tmpDir, wt, "deploy arlon cluster "+clusterPath)
+	if err != nil {
+		return fmt.Errorf("failed to commit changes: %s", err)
+	}
+	if !changed {
+		log.Info("no changed files, skipping commit & push")
+		return nil
+	}
+	err = repo.Push(&gogit.PushOptions{
+		RemoteName: gogit.DefaultRemoteName,
+		Auth:       auth,
+		Progress:   nil,
+		CABundle:   nil,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to push to remote repository: %s", err)
+	}
+	log.V(1).Info("successfully pushed working tree", "tmpDir", tmpDir)
+	return nil
+}
