@@ -12,6 +12,7 @@ import (
 	"github.com/arlonproj/arlon/pkg/gitutils"
 	logpkg "github.com/arlonproj/arlon/pkg/log"
 	"github.com/arlonproj/arlon/pkg/profile"
+	"github.com/go-git/go-billy"
 	gogit "github.com/go-git/go-git/v5"
 )
 
@@ -204,13 +205,20 @@ func DeployPatchToGit(
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}
 
-	changed, err := gitutils.CommitChanges(tmpDir, wt, "deploy arlon cluster "+clusterPath)
+	_, err = gitutils.CommitChanges(tmpDir, wt, "deploy arlon cluster "+clusterPath)
 	if err != nil {
 		return fmt.Errorf("failed to commit changes: %s", err)
 	}
-	if !changed {
-		log.Info("no changed files, skipping commit & push")
-		return nil
+	var file billy.File
+	fs := wt.Filesystem
+	file, err = fs.Create(path.Join(clusterPath, "configurations.yaml"))
+	if err != nil {
+		return fmt.Errorf("failed to create configurations.yaml: %s", err)
+	}
+	_, err = file.Write([]byte(configurationsYaml))
+	_ = file.Close()
+	if err != nil {
+		return fmt.Errorf("failed to write to configurations.yaml: %s", err)
 	}
 	err = repo.Push(&gogit.PushOptions{
 		RemoteName: gogit.DefaultRemoteName,
