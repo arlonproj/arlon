@@ -9,4 +9,6 @@ var (
 	YAMLrbacCHC []byte
 	//go:embed manifests/rbac_clusterregistration.yaml
 	YAMLrbacClusterReg []byte
+	//go:embed manifests/rbac_appprofile.yaml
+	YAMLrbacAppProf []byte
 )

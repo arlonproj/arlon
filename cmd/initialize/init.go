@@ -359,11 +359,13 @@ func beginArlonInstall(ctx context.Context, client k8sclient.Client, kubeClient 
 		config.CRDProfile,
 		config.CRDClusterReg,
 		config.CRDCallHomeConfig,
+		config.CRDAppProfile,
 	}
 	deplManifests := [][]byte{
 		deploy.YAMLdeploy,
 		deploy.YAMLrbacCHC,
 		deploy.YAMLrbacClusterReg,
+		deploy.YAMLrbacAppProf,
 	}
 	decodedCrds := [][]*unstructured.Unstructured{}
 	for _, crd := range crds {
