@@ -50,20 +50,21 @@ import (
 )
 
 const (
-	argocdManifestURL                      = "https://raw.githubusercontent.com/argoproj/argo-cd/%s/manifests/install.yaml"
-	defaultArgoNamespace                   = "argocd"
-	defaultArlonNamespace                  = "arlon"
-	defaultArlonArgoCDUser                 = "arlon"
-	defaultArgoServerDeployment            = "argocd-server"
-	defaultArlonControllerDeployment       = "arlon-controller"
-	reasonMinimumReplicasAvailable         = "MinimumReplicasAvailable"
-	argoInitialAdminSecret                 = "argocd-initial-admin-secret"
-	argoServer                             = "127.0.0.1:8080"
-	exampleDir                             = "examples"
-	baseclusterDir                         = "baseclusters"
-	defaultCtrlPlaneCount            int64 = 2
-	defaultWorkerCount               int64 = 3
-	defaultK8sVersion                      = "1.23.14"
+	argocdManifestURL                                = "https://raw.githubusercontent.com/argoproj/argo-cd/%s/manifests/install.yaml"
+	defaultArgoNamespace                             = "argocd"
+	defaultArlonNamespace                            = "arlon"
+	defaultArlonArgoCDUser                           = "arlon"
+	defaultArgoServerDeployment                      = "argocd-server"
+	defaultArlonControllerDeployment                 = "arlon-controller"
+	defaultArlonAppProfileControllerDeployment       = "arlon-appprof-ctrlr"
+	reasonMinimumReplicasAvailable                   = "MinimumReplicasAvailable"
+	argoInitialAdminSecret                           = "argocd-initial-admin-secret"
+	argoServer                                       = "127.0.0.1:8080"
+	exampleDir                                       = "examples"
+	baseclusterDir                                   = "baseclusters"
+	defaultCtrlPlaneCount                      int64 = 2
+	defaultWorkerCount                         int64 = 3
+	defaultK8sVersion                                = "1.23.14"
 )
 
 type porfForwardCfg struct {
@@ -413,6 +414,17 @@ func beginArlonInstall(ctx context.Context, client k8sclient.Client, kubeClient 
 	if err != nil {
 		return err
 	}
+	err = wait.PollImmediate(time.Second*10, time.Minute*5, func() (bool, error) {
+		fmt.Printf("waiting for arlon app profile controller\n")
+		var depl *apps.Deployment
+		d, err := kubeClient.AppsV1().Deployments(arlonNs).Get(ctx, defaultArlonAppProfileControllerDeployment, metav1.GetOptions{})
+		if err != nil {
+			return false, err
+		}
+		depl = d
+		condition := getDeploymentCondition(depl.Status, apps.DeploymentAvailable)
+		return condition != nil && condition.Reason == reasonMinimumReplicasAvailable, nil
+	})
 	return nil
 }
 
