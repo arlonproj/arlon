@@ -171,6 +171,9 @@ func NewCommand() *cobra.Command {
 			if err := installCmd.RunE(installCmd, []string{}); err != nil {
 				return err
 			}
+			if !addExamples {
+				return nil
+			}
 			err = portForward(&porfForwardCfg{
 				ctx:        ctx,
 				hostPort:   8080,
@@ -190,12 +193,10 @@ func NewCommand() *cobra.Command {
 						return err
 					}
 					if err := os.Remove(path); err != nil {
-						var errPath *os.PathError
-						if e.As(err, &errPath) {
-							if errPath != os.ErrNotExist {
-								return err
-							}
+						if !os.IsNotExist(err) {
+							return err
 						}
+						fmt.Println("repoctx file does not exist")
 					}
 					if len(repoUrl) == 0 {
 						return e.New("repoUrl not set")
@@ -214,9 +215,6 @@ func NewCommand() *cobra.Command {
 			}, defaultArgoNamespace)
 			if err != nil {
 				return err
-			}
-			if !addExamples {
-				return nil
 			}
 			baseClusterArgs := []struct {
 				repoPath         string
@@ -245,6 +243,14 @@ func NewCommand() *cobra.Command {
 					provider:         "aws",
 					flavor:           "eks",
 				},
+			}
+			baseClusterPaths := []string{}
+			for _, b := range baseClusterArgs {
+				baseClusterPaths = append(baseClusterPaths, b.repoPath)
+			}
+			err = checkExamples(repoUrl, gitUser, password, baseClusterPaths, noConfirm)
+			if err != nil {
+				return err
 			}
 			for _, b := range baseClusterArgs {
 				manifest, err := runGenerateClusterTemplate(b.name, defaultK8sVersion, b.provider, b.flavor)
@@ -669,6 +675,57 @@ func runPortForward(args *porfForwardCfg, pod v1.Pod, argoNs string) error {
 	if err := args.callback(args.ctx, ports[0].Local); err != nil {
 		return err
 	}
+	return nil
+}
+
+func checkExamples(repoUrl, gitUser, password string, baseClusterPaths []string, noConfirm bool) error {
+	repo, tmpDir, auth, err := argocd.CloneRepo(&argocd.RepoCreds{
+		Url:      repoUrl,
+		Username: gitUser,
+		Password: password,
+	}, repoUrl, "main")
+	if err != nil {
+		return err
+	}
+	defer func(path string) {
+		_ = os.RemoveAll(path)
+	}(tmpDir)
+	wt, err := repo.Worktree()
+	if err != nil {
+		return err
+	}
+	fs := wt.Filesystem
+	for _, path := range baseClusterPaths {
+		_, err := fs.Stat(path)
+		if os.IsNotExist(err) {
+			continue
+		}
+		shouldDelete := noConfirm
+		if !noConfirm {
+			shouldDelete = cli.AskToProceed(fmt.Sprintf("Example directory %s already exists. Remove and proceed?[y/n]", path))
+		}
+		if shouldDelete {
+			err := os.Remove(filepath.Join(tmpDir, path))
+			if err != nil {
+				return err
+			}
+		}
+	}
+	changed, err := gitutils.CommitChanges(tmpDir, wt, "cleared example directories")
+	if err != nil {
+		return err
+	}
+	if !changed {
+		return nil
+	}
+	if err := repo.Push(&gogit.PushOptions{
+		RemoteName: gogit.DefaultRemoteName,
+		Auth:       auth,
+		CABundle:   nil,
+	}); err != nil {
+		return err
+	}
+
 	return nil
 }
 
