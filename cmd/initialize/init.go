@@ -30,6 +30,7 @@ import (
 	"github.com/arlonproj/arlon/pkg/gitutils"
 	gyaml "github.com/ghodss/yaml"
 	gogit "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/spf13/cobra"
 	apps "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
@@ -248,9 +249,13 @@ func NewCommand() *cobra.Command {
 			for _, b := range baseClusterArgs {
 				baseClusterPaths = append(baseClusterPaths, b.repoPath)
 			}
-			err = checkExamples(repoUrl, gitUser, password, baseClusterPaths, noConfirm)
+			exists, err := checkExamples(repoUrl, gitUser, password, baseClusterPaths, noConfirm)
 			if err != nil {
 				return err
+			}
+			if exists {
+				fmt.Println("One or more example directories already exist and was not removed. Exiting...")
+				return nil
 			}
 			for _, b := range baseClusterArgs {
 				manifest, err := runGenerateClusterTemplate(b.name, defaultK8sVersion, b.provider, b.flavor)
@@ -678,21 +683,22 @@ func runPortForward(args *porfForwardCfg, pod v1.Pod, argoNs string) error {
 	return nil
 }
 
-func checkExamples(repoUrl, gitUser, password string, baseClusterPaths []string, noConfirm bool) error {
+func checkExamples(repoUrl, gitUser, password string, baseClusterPaths []string, noConfirm bool) (bool, error) {
+	var exists bool
 	repo, tmpDir, auth, err := argocd.CloneRepo(&argocd.RepoCreds{
 		Url:      repoUrl,
 		Username: gitUser,
 		Password: password,
 	}, repoUrl, "main")
 	if err != nil {
-		return err
+		return false, err
 	}
 	defer func(path string) {
 		_ = os.RemoveAll(path)
 	}(tmpDir)
 	wt, err := repo.Worktree()
 	if err != nil {
-		return err
+		return false, err
 	}
 	fs := wt.Filesystem
 	for _, path := range baseClusterPaths {
@@ -702,31 +708,44 @@ func checkExamples(repoUrl, gitUser, password string, baseClusterPaths []string,
 		}
 		shouldDelete := noConfirm
 		if !noConfirm {
-			shouldDelete = cli.AskToProceed(fmt.Sprintf("Example directory %s already exists. Remove and proceed?[y/n]", path))
+			shouldDelete = cli.AskToProceed(fmt.Sprintf("Example directory %s already exists. Remove and proceed or Exit?[y/n]", path))
 		}
 		if shouldDelete {
-			err := os.Remove(filepath.Join(tmpDir, path))
+			err := os.RemoveAll(filepath.Join(tmpDir, path))
 			if err != nil {
-				return err
+				return false, err
 			}
 		}
+		if !shouldDelete {
+			return true, nil
+		}
+
 	}
-	changed, err := gitutils.CommitChanges(tmpDir, wt, "cleared example directories")
+	status, err := wt.Status()
 	if err != nil {
-		return err
+		return false, fmt.Errorf("failed to get worktree status: %w", err)
 	}
-	if !changed {
-		return nil
+	for file, _ := range status {
+		_, _ = wt.Add(file)
+	}
+	commitOpts := &gogit.CommitOptions{Author: &object.Signature{
+		Name:  "arlon automation",
+		Email: "arlon@arlon.io",
+		When:  time.Now(),
+	}}
+	_, err = wt.Commit("clearing examples", commitOpts)
+	if err != nil {
+		return false, fmt.Errorf("failed to commit change: %w", err)
 	}
 	if err := repo.Push(&gogit.PushOptions{
 		RemoteName: gogit.DefaultRemoteName,
 		Auth:       auth,
 		CABundle:   nil,
 	}); err != nil {
-		return err
+		return false, err
 	}
 
-	return nil
+	return exists, nil
 }
 
 // from `clusterctl` source, had to copy it over because `clusterctl` only outputs to STDOUT :( Will add an issue on GH for this
