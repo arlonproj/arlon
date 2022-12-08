@@ -66,7 +66,7 @@ func createClusterCommand() *cobra.Command {
 			}
 			createInArgoCd := !outputYaml
 			baseClusterName, err := bcl.ValidateGitDir(creds,
-				clusterRepoUrl, clusterRepoRevision, clusterRepoPath)
+				bcRepoUrl, clusterRepoRevision, bcRepoPath)
 			if err != nil {
 				return fmt.Errorf("failed to validate base cluster: %s", err)
 			}
