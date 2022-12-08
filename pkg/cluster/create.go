@@ -106,7 +106,8 @@ func CreatePatchDir(
 	repoURL string,
 	argocdNs string,
 	basePath string,
-	repoBranch string) error {
+	repoBranch string,
+	overRides string) error {
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return fmt.Errorf("failed to get kube client: %s", err)
@@ -117,7 +118,7 @@ func CreatePatchDir(
 	}
 
 	err = DeployPatchToGit(creds, argocdNs, clusterName,
-		repoURL, repoBranch, basePath)
+		repoURL, repoBranch, basePath, overRides)
 	if err != nil {
 		return fmt.Errorf("failed to deploy git tree: %s", err)
 	}

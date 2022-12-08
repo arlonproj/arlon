@@ -3,11 +3,12 @@ package gitutils
 import (
 	"embed"
 	"fmt"
-	"github.com/arlonproj/arlon/pkg/log"
-	gogit "github.com/go-git/go-git/v5"
 	"io"
 	"path"
 	"strings"
+
+	"github.com/arlonproj/arlon/pkg/log"
+	gogit "github.com/go-git/go-git/v5"
 )
 
 // -----------------------------------------------------------------------------

@@ -49,7 +49,7 @@ func createClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get repository credentials: %s", err)
 			}
-			cluster.CreatePatchDir(config, clusterName, clusterRepoUrl, argocdNs, clusterRepoPath, repoBranch)
+			cluster.CreatePatchDir(config, clusterName, clusterRepoUrl, argocdNs, clusterRepoPath, repoBranch, overRides)
 			// createInArgoCd := !outputYaml
 			// baseClusterName, err := bcl.ValidateGitDir(creds,
 			// 	clusterRepoUrl, clusterRepoRevision, clusterRepoPath)
