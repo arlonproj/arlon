@@ -14,12 +14,31 @@ import (
 	"github.com/arlonproj/arlon/pkg/profile"
 	"github.com/go-git/go-billy"
 	gogit "github.com/go-git/go-git/v5"
+	"gopkg.in/yaml.v2"
 )
 
 //go:embed manifests/*
 var content embed.FS
 
 // -----------------------------------------------------------------------------
+type kustomizeyaml struct {
+	APIVersion string   `yaml:"apiVersion"`
+	Kind       string   `yaml:"kind"`
+	Resources  []string `yaml:"resources"`
+	Patches    []target `yaml:"patches"`
+}
+
+type target struct {
+	Target info   `yaml:"target"`
+	Path   string `yaml:"path"`
+}
+
+type info struct {
+	Group   string `yaml:"group"`
+	Version string `yaml:"version"`
+	Kind    string `yaml:"kind"`
+	Name    string `yaml:"name"`
+}
 
 func DeployToGit(
 	creds *argocd.RepoCreds,
@@ -215,6 +234,41 @@ func DeployPatchToGit(
 	if err != nil {
 		return fmt.Errorf("failed to write to configurations.yaml: %s", err)
 	}
+	information := info{
+		Group:   "cluster.x-k8s.io",
+		Version: "v1beta1",
+		Kind:    "MachineDeployment",
+		Name:    ".*",
+	}
+	kustomizeresult := kustomizeyaml{
+		APIVersion: "kustomize.config.k8s.io/v1beta1",
+		Kind:       "Kustomization",
+		Resources: []string{
+			"../../bc1",
+		},
+		Patches: []target{
+			{
+				Target: information,
+				Path:   "md-details.yaml",
+			},
+		},
+	}
+	var tmpl *template.Template
+	yamlData, err := yaml.Marshal(&kustomizeresult)
+	tmpl, err = template.New("kust").Parse(string(yamlData))
+	if err != nil {
+		return fmt.Errorf("failed to create kustomization template: %s", err)
+	}
+	file, err = fs.Create(path.Join(clusterPath, "kustomization.yaml"))
+	if err != nil {
+		return fmt.Errorf("failed to create kustomization.yaml: %s", err)
+	}
+	err = tmpl.Execute(file, yamlData)
+	_ = file.Close()
+	if err != nil {
+		return fmt.Errorf("failed to write to kustomization.yaml: %s", err)
+	}
+
 	_, err = gitutils.CommitChanges(tmpDir, wt, "deploy arlon cluster "+clusterPath)
 	if err != nil {
 		return fmt.Errorf("failed to commit changes: %s", err)
