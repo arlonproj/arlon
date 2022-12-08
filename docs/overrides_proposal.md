@@ -1,4 +1,4 @@
-# Gen2 Cluster Overrides - Proposal
+# Gen2 Cluster Overrides - Proposal 1
 This is a design proposal doc for gen2 cluster overrides. Right now, according to our gen2 design, we can deploy multiple clusters with same specifications from one base cluster. But what if we want to deploy cluster with a different sshkeyname from the same manifest?. To allow deploying clusters with different specifications from the same base clsuter we are introducing the concept of clusteroverrides. So, clusteroverrides is being able to deploy clusters with different specs using same manifest and overriding the specs which we want to change.
 
 We have 2 different approches to override in a cluster:
@@ -110,6 +110,6 @@ But we should even take care of the point that the base manifest in the git and 
 - So, if we consider having the manifests (base and overlays) are in different repositories, they will need a link to each other and as of now, if we update the base cluster while having manifest in one repo and patches in another repo. Argocd will not be able to take up the updated changes in base manifest
   
 - The main goal of gen2 clusters was to remove the dependency on git to store metadata and make the clusters completely declarative unlike gen1 clusters. But here, we re-introduce a dependency on Arlon API (library) and git (state in git with dir structure)
-- Although, we can try to make this approach declarative by introducing another controller (CRD) but this would increase the whole complexity of the issue and arlon.
+- Although we can make this approach declarative by introducing another controller (CRD), this would increase the whole complexity of the issue and arlon.
   
 - Using this approach, we might not be able to prefix a name in the base manifest which is an issue because, Some resources generate external resources, like AWS load balancer and we need to avoid naming conflict - hence name prefix (not sufficient) + name reference in gen2 is required
