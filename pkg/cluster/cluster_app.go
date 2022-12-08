@@ -98,9 +98,10 @@ func constructClusterApp(
 		},
 		SyncOptions: []string{"Prune=true", "RespectIgnoreDifferences=true"},
 	}
+	finalRepoPath := repoPath + "/" + clusterName
 	app.Spec.Source.RepoURL = repoUrl
 	app.Spec.Source.TargetRevision = repoRevision
-	app.Spec.Source.Path = repoPath
+	app.Spec.Source.Path = finalRepoPath
 	app.Spec.Destination.Server = "https://kubernetes.default.svc"
 	app.Spec.Destination.Namespace = clusterName
 	app.Spec.SyncPolicy = &argoappv1.SyncPolicy{
