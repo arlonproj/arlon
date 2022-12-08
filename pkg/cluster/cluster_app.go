@@ -89,7 +89,9 @@ func constructClusterApp(
 		JSONPointers: []string{"/spec"},
 	})
 	app.Spec.IgnoreDifferences = ignoreDiffs
-	app.Spec.Source.Kustomize = &argoappv1.ApplicationSourceKustomize{}
+	app.Spec.Source.Kustomize = &argoappv1.ApplicationSourceKustomize{
+		NamePrefix: clusterName + "-",
+	}
 	app.Spec.SyncPolicy = &argoappv1.SyncPolicy{
 		Automated: &argoappv1.SyncPolicyAutomated{
 			Prune: true,
