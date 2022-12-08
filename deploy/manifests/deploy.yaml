@@ -24,7 +24,7 @@ spec:
         - controller
         - --argocd-config-path
         - /.argocd/config
-        image: ghcr.io/arlonproj/arlon/controller:0.10.0
+        image: ghcr.io/arlonproj/arlon/controller:0.10.0-devel-init
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
@@ -100,7 +100,7 @@ spec:
             - appprofilecontroller
             - --argocd-config-path
             - /.argocd/config
-          image: ghcr.io/arlonproj/arlon/controller:0.10.0
+          image: ghcr.io/arlonproj/arlon/controller:0.10.0-devel-init
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
