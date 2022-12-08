@@ -63,7 +63,9 @@ func CopyPatchManifests(wt *gogit.Worktree, fs embed.FS, filePath string, mgmtPa
 		return nil
 	}
 	for _, file := range files {
+		fmt.Println(file.Name())
 		newFilePath := path.Join(filePath, file.Name())
+		fmt.Println(newFilePath)
 		src, err := os.OpenFile(newFilePath, os.O_RDONLY, os.ModePerm)
 		if err != nil {
 			return fmt.Errorf("failed to open embedded file %s: %s", filePath, err)
