@@ -75,7 +75,7 @@ func CopyManifests(wt *gogit.Worktree, fs embed.FS, root string, mgmtPath string
 
 // -----------------------------------------------------------------------------
 
-func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string) error {
+func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string, baseRepoUrl string, baseRepoPath string) error {
 	log := log.GetLogger()
 	files, err := ioutil.ReadDir(filePath)
 	if err != nil {
@@ -143,11 +143,12 @@ func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string)
 		}
 		log.V(1).Info("copied embedded file", "destination", dstPath)
 	}
+	resourcestring := "git::" + baseRepoUrl + "//" + baseRepoPath
 	kustomizeresult := kustomizeyaml{
 		APIVersion: "kustomize.config.k8s.io/v1beta1",
 		Kind:       "Kustomization",
 		Resources: []string{
-			"../../bc1",
+			resourcestring,
 		},
 		Patches: targetData,
 	}
