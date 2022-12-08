@@ -24,7 +24,6 @@ func createClusterCommand() *cobra.Command {
 	var repoBranch string
 	var clusterRepoPath string
 	var clusterName string
-	var overRides string
 	var outputYaml bool
 	var profileName string
 	command := &cobra.Command{
