@@ -176,7 +176,6 @@ func DeployPatchToGit(
 	repoUrl string,
 	repoBranch string,
 	basePath string,
-	overRides string,
 ) error {
 	log := logpkg.GetLogger()
 	repo, tmpDir, auth, err := argocd.CloneRepo(creds, repoUrl, repoBranch)
@@ -199,7 +198,7 @@ func DeployPatchToGit(
 			return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
 		}
 	}
-	err = gitutils.CopyManifests(wt, content, overRides, clusterPath)
+	err = gitutils.CopyManifests(wt, content, ".", clusterPath)
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}
