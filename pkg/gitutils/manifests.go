@@ -105,26 +105,29 @@ func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string)
 		}
 		var targetcomp []string
 		var kind string
+		var information info
 		for k, v := range parsedData {
 			if k == "apiVersion" {
 				strv := fmt.Sprintf("%v", v)
 				fmt.Println(strv)
 				targetcomp = strings.Split(string(strv), "/")
 				fmt.Println(targetcomp)
+				fmt.Println(len(targetcomp))
+				fmt.Println(string(targetcomp[0]))
 			}
 			if k == "kind" {
 				kind = fmt.Sprintf("%v", v)
 				fmt.Println(kind)
 			}
-			information := info{
+			information = info{
 				Group:   "temp",
 				Version: "temp",
 				Kind:    kind,
 			}
-			targetData = append(targetData, target{
-				information, file.Name(),
-			})
 		}
+		targetData = append(targetData, target{
+			information, file.Name(),
+		})
 
 		// remove manifests/ prefix
 		components := strings.Split(newFilePath, "/")

@@ -12,6 +12,7 @@ import (
 	"github.com/arlonproj/arlon/pkg/gitutils"
 	logpkg "github.com/arlonproj/arlon/pkg/log"
 	"github.com/arlonproj/arlon/pkg/profile"
+	"github.com/go-git/go-billy"
 	gogit "github.com/go-git/go-git/v5"
 )
 
@@ -220,17 +221,17 @@ func DeployPatchToGit(
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}
-	// var file billy.File
-	// fs := wt.Filesystem
-	// file, err = fs.Create(path.Join(clusterPath, "configurations.yaml"))
-	// if err != nil {
-	// 	return fmt.Errorf("failed to create configurations.yaml: %s", err)
-	// }
-	// _, err = file.Write([]byte(configurationsYaml))
-	// _ = file.Close()
-	// if err != nil {
-	// 	return fmt.Errorf("failed to write to configurations.yaml: %s", err)
-	// }
+	var file billy.File
+	fs := wt.Filesystem
+	file, err = fs.Create(path.Join(clusterPath, "configurations.yaml"))
+	if err != nil {
+		return fmt.Errorf("failed to create configurations.yaml: %s", err)
+	}
+	_, err = file.Write([]byte(configurationsYaml))
+	_ = file.Close()
+	if err != nil {
+		return fmt.Errorf("failed to write to configurations.yaml: %s", err)
+	}
 	// kustomizeresult := kustomizeyaml{
 	// 	APIVersion: "kustomize.config.k8s.io/v1beta1",
 	// 	Kind:       "Kustomization",
