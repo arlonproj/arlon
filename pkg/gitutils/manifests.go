@@ -11,6 +11,7 @@ import (
 
 	"github.com/arlonproj/arlon/pkg/log"
 	gogit "github.com/go-git/go-git/v5"
+	"gopkg.in/yaml.v2"
 )
 
 // -----------------------------------------------------------------------------
@@ -69,6 +70,22 @@ func CopyPatchManifests(wt *gogit.Worktree, fs embed.FS, filePath string, mgmtPa
 		src, err := os.OpenFile(newFilePath, os.O_RDONLY, os.ModePerm)
 		if err != nil {
 			return fmt.Errorf("failed to open embedded file %s: %s", filePath, err)
+		}
+
+		file, err := ioutil.ReadFile(newFilePath)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		parsedData := make(map[interface{}]interface{})
+
+		err2 := yaml.Unmarshal(file, &parsedData)
+		if err2 != nil {
+			fmt.Println(err2)
+		}
+
+		for k, v := range parsedData {
+			fmt.Printf("%s -> %d\n", k, v)
 		}
 
 		// remove manifests/ prefix
