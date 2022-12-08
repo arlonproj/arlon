@@ -24,6 +24,7 @@ func createClusterCommand() *cobra.Command {
 	var repoBranch string
 	var clusterRepoPath string
 	var clusterName string
+	var overRides string
 	var outputYaml bool
 	var profileName string
 	command := &cobra.Command{
@@ -48,7 +49,10 @@ func createClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get repository credentials: %s", err)
 			}
-			cluster.CreatePatchDir(config, clusterName, clusterRepoUrl, argocdNs, clusterRepoPath, repoBranch)
+			err = cluster.CreatePatchDir(config, clusterName, clusterRepoUrl, argocdNs, clusterRepoPath, repoBranch, overRides)
+			if err != nil {
+				fmt.Println(err)
+			}
 			// createInArgoCd := !outputYaml
 			// baseClusterName, err := bcl.ValidateGitDir(creds,
 			// 	clusterRepoUrl, clusterRepoRevision, clusterRepoPath)
@@ -134,7 +138,7 @@ func createClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&repoBranch, "repo-branch", "main", "the git branch")
 	command.Flags().StringVar(&clusterRepoPath, "repo-path", "", "the git repository path for cluster template")
 	command.Flags().StringVar(&clusterName, "cluster-name", "", "the cluster name")
-	//command.Flags().StringVar(&overRides, "overrides", "", "path to the corresponding patch file to the cluster")
+	command.Flags().StringVar(&overRides, "overrides", "", "path to the corresponding patch file to the cluster")
 	command.Flags().BoolVar(&outputYaml, "output-yaml", false, "output root applications YAML instead of deploying to ArgoCD")
 	command.Flags().StringVar(&profileName, "profile", "", "profile name (if specified, must refer to dynamic profile)")
 	command.MarkFlagRequired("cluster-name")
