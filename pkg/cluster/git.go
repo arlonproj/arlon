@@ -12,9 +12,7 @@ import (
 	"github.com/arlonproj/arlon/pkg/gitutils"
 	logpkg "github.com/arlonproj/arlon/pkg/log"
 	"github.com/arlonproj/arlon/pkg/profile"
-	"github.com/go-git/go-billy"
 	gogit "github.com/go-git/go-git/v5"
-	"gopkg.in/yaml.v2"
 )
 
 //go:embed manifests/*
@@ -37,7 +35,6 @@ type info struct {
 	Group   string `yaml:"group"`
 	Version string `yaml:"version"`
 	Kind    string `yaml:"kind"`
-	Name    string `yaml:"name"`
 }
 
 func DeployToGit(
@@ -219,55 +216,44 @@ func DeployPatchToGit(
 			return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
 		}
 	}
-	err = gitutils.CopyPatchManifests(wt, content, overrides, clusterPath)
+	err = gitutils.CopyPatchManifests(wt, overrides, clusterPath)
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}
-	var file billy.File
-	fs := wt.Filesystem
-	file, err = fs.Create(path.Join(clusterPath, "configurations.yaml"))
-	if err != nil {
-		return fmt.Errorf("failed to create configurations.yaml: %s", err)
-	}
-	_, err = file.Write([]byte(configurationsYaml))
-	_ = file.Close()
-	if err != nil {
-		return fmt.Errorf("failed to write to configurations.yaml: %s", err)
-	}
-	information := info{
-		Group:   "cluster.x-k8s.io",
-		Version: "v1beta1",
-		Kind:    "MachineDeployment",
-		Name:    ".*",
-	}
-	kustomizeresult := kustomizeyaml{
-		APIVersion: "kustomize.config.k8s.io/v1beta1",
-		Kind:       "Kustomization",
-		Resources: []string{
-			"../../bc1",
-		},
-		Patches: []target{
-			{
-				Target: information,
-				Path:   "md-details.yaml",
-			},
-		},
-	}
-	var tmpl *template.Template
-	yamlData, err := yaml.Marshal(&kustomizeresult)
-	tmpl, err = template.New("kust").Parse(string(yamlData))
-	if err != nil {
-		return fmt.Errorf("failed to create kustomization template: %s", err)
-	}
-	file, err = fs.Create(path.Join(clusterPath, "kustomization.yaml"))
-	if err != nil {
-		return fmt.Errorf("failed to create kustomization.yaml: %s", err)
-	}
-	err = tmpl.Execute(file, yamlData)
-	_ = file.Close()
-	if err != nil {
-		return fmt.Errorf("failed to write to kustomization.yaml: %s", err)
-	}
+	// var file billy.File
+	// fs := wt.Filesystem
+	// file, err = fs.Create(path.Join(clusterPath, "configurations.yaml"))
+	// if err != nil {
+	// 	return fmt.Errorf("failed to create configurations.yaml: %s", err)
+	// }
+	// _, err = file.Write([]byte(configurationsYaml))
+	// _ = file.Close()
+	// if err != nil {
+	// 	return fmt.Errorf("failed to write to configurations.yaml: %s", err)
+	// }
+	// kustomizeresult := kustomizeyaml{
+	// 	APIVersion: "kustomize.config.k8s.io/v1beta1",
+	// 	Kind:       "Kustomization",
+	// 	Resources: []string{
+	// 		"../../bc1",
+	// 	},
+	// 	Patches: targetData,
+	// }
+	// var tmpl *template.Template
+	// yamlData, err := yaml.Marshal(&kustomizeresult)
+	// tmpl, err = template.New("kust").Parse(string(yamlData))
+	// if err != nil {
+	// 	return fmt.Errorf("failed to create kustomization template: %s", err)
+	// }
+	// file, err = fs.Create(path.Join(clusterPath, "kustomization.yaml"))
+	// if err != nil {
+	// 	return fmt.Errorf("failed to create kustomization.yaml: %s", err)
+	// }
+	// err = tmpl.Execute(file, yamlData)
+	// _ = file.Close()
+	// if err != nil {
+	// 	return fmt.Errorf("failed to write to kustomization.yaml: %s", err)
+	// }
 
 	_, err = gitutils.CommitChanges(tmpDir, wt, "deploy arlon cluster "+clusterPath)
 	if err != nil {
