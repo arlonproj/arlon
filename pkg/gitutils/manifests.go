@@ -72,7 +72,7 @@ func CopyPatchManifests(wt *gogit.Worktree, fs embed.FS, filePath string, mgmtPa
 		}
 
 		// remove manifests/ prefix
-		components := strings.Split(filePath, "/")
+		components := strings.Split(newFilePath, "/")
 		dstPath := path.Join(components[len(components)-1])
 		dstPath = path.Join(mgmtPath, dstPath)
 		dst, err := wt.Filesystem.Create(dstPath)
