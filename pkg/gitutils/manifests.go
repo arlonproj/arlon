@@ -111,19 +111,16 @@ func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string)
 				strv := fmt.Sprintf("%v", v)
 				fmt.Println(strv)
 				targetcomp = strings.Split(string(strv), "/")
-				fmt.Println(targetcomp)
-				fmt.Println(len(targetcomp))
-				fmt.Println(string(targetcomp[0]))
 			}
 			if k == "kind" {
 				kind = fmt.Sprintf("%v", v)
 				fmt.Println(kind)
 			}
-			information = info{
-				Group:   "temp",
-				Version: "temp",
-				Kind:    kind,
-			}
+		}
+		information = info{
+			Group:   string(targetcomp[0]),
+			Version: string(targetcomp[1]),
+			Kind:    kind,
 		}
 		targetData = append(targetData, target{
 			information, file.Name(),
