@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -56,25 +57,34 @@ func CopyManifests(wt *gogit.Worktree, fs embed.FS, root string, mgmtPath string
 
 func CopyPatchManifests(wt *gogit.Worktree, fs embed.FS, filePath string, mgmtPath string) error {
 	log := log.GetLogger()
-	src, err := os.OpenFile(filePath, os.O_RDONLY, os.ModePerm)
+	files, err := ioutil.ReadDir(filePath)
 	if err != nil {
-		return fmt.Errorf("failed to open embedded file %s: %s", filePath, err)
+		fmt.Println(err)
+		return nil
 	}
-	// remove manifests/ prefix
-	components := strings.Split(filePath, "/")
-	dstPath := path.Join(components[len(components)-1])
-	dstPath = path.Join(mgmtPath, dstPath)
-	dst, err := wt.Filesystem.Create(dstPath)
-	if err != nil {
+	for _, file := range files {
+		newFilePath := path.Join(filePath, file.Name())
+		src, err := os.OpenFile(newFilePath, os.O_RDONLY, os.ModePerm)
+		if err != nil {
+			return fmt.Errorf("failed to open embedded file %s: %s", filePath, err)
+		}
+
+		// remove manifests/ prefix
+		components := strings.Split(filePath, "/")
+		dstPath := path.Join(components[len(components)-1])
+		dstPath = path.Join(mgmtPath, dstPath)
+		dst, err := wt.Filesystem.Create(dstPath)
+		if err != nil {
+			_ = src.Close()
+			return fmt.Errorf("failed to create destination file %s: %s", dstPath, err)
+		}
+		_, err = io.Copy(dst, src)
 		_ = src.Close()
-		return fmt.Errorf("failed to create destination file %s: %s", dstPath, err)
+		_ = dst.Close()
+		if err != nil {
+			return fmt.Errorf("failed to copy embedded file: %s", err)
+		}
+		log.V(1).Info("copied embedded file", "destination", dstPath)
 	}
-	_, err = io.Copy(dst, src)
-	_ = src.Close()
-	_ = dst.Close()
-	if err != nil {
-		return fmt.Errorf("failed to copy embedded file: %s", err)
-	}
-	log.V(1).Info("copied embedded file", "destination", dstPath)
 	return nil
 }
