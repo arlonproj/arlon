@@ -85,7 +85,7 @@ func CopyPatchManifests(wt *gogit.Worktree, fs embed.FS, filePath string, mgmtPa
 		}
 
 		for k, v := range parsedData {
-			fmt.Printf("%s -> %d\n", k, v)
+			fmt.Printf("%s -> %s\n", k, v)
 		}
 
 		// remove manifests/ prefix
