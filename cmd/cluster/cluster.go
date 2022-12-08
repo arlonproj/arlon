@@ -41,6 +41,7 @@ func checkForArgocd(c *cobra.Command, args []string) {
 	_, err := appIf.List(context.Background(), &apppkg.ApplicationQuery{Selector: &query})
 	if err != nil {
 		fmt.Println("ArgoCD auth token has expired....Login to ArgoCD again")
+		fmt.Println(err)
 		os.Exit(1)
 	}
 }
