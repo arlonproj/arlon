@@ -53,14 +53,14 @@ func CopyManifests(wt *gogit.Worktree, fs embed.FS, root string, mgmtPath string
 
 // -----------------------------------------------------------------------------
 
-func CopyPatchManifests(wt *gogit.Worktree, fs embed.FS, filePath string, mgmtPath string) error {
+func CopyPatchManifests(wt *gogit.Worktree, fs embed.FS, root string, mgmtPath string) error {
 	log := log.GetLogger()
-	items, err := fs.ReadDir(filePath)
+	items, err := fs.ReadDir(root)
 	if err != nil {
 		return fmt.Errorf("failed to read embedded directory: %s", err)
 	}
 	for _, item := range items {
-		filePath := path.Join(filePath, item.Name())
+		filePath := path.Join(root, item.Name())
 		if item.IsDir() {
 			if err := CopyManifests(wt, fs, filePath, mgmtPath); err != nil {
 				return err
