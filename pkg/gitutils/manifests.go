@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"io"
+	"os"
 	"path"
 	"strings"
 
@@ -55,7 +56,7 @@ func CopyManifests(wt *gogit.Worktree, fs embed.FS, root string, mgmtPath string
 
 func CopyPatchManifests(wt *gogit.Worktree, fs embed.FS, filePath string, mgmtPath string) error {
 	log := log.GetLogger()
-	src, err := fs.Open(filePath)
+	src, err := os.OpenFile(filePath, os.O_WRONLY, 0600)
 	if err != nil {
 		return fmt.Errorf("failed to open embedded file %s: %s", filePath, err)
 	}
