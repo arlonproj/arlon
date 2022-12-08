@@ -2,10 +2,11 @@ package basecluster
 
 import (
 	"fmt"
-	"github.com/arlonproj/arlon/pkg/argocd"
-	"k8s.io/cli-runtime/pkg/resource"
 	"os"
 	"path"
+
+	"github.com/arlonproj/arlon/pkg/argocd"
+	"k8s.io/cli-runtime/pkg/resource"
 )
 
 // Validate verifies whether the resources in the specified file contain one and
@@ -71,7 +72,6 @@ func ValidateGitDir(
 // conditions are met for using the directory as a base cluster.
 func validateDir(dirPath string, infos []os.FileInfo) (clusterName string, err error) {
 	var kustomizationFound bool
-	var configurationsFound bool
 	var manifestFile string
 	for _, info := range infos {
 		if info.IsDir() {
@@ -79,10 +79,6 @@ func validateDir(dirPath string, infos []os.FileInfo) (clusterName string, err e
 		}
 		if info.Name() == "kustomization.yaml" {
 			kustomizationFound = true
-			continue
-		}
-		if info.Name() == "configurations.yaml" {
-			configurationsFound = true
 			continue
 		}
 		if manifestFile != "" {
@@ -95,9 +91,6 @@ func validateDir(dirPath string, infos []os.FileInfo) (clusterName string, err e
 	}
 	if !kustomizationFound {
 		return "", ErrNoKustomizationYaml
-	}
-	if !configurationsFound {
-		return "", ErrNoConfigurationsYaml
 	}
 	manifestPath := path.Join(dirPath, manifestFile)
 	return Validate(manifestPath)
