@@ -729,8 +729,7 @@ func checkExamples(repoUrl, gitUser, password string, baseClusterPaths []string,
 			if err != nil {
 				return false, err
 			}
-		}
-		if !shouldDelete {
+		} else {
 			return true, nil
 		}
 
