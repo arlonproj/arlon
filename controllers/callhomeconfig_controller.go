@@ -64,8 +64,6 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	log := log.FromContext(ctx).WithValues("callhomeconfig", req.NamespacedName)
 	log.V(1).Info("arlon callhomeconfig")
 	var chc arlonv1.CallHomeConfig
-	fmt.Printf("CHC called with params: req: %+v\n", req)
-	//req{namespace:cas-cl, name:cluster-autoscaler }
 	if err := r.Get(ctx, req.NamespacedName, &chc); err != nil {
 		if apierrors.IsNotFound(err) {
 			log.Info("callhomeconfig is gone -- ok")
@@ -74,18 +72,6 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		log.Info(fmt.Sprintf("unable to get callhomeconfig (%s) ... requeuing", err))
 		return ctrl.Result{Requeue: true}, nil
 	}
-	fmt.Printf("CHC looks like: %+v\n", chc)
-	//	CHC looks like:
-	//	ObjectMeta:{
-	//		Name:cluster-autoscaler,
-	//		GenerateName: Namespace:cas-cl,
-	//		Labels:map[app.kubernetes.io/instance:cas-cl]
-	// 		Spec:{ServiceAccountName:cluster-autoscaler,
-	//			  KubeconfigSecretName:cas-cl-kubeconfig,
-	//			  KubeconfigSecretKeyName:value,
-	//			  TargetNamespace:kube-system,
-	//			  TargetSecretName:cluster-autoscaler-management-kubeconfig,
-	//			  TargetSecretKeyName:kubeconfig ManagementClusterUrl:https://127.0.0.1:33365}
 
 	if chc.Status.State == "complete" {
 		log.V(1).Info("callhomeconfig is already complete")
@@ -146,7 +132,7 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	// read the service account token
 	var sa corev1.ServiceAccount
 	namespacedName := types.NamespacedName{
-		Namespace: req.Namespace, //req{namespace:cas-cl, name:cluster-autoscaler}
+		Namespace: req.Namespace,
 		Name:      chc.Spec.ServiceAccountName,
 	}
 	if err := r.Get(ctx, namespacedName, &sa); err != nil {
@@ -175,24 +161,6 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		return retryLater(r, log, &chc, "secret",
 			namespacedName.Name, "does not have a token")
 	}
-	//if len(sa.Secrets) < 1 {
-	//	return retryLater(r, log, &chc, "serviceaccount",
-	//		namespacedName.Name, "does not have a token")
-	//}
-	//tokenSecretName := sa.Secrets[0]
-	//var token corev1.Secret
-	//if err := r.Get(ctx, types.NamespacedName{
-	//	Namespace: req.Namespace,
-	//	Name:      tokenSecretName.Name,
-	//}, &token); err != nil {
-	//	if apierrors.IsNotFound(err) {
-	//		return retryLater(r, log, &chc, "token secret",
-	//			tokenSecretName.Name, "does not exist yet")
-	//	}
-	//	return updateCallHomeConfigState(r, log, &chc, "error",
-	//		fmt.Sprintf("unexpected error getting service account: %s", err),
-	//		ctrl.Result{})
-	//}
 	cfg := clientcmdapi.NewConfig()
 	clst := clientcmdapi.NewCluster()
 	clst.Server = chc.Spec.ManagementClusterUrl
