@@ -15,7 +15,7 @@ builds:
       - -w
       - -s
     env:
-      - CGO_ENABLED=0x
+      - CGO_ENABLED=0
     goos:
       - linux
       #      - windows # coming soon?
