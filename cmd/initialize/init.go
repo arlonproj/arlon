@@ -30,6 +30,7 @@ import (
 	"github.com/arlonproj/arlon/pkg/gitutils"
 	gyaml "github.com/ghodss/yaml"
 	gogit "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/spf13/cobra"
 	apps "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
@@ -49,20 +50,21 @@ import (
 )
 
 const (
-	argocdManifestURL                      = "https://raw.githubusercontent.com/argoproj/argo-cd/%s/manifests/install.yaml"
-	defaultArgoNamespace                   = "argocd"
-	defaultArlonNamespace                  = "arlon"
-	defaultArlonArgoCDUser                 = "arlon"
-	defaultArgoServerDeployment            = "argocd-server"
-	defaultArlonControllerDeployment       = "arlon-controller"
-	reasonMinimumReplicasAvailable         = "MinimumReplicasAvailable"
-	argoInitialAdminSecret                 = "argocd-initial-admin-secret"
-	argoServer                             = "127.0.0.1:8080"
-	exampleDir                             = "examples"
-	baseclusterDir                         = "baseclusters"
-	defaultCtrlPlaneCount            int64 = 2
-	defaultWorkerCount               int64 = 3
-	defaultK8sVersion                      = "1.23.14"
+	argocdManifestURL                                = "https://raw.githubusercontent.com/argoproj/argo-cd/%s/manifests/install.yaml"
+	defaultArgoNamespace                             = "argocd"
+	defaultArlonNamespace                            = "arlon"
+	defaultArlonArgoCDUser                           = "arlon"
+	defaultArgoServerDeployment                      = "argocd-server"
+	defaultArlonControllerDeployment                 = "arlon-controller"
+	defaultArlonAppProfileControllerDeployment       = "arlon-appprof-ctrlr"
+	reasonMinimumReplicasAvailable                   = "MinimumReplicasAvailable"
+	argoInitialAdminSecret                           = "argocd-initial-admin-secret"
+	argoServer                                       = "127.0.0.1:8080"
+	exampleDir                                       = "examples"
+	baseclusterDir                                   = "baseclusters"
+	defaultCtrlPlaneCount                      int64 = 2
+	defaultWorkerCount                         int64 = 3
+	defaultK8sVersion                                = "1.23.14"
 )
 
 type porfForwardCfg struct {
@@ -171,6 +173,9 @@ func NewCommand() *cobra.Command {
 			if err := installCmd.RunE(installCmd, []string{}); err != nil {
 				return err
 			}
+			if !addExamples {
+				return nil
+			}
 			err = portForward(&porfForwardCfg{
 				ctx:        ctx,
 				hostPort:   8080,
@@ -190,12 +195,10 @@ func NewCommand() *cobra.Command {
 						return err
 					}
 					if err := os.Remove(path); err != nil {
-						var errPath *os.PathError
-						if e.As(err, &errPath) {
-							if errPath != os.ErrNotExist {
-								return err
-							}
+						if !os.IsNotExist(err) {
+							return err
 						}
+						fmt.Println("repoctx file does not exist")
 					}
 					if len(repoUrl) == 0 {
 						return e.New("repoUrl not set")
@@ -214,9 +217,6 @@ func NewCommand() *cobra.Command {
 			}, defaultArgoNamespace)
 			if err != nil {
 				return err
-			}
-			if !addExamples {
-				return nil
 			}
 			baseClusterArgs := []struct {
 				repoPath         string
@@ -245,6 +245,18 @@ func NewCommand() *cobra.Command {
 					provider:         "aws",
 					flavor:           "eks",
 				},
+			}
+			baseClusterPaths := []string{}
+			for _, b := range baseClusterArgs {
+				baseClusterPaths = append(baseClusterPaths, b.repoPath)
+			}
+			exists, err := checkExamples(repoUrl, gitUser, password, baseClusterPaths, noConfirm)
+			if err != nil {
+				return err
+			}
+			if exists {
+				fmt.Println("One or more example directories already exist and was not removed. Exiting...")
+				return nil
 			}
 			for _, b := range baseClusterArgs {
 				manifest, err := runGenerateClusterTemplate(b.name, defaultK8sVersion, b.provider, b.flavor)
@@ -348,11 +360,13 @@ func beginArlonInstall(ctx context.Context, client k8sclient.Client, kubeClient 
 		config.CRDProfile,
 		config.CRDClusterReg,
 		config.CRDCallHomeConfig,
+		config.CRDAppProfile,
 	}
 	deplManifests := [][]byte{
 		deploy.YAMLdeploy,
 		deploy.YAMLrbacCHC,
 		deploy.YAMLrbacClusterReg,
+		deploy.YAMLrbacAppProf,
 	}
 	decodedCrds := [][]*unstructured.Unstructured{}
 	for _, crd := range crds {
@@ -400,6 +414,17 @@ func beginArlonInstall(ctx context.Context, client k8sclient.Client, kubeClient 
 	if err != nil {
 		return err
 	}
+	err = wait.PollImmediate(time.Second*10, time.Minute*5, func() (bool, error) {
+		fmt.Printf("waiting for arlon app profile controller\n")
+		var depl *apps.Deployment
+		d, err := kubeClient.AppsV1().Deployments(arlonNs).Get(ctx, defaultArlonAppProfileControllerDeployment, metav1.GetOptions{})
+		if err != nil {
+			return false, err
+		}
+		depl = d
+		condition := getDeploymentCondition(depl.Status, apps.DeploymentAvailable)
+		return condition != nil && condition.Reason == reasonMinimumReplicasAvailable, nil
+	})
 	return nil
 }
 
@@ -670,6 +695,70 @@ func runPortForward(args *porfForwardCfg, pod v1.Pod, argoNs string) error {
 		return err
 	}
 	return nil
+}
+
+func checkExamples(repoUrl, gitUser, password string, baseClusterPaths []string, noConfirm bool) (bool, error) {
+	var exists bool
+	repo, tmpDir, auth, err := argocd.CloneRepo(&argocd.RepoCreds{
+		Url:      repoUrl,
+		Username: gitUser,
+		Password: password,
+	}, repoUrl, "main")
+	if err != nil {
+		return false, err
+	}
+	defer func(path string) {
+		_ = os.RemoveAll(path)
+	}(tmpDir)
+	wt, err := repo.Worktree()
+	if err != nil {
+		return false, err
+	}
+	fs := wt.Filesystem
+	for _, path := range baseClusterPaths {
+		_, err := fs.Stat(path)
+		if os.IsNotExist(err) {
+			continue
+		}
+		shouldDelete := noConfirm
+		if !noConfirm {
+			shouldDelete = cli.AskToProceed(fmt.Sprintf("Example directory %s already exists. Remove and proceed or Exit?[y/n]", path))
+		}
+		if shouldDelete {
+			err := os.RemoveAll(filepath.Join(tmpDir, path))
+			if err != nil {
+				return false, err
+			}
+		} else {
+			return true, nil
+		}
+
+	}
+	status, err := wt.Status()
+	if err != nil {
+		return false, fmt.Errorf("failed to get worktree status: %w", err)
+	}
+	for file, _ := range status {
+		_, _ = wt.Add(file)
+	}
+	commitOpts := &gogit.CommitOptions{Author: &object.Signature{
+		Name:  "arlon automation",
+		Email: "arlon@arlon.io",
+		When:  time.Now(),
+	}}
+	_, err = wt.Commit("clearing examples", commitOpts)
+	if err != nil {
+		return false, fmt.Errorf("failed to commit change: %w", err)
+	}
+	if err := repo.Push(&gogit.PushOptions{
+		RemoteName: gogit.DefaultRemoteName,
+		Auth:       auth,
+		CABundle:   nil,
+	}); err != nil {
+		return false, err
+	}
+
+	return exists, nil
 }
 
 // from `clusterctl` source, had to copy it over because `clusterctl` only outputs to STDOUT :( Will add an issue on GH for this

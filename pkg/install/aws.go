@@ -19,6 +19,8 @@ const (
 	envCtrlPlaneMachine = "AWS_CONTROL_PLANE_MACHINE_TYPE"
 	envNodeMachine      = "AWS_NODE_MACHINE_TYPE"
 	envAWSB64Creds      = "AWS_B64ENCODED_CREDENTIALS"
+
+	envFeatureGateMachinePool = "EXP_MACHINE_POOL"
 )
 
 type awsInstaller struct {
@@ -81,6 +83,13 @@ func (a *awsInstaller) EnsureRequisites() error {
 }
 
 func (a *awsInstaller) Bootstrap() error {
+	err := os.Setenv(envFeatureGateMachinePool, "true")
+	if err != nil {
+		return &ErrBootstrap{
+			HardFail: true,
+			Message:  "Cannot enable AWS machine pool feature gate. Cannot set environment variable EXP_MACHINE_POOL to true",
+		}
+	}
 	ogArgs := os.Args
 	defer func() {
 		os.Args = ogArgs
@@ -93,7 +102,7 @@ func (a *awsInstaller) Bootstrap() error {
 	}
 	rootCmd := cmd.RootCmd()
 	rootCmd.SilenceUsage = true
-	err := rootCmd.Execute()
+	err = rootCmd.Execute()
 	if err != nil {
 		if !a.recoverOnFail("Error when creating cloud-formation-stack and IAM roles. This may be caused by pre-existing IAM roles and may result in a working installation.") {
 			return err
