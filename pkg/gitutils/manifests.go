@@ -110,12 +110,10 @@ func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string,
 		for k, v := range parsedData {
 			if k == "apiVersion" {
 				strv := fmt.Sprintf("%v", v)
-				fmt.Println(strv)
 				targetcomp = strings.Split(string(strv), "/")
 			}
 			if k == "kind" {
 				kind = fmt.Sprintf("%v", v)
-				fmt.Println(kind)
 			}
 		}
 		information = info{
