@@ -19,10 +19,11 @@ import (
 // // -----------------------------------------------------------------------------
 
 type kustomizeyaml struct {
-	APIVersion string   `yaml:"apiVersion"`
-	Kind       string   `yaml:"kind"`
-	Resources  []string `yaml:"resources"`
-	Patches    []target `yaml:"patches"`
+	APIVersion     string   `yaml:"apiVersion"`
+	Kind           string   `yaml:"kind"`
+	Resources      []string `yaml:"resources"`
+	Configurations []string `yaml:"configurations"`
+	Patches        []target `yaml:"patches"`
 }
 type target struct {
 	Target info   `yaml:"target"`
@@ -149,6 +150,9 @@ func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string,
 		Kind:       "Kustomization",
 		Resources: []string{
 			resourcestring,
+		},
+		Configurations: []string{
+			"configurations.yaml",
 		},
 		Patches: targetData,
 	}
