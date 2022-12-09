@@ -10,8 +10,6 @@ typically contains multiple related resources that together define an arbitraril
 If you make subsequent changes to the base cluster, workload clusters originally created from it
 will automatically acquire the changes.
 
-**NB: Base clusters only support dynamic profiles.**
-
 ## Creating Cluster-API cluster manifest
 
 Note: The CAPA version used here is v2.0 and the manifests created here are in accordance with this version.
@@ -357,6 +355,8 @@ arlon basecluster validategit --repo-alias prod --repo-path <pathToDirectory> [-
 ```
 
 ## gen2 cluster creation
+
+**Note: Base clusters only support dynamic profiles.**
 
 To create a gen2 workload cluster from the base cluster:
 

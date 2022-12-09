@@ -453,3 +453,84 @@ This example updates a cluster to use a new profile `my-new-profile`:
 ```shell
 arlon cluster update eks-1 --profile my-new-profile
 ```
+## Enabling Cluster Autoscaler in the workload cluster:
+
+### Bundle creation:
+Register a dynamic bundle pointing to the bundles/capi-cluster-autoscaler in the Arlon repo.
+
+The capi-cluster-autoscaler bundle requires the name of the cluster, so that it knows what namespace in the management cluster to scan for CAPI resources. To enable the cluster-autoscaler bundle, add one more parameter during cluster creation: `srcType`. This is the ArgoCD-defined application source type (Helm, Kustomize, Directory).
+
+This example creates a bundle pointing to the bundles/capi-cluster-autoscaler in Arlon repo
+
+```shell
+arlon bundle create cas-bundle --tags cas,devel,test --desc "CAS Bundle" --repo-url https://github.com/arlonproj/arlon.git --repo-path bundles/capi-cluster-autoscaler --srctype helm
+```
+
+### Profile creation:
+Create a profile that contains this capi-cluster-autoscaler bundle. 
+
+```shell
+arlon profile create dynamic-cas --repo-url ${WORKSPACE_REPO_URL} --repo-base-path profiles --bundles cas-bundle --desc "dynamic cas profile" --tags examples
+```
+
+### Clusterspec creation:
+Create a clusterspec with CAPI as ApiProvider and autoscaling enabled.In addition to this, the ClusterAutoscaler(Min|Max)Nodes properties are used to set 2 annotations on MachineDeployment required by the cluster autoscaler for CAPI.
+
+```shell
+arlon clusterspec create cas-spec --api capi --cloud aws --type eks --kubeversion v1.21.10 --nodecount 2 --nodetype t2.medium --tags devel,test --desc "dev/test"  --region ${CLOUD_REGION} --sshkey ${SSH_KEY_NAME} --casenabled
+```
+
+### Cluster creation:
+Deploy a cluster from this cluster spec and profile created in the previous steps.
+
+```shell
+arlon cluster deploy --repo-url ${WORKSPACE_REPO_URL} --cluster-name cas-cluster --profile dynamic-cas --cluster-spec cas-spec
+```
+Consequently, this example produces the directory `clusters/cas-cluster/` in the repo. This will contain the capi-autoscaler subchart and manifests `mgmt/charts/`.
+To verify its contents:
+
+```shell
+$ cd ${WORKSPACE_REPO_URL}
+$ tree clusters/cas-cluster
+clusters/cas-cluster
+└── mgmt
+    ├── Chart.yaml
+    ├── charts
+    │   ├── capi-aws-eks
+    │   │   ├── Chart.yaml
+    │   │   └── templates
+    │   │       └── cluster.yaml
+    │   ├── capi-aws-kubeadm
+    │   │   ├── Chart.yaml
+    │   │   └── templates
+    │   │       └── cluster.yaml
+    │   ├── capi-cluster-autoscaler
+    │   │   ├── Chart.yaml
+    │   │   └── templates
+    │   │       ├── callhomeconfig.yaml
+    │   │       └── rbac.yaml
+    │   └── xplane-aws-eks
+    │       ├── Chart.yaml
+    │       └── templates
+    │           ├── cluster.yaml
+    │           └── network.yaml
+    ├── templates
+    │   ├── clusterregistration.yaml
+    │   ├── ns.yaml
+    │   ├── profile.yaml
+    │   └── rbac.yaml
+    └── values.yaml
+```
+
+At this point, the cluster is provisioning. To monitor the progress of the cluster deployment, check the status of
+the ArgoCD app of the same name. Eventually, the ArgoCD apps will be synced and healthy.
+
+```shell
+$ argocd app list
+
+NAME                           CLUSTER                         NAMESPACE  PROJECT  STATUS     HEALTH   SYNCPOLICY  CONDITIONS  REPO                                            PATH                             TARGET
+cas-cluster                    https://kubernetes.default.svc  default    default Synced  Healthy  Auto-Prune  <none>  ${WORKSPACE_REPO_URL}   clusters/cas-cluster/mgmt        main
+cas-cluster-cas-bundle           cas-cluster                 default    default  Synced     Healthy  Auto-Prune  <none>   https://github.com/arlonproj/arlon.git   bundles/capi-cluster-autoscaler  HEAD
+cas-cluster-profile-dynamic-cas  https://kubernetes.default.svc  argocd     default  Synced     Healthy  Auto-Prune  <none>      ${WORKSPACE_REPO_URL} profiles/dynamic-cas/mgmt
+
+```
