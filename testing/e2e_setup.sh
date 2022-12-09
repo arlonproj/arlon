@@ -310,21 +310,9 @@ if ! which kubectl-kuttl &>/dev/null; then
   chmod +x "${HOME}/.local/bin/kubectl-kuttl"
 fi
 
-if ! which envsubst &> /dev/null; then
-  echo Downloading envsubst plugin to run e2e tests
-  curl -Lo "${HOME}/.local/bin/envsubst" https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m`
-  chmod +x "${HOME}/.local/bin/envsubst"
-fi
-
-# Substituting the environment variables in e2e test manifest file
-e2eTemplate=${arlon_repo}/testing/capi-quickstart-e2e-template.yaml
-manifestfile=${arlon_repo}/testing/capi-quickstart-e2e-test.yaml
-envsubst < ${e2eTemplate} > ${manifestfile}
-
 # not needed for us...	
 #clusterawsadm bootstrap iam create-cloudformation-stack
-echo "Enabling MachinePool Feature Gate for running e2e tests"
-export EXP_MACHINE_POOL=true
+
 export AWS_B64ENCODED_CREDENTIALS=$(clusterawsadm bootstrap credentials encode-as-profile)
 
 clusterctl init --infrastructure aws --wait-providers
@@ -333,6 +321,13 @@ echo "Login as admin: ${pwd} into ArgoCD at http://localhost:${forwarding_port}"
 echo "Run the following command to use kubectl, argocd, clusterctl, clusterawsadm, arlon (If not already installed)"
 echo 'PATH=$PATH:$HOME/.local/bin'
 echo Installation successfull
+
+clusterctl generate cluster capi-quickstart --flavor eks \
+  --kubernetes-version v1.23.10 \
+  --control-plane-machine-count=3 \
+  --worker-machine-count=2 \
+  --infrastructure aws \
+  >${arlon_repo}/testing/capi-quickstart-e2e-test.yaml
 
 repodir="${GIT_CLONE_ROOT}/myrepo"
 

@@ -4,9 +4,10 @@ type Cluster struct {
 	Name            string
 	ClusterSpecName string           // empty for external clusters
 	BaseCluster     *BaseClusterInfo // gen2 only
-	ProfileName     string
+	ProfileName     string           // gen1 profile
 	IsExternal      bool
-	SecretName      string // The corresponding argocd secret. Empty for non-external clusters.
+	SecretName      string   // The corresponding argocd secret. Empty for non-external clusters.
+	AppProfiles     []string // gen2 profiles
 }
 
 type BaseClusterInfo struct {
@@ -24,3 +25,6 @@ const baseClusterNameAnnotation = "arlon.io/basecluster-name"
 const baseClusterRepoUrlAnnotation = "arlon.io/basecluster-repo-url"
 const baseClusterRepoRevisionAnnotation = "arlon.io/basecluster-repo-revision"
 const baseClusterRepoPathAnnotation = "arlon.io/basecluster-repo-path"
+
+const ArlonGen1ClusterLabelQueryOnArgoApps = "managed-by=arlon,arlon-type=cluster"
+const ArlonGen2ClusterLabelQueryOnArgoApps = "managed-by=arlon,arlon-type=cluster-app"

@@ -25,6 +25,8 @@ jobs:
         cache: true
     - name: Build
       run: go build -v ./...
+    - name: Unit tests
+      run: make pkgtest
     - name: Run coverage
       run: go test -race -coverprofile=coverage.txt -covermode=atomic
     - name: Upload coverage to Codecov

@@ -6,7 +6,7 @@ import (
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/bundle"
-	"github.com/arlonproj/arlon/pkg/controller"
+	"github.com/arlonproj/arlon/pkg/ctrlruntimeclient"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
@@ -31,7 +31,7 @@ func Create(
 			return fmt.Errorf("%w: %s", bundle.ErrInvalidName, name)
 		}
 	}
-	cli, err := controller.NewClient(config)
+	cli, err := ctrlruntimeclient.NewClient(config)
 	if err != nil {
 		return fmt.Errorf("failed to get controller runtime client: %s", err)
 	}

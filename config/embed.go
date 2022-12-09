@@ -9,4 +9,6 @@ var (
 	CRDClusterReg []byte
 	//go:embed crd/bases/core.arlon.io_profiles.yaml
 	CRDProfile []byte
+	//go:embed crd/bases/core.arlon.io_appprofiles.yaml
+	CRDAppProfile []byte
 )

@@ -6,7 +6,7 @@ import (
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/bundle"
-	"github.com/arlonproj/arlon/pkg/controller"
+	"github.com/arlonproj/arlon/pkg/ctrlruntimeclient"
 	restclient "k8s.io/client-go/rest"
 )
 
@@ -104,7 +104,7 @@ func Update(
 			return false, fmt.Errorf("failed to update dynamic profile in git: %s", err)
 		}
 	}
-	cli, err := controller.NewClient(config)
+	cli, err := ctrlruntimeclient.NewClient(config)
 	if err != nil {
 		return false, fmt.Errorf("failed to get new controller runtime client: %s", err)
 	}

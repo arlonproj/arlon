@@ -1,6 +1,8 @@
 package controller
 
 import (
+	argoapp "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
+	appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/controllers"
 	"github.com/arlonproj/arlon/pkg/argocd"
@@ -24,6 +26,8 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(arlonv1.AddToScheme(scheme))
+	utilruntime.Must(appset.AddToScheme(scheme))
+	utilruntime.Must(argoapp.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -119,6 +123,75 @@ func StartCallHomeController(metricsAddr string, probeAddr string, enableLeaderE
 		setupLog.Error(err, "unable to create controller", "controller", "ClusterRegistration")
 		os.Exit(1)
 	}
+	//+kubebuilder:scaffold:builder
+
+	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
+		setupLog.Error(err, "unable to set up health check")
+		os.Exit(1)
+	}
+	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
+		setupLog.Error(err, "unable to set up ready check")
+		os.Exit(1)
+	}
+
+	setupLog.Info("starting manager")
+	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+		setupLog.Error(err, "problem running manager")
+		os.Exit(1)
+	}
+}
+
+func StartAppProfileController(argocdConfigPath string, metricsAddr string, probeAddr string, enableLeaderElection bool) {
+	argocdClient := argocd.NewArgocdClientOrDie(argocdConfigPath)
+	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
+		Scheme:                 scheme,
+		MetricsBindAddress:     metricsAddr,
+		Port:                   9443,
+		HealthProbeBindAddress: probeAddr,
+		LeaderElection:         enableLeaderElection,
+		LeaderElectionID:       "d5252dee.arlon.io",
+		// Disable caching for secret objects, because the controller reads them
+		// in a particular namespace. Caching requires RBAC to be setup for
+		// cluster-wide List access, as opposed to the more secure
+		// namespace-scoped access.
+		// Update: need to do the same for ServiceAccount
+		/*
+			ClientDisableCacheFor: []client.Object{
+				&corev1.Secret{},
+				&corev1.ServiceAccount{},
+			},
+		*/
+	})
+	if err != nil {
+		setupLog.Error(err, "unable to start manager")
+		os.Exit(1)
+	}
+
+	if err = (&controllers.AppProfileReconciler{
+		Client:       mgr.GetClient(),
+		Scheme:       mgr.GetScheme(),
+		ArgocdClient: argocdClient,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to set up controller", "controller", "AppProfile")
+		os.Exit(1)
+	}
+	if err = (&controllers.ApplicationSetReconciler{
+		Client:       mgr.GetClient(),
+		Scheme:       mgr.GetScheme(),
+		ArgocdClient: argocdClient,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to set up controller", "controller", "ApplicationSet")
+		os.Exit(1)
+	}
+	if err = (&controllers.ApplicationReconciler{
+		Client:       mgr.GetClient(),
+		Scheme:       mgr.GetScheme(),
+		ArgocdClient: argocdClient,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to set up controller", "controller", "Application")
+		os.Exit(1)
+	}
+
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {

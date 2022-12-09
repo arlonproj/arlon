@@ -1,0 +1,37 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 3600
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  namespace: example-1
+status:
+  controlPlaneReady: true
+  infrastructureReady: true
+  phase: Provisioned
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: AWSManagedControlPlane
+metadata:
+  namespace: example-1
+status:
+  ready: true
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachinePool
+metadata:
+  namespace: example-1
+status:
+  bootstrapReady: true
+  infrastructureReady: true
+  phase: Running
+  readyReplicas: 2
+  availableReplicas: 2
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AWSManagedMachinePool
+metadata:
+  namespace: example-1
+status:
+  ready: true
