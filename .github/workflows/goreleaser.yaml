@@ -20,7 +20,13 @@ jobs:
         name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.19.3
+          token: ${{ secrets.GH_PAT }}        
+          go-version: 1.19
+          check-latest: true
+      -
+        name: Print the version of golang
+        run: |
+          go version
       -
         name: Cache go modules
         uses: actions/cache@v3
