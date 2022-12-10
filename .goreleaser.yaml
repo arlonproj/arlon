@@ -8,6 +8,12 @@ before:
     - make vet
 builds:
   - id: 'cli'
+    ldflags:
+      - -X github.com/arlonproj/arlon/cmd/install.capiCoreProvider=cluster-api:v1.1.5
+      - -X github.com/arlonproj/arlon/cmd/initialize.argocdGitTag=release-2.4
+      - -X github.com/arlonproj/arlon/cmd/version.cliVersion=0.10.0
+      - -w
+      - -s
     env:
       - CGO_ENABLED=0
     goos:
