@@ -35,7 +35,7 @@ an RBAC ruleset, an add-on, an application, etc.
 
 - Improves time to market by enabling better velocity for developers through infrastructure management that is more fluid and agile. Define, store, change and enforce your cluster infrastructure & application add-ons at scale.  
 - Reduces the risk of unexpected infrastructure downtime and outages, or unexpected security misconfiguration, with consistent management of infrastructure and security policies.   
-- Allows IT and Platform Ops admins to operate large scale of clusters, infrastructure & devops add-ons with significantly reduced team size & operational overhead, using GitOps. 
+- Allows IT and Platform Ops admins to operate large scale of clusters, infrastructure & add-ons with significantly reduced team size & operational overhead, using GitOps. 
 
 # Contents
 
