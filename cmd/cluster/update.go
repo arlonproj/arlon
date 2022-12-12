@@ -23,7 +23,6 @@ func updateClusterCommand() *cobra.Command {
 	var clusterSpecName string
 	var profileName string
 	var outputYaml bool
-	var withCAS bool //gen2 specific flag to enable cluster autoscaler
 	command := &cobra.Command{
 		Use:   "update <clustername> [flags]",
 		Short: "update existing cluster",
@@ -69,7 +68,7 @@ func updateClusterCommand() *cobra.Command {
 			updateInArgoCd := !outputYaml
 			rootApp, err := cluster.Update(appIf, config, argocdNs, arlonNs,
 				clusterName, clusterSpecName, profileName, updateInArgoCd,
-				config.Host, withCAS)
+				config.Host)
 			if err != nil {
 				return fmt.Errorf("failed to update cluster: %s", err)
 			}
@@ -97,7 +96,6 @@ func updateClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&arlonNs, "arlon-ns", "arlon", "the arlon namespace")
 	command.Flags().StringVar(&profileName, "profile", "", "the configuration profile to use")
 	command.Flags().StringVar(&clusterSpecName, "cluster-spec", "", "the clusterspec to use")
-	command.Flags().BoolVar(&withCAS, "autoscaler", false, "enable CAPI cluster autoscaler for cluster template based clusters")
 	command.Flags().BoolVar(&outputYaml, "output-yaml", false, "output root application YAML instead of updating ArgoCD root app")
 	return command
 }
