@@ -32,6 +32,7 @@ func Update(
 	profileName string,
 	updateInArgoCd bool,
 	managementClusterUrl string,
+	withCAS bool, //gen2 specific flag to enable cluster autoscaler
 ) (*argoappv1.Application, error) {
 	oldApp, err := appIf.Get(context.Background(),
 		&argoapp.ApplicationQuery{Name: &clusterName})
@@ -90,7 +91,7 @@ func Update(
 	}
 	rootApp, err := ConstructRootApp(argocdNs, clusterName, "", repoUrl,
 		repoBranch, repoPath, clusterSpecName, clusterSpecCm, prof.Name,
-		managementClusterUrl)
+		managementClusterUrl, withCAS)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct root app: %s", err)
 	}

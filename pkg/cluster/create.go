@@ -30,8 +30,8 @@ func Create(
 	clusterSpecName string, // empty for gen2
 	prof *arlonv1.Profile,
 	createInArgoCd bool,
-	withCAS bool,
 	managementClusterUrl string,
+	withCAS bool,
 ) (*argoappv1.Application, error) {
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {

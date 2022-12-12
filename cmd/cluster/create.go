@@ -39,7 +39,7 @@ func createClusterCommand() *cobra.Command {
 	var overridesDir string
 	var outputYaml bool
 	var profileName string
-	var withCAS bool
+	var withCAS bool //gen2 specific flag to enable cluster autoscaler
 	command := &cobra.Command{
 		Use:   "create",
 		Short: "create new cluster from a base",
@@ -97,7 +97,7 @@ func createClusterCommand() *cobra.Command {
 			arlonApp, err := cluster.Create(appIf, config, argocdNs, arlonNs,
 				clusterName, baseClusterName, arlonRepoUrl, arlonRepoRevision,
 				arlonRepoPath, "",
-				nil, createInArgoCd, withCAS, config.Host)
+				nil, createInArgoCd, config.Host, withCAS)
 			if err != nil {
 				return fmt.Errorf("failed to create arlon app: %s", err)
 			}
@@ -171,7 +171,7 @@ func createClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&overridesDir, "overrides-dir", "", "path to the corresponding patch file to the cluster")
 	command.Flags().BoolVar(&outputYaml, "output-yaml", false, "output root applications YAML instead of deploying to ArgoCD")
 	command.Flags().StringVar(&profileName, "profile", "", "profile name (if specified, must refer to dynamic profile)")
-	command.Flags().BoolVar(&withCAS, "autoscale", false, "enable CAPI cluster autoscaler for cluster template based clusters")
+	command.Flags().BoolVar(&withCAS, "autoscaler", false, "enable CAPI cluster autoscaler for cluster template based clusters")
 	command.MarkFlagRequired("cluster-name")
 	command.MarkFlagsMutuallyExclusive("repo-url", "repo-alias")
 	return command
