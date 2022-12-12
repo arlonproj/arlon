@@ -3,21 +3,40 @@ package cluster
 import (
 	"embed"
 	"fmt"
+	"path"
+	"text/template"
+
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/gitutils"
 	logpkg "github.com/arlonproj/arlon/pkg/log"
 	"github.com/arlonproj/arlon/pkg/profile"
+	"github.com/go-git/go-billy"
 	gogit "github.com/go-git/go-git/v5"
-	"path"
-	"text/template"
 )
 
 //go:embed manifests/*
 var content embed.FS
 
 // -----------------------------------------------------------------------------
+type kustomizeyaml struct {
+	APIVersion string   `yaml:"apiVersion"`
+	Kind       string   `yaml:"kind"`
+	Resources  []string `yaml:"resources"`
+	Patches    []target `yaml:"patches"`
+}
+
+type target struct {
+	Target info   `yaml:"target"`
+	Path   string `yaml:"path"`
+}
+
+type info struct {
+	Group   string `yaml:"group"`
+	Version string `yaml:"version"`
+	Kind    string `yaml:"kind"`
+}
 
 func DeployToGit(
 	creds *argocd.RepoCreds,
@@ -168,3 +187,67 @@ func ProcessDynamicProfile(
 }
 
 // -----------------------------------------------------------------------------
+func DeployPatchToGit(
+	creds *argocd.RepoCreds,
+	argocdNs string,
+	clusterName string,
+	repoUrl string,
+	repoBranch string,
+	basePath string,
+	overrides string,
+	baseRepoUrl string,
+	baseRepoPath string,
+) error {
+	log := logpkg.GetLogger()
+	repo, tmpDir, auth, err := argocd.CloneRepo(creds, repoUrl, repoBranch)
+	if err != nil {
+		return fmt.Errorf("failed to clone repo: %s", err)
+	}
+	clusterPath := clusterPathFromBasePath(basePath, clusterName)
+	wt, err := repo.Worktree()
+	if err != nil {
+		return fmt.Errorf("failed to get repo worktree: %s", err)
+	}
+	// remove old data if directory exists, we'll regenerate everything
+	fileInfo, err := wt.Filesystem.Lstat(clusterPath)
+	if err == nil {
+		if !fileInfo.IsDir() {
+			return fmt.Errorf("unexpected file type for %s", clusterPath)
+		}
+		_, err = wt.Remove(clusterPath)
+		if err != nil {
+			return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
+		}
+	}
+	err = gitutils.CopyPatchManifests(wt, overrides, clusterPath, baseRepoUrl, baseRepoPath)
+	if err != nil {
+		return fmt.Errorf("failed to copy embedded content: %s", err)
+	}
+	var file billy.File
+	fs := wt.Filesystem
+	file, err = fs.Create(path.Join(clusterPath, "configurations.yaml"))
+	if err != nil {
+		return fmt.Errorf("failed to create configurations.yaml: %s", err)
+	}
+	_, err = file.Write([]byte(configurationsYaml))
+	_ = file.Close()
+	if err != nil {
+		return fmt.Errorf("failed to write to configurations.yaml: %s", err)
+	}
+
+	_, err = gitutils.CommitChanges(tmpDir, wt, "deploy patches of the arlon cluster in "+clusterPath)
+	if err != nil {
+		return fmt.Errorf("failed to commit changes: %s", err)
+	}
+	err = repo.Push(&gogit.PushOptions{
+		RemoteName: gogit.DefaultRemoteName,
+		Auth:       auth,
+		Progress:   nil,
+		CABundle:   nil,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to push to remote repository: %s", err)
+	}
+	log.V(1).Info("successfully pushed working tree", "tmpDir", tmpDir)
+	return nil
+}

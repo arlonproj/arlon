@@ -2,10 +2,11 @@ package basecluster
 
 import (
 	"fmt"
-	"github.com/arlonproj/arlon/pkg/argocd"
-	"k8s.io/cli-runtime/pkg/resource"
 	"os"
 	"path"
+
+	"github.com/arlonproj/arlon/pkg/argocd"
+	"k8s.io/cli-runtime/pkg/resource"
 )
 
 // Validate verifies whether the resources in the specified file contain one and

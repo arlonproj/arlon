@@ -3,6 +3,10 @@ package basecluster
 import (
 	"bytes"
 	"fmt"
+	"os"
+	"path"
+	"text/template"
+
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/gitutils"
 	logpkg "github.com/arlonproj/arlon/pkg/log"
@@ -12,10 +16,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/cli-runtime/pkg/resource"
 	"k8s.io/client-go/kubernetes/scheme"
-	"os"
-	"path"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
-	"text/template"
 )
 
 // Prepare checks a cluster API manifest file for problems, and if

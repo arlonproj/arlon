@@ -99,3 +99,30 @@ func Create(
 	}
 	return rootApp, nil
 }
+
+func CreatePatchDir(
+	config *restclient.Config,
+	clusterName string,
+	repoURL string,
+	argocdNs string,
+	basePath string,
+	repoBranch string,
+	overRides string,
+	baseRepoUrl string,
+	baseRepoPath string) error {
+	kubeClient, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return fmt.Errorf("failed to get kube client: %s", err)
+	}
+	creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoURL)
+	if err != nil {
+		return fmt.Errorf("failed to get repo credentials: %s", err)
+	}
+
+	err = DeployPatchToGit(creds, argocdNs, clusterName,
+		repoURL, repoBranch, basePath, overRides, baseRepoUrl, baseRepoPath)
+	if err != nil {
+		return fmt.Errorf("failed to deploy git tree: %s", err)
+	}
+	return nil
+}

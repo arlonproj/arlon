@@ -24,13 +24,17 @@ func createClusterCommand() *cobra.Command {
 	var argocdNs string
 	var arlonNs string
 	var arlonRepoUrl string
+	var bcRepoUrl string
 	var arlonRepoRevision string
 	var arlonRepoPath string
+	var bcRepoPath string
 	var clusterRepoUrl string
 	var repoAlias string
 	var clusterRepoRevision string
+	var repoBranch string
 	var clusterRepoPath string
 	var clusterName string
+	var overRides string
 	var outputYaml bool
 	var profileName string
 	command := &cobra.Command{
@@ -55,9 +59,14 @@ func createClusterCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get repository credentials: %s", err)
 			}
+
+			err = cluster.CreatePatchDir(config, clusterName, clusterRepoUrl, argocdNs, clusterRepoPath, repoBranch, overRides, bcRepoUrl, bcRepoPath)
+			if err != nil {
+				return fmt.Errorf("failed to create patch files directory: %s", err)
+			}
 			createInArgoCd := !outputYaml
 			baseClusterName, err := bcl.ValidateGitDir(creds,
-				clusterRepoUrl, clusterRepoRevision, clusterRepoPath)
+				bcRepoUrl, clusterRepoRevision, bcRepoPath)
 			if err != nil {
 				return fmt.Errorf("failed to validate base cluster: %s", err)
 			}
@@ -132,13 +141,17 @@ func createClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&argocdNs, "argocd-ns", "argocd", "the argocd namespace")
 	command.Flags().StringVar(&arlonNs, "arlon-ns", "arlon", "the arlon namespace")
 	command.Flags().StringVar(&arlonRepoUrl, "arlon-repo-url", "https://github.com/arlonproj/arlon.git", "the git repository url for arlon template")
+	command.Flags().StringVar(&bcRepoUrl, "bc-repo-url", " ", "the git repository url for base cluster template")
 	command.Flags().StringVar(&arlonRepoRevision, "arlon-repo-revision", "v0.9.0", "the git revision for arlon template")
 	command.Flags().StringVar(&arlonRepoPath, "arlon-repo-path", "pkg/cluster/manifests", "the git repository path for arlon template")
+	command.Flags().StringVar(&bcRepoPath, "bc-repo-path", " ", "the git repository path for base cluster template")
 	command.Flags().StringVar(&clusterRepoUrl, "repo-url", "", "the git repository url for cluster template")
 	command.Flags().StringVar(&repoAlias, "repo-alias", gitrepo.RepoDefaultCtx, "git repository alias to use")
 	command.Flags().StringVar(&clusterRepoRevision, "repo-revision", "main", "the git revision for cluster template")
+	command.Flags().StringVar(&repoBranch, "repo-branch", "main", "the git branch")
 	command.Flags().StringVar(&clusterRepoPath, "repo-path", "", "the git repository path for cluster template")
 	command.Flags().StringVar(&clusterName, "cluster-name", "", "the cluster name")
+	command.Flags().StringVar(&overRides, "overrides", "", "path to the corresponding patch file to the cluster")
 	command.Flags().BoolVar(&outputYaml, "output-yaml", false, "output root applications YAML instead of deploying to ArgoCD")
 	command.Flags().StringVar(&profileName, "profile", "", "profile name (if specified, must refer to dynamic profile)")
 	command.MarkFlagRequired("cluster-name")
