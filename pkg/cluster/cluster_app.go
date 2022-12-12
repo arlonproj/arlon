@@ -20,9 +20,10 @@ func CreateClusterApp(
 	repoRevision string, // source revision
 	repoPath string, // source path
 	createInArgoCd bool,
+	overRiden bool,
 ) (*argoappv1.Application, error) {
 	app := constructClusterApp(argocdNs, clusterName, baseClusterName,
-		repoUrl, repoRevision, repoPath)
+		repoUrl, repoRevision, repoPath, overRiden)
 	if createInArgoCd {
 		appCreateRequest := argoapp.ApplicationCreateRequest{
 			Application: app,
@@ -43,7 +44,12 @@ func constructClusterApp(
 	repoUrl string, // source repo
 	repoRevision string, // source revision
 	repoPath string, // source path
+	overRiden bool,
 ) *argoappv1.Application {
+	clusterOverriden := "false"
+	if overRiden {
+		clusterOverriden = "true"
+	}
 	app := &argoappv1.Application{
 		TypeMeta: v1.TypeMeta{
 			Kind:       application.ApplicationKind,
@@ -62,6 +68,7 @@ func constructClusterApp(
 				baseClusterRepoUrlAnnotation:      repoUrl,
 				baseClusterRepoRevisionAnnotation: repoRevision,
 				baseClusterRepoPathAnnotation:     repoPath,
+				baseClusterOverriden:              clusterOverriden,
 			},
 			Finalizers: []string{argoappv1.ForegroundPropagationPolicyFinalizer},
 		},
@@ -98,7 +105,10 @@ func constructClusterApp(
 		},
 		SyncOptions: []string{"Prune=true", "RespectIgnoreDifferences=true"},
 	}
-	finalRepoPath := repoPath + "/" + clusterName
+	finalRepoPath := repoPath
+	if overRiden {
+		finalRepoPath = repoPath + "/" + clusterName
+	}
 	app.Spec.Source.RepoURL = repoUrl
 	app.Spec.Source.TargetRevision = repoRevision
 	app.Spec.Source.Path = finalRepoPath

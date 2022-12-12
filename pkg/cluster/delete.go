@@ -69,42 +69,45 @@ func Delete(
 		RepoUrl := app.Annotations[baseClusterRepoUrlAnnotation]
 		RepoRevision := app.Annotations[baseClusterRepoRevisionAnnotation]
 		RepoPath := app.Annotations[baseClusterRepoPathAnnotation] + "/" + name
-		creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, RepoUrl)
-		repo, tmpDir, auth, err := argocd.CloneRepo(creds, RepoUrl, RepoRevision)
-		if err != nil {
-			return fmt.Errorf("failed to clone repo: %s", err)
-		}
-		wt, err := repo.Worktree()
-		fileInfo, err := wt.Filesystem.Lstat(RepoPath)
-		if err == nil {
-			if !fileInfo.IsDir() {
-				return fmt.Errorf("unexpected file type for %s", RepoPath)
-			}
-			_, err := wt.Remove(RepoPath)
+		overRiden := app.Annotations[baseClusterOverriden]
+		if overRiden == "true" {
+			creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, RepoUrl)
+			repo, tmpDir, auth, err := argocd.CloneRepo(creds, RepoUrl, RepoRevision)
 			if err != nil {
-				return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
+				return fmt.Errorf("failed to clone repo: %s", err)
 			}
-		}
+			wt, err := repo.Worktree()
+			fileInfo, err := wt.Filesystem.Lstat(RepoPath)
+			if err == nil {
+				if !fileInfo.IsDir() {
+					return fmt.Errorf("unexpected file type for %s", RepoPath)
+				}
+				_, err := wt.Remove(RepoPath)
+				if err != nil {
+					return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
+				}
+			}
 
-		commitMsg := "Deleted the files regarding to " + RepoPath
-		changed, err := gitutils.CommitDeletechanges(tmpDir, wt, commitMsg)
-		if err != nil {
-			return fmt.Errorf("failed to commit changes: %s", err)
+			commitMsg := "Deleted the files regarding to " + RepoPath
+			changed, err := gitutils.CommitDeletechanges(tmpDir, wt, commitMsg)
+			if err != nil {
+				return fmt.Errorf("failed to commit changes: %s", err)
+			}
+			if !changed {
+				log.Info("no changed files, skipping commit & push")
+				return nil
+			}
+			err = repo.Push(&gogit.PushOptions{
+				RemoteName: gogit.DefaultRemoteName,
+				Auth:       auth,
+				Progress:   nil,
+				CABundle:   nil,
+			})
+			if err != nil {
+				return fmt.Errorf("failed to push to remote repository: %s", err)
+			}
+			log.V(1).Info("successfully pushed working tree", "tmpDir", tmpDir)
 		}
-		if !changed {
-			log.Info("no changed files, skipping commit & push")
-			return nil
-		}
-		err = repo.Push(&gogit.PushOptions{
-			RemoteName: gogit.DefaultRemoteName,
-			Auth:       auth,
-			Progress:   nil,
-			CABundle:   nil,
-		})
-		if err != nil {
-			return fmt.Errorf("failed to push to remote repository: %s", err)
-		}
-		log.V(1).Info("successfully pushed working tree", "tmpDir", tmpDir)
 	}
 
 	for _, app := range apps.Items {
