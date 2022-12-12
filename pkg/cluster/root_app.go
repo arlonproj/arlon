@@ -68,9 +68,10 @@ func ConstructRootApp(
 			if err != nil {
 				return nil, err
 			}
+			fmt.Println(helmParams, ignoreDiffs)
 		}
 	}
-	helmParams = []argoappv1.HelmParameter{
+	helmParams = append(helmParams, []argoappv1.HelmParameter{
 		{
 			Name:  "global.clusterName",
 			Value: clusterName,
@@ -83,7 +84,7 @@ func ConstructRootApp(
 			Name:  "global.managementClusterUrl",
 			Value: managementClusterUrl,
 		},
-	}
+	}...)
 	if innerClusterName != "" {
 		innerClusterNameWithDashSuffix := innerClusterName + "-"
 		helmParams = append(helmParams, argoappv1.HelmParameter{
@@ -139,6 +140,7 @@ func ConstructRootApp(
 		},
 		SyncOptions: []string{"Prune=true"},
 	}
+	fmt.Println(app.Spec.Source.Helm)
 	return app, nil
 }
 
