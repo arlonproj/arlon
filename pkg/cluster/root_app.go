@@ -21,6 +21,7 @@ func ConstructRootApp(
 	clusterSpecCm *corev1.ConfigMap, // nil for gen2
 	profileName string,
 	managementClusterUrl string,
+	withCAS bool,
 ) (*argoappv1.Application, error) {
 	appName := clusterName // gen1 default
 	arlonType := "cluster" // gen1 default
@@ -47,6 +48,8 @@ func ConstructRootApp(
 	}
 	var apiProvider string
 	var cs *clusterspec.ClusterSpec
+	helmParams := []argoappv1.HelmParameter{}
+	ignoreDiffs := []argoappv1.ResourceIgnoreDifferences{}
 	if clusterSpecCm != nil {
 		// gen1
 		var err error
@@ -60,8 +63,14 @@ func ConstructRootApp(
 		app.ObjectMeta.Labels["arlon-cluster"] = clusterName
 		// assume CAPI for now
 		apiProvider = "capi"
+		if withCAS {
+			err := enableClusterAutoscaler(apiProvider, &helmParams, &ignoreDiffs)
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
-	helmParams := []argoappv1.HelmParameter{
+	helmParams = []argoappv1.HelmParameter{
 		{
 			Name:  "global.clusterName",
 			Value: clusterName,
@@ -101,22 +110,11 @@ func ConstructRootApp(
 			Name:  fmt.Sprintf("tags.%s", subchartName),
 			Value: "true",
 		})
-		var ignoreDiffs []argoappv1.ResourceIgnoreDifferences
 		if cs.ClusterAutoscalerEnabled {
-			casSubchartName, err := clusterspec.ClusterAutoscalerSubchartNameFromClusterSpec(cs)
+			err := enableClusterAutoscaler(cs.ApiProvider, &helmParams, &ignoreDiffs)
 			if err != nil {
-				return nil, fmt.Errorf("failed to get cluster autoscaler subchart name: %s", err)
+				return nil, fmt.Errorf("failed to enable cluster autoscaler for %s: %w", cs.ApiProvider, err)
 			}
-			helmParams = append(helmParams, argoappv1.HelmParameter{
-				Name:  fmt.Sprintf("tags.%s", casSubchartName),
-				Value: "true",
-			})
-			// Cluster autoscaler will change replicas so ignore it
-			ignoreDiffs = append(ignoreDiffs, argoappv1.ResourceIgnoreDifferences{
-				Group:        "cluster.x-k8s.io",
-				Kind:         "MachineDeployment",
-				JSONPointers: []string{"/spec/replicas"},
-			})
 		}
 		// Ignore CAPI EKS control plane's spec.version because the AWS controller(s)
 		// appear to update it with a value that is less precise than the requested
@@ -142,4 +140,24 @@ func ConstructRootApp(
 		SyncOptions: []string{"Prune=true"},
 	}
 	return app, nil
+}
+
+func enableClusterAutoscaler(apiProvider string, helmParams *[]argoappv1.HelmParameter, ignoreDiffs *[]argoappv1.ResourceIgnoreDifferences) error {
+	casSubchartName := clusterspec.ClusterAutoscalerSubchartNameFromApiProvider(apiProvider)
+	if len(casSubchartName) == 0 {
+		return fmt.Errorf("failed to get cluster autoscaler subchart name for %s", apiProvider)
+	}
+	*helmParams = append(*helmParams, argoappv1.HelmParameter{
+		Name:  fmt.Sprintf("tags.%s", casSubchartName),
+		Value: "true",
+	})
+
+	// Cluster autoscaler will change replicas so ignore it
+	*ignoreDiffs = append(*ignoreDiffs, argoappv1.ResourceIgnoreDifferences{
+		Group:        "cluster.x-k8s.io",
+		Kind:         "MachineDeployment",
+		JSONPointers: []string{"/spec/replicas"},
+	})
+
+	return nil
 }
