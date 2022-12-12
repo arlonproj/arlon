@@ -21,7 +21,7 @@ func ConstructRootApp(
 	clusterSpecCm *corev1.ConfigMap, // nil for gen2
 	profileName string,
 	managementClusterUrl string,
-	withCAS bool,
+	withCAS bool, // false during gen1 cluster update
 ) (*argoappv1.Application, error) {
 	appName := clusterName // gen1 default
 	arlonType := "cluster" // gen1 default
