@@ -2,6 +2,9 @@ package basecluster
 
 const kustomizationYamlTemplate = `resources:
 - {{.ManifestFileName}}
+
+configurations:
+- configurations.yaml
 `
 
 // -----------------------------------------------------------------------------

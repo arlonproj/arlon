@@ -234,31 +234,8 @@ func DeployPatchToGit(
 	if err != nil {
 		return fmt.Errorf("failed to write to configurations.yaml: %s", err)
 	}
-	// kustomizeresult := kustomizeyaml{
-	// 	APIVersion: "kustomize.config.k8s.io/v1beta1",
-	// 	Kind:       "Kustomization",
-	// 	Resources: []string{
-	// 		"../../bc1",
-	// 	},
-	// 	Patches: targetData,
-	// }
-	// var tmpl *template.Template
-	// yamlData, err := yaml.Marshal(&kustomizeresult)
-	// tmpl, err = template.New("kust").Parse(string(yamlData))
-	// if err != nil {
-	// 	return fmt.Errorf("failed to create kustomization template: %s", err)
-	// }
-	// file, err = fs.Create(path.Join(clusterPath, "kustomization.yaml"))
-	// if err != nil {
-	// 	return fmt.Errorf("failed to create kustomization.yaml: %s", err)
-	// }
-	// err = tmpl.Execute(file, yamlData)
-	// _ = file.Close()
-	// if err != nil {
-	// 	return fmt.Errorf("failed to write to kustomization.yaml: %s", err)
-	// }
 
-	_, err = gitutils.CommitChanges(tmpDir, wt, "deploy arlon cluster "+clusterPath)
+	_, err = gitutils.CommitChanges(tmpDir, wt, "deploy patches of the arlon cluster in "+clusterPath)
 	if err != nil {
 		return fmt.Errorf("failed to commit changes: %s", err)
 	}

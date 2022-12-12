@@ -98,20 +98,20 @@ func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string,
 
 		parsedData := make(map[interface{}]interface{})
 
-		err2 := yaml.Unmarshal(kustomfile, &parsedData)
-		if err2 != nil {
-			fmt.Println(err2)
+		err = yaml.Unmarshal(kustomfile, &parsedData)
+		if err != nil {
+			return fmt.Errorf("Failed to load the parsed data %s", err)
 		}
 		var targetcomp []string
 		var kind string
 		var information info
-		for k, v := range parsedData {
-			if k == "apiVersion" {
-				strv := fmt.Sprintf("%v", v)
-				targetcomp = strings.Split(string(strv), "/")
+		for kustomkey, kustomval := range parsedData {
+			if kustomkey == "apiVersion" {
+				strkustomval := fmt.Sprintf("%v", kustomval)
+				targetcomp = strings.Split(string(strkustomval), "/")
 			}
-			if k == "kind" {
-				kind = fmt.Sprintf("%v", v)
+			if kustomkey == "kind" {
+				kind = fmt.Sprintf("%v", kustomval)
 			}
 		}
 		information = info{

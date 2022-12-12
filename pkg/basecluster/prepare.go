@@ -148,6 +148,7 @@ func prepareDir(
 	actualFsRootDir string,
 ) (manifestFileName string, clusterName string, err error) {
 	var kustomizationFound bool
+	var configurationsFound bool
 	infos, err := fs.ReadDir(dirRelPath)
 	if err != nil {
 		err = fmt.Errorf("failed to list repo directory: %s", err)
@@ -160,6 +161,10 @@ func prepareDir(
 		}
 		if info.Name() == "kustomization.yaml" {
 			kustomizationFound = true
+			continue
+		}
+		if info.Name() == "configurations.yaml" {
+			configurationsFound = true
 			continue
 		}
 		if manifestFileName != "" {
@@ -213,6 +218,20 @@ func prepareDir(
 		_ = file.Close()
 		if err != nil {
 			err = fmt.Errorf("failed to write to kustomization.yaml: %s", err)
+			return
+		}
+	}
+	if !configurationsFound {
+		var file billy.File
+		file, err = fs.Create(path.Join(dirRelPath, "configurations.yaml"))
+		if err != nil {
+			err = fmt.Errorf("failed to create configurations.yaml: %s", err)
+			return
+		}
+		_, err = file.Write([]byte(configurationsYaml))
+		_ = file.Close()
+		if err != nil {
+			err = fmt.Errorf("failed to write to configurations.yaml: %s", err)
 			return
 		}
 	}

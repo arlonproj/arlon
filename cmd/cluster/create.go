@@ -62,7 +62,7 @@ func createClusterCommand() *cobra.Command {
 
 			err = cluster.CreatePatchDir(config, clusterName, clusterRepoUrl, argocdNs, clusterRepoPath, repoBranch, overRides, bcRepoUrl, bcRepoPath)
 			if err != nil {
-				fmt.Println(err)
+				return fmt.Errorf("failed to create patch files directory: %s", err)
 			}
 			createInArgoCd := !outputYaml
 			baseClusterName, err := bcl.ValidateGitDir(creds,

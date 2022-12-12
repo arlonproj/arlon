@@ -2,11 +2,12 @@ package gitutils
 
 import (
 	"fmt"
-	gogit "github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/object"
 	"os"
 	"path/filepath"
 	"time"
+
+	gogit "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
 func CommitChanges(tmpDir string, wt *gogit.Worktree, commitMsg string) (changed bool, err error) {
@@ -42,6 +43,33 @@ func CommitChanges(tmpDir string, wt *gogit.Worktree, commitMsg string) (changed
 		changed = true
 	}
 
+	if !changed {
+		return false, nil
+	}
+	commitOpts := &gogit.CommitOptions{
+		Author: &object.Signature{
+			Name:  "arlon automation",
+			Email: "arlon@arlon.io",
+			When:  time.Now(),
+		},
+	}
+	_, err = wt.Commit(commitMsg, commitOpts)
+	if err != nil {
+		return changed, fmt.Errorf("failed to commit change: %s", err)
+	}
+	return
+}
+
+func CommitDeletechanges(tmpDir string, wt *gogit.Worktree, commitMsg string) (changed bool, err error) {
+	status, err := wt.Status()
+	if err != nil {
+		return false, fmt.Errorf("failed to get worktree status: %s", err)
+	}
+	for file, _ := range status {
+		fmt.Println(file)
+		_, _ = wt.Add(file)
+		changed = true
+	}
 	if !changed {
 		return false, nil
 	}

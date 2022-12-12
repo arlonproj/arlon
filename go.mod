@@ -34,7 +34,10 @@ require (
 	sigs.k8s.io/kustomize/kyaml v0.13.0
 )
 
-require gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
+require (
+	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
+	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
+)
 
 require (
 	cloud.google.com/go v0.99.0 // indirect
@@ -95,6 +98,7 @@ require (
 	github.com/go-errors/errors v1.0.1 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy v4.2.0+incompatible
+	github.com/go-git/go-git v4.7.0+incompatible
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-logr/zapr v1.2.0 // indirect
 	github.com/go-openapi/analysis v0.19.5 // indirect
