@@ -1,10 +1,12 @@
 package cluster
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
 	"os"
 
+	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
@@ -63,6 +65,11 @@ func createClusterCommand() *cobra.Command {
 			}
 			overRiden := false
 			if overRides != " " {
+				_, err = appIf.Get(context.Background(),
+					&argoapp.ApplicationQuery{Name: &clusterName})
+				if err == nil {
+					return fmt.Errorf("arlon cluster already exists")
+				}
 				err = cluster.CreatePatchDir(config, clusterName, patchRepoUrl, argocdNs, patchRepoPath, patchRepoBranch, overRides, clusterRepoUrl, clusterRepoPath)
 				if err != nil {
 					return fmt.Errorf("failed to create patch files directory: %s", err)
