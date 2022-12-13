@@ -3,6 +3,8 @@
 
 # ![logo](./images/logo_arlon.svg)
 
+## What Is Arlon?
+
 Arlon is a declarative, gitops based fleet management tool for Kubernetes clusters.
 It allows administrators to: 
 - Deploy and upgrade a large number of *workload clusters* 
