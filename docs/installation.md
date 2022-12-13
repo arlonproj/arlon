@@ -119,60 +119,15 @@ I0222 17:31:14.112689   27922 request.go:668] Waited for 1.046146023s due to cli
 
 Arlon CLI provides an `init` command to install "itself" on a management cluster.
 This command performs a basic setup of `argocd`(if needed) and `arlon` controller.
-It makes the following assumptions while installing `arlon`:
-
-For `argocd`:
-- If `argocd` is present, it is present the in namespace `argocd` and the `admin` password is the same as in `argocd-initial-admin-secret` ConfigMap.
-
-Similar assumptions are made for detecting Arlon installation as well: 
-- assuming that the existence of `arlon` namespace means Arlon controller exists.
-
-
+If `argocd` is already installed, it assumes that `admin` password is the same as in `argocd-initial-admin-secret` ConfigMap and that `argocd` resides in the `argocd` namespace.
+Similar assumptions are made for detecting Arlon installation as well: assuming that the existence of `arlon` namespace means Arlon controller exists.
 To install Arlon controller using the init command these pre-requisites need to be met:
 
-1. A valid kubeconfig pointing to the management cluster.
-1. Port **8080** should not be in use by other programs. Arlon init uses it to port-forward `argocd`.
-1. A hosted Git repository with at least a `README` file present and a valid GitHub token([detailed here](#setting-up-the-workspace-repository)) for: 
-   1. Adding a repository to ArgoCD.
-   1. Avoiding rate limiting of GitHub API while fetching `cluster-api` related manifests.
-   1. Pushing cluster template manifests to the workspace repository.
-1. Pre-requisites for supported CAPI infrastructure providers(AWS and Docker as of now) as [described below](#pre-requisites-for-cluster-api-providers).
+- A valid kubeconfig pointing to the management cluster.
+- A hosted Git repository with at least a `README` file present.
+- Pre-requisites for supported CAPI infrastructure providers(AWS and Docker as of now).
 
-## Setting up the workspace repository
-1. Create a GitHub repository if you don't already have it.
-2. Ensure that the repository at least has a README file because empty repository cannot be added to ArgoCD.
-3. Create a Personal Access Token for authentication, the token will need `repo:write` scope to push the cluster template example manifests.
-4. Set the `GITHUB_TOKEN` environment variable to the token create in the previous step.
-
-## Pre-requisites for cluster-api providers
-This section outlines the requirements that need to be fulfilled for installing the `cluster-api` provider components that the `init` command installs on the management cluster by default.
-
-### Docker
-There are no special requirements for docker provider, as it is largely used in an experimental setups.
-
-### AWS
-The following environment variables need to be set before running `arlon init`:
-- `AWS_SSH_KEY_NAME` (the SSH key name to use)
-- `AWS_REGION` (region where the cluster is deployed)
-- `AWS_ACCESS_KEY_ID` (access key id for the associated AWS account)
-- `AWS_SECRET_ACCESS_KEY` (secret access key for the associated AWS account)
-- `AWS_NODE_MACHINE_TYPE` (machine type for cluster nodes)
-- `AWS_CONTROL_PLANE_MACHINE_TYPE` (machine type for control plane)
-- `AWS_SESSION_TOKEN` (optional: only for MFA enabled accounts)
-
-## Starting the installation
-Once the above requirements are met, start the installation process, simply running `arlon init -e --username <GIT_USER> --repoURL <WORKSPACE_URL> --password <GIT_PASSWORD> --examples -y`.
+To start the installation process, simply run `arlon init -e --username <GIT_USER> --repoURL <WORKSPACE_URL> --password <GIT_PASSWORD> --examples -y`.
 This installs the controller, argocd(if not already present) `-e` flag adds basecluster manifests to the <WORKSPACE_URL> for using the given credentials. To not add examples, just remove the `-e` flag.
 The `-y` flag refers to silent installation, which is useful for scripts.
 For an interactive installation, exclude the `-y` or `--no-confirm` flag.
-
-This command does the following:
-- Installs ArgoCD if not present.
-- Installs Arlon if not present.
-- Creates the Arlon user account in ArgoCD with `admin` rights.
-- Installs `cluster-api` with the latest versions of `docker` and `aws` providers.
-- Removes the `repoctx` file created by `arlon git register` if present.
-- Registers a `default` alias against the provided `repoUrl`.
-- Checks for pre-existing examples, and prompts to delete and proceed(if `-y` or `--no-confirm` flag is not set, else deletes the existing examples).
-- Pushes cluster template manifests to the provided GitHub repository.
-
