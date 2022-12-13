@@ -44,11 +44,10 @@ nav:
     - Design: 'design.md'    
     - Architecture: 'architecture.md'
     - Installation: 'installation.md'
-    - Tutorial (gen1): 'tutorial.md' 
-    - Tutorial (gen2): 'gen2_Tutorial.md'       
+    - Tutorial: 'gen2_Tutorial.md'       
     - Developer Guide:
       - Setup: 'dev_setup.md'
-      - E2E Tests: 'e2e_testing.md'
+      - End to End Tests: 'e2e_testing.md'
       - Contributing: 'contributing.md'
       - Help with MkDocs: 'docs_help.md'
 
