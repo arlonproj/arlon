@@ -84,10 +84,15 @@ The following instructions are to manually build CLI from this code repository.
 ## Cluster orchestration API providers
 
 Arlon currently supports Cluster API on AWS cloud. It also has experimental
-support for Crossplane on AWS.
+support for Crossplane on AWS. It `cluster-api` cloud provider components on 
+a management cluster can be installed by following the official guide, as instructed [here](#cluster-api).
+In addition to this, the Arlon CLI also ships with an `install` command to facilitate, the installation of supported 
+infrastructure providers by mimicking the behaviour of `clusterctl` CLI used in the official setup instructions. The details 
+for which can be found (here)[#install]
 
 ### Cluster API
 
+#### Manual Installation
 Using the [Cluster API Quickstart Guide](https://cluster-api.sigs.k8s.io/user/quick-start.html)
 as reference, complete these steps:
 
@@ -95,6 +100,15 @@ as reference, complete these steps:
 - Initialize the management cluster.
   In particular, follow instructions for your specific cloud provider (AWS in this example)
   Ensure `clusterctl init` completes successfully and produces the expected output.
+
+#### Using Arlon CLI
+To install `cluster-api` components on the management cluster, the `install` command provides a 
+helpful wrapper around `clusterctl` CLI tool.
+
+To install a provider, all the pre-requisites must be met as mentioned [here](#pre-requisites-for-cluster-api-providers).
+After which, simply running `arlon install --capi-only --infrastructure aws,docker` will install the latest available version 
+of these provider components onto the management cluster.
+
 
 ### Crossplane (experimental)
 
