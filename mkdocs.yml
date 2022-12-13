@@ -36,13 +36,13 @@ markdown_extensions:
 nav:
     - Home: 'README.md'
     - Concepts: 'concepts.md'
+      - Base clusters: 'baseclusters.md'
     - Design: 'design.md'    
-    - Base clusters: 'baseclusters.md'
     - Architecture: 'architecture.md'
     - Installation: 'installation.md'
     - Tutorial (gen1): 'tutorial.md' 
     - Tutorial (gen2): 'gen2_Tutorial.md'       
-    - Development:
+    - Developer Guide:
       - Setup: 'dev_setup.md'
       - E2E Tests: 'e2e_testing.md'
       - Contributing: 'contributing.md'
