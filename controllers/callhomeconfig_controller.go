@@ -19,7 +19,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"k8s.io/kubernetes/pkg/apis/core"
 	"time"
 
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
@@ -61,7 +60,7 @@ const (
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.10.0/pkg/reconcile
 func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := log.FromContext(ctx).WithValues("callhomeconfig", req.NamespacedName)
+	log := log.FromContext(ctx)
 	log.V(1).Info("arlon callhomeconfig")
 	var chc arlonv1.CallHomeConfig
 	if err := r.Get(ctx, req.NamespacedName, &chc); err != nil {
@@ -193,12 +192,8 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			ctrl.Result{})
 	}
 	newSecr := corev1.Secret{
-		Type: corev1.SecretType(core.SecretTypeServiceAccountToken),
 		ObjectMeta: metav1.ObjectMeta{
 			Name: chc.Spec.TargetSecretName,
-			Annotations: map[string]string{
-				"kubernetes.io/service-account.name": chc.Spec.ServiceAccountName,
-			},
 		},
 		Data: map[string][]byte{
 			chc.Spec.TargetSecretKeyName: kubeconfigData,
