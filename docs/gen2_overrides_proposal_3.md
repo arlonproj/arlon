@@ -6,7 +6,6 @@ This is an update to proposal of [Gen2 cluster overrides proposal-2](gen2_overri
 
 - Basically, we want to construct various clusters with patches from the same base manifest in the cluster overrides. The person uploading the base manifest in git may be an administrator, and another employee who wants to construct a cluster from the base manifest may not have access to the git repository where the base manifest is located. This is because the capability is intended to be used in an enterprise setting.
 - The cluster overrides feature is built on top of the existing base cluster design. So, there won't be any changes in the design of base cluster folder.
-- The cluster overrides feature is built on top of the existing base cluster design. So, there won't be any changes in the design of base cluster folder.
 - Let's consider an example where our manifest is a repo called arlon-bc and with the repo path bc1. So, these are the files which will be present in bc1 folder:
   1. Resouces file which is the base manifest
   2. Kustomization.yaml

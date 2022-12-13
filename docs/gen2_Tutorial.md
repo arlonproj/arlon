@@ -370,6 +370,34 @@ arlon cluster create --cluster-name <clusterName> --repo-path <pathToDirectory> 
 arlon cluster create --cluster-name <clusterName> --repo-alias prod --repo-path <pathToDirectory> [--output-yaml] [--profile <profileName>] [--repo-revision <repoRevision>]
 ```
 
+
+## gen2 cluster creation with overrides
+
+We call the concept of constructing various clusters with patches from the same base manifest as cluster overrides. 
+The cluster overrides feature is built on top of the existing base cluster design. So, A user can create a cluster from the base manifest using the same command as in the above step(gen2 cluster creation).
+Now, to create a cluster with overrides in the base manifest, a user should have the corresponding patch files in a dedicated folder in local which doesn't contain any other files except patch files. Example of a patch file where we want to override replicas count to 2 is:
+
+```shell
+  ---
+  apiVersion: cluster.x-k8s.io/v1beta1
+  kind: MachineDeployment
+  metadata:
+    name: .*
+  spec:
+    replicas: 2
+  ```
+
+Refer to this [document](https://blog.scottlowe.org/2019/11/12/using-kustomize-with-cluster-api-manifests/) to know more about patch files
+
+Command to create a gen2 workload cluster form the base cluster manifest with overrides to the manifest is:
+
+```shell
+arlon cluster create <cluster-name> --repo-url <repo url where base manifest is present> --repo-path <repo path to the base manifest> --override <path to the patch files folder> --patch-repo-url <repo url where patch files should be stored> --patch-repo-path <repo path to store the patch files>
+````
+Runnning the above command will create a cluster named folder in patch repo path of patch repo url which contains the patch files, kustomization.yaml and configurations.yaml which are used to create the cluster app.
+
+Note that the patch file repo url can be different or same from the base manifest repo url acoording to the requirement of the user. A user can use a different repo url for string patch files for the cluster.
+
 ## gen2 cluster update
 
 To update the profiles of a gen2 workload cluster:
@@ -399,6 +427,8 @@ Arlon creates between 2 and 3 ArgoCD application resources to compose a gen2 clu
 an optional profile is specified at cluster creation time). When you destroy a gen2 cluster, Arlon will find all related ArgoCD applications
 and clean them up.
 
+If the cluster which which is being deleted is a cluster created using patch files, the controller first cleans the git repo where the respective patch files of the cluster are present and then it destroys all the related ArgoCD applications and clean them up.
+
 ## Known issues and limitations
 
 Gen2 clusters are powerful because the base cluster can be arbitrarily complex and feature rich. Since they are fairly
@@ -408,6 +438,8 @@ new and still evolving, gen2 clusters have several known limitations relative to
   which is an exact clone of the base cluster except for the names of its resources and their namespace.
   The work-around is to make a copy of the base cluster directory, push the new directory, make
   the desired changes, commit & push the changes, and register the directory as a new base cluster.
+* The clusters created directly from the base manifest are completely declarative whereas the clusters which are created using override property are not completely declarative.
+* If a user passes a different repository for patch repo url from the repo where base manifest is present, argocd won't be able to detect if there are any changes in the base manifest repository but will deect all the chnages in patch repo url for the cluster.
 * If you modify and commit a change to one or more properties of the base cluster that the underlying Cluster API provider deems as "immutable", new
   workload clusters created from the base cluster will have the modified propert(ies), but ArgoCD will flag existing clusters as OutOfSync, since
   the provider will continually reject attempts to apply the new property values. The existing clusters continue to function, despite appearing unhealthy
@@ -421,6 +453,7 @@ Examples of mutable properties in Cluster API resources:
 Examples of immutable properties:
 
 * Most fields of AWSMachineTemplate (instance type, labels, etc...)
+
 
 ## For more information
 
