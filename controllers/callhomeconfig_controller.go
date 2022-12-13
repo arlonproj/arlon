@@ -19,7 +19,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"k8s.io/kubernetes/pkg/apis/core"
 	"time"
 
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
@@ -193,12 +192,8 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			ctrl.Result{})
 	}
 	newSecr := corev1.Secret{
-		Type: corev1.SecretType(core.SecretTypeServiceAccountToken),
 		ObjectMeta: metav1.ObjectMeta{
 			Name: chc.Spec.TargetSecretName,
-			Annotations: map[string]string{
-				"kubernetes.io/service-account.name": chc.Spec.ServiceAccountName,
-			},
 		},
 		Data: map[string][]byte{
 			chc.Spec.TargetSecretKeyName: kubeconfigData,
