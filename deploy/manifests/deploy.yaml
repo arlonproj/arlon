@@ -100,7 +100,7 @@ spec:
             - appprofilecontroller
             - --argocd-config-path
             - /.argocd/config
-          image: ghcr.io/arlonproj/arlon/controller:0.10.0
+          image: ghcr.io/arlonproj/arlon/controller:0.10.0-devel-cas-1
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
