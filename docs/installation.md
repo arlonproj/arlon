@@ -20,7 +20,7 @@ You can use any Kubernetes cluster that you have admin access to. Ensure:
 ## ArgoCD
 
 - Follow steps 1-4 of the [ArgoCD installation guide](https://argo-cd.readthedocs.io/en/stable/getting_started/) to install ArgoCD onto your management cluster.
-  After this step, you should be logged in as `admin` and a config file was created at `${HOME}/.config/argocd/config`
+-  After this step, you should be logged in as `admin` and a config file was created at `${HOME}/.config/argocd/config`
 - Create your workspace repository in your git provider if necessary, then register it.
   Example: `argocd repo add https://github.com/myname/arlon_workspace --username myname --password secret`.
   -  Note: type `argocd repo add --help` to see all available options.
@@ -88,7 +88,7 @@ support for Crossplane on AWS. It `cluster-api` cloud provider components on
 a management cluster can be installed by following the official guide, as instructed [here](#cluster-api).
 In addition to this, the Arlon CLI also ships with an `install` command to facilitate, the installation of supported 
 infrastructure providers by mimicking the behaviour of `clusterctl` CLI used in the official setup instructions. The details 
-for which can be found (here)[#install]
+for which can be found [here](#using-arlon-cli).
 
 ### Cluster API
 
@@ -107,7 +107,7 @@ helpful wrapper around `clusterctl` CLI tool.
 
 To install a provider, all the pre-requisites must be met as mentioned [here](#pre-requisites-for-cluster-api-providers).
 After which, simply running `arlon install --capi-only --infrastructure aws,docker` will install the latest available version 
-of these provider components onto the management cluster.
+of AWS and Docker provider components onto the management cluster.
 
 
 ### Crossplane (experimental)
