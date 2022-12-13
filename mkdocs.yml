@@ -4,6 +4,7 @@ site_name: Arlon
 theme:
   name: material
   logo: images/logo_arlon.svg
+  favicon: images/favicon-32x32.png
   palette: 
     # Palette toggle for light mode
     - scheme: default
