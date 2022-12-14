@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
 
-site_name: Arlon 
+site_name: Arlon - Declarative, GitOps-based Kubernetes Fleet Management
 theme:
   name: material
   logo: images/pictogram_arlon-stroke.svg
@@ -20,10 +20,6 @@ theme:
 plugins:
   - search
   - mkdocs_pymdownx_material_extras
-  
-extra:
-  version:
-    provider: mike
 
 extra_javascript:
   - https://unpkg.com/mermaid@8.8.4/dist/mermaid.min.js
