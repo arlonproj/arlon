@@ -1,8 +1,10 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
 
-site_name: Arlon 
+site_name: Arlon - GitOps-based Fleet Management for Kubernetes
 theme:
   name: material
+  logo: images/pictogram_arlon-stroke.svg
+  favicon: images/favicon-32x32.png
   palette: 
     # Palette toggle for light mode
     - scheme: default
@@ -14,6 +16,8 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+  font:
+    text: Work Sans
 
 plugins:
   - search
@@ -21,6 +25,9 @@ plugins:
 
 extra_javascript:
   - https://unpkg.com/mermaid@8.8.4/dist/mermaid.min.js
+  
+extra_css:
+  - stylesheets/extra.css
 
 markdown_extensions:
   - pymdownx.striphtml:
@@ -31,20 +38,21 @@ markdown_extensions:
         # Mermaid diagrams
         - name: diagram
           class: diagram
-          format: !!python/name:pymdownx.superfences.fence_code_format      
-
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - toc:
+      permalink: true
+      
 nav:
-    - Home: 'README.md'
+    - Overview: 'README.md'
     - Concepts: 'concepts.md'
-    - Design: 'design.md'    
     - Base clusters: 'baseclusters.md'
+    - Design: 'design.md'    
     - Architecture: 'architecture.md'
     - Installation: 'installation.md'
-    - Tutorial (gen1): 'tutorial.md' 
-    - Tutorial (gen2): 'gen2_Tutorial.md'       
-    - Development:
+    - Tutorial: 'gen2_Tutorial.md'       
+    - Developer Guide:
       - Setup: 'dev_setup.md'
-      - E2E Tests: 'e2e_testing.md'
+      - End to End Tests: 'e2e_testing.md'
       - Contributing: 'contributing.md'
       - Help with MkDocs: 'docs_help.md'
 
