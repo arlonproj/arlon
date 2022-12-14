@@ -46,9 +46,9 @@ func constructClusterApp(
 	repoPath string, // source path
 	overRiden bool,
 ) *argoappv1.Application {
-	clusterOverriden := "false"
+	clusterOverridden := "false"
 	if overRiden {
-		clusterOverriden = "true"
+		clusterOverridden = "true"
 	}
 	app := &argoappv1.Application{
 		TypeMeta: v1.TypeMeta{
@@ -68,7 +68,7 @@ func constructClusterApp(
 				baseClusterRepoUrlAnnotation:      repoUrl,
 				baseClusterRepoRevisionAnnotation: repoRevision,
 				baseClusterRepoPathAnnotation:     repoPath,
-				baseClusterOverriden:              clusterOverriden,
+				baseClusterOverridden:             clusterOverridden,
 			},
 			Finalizers: []string{argoappv1.ForegroundPropagationPolicyFinalizer},
 		},

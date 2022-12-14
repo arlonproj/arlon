@@ -76,7 +76,8 @@ func CopyManifests(wt *gogit.Worktree, fs embed.FS, root string, mgmtPath string
 
 // -----------------------------------------------------------------------------
 
-func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string, baseRepoUrl string, baseRepoPath string) error {
+func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string,
+	baseRepoUrl string, baseRepoPath string, baseRepoRevision string) error {
 	log := log.GetLogger()
 	files, err := ioutil.ReadDir(filePath)
 	if err != nil {
@@ -88,35 +89,37 @@ func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string,
 		newFilePath := path.Join(filePath, file.Name())
 		src, err := os.OpenFile(newFilePath, os.O_RDONLY, os.ModePerm)
 		if err != nil {
+			_ = src.Close()
 			return fmt.Errorf("failed to open embedded file %s: %s", filePath, err)
 		}
 
-		kustomfile, err := ioutil.ReadFile(newFilePath)
+		kustomFile, err := ioutil.ReadFile(newFilePath)
 		if err != nil {
+			_ = src.Close()
 			return fmt.Errorf("Failed to read the embedded file %s", err)
 		}
-
 		parsedData := make(map[interface{}]interface{})
 
-		err = yaml.Unmarshal(kustomfile, &parsedData)
+		err = yaml.Unmarshal(kustomFile, &parsedData)
 		if err != nil {
+			_ = src.Close()
 			return fmt.Errorf("Failed to load the parsed data %s", err)
 		}
-		var targetcomp []string
+		var targetComp []string
 		var kind string
 		var information info
-		for kustomkey, kustomval := range parsedData {
-			if kustomkey == "apiVersion" {
-				strkustomval := fmt.Sprintf("%v", kustomval)
-				targetcomp = strings.Split(string(strkustomval), "/")
+		for kustomKey, kustomVal := range parsedData {
+			if kustomKey == "apiVersion" {
+				strKustomVal := fmt.Sprintf("%v", kustomVal)
+				targetComp = strings.Split(string(strKustomVal), "/")
 			}
-			if kustomkey == "kind" {
-				kind = fmt.Sprintf("%v", kustomval)
+			if kustomKey == "kind" {
+				kind = fmt.Sprintf("%v", kustomVal)
 			}
 		}
 		information = info{
-			Group:   string(targetcomp[0]),
-			Version: string(targetcomp[1]),
+			Group:   string(targetComp[0]),
+			Version: string(targetComp[1]),
 			Kind:    kind,
 		}
 		targetData = append(targetData, target{
@@ -140,7 +143,7 @@ func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string,
 		}
 		log.V(1).Info("copied embedded file", "destination", dstPath)
 	}
-	resourcestring := "git::" + baseRepoUrl + "//" + baseRepoPath
+	resourcestring := "git::" + baseRepoUrl + "//" + baseRepoPath + "?ref=" + baseRepoRevision
 	kustomizeresult := kustomizeyaml{
 		APIVersion: "kustomize.config.k8s.io/v1beta1",
 		Kind:       "Kustomization",

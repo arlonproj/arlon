@@ -8,6 +8,7 @@ import (
 
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/pkg/argocd"
+	bcl "github.com/arlonproj/arlon/pkg/basecluster"
 	"github.com/arlonproj/arlon/pkg/bundle"
 	"github.com/arlonproj/arlon/pkg/gitutils"
 	logpkg "github.com/arlonproj/arlon/pkg/log"
@@ -192,14 +193,15 @@ func DeployPatchToGit(
 	argocdNs string,
 	clusterName string,
 	repoUrl string,
-	repoBranch string,
+	patchRepoRevision string,
+	baseRepoRevision string,
 	basePath string,
 	overrides string,
 	baseRepoUrl string,
 	baseRepoPath string,
 ) error {
 	log := logpkg.GetLogger()
-	repo, tmpDir, auth, err := argocd.CloneRepo(creds, repoUrl, repoBranch)
+	repo, tmpDir, auth, err := argocd.CloneRepo(creds, repoUrl, patchRepoRevision)
 	if err != nil {
 		return fmt.Errorf("failed to clone repo: %s", err)
 	}
@@ -219,7 +221,7 @@ func DeployPatchToGit(
 			return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
 		}
 	}
-	err = gitutils.CopyPatchManifests(wt, overrides, clusterPath, baseRepoUrl, baseRepoPath)
+	err = gitutils.CopyPatchManifests(wt, overrides, clusterPath, baseRepoUrl, baseRepoPath, baseRepoRevision)
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}
@@ -229,7 +231,7 @@ func DeployPatchToGit(
 	if err != nil {
 		return fmt.Errorf("failed to create configurations.yaml: %s", err)
 	}
-	_, err = file.Write([]byte(configurationsYaml))
+	_, err = file.Write([]byte(bcl.ConfigurationsYaml))
 	_ = file.Close()
 	if err != nil {
 		return fmt.Errorf("failed to write to configurations.yaml: %s", err)

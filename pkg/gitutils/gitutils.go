@@ -60,7 +60,7 @@ func CommitChanges(tmpDir string, wt *gogit.Worktree, commitMsg string) (changed
 	return
 }
 
-func CommitDeletechanges(tmpDir string, wt *gogit.Worktree, commitMsg string) (changed bool, err error) {
+func CommitDeleteChanges(tmpDir string, wt *gogit.Worktree, commitMsg string) (changed bool, err error) {
 	status, err := wt.Status()
 	if err != nil {
 		return false, fmt.Errorf("failed to get worktree status: %s", err)

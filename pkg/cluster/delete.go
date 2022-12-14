@@ -66,30 +66,30 @@ func Delete(
 	typ := app.Labels["arlon-type"]
 	if typ == "cluster-app" {
 		log := logpkg.GetLogger()
-		RepoUrl := app.Annotations[baseClusterRepoUrlAnnotation]
-		RepoRevision := app.Annotations[baseClusterRepoRevisionAnnotation]
-		RepoPath := app.Annotations[baseClusterRepoPathAnnotation] + "/" + name
-		overRiden := app.Annotations[baseClusterOverriden]
+		repoUrl := app.Annotations[baseClusterRepoUrlAnnotation]
+		repoRevision := app.Annotations[baseClusterRepoRevisionAnnotation]
+		repoPath := app.Annotations[baseClusterRepoPathAnnotation] + "/" + name
+		overRiden := app.Annotations[baseClusterOverridden]
 		if overRiden == "true" {
-			creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, RepoUrl)
-			repo, tmpDir, auth, err := argocd.CloneRepo(creds, RepoUrl, RepoRevision)
+			creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoUrl)
+			repo, tmpDir, auth, err := argocd.CloneRepo(creds, repoUrl, repoRevision)
 			if err != nil {
 				return fmt.Errorf("failed to clone repo: %s", err)
 			}
 			wt, err := repo.Worktree()
-			fileInfo, err := wt.Filesystem.Lstat(RepoPath)
+			fileInfo, err := wt.Filesystem.Lstat(repoPath)
 			if err == nil {
 				if !fileInfo.IsDir() {
-					return fmt.Errorf("unexpected file type for %s", RepoPath)
+					return fmt.Errorf("unexpected file type for %s", repoPath)
 				}
-				_, err := wt.Remove(RepoPath)
+				_, err := wt.Remove(repoPath)
 				if err != nil {
 					return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
 				}
 			}
 
-			commitMsg := "Deleted the files regarding to " + RepoPath
-			changed, err := gitutils.CommitDeletechanges(tmpDir, wt, commitMsg)
+			commitMsg := "Deleted the files regarding to " + repoPath
+			changed, err := gitutils.CommitDeleteChanges(tmpDir, wt, commitMsg)
 			if err != nil {
 				return fmt.Errorf("failed to commit changes: %s", err)
 			}

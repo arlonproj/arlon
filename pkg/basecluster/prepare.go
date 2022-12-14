@@ -228,7 +228,7 @@ func prepareDir(
 			err = fmt.Errorf("failed to create configurations.yaml: %s", err)
 			return
 		}
-		_, err = file.Write([]byte(configurationsYaml))
+		_, err = file.Write([]byte(ConfigurationsYaml))
 		_ = file.Close()
 		if err != nil {
 			err = fmt.Errorf("failed to write to configurations.yaml: %s", err)
