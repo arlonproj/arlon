@@ -20,6 +20,10 @@ theme:
 plugins:
   - search
   - mkdocs_pymdownx_material_extras
+  
+extra:
+  version:
+    provider: mike
 
 extra_javascript:
   - https://unpkg.com/mermaid@8.8.4/dist/mermaid.min.js
@@ -41,7 +45,7 @@ markdown_extensions:
       permalink: true
       
 nav:
-    - Home: 'README.md'
+    - Overview: 'README.md'
     - Concepts: 'concepts.md'
     - Base clusters: 'baseclusters.md'
     - Design: 'design.md'    
