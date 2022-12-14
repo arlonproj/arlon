@@ -143,19 +143,35 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			fmt.Sprintf("unexpected error getting service account: %s", err),
 			ctrl.Result{})
 	}
+	var secretList corev1.SecretList
 	var kubeconfigSecret corev1.Secret
-	if err := r.Get(ctx, types.NamespacedName{
+	secretFound := false
+	if err := r.List(ctx, &secretList, &client.ListOptions{
 		Namespace: req.Namespace,
-		Name:      "cluster-autoscaler-mgmt-kubeconfig",
-	}, &kubeconfigSecret); err != nil {
-		if apierrors.IsNotFound(err) {
-			return retryLater(r, log, &chc, "secret",
-				namespacedName.Name, "does not exist yet")
-		}
-		return updateCallHomeConfigState(r, log, &chc, "error",
-			fmt.Sprintf("unexpected error getting service account: %s", err),
-			ctrl.Result{})
+	}); err != nil {
+		return retryLater(r, log, &chc, "secrets", req.Namespace, "cannot list secrets")
 	}
+	if len(secretList.Items) == 0 {
+		return retryLater(r, log, &chc, "secrets", req.Namespace, "no secrets in the namespace")
+	}
+	for _, secret := range secretList.Items {
+		annotations := secret.GetAnnotations()
+		if annotations != nil {
+			val, ok := annotations["kubernetes.io/service-account.name"]
+			if !ok {
+				// the map is not nil, but the required key isn't present, so skip it
+				continue
+			}
+			if val == chc.Spec.ServiceAccountName {
+				kubeconfigSecret = secret
+				secretFound = true
+			}
+		}
+	}
+	if !secretFound {
+		return retryLater(r, log, &chc, "secret", "", "secret containing service account token not found")
+	}
+
 	if len(kubeconfigSecret.Data["token"]) == 0 {
 		return retryLater(r, log, &chc, "secret",
 			namespacedName.Name, "does not have a token")
