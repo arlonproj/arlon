@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
 
-site_name: Arlon - Declarative, GitOps-based Kubernetes Fleet Management
+site_name: Arlon - GitOps-based Fleet Management for Kubernetes
 theme:
   name: material
   logo: images/pictogram_arlon-stroke.svg
