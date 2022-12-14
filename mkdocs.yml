@@ -41,7 +41,7 @@ markdown_extensions:
 nav:
     - Home: 'README.md'
     - Concepts: 'concepts.md'
-      - Base clusters: 'baseclusters.md'
+    - Base clusters: 'baseclusters.md'
     - Design: 'design.md'    
     - Architecture: 'architecture.md'
     - Installation: 'installation.md'
