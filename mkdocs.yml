@@ -36,7 +36,9 @@ markdown_extensions:
         # Mermaid diagrams
         - name: diagram
           class: diagram
-          format: !!python/name:pymdownx.superfences.fence_code_format      
+          format: !!python/name:pymdownx.superfences.fence_code_format   
+   - toc:
+      permalink: true
 
 nav:
     - Home: 'README.md'
