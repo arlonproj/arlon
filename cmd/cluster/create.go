@@ -164,7 +164,7 @@ func createClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&clusterRepoUrl, "repo-url", "", "the git repository url for cluster template")
 	command.Flags().StringVar(&repoAlias, "repo-alias", gitrepo.RepoDefaultCtx, "git repository alias to use")
 	command.Flags().StringVar(&clusterRepoRevision, "repo-revision", "main", "the git revision for cluster template")
-	command.Flags().StringVar(&patchRepoRevision, "patch-repo-revision", "main", "the git branch")
+	command.Flags().StringVar(&patchRepoRevision, "patch-repo-revision", "main", "the git revision for patch files")
 	command.Flags().StringVar(&clusterRepoPath, "repo-path", "", "the git repository path for cluster template")
 	command.Flags().StringVar(&clusterName, "cluster-name", "", "the cluster name")
 	command.Flags().StringVar(&overridesDir, "overrides-dir", "", "path to the corresponding patch file to the cluster")
