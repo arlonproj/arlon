@@ -3,7 +3,7 @@
 site_name: Arlon 
 theme:
   name: material
-  logo: images/arlon-512x512.png
+  logo: images/logo_arlon-stroke.svg
   favicon: images/favicon-32x32.png
   palette: 
     # Palette toggle for light mode
