@@ -15,16 +15,42 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
 
+plugins:
+  - search
+  - mkdocs_pymdownx_material_extras
+
+extra_javascript:
+  - https://unpkg.com/mermaid@8.8.4/dist/mermaid.min.js
+
+markdown_extensions:
+  - pymdownx.striphtml:
+      strip_comments: true
+      strip_js_on_attributes: false
+  - pymdownx.superfences:
+      custom_fences:
+        # Mermaid diagrams
+        - name: diagram
+          class: diagram
+          format: !!python/name:pymdownx.superfences.fence_code_format      
+
 nav:
     - Home: 'README.md'
-    - Design: 'design.md'
-    - How to contribute to Arlon: 'contributing.md'
-    - Help with MkDocs: 'help.md'
+    - Concepts: 'concepts.md'
+    - Design: 'design.md'    
+    - Base clusters: 'baseclusters.md'
+    - Architecture: 'architecture.md'
+    - Installation: 'installation.md'
+    - Tutorial (gen1): 'tutorial.md' 
+    - Tutorial (gen2): 'gen2_Tutorial.md'       
+    - Development:
+      - Setup: 'dev_setup.md'
+      - Contributing: 'contributing.md'
+      - Help with MkDocs: 'docs_help.md'
 
 #  name: gitbook
 #  name: 'rtd-dropdown'
 #theme: ivory
 # The default edit_uri is : edit/master/docs/
-edit_uri: edit/main/docs/
+edit_uri: edit/v0.9/docs/
 repo_url: https://github.com/arlonproj/arlon
 repo_name: arlonproj/arlon
