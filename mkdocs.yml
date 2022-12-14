@@ -17,7 +17,7 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
   font:
-    text: Source Sans Pro
+    text: Work Sans
 
 plugins:
   - search
