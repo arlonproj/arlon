@@ -36,10 +36,10 @@ markdown_extensions:
         # Mermaid diagrams
         - name: diagram
           class: diagram
-          format: !!python/name:pymdownx.superfences.fence_code_format   
-   - toc:
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - toc:
       permalink: true
-
+      
 nav:
     - Home: 'README.md'
     - Concepts: 'concepts.md'
