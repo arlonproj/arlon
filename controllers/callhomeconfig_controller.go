@@ -18,7 +18,9 @@ package controllers
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
@@ -80,20 +82,22 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		log.V(1).Info("callhomeconfig is already in error state")
 		return ctrl.Result{}, nil
 	}
+	var clusterKubeConfigList corev1.SecretList
 	var secret corev1.Secret
-	// get workload cluster kubeconfig secret
-	secretNamespacedName := types.NamespacedName{
+	if err := r.List(ctx, &clusterKubeConfigList, &client.ListOptions{
 		Namespace: req.NamespacedName.Namespace,
-		Name:      chc.Spec.KubeconfigSecretName,
+	}); err != nil {
+		return retryLater(r, log, &chc, "secrets", "", fmt.Sprintf("failed to list all secrets in %s namespace", req.NamespacedName.Namespace))
 	}
-	if err := r.Get(ctx, secretNamespacedName, &secret); err != nil {
-		if apierrors.IsNotFound(err) {
-			return retryLater(r, log, &chc, "kubeconfig secret",
-				chc.Spec.KubeconfigSecretName, "does not exist yet")
-		}
-		msg := fmt.Sprintf("failed to read secret: %s", err)
-		return updateCallHomeConfigState(r, log, &chc, "error", msg, ctrl.Result{})
+	if len(clusterKubeConfigList.Items) == 0 {
+		return retryLater(r, log, &chc, "secrets", "", fmt.Sprintf("%s has no secrets", req.NamespacedName.Namespace))
 	}
+	// get workload cluster kubeconfig secret
+	secret, err := getWorkloadKubeconfig(&chc, clusterKubeConfigList)
+	if err != nil {
+		return retryLater(r, log, &chc, "secret", "", "cannot get kubeconfig secret for workload cluster")
+	}
+
 	data := secret.Data[chc.Spec.KubeconfigSecretKeyName]
 	if data == nil {
 		return updateCallHomeConfigState(r, log, &chc, "error",
@@ -222,6 +226,36 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	}
 	return updateCallHomeConfigState(r, log, &chc, "complete",
 		"successfully created target secret", ctrl.Result{})
+}
+
+func getWorkloadKubeconfig(chc *arlonv1.CallHomeConfig, list corev1.SecretList) (corev1.Secret, error) {
+	requiredLabel := "cluster.x-k8s.io/cluster-name"
+	requiredType := "cluster.x-k8s.io/secret"
+	kubeconfigSecretNameSegments := strings.Split(chc.Spec.KubeconfigSecretName, "-")
+	requiredPrefix := strings.Join(kubeconfigSecretNameSegments[:len(kubeconfigSecretNameSegments)-1], "-")
+	for _, secret := range list.Items {
+		if secret.Type != corev1.SecretType(requiredType) {
+			// skip it because it's not the proper type
+			continue
+		}
+		if strings.HasSuffix(secret.GetName(), "user-kubeconfig") {
+			// this is the user kubeconfig skip it
+			continue
+		}
+		labels := secret.GetLabels()
+		if labels != nil {
+			val, ok := labels[requiredLabel]
+			if !ok {
+				// skip it because it doesn't have the required label
+				continue
+			}
+			if strings.HasPrefix(val, requiredPrefix) {
+				continue
+			}
+			return secret, nil
+		}
+	}
+	return corev1.Secret{}, errors.New("cannot find the kubeconfig secret")
 }
 
 // SetupWithManager sets up the controller with the Manager.
