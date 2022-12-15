@@ -71,11 +71,18 @@ func ConstructRootApp(
 			}
 		}
 	}
-	helmParams = append(helmParams,
-		argoappv1.HelmParameter{
+	if innerClusterName != "" {
+		helmParams = append(helmParams, argoappv1.HelmParameter{
+			Name:  "global.clusterName",
+			Value: fmt.Sprintf("%s-%s", clusterName, innerClusterName),
+		})
+	} else {
+		helmParams = append(helmParams, argoappv1.HelmParameter{
 			Name:  "global.clusterName",
 			Value: clusterName,
-		},
+		})
+	}
+	helmParams = append(helmParams,
 		argoappv1.HelmParameter{
 			Name:  "global.kubeconfigSecretKeyName",
 			Value: clusterspec.KubeconfigSecretKeyNameByApiProvider[apiProvider],

@@ -15,7 +15,13 @@ import (
 	"os"
 	"path"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
+	"strconv"
 	"text/template"
+)
+
+const (
+	casMinAnnotationMachineDeployments = "cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size"
+	casMaxAnnotationMachineDeployments = "cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size"
 )
 
 // Prepare checks a cluster API manifest file for problems, and if
@@ -24,7 +30,7 @@ import (
 // or no modifications are necessary, then modifiedYaml is nil.
 // An error is returned if other types of (non-namespace related) issues
 // are found in the manifest.
-func Prepare(fileName string, validateOnly bool) (clusterName string, modifiedYaml []byte, err error) {
+func Prepare(fileName string, validateOnly bool, casMax, casMin int) (clusterName string, modifiedYaml []byte, err error) {
 	var buf bytes.Buffer
 	dirty := false
 	enc := yaml.NewEncoder(&buf)
@@ -48,7 +54,7 @@ func Prepare(fileName string, validateOnly bool) (clusterName string, modifiedYa
 			clusterName = info.Name
 		}
 		var modified bool
-		modified, err = removeNamespaceThenEncode(info.Object, enc)
+		modified, err = removeNamespaceThenEncode(info.Object, enc, casMax, casMin)
 		if err != nil {
 			err = fmt.Errorf("failed to remove namespace or encode object: %s", err)
 			return
@@ -68,17 +74,28 @@ func Prepare(fileName string, validateOnly bool) (clusterName string, modifiedYa
 
 // -----------------------------------------------------------------------------
 
-func removeNamespaceThenEncode(obj runtime.Object, enc *yaml.Encoder) (modified bool, err error) {
+func removeNamespaceThenEncode(obj runtime.Object, enc *yaml.Encoder, casMax, casMin int) (modified bool, err error) {
 	log := logpkg.GetLogger()
 	unstr := &unstructured.Unstructured{}
 	if err := scheme.Scheme.Convert(obj, unstr, nil); err != nil {
 		return false, fmt.Errorf("failed to convert object: %s", err)
 	}
+	kind := unstr.GetKind()
 	ns := unstr.GetNamespace()
 	if ns != "" {
 		log.V(1).Info("removing namespace",
 			"resource", unstr.GetName(), "namespace", ns)
 		unstr.SetNamespace("")
+		modified = true
+	}
+	if kind == "MachineDeployment" {
+		annotations := unstr.GetAnnotations()
+		if annotations == nil {
+			annotations = map[string]string{}
+		}
+
+		annotations[casMaxAnnotationMachineDeployments] = strconv.Itoa(casMax)
+		annotations[casMinAnnotationMachineDeployments] = strconv.Itoa(casMin)
 		modified = true
 	}
 	if err := enc.Encode(unstr.Object); err != nil {
@@ -98,6 +115,8 @@ func PrepareGitDir(
 	repoUrl string,
 	repoRevision string,
 	repoPath string,
+	casMax int,
+	casMin int,
 ) (clusterName string, changed bool, err error) {
 	repo, tmpDir, auth, err := argocd.CloneRepo(creds, repoUrl, repoRevision)
 	defer os.RemoveAll(tmpDir)
@@ -109,7 +128,7 @@ func PrepareGitDir(
 		return "", false, fmt.Errorf("failed to get repo worktree: %s", err)
 	}
 	fs := wt.Filesystem
-	manifestFileName, clusterName, err := prepareDir(fs, repoPath, tmpDir)
+	manifestFileName, clusterName, err := prepareDir(fs, repoPath, tmpDir, casMax, casMin)
 	if err != nil {
 		return "", false, fmt.Errorf("failed to prepare directory: %s", err)
 	}
@@ -145,6 +164,8 @@ func prepareDir(
 	fs billy.Filesystem,
 	dirRelPath string,
 	actualFsRootDir string,
+	casMax int,
+	casMin int,
 ) (manifestFileName string, clusterName string, err error) {
 	var kustomizationFound bool
 	var configurationsFound bool
@@ -179,7 +200,7 @@ func prepareDir(
 	}
 	manifestRelPath := path.Join(dirRelPath, manifestFileName)
 	manifestAbsPath := path.Join(actualFsRootDir, manifestRelPath)
-	clusterName, modifiedYaml, err := Prepare(manifestAbsPath, false)
+	clusterName, modifiedYaml, err := Prepare(manifestAbsPath, false, casMax, casMin)
 	if err != nil {
 		err = fmt.Errorf("failed to prepare manifest: %s", err)
 		return
