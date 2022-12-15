@@ -23,6 +23,11 @@ plugins:
   - search
   - mkdocs_pymdownx_material_extras
 
+extra:
+  version:
+    default: stable
+    provider: mike
+
 extra_javascript:
   - https://unpkg.com/mermaid@8.8.4/dist/mermaid.min.js
   
