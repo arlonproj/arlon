@@ -38,7 +38,7 @@ func prepareBaseClusterCommand() *cobra.Command {
 		},
 	}
 	command.Flags().IntVar(&casMin, "cas-min", 1, "set minimum number of nodes for capi-cluster autoscaler, for MachineDeployment based clusters")
-	command.Flags().IntVar(&casMax, "cas-min", 9, "set maximum number of nodes for capi-cluster autoscaler, for MachineDeployment based clusters")
+	command.Flags().IntVar(&casMax, "cas-max", 9, "set maximum number of nodes for capi-cluster autoscaler, for MachineDeployment based clusters")
 	command.Flags().BoolVar(&validateOnly, "validate-only", false, "validate only, don't modify")
 	return command
 }

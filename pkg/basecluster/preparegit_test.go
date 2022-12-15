@@ -23,7 +23,7 @@ func TestGitPreparation(t *testing.T) {
 	_, err := ValidateGitDir(creds, repoUrl, repoRevision, subdirName)
 	assert.Assert(t, errors.Is(err, ErrNoKustomizationYaml), "unexpected validation error: %s", err)
 	t.Log("got expected error:", err)
-	clustName, changed, err := PrepareGitDir(creds, repoUrl, repoRevision, subdirName)
+	clustName, changed, err := PrepareGitDir(creds, repoUrl, repoRevision, subdirName, defaultCasMax, defaultCasMin)
 	assert.NilError(t, err, "failed to prepare git directory")
 	assert.Assert(t, changed, "git dir preparation resulted in no changes")
 	assert.Equal(t, clustName, "capi-quickstart", "unexpected cluster name: %s", clustName)

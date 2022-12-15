@@ -61,7 +61,7 @@ func prepareGitBaseClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&repoRevision, "repo-revision", "main", "the git revision for base cluster directory")
 	command.Flags().StringVar(&repoPath, "repo-path", "", "the git repository path for base cluster directory")
 	command.Flags().IntVar(&casMin, "cas-min", 1, "set minimum number of nodes for capi-cluster autoscaler, for MachineDeployment based clusters")
-	command.Flags().IntVar(&casMax, "cas-min", 9, "set maximum number of nodes for capi-cluster autoscaler, for MachineDeployment based clusters")
+	command.Flags().IntVar(&casMax, "cas-max", 9, "set maximum number of nodes for capi-cluster autoscaler, for MachineDeployment based clusters")
 	command.MarkFlagsMutuallyExclusive("repo-url", "repo-alias")
 	return command
 }
