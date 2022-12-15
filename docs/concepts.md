@@ -135,8 +135,7 @@ They currently include:
 
 ## Base Cluster 
 
-!!! tip 
-    The 'Base Cluster' is a new and evolved way of specifying cluster configuration. It will become the default mechanism for specifying     cluster configuration starting version 0.10.0 of Arlon
+NOTE: The 'Base Cluster' is a new and evolved way of specifying cluster configuration. It will become the default mechanism for specifying cluster configuration starting version 0.10.0 of Arlon
 
 The Base Cluster contains the desired settings when creating a new cluster.
 They currently include:
