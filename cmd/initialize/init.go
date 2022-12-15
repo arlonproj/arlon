@@ -62,9 +62,9 @@ const (
 	argoServer                                       = "127.0.0.1:8080"
 	exampleDir                                       = "examples"
 	baseclusterDir                                   = "baseclusters"
-	defaultCtrlPlaneCount                      int64 = 2
+	defaultCtrlPlaneCount                      int64 = 3
 	defaultWorkerCount                         int64 = 3
-	defaultK8sVersion                                = "1.23.14"
+	defaultK8sVersion                                = "v1.23.14"
 )
 
 type porfForwardCfg struct {
