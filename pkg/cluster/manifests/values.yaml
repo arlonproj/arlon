@@ -3,6 +3,7 @@
 # Declare variables to be passed into your templates.
 
 global:
+  clusterFullNameWithInnerCluster: cluster-x-inner-change-me
   clusterName: cluster-x-change-me
   innerClusterNameWithDashSuffix: ""
   region: us-west-2

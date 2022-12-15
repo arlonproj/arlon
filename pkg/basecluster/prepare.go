@@ -96,6 +96,7 @@ func removeNamespaceThenEncode(obj runtime.Object, enc *yaml.Encoder, casMax, ca
 
 		annotations[casMaxAnnotationMachineDeployments] = strconv.Itoa(casMax)
 		annotations[casMinAnnotationMachineDeployments] = strconv.Itoa(casMin)
+		unstr.SetAnnotations(annotations)
 		modified = true
 	}
 	if err := enc.Encode(unstr.Object); err != nil {
