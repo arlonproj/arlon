@@ -123,7 +123,19 @@ the workspace repository.
 
 ## Cluster Specification
 
-The Cluster Specification, also called the 'Base Cluster' contains the desired settings when creating a new cluster.
+A cluster spec contains desired settings when creating a new cluster.
+They currently include:
+
+- API Provider: the cluster orchestration technology. Supported values are `CAPI` (Cluster API) and `xplane` (Crossplane)
+- Cloud Provider: the infrastructure cloud provider. The currently supported values is `aws`, with `gcp` and `azure` support coming later.
+- Type: the cluster type. Some API providers support more than one type. On `aws` cloud, Cluster API supports `kubeadm` and `eks`, whereas Crossplane only supports `eks`.
+- The (worker) node instance type
+- The initial (worker) node count
+- The Kubernetes version
+
+## Base Cluster 
+
+The Base Cluster contains the desired settings when creating a new cluster.
 They currently include:
 
 - A predefined list of Cluster API objects: Cluster, Machines, Machine Deployments, etc. to be deployed in the current namespace
