@@ -20,9 +20,10 @@ func CreateClusterApp(
 	repoRevision string, // source revision
 	repoPath string, // source path
 	createInArgoCd bool,
+	overridden bool,
 ) (*argoappv1.Application, error) {
 	app := constructClusterApp(argocdNs, clusterName, baseClusterName,
-		repoUrl, repoRevision, repoPath)
+		repoUrl, repoRevision, repoPath, overridden)
 	if createInArgoCd {
 		appCreateRequest := argoapp.ApplicationCreateRequest{
 			Application: app,
@@ -43,7 +44,9 @@ func constructClusterApp(
 	repoUrl string, // source repo
 	repoRevision string, // source revision
 	repoPath string, // source path
+	overridden bool,
 ) *argoappv1.Application {
+	clusterOverridden := fmt.Sprintf("%v", overridden)
 	app := &argoappv1.Application{
 		TypeMeta: v1.TypeMeta{
 			Kind:       application.ApplicationKind,
@@ -62,12 +65,12 @@ func constructClusterApp(
 				baseClusterRepoUrlAnnotation:      repoUrl,
 				baseClusterRepoRevisionAnnotation: repoRevision,
 				baseClusterRepoPathAnnotation:     repoPath,
+				baseClusterOverridden:             clusterOverridden,
 			},
 			Finalizers: []string{argoappv1.ForegroundPropagationPolicyFinalizer},
 		},
 	}
 	var ignoreDiffs []argoappv1.ResourceIgnoreDifferences
-
 	// If used, cluster autoscaler will change replicas so ignore it
 	ignoreDiffs = append(ignoreDiffs, argoappv1.ResourceIgnoreDifferences{
 		Group:        "cluster.x-k8s.io",
@@ -99,9 +102,13 @@ func constructClusterApp(
 		},
 		SyncOptions: []string{"Prune=true", "RespectIgnoreDifferences=true"},
 	}
+	finalRepoPath := repoPath
+	if overridden {
+		finalRepoPath = repoPath + "/" + clusterName
+	}
 	app.Spec.Source.RepoURL = repoUrl
 	app.Spec.Source.TargetRevision = repoRevision
-	app.Spec.Source.Path = repoPath
+	app.Spec.Source.Path = finalRepoPath
 	app.Spec.Destination.Server = "https://kubernetes.default.svc"
 	app.Spec.Destination.Namespace = clusterName
 	app.Spec.SyncPolicy = &argoappv1.SyncPolicy{

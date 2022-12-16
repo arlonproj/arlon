@@ -17,7 +17,7 @@ require (
 	google.golang.org/grpc v1.51.0
 	k8s.io/api v0.23.14
 	k8s.io/apimachinery v0.23.14
-	k8s.io/client-go v0.23.14
+	k8s.io/client-go v11.0.1-0.20190816222228-6d55c1b1f1ca+incompatible
 	sigs.k8s.io/cluster-api v1.1.6 //v1.1.x will upgrade k8s APIs to v0.23.x
 	sigs.k8s.io/controller-runtime v0.11.2 //v1.11 will upgrade k8s APIs to v0.23.x
 )
@@ -35,6 +35,13 @@ require (
 	k8s.io/cli-runtime v0.23.14
 	sigs.k8s.io/cluster-api-provider-aws v1.5.2
 	sigs.k8s.io/kustomize/kyaml v0.13.0
+)
+
+require (
+	github.com/bombsimon/logrusr v1.0.0 // indirect
+	github.com/src-d/gcfg v1.4.0 // indirect
+	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
+	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 )
 
 require (
@@ -66,6 +73,7 @@ require (
 	github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20210826220005-b48c857c3a0e // indirect
 	github.com/antonmedv/expr v1.8.9 // indirect
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect
+	github.com/argoproj/argo-cd v1.8.7
 	github.com/argoproj/gitops-engine v0.7.3 // indirect
 	github.com/argoproj/notifications-engine v0.3.1-0.20220430155844-567361917320 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a // indirect
@@ -95,6 +103,7 @@ require (
 	github.com/fvbommel/sortorder v1.0.1 // indirect
 	github.com/go-errors/errors v1.0.1 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
+	github.com/go-git/go-billy v4.2.0+incompatible
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-logr/zapr v1.2.0 // indirect
 	github.com/go-openapi/analysis v0.19.5 // indirect
@@ -243,7 +252,7 @@ require (
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apiserver v0.23.14 // indirect
 	k8s.io/cluster-bootstrap v0.23.0 // indirect
