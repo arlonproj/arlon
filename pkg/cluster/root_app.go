@@ -71,6 +71,17 @@ func ConstructRootApp(
 			}
 		}
 	}
+	if innerClusterName != "" {
+		helmParams = append(helmParams, argoappv1.HelmParameter{
+			Name:  "global.clusterFullNameWithInnerCluster",
+			Value: fmt.Sprintf("%s-%s", clusterName, innerClusterName),
+		})
+	} else {
+		helmParams = append(helmParams, argoappv1.HelmParameter{
+			Name:  "global.clusterFullNameWithInnerCluster",
+			Value: clusterName,
+		})
+	}
 	helmParams = append(helmParams,
 		argoappv1.HelmParameter{
 			Name:  "global.clusterName",

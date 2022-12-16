@@ -149,7 +149,7 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	if err := r.List(ctx, &secretList, &client.ListOptions{
 		Namespace: req.Namespace,
 	}); err != nil {
-		return retryLater(r, log, &chc, "secrets", req.Namespace, "cannot list secrets")
+		return retryLater(r, log, &chc, "namespace", req.Namespace, "cannot list secrets")
 	}
 	if len(secretList.Items) == 0 {
 		return retryLater(r, log, &chc, "secrets", req.Namespace, "no secrets in the namespace")
@@ -157,19 +157,15 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	for _, secret := range secretList.Items {
 		annotations := secret.GetAnnotations()
 		if annotations != nil {
-			val, ok := annotations["kubernetes.io/service-account.name"]
-			if !ok {
-				// the map is not nil, but the required key isn't present, so skip it
-				continue
-			}
-			if val == chc.Spec.ServiceAccountName {
+			if annotations["kubernetes.io/service-account.name"] == chc.Spec.ServiceAccountName {
 				kubeconfigSecret = secret
 				secretFound = true
+				break
 			}
 		}
 	}
 	if !secretFound {
-		return retryLater(r, log, &chc, "secret", "", "secret containing service account token not found")
+		return retryLater(r, log, &chc, "secret", "", "containing service account token not found")
 	}
 
 	if len(kubeconfigSecret.Data["token"]) == 0 {

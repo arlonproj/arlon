@@ -11,6 +11,11 @@ import (
 	"gotest.tools/v3/assert"
 )
 
+const (
+	defaultCasMin = 1
+	defaultCasMax = 9
+)
+
 type testCase struct {
 	dirName         string
 	expectedPrepErr error
@@ -42,7 +47,7 @@ func testOneDir(t *testing.T, tc testCase) {
 	}
 	fmt.Println("validation returned expected error:", err)
 	fs := osfs.New(tmpDir)
-	manifestFileName, clusterName, err := prepareDir(fs, ".", tmpDir)
+	manifestFileName, clusterName, err := prepareDir(fs, ".", tmpDir, defaultCasMax, defaultCasMin)
 	if tc.expectedPrepErr == nil {
 		assert.NilError(t, err, "expected nil error")
 	} else {
