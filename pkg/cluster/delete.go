@@ -26,6 +26,9 @@ func Delete(
 ) error {
 	//log := logpkg.GetLogger()
 	kubeClient, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return fmt.Errorf("failed to get kube client: %s", err)
+	}
 	conn, appIf, err := argoIf.NewApplicationClient()
 	if err != nil {
 		return fmt.Errorf("failed to get argocd application client: %s", err)
@@ -88,6 +91,9 @@ func DeleteOverridesDir(app *v1alpha1.Application, kubeClient *kubernetes.Client
 	repoRevision := app.Annotations[baseClusterRepoRevisionAnnotation]
 	repoPath := app.Annotations[baseClusterRepoPathAnnotation] + "/" + clusterName
 	creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoUrl)
+	if err != nil {
+		return fmt.Errorf("failed to get repo credentials: %s", err)
+	}
 	repo, tmpDir, auth, err := argocd.CloneRepo(creds, repoUrl, repoRevision)
 	if err != nil {
 		return fmt.Errorf("failed to clone repo: %s", err)
@@ -102,8 +108,9 @@ func DeleteOverridesDir(app *v1alpha1.Application, kubeClient *kubernetes.Client
 		if err != nil {
 			return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
 		}
+	} else {
+		return fmt.Errorf("Failed to find the directory to delete: %s", err)
 	}
-
 	commitMsg := "Deleted the files regarding to " + repoPath
 	changed, err := gitutils.CommitDeleteChanges(tmpDir, wt, commitMsg)
 	if err != nil {
