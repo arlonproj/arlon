@@ -63,7 +63,7 @@ func deployClusterCommand() *cobra.Command {
 			}
 			rootApp, err := cluster.Create(appIf, config, argocdNs, arlonNs,
 				clusterName, "", repoUrl, repoBranch, basePath, clusterSpecName,
-				prof, createInArgoCd, config.Host)
+				prof, createInArgoCd, config.Host, false)
 			if err != nil {
 				return fmt.Errorf("failed to create cluster: %s", err)
 			}

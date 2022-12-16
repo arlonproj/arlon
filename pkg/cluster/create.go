@@ -31,6 +31,7 @@ func Create(
 	prof *arlonv1.Profile,
 	createInArgoCd bool,
 	managementClusterUrl string,
+	withCAS bool,
 ) (*argoappv1.Application, error) {
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
@@ -67,7 +68,7 @@ func Create(
 		profileName = prof.Name
 	}
 	rootApp, err := ConstructRootApp(argocdNs, clusterName, baseClusterName, repoUrl, repoBranch,
-		repoPath, clusterSpecName, cm, profileName, managementClusterUrl)
+		repoPath, clusterSpecName, cm, profileName, managementClusterUrl, withCAS)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct root app: %s", err)
 	}

@@ -9,11 +9,11 @@ spec:
       cidrBlocks:
       - {{ .Values.global.podCidrBlock }}
   controlPlaneRef:
-    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta2
     kind: AWSManagedControlPlane
     name: {{ .Values.global.clusterName }}-control-plane
   infrastructureRef:
-    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta2
     kind: AWSManagedControlPlane
     name: {{ .Values.global.clusterName }}-control-plane
 ---
