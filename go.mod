@@ -11,7 +11,7 @@ require (
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-logr/logr v1.2.3
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.24.1
+	github.com/onsi/gomega v1.24.2
 	github.com/otiai10/copy v1.9.0
 	github.com/spf13/cobra v1.6.1
 	google.golang.org/grpc v1.51.0
@@ -37,12 +37,7 @@ require (
 	sigs.k8s.io/kustomize/kyaml v0.13.0
 )
 
-require (
-	github.com/bombsimon/logrusr v1.0.0 // indirect
-	github.com/src-d/gcfg v1.4.0 // indirect
-	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
-	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
-)
+require gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 
 require (
 	cloud.google.com/go v0.99.0 // indirect
@@ -73,7 +68,6 @@ require (
 	github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20210826220005-b48c857c3a0e // indirect
 	github.com/antonmedv/expr v1.8.9 // indirect
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect
-	github.com/argoproj/argo-cd v1.8.7
 	github.com/argoproj/gitops-engine v0.7.3 // indirect
 	github.com/argoproj/notifications-engine v0.3.1-0.20220430155844-567361917320 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a // indirect
@@ -231,12 +225,12 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/exp v0.0.0-20210901193431-a062eea981d2 // indirect
-	golang.org/x/net v0.2.0 // indirect
+	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20220608161450-d0670ef3b1eb // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
-	golang.org/x/sys v0.2.0 // indirect
-	golang.org/x/term v0.2.0 // indirect
-	golang.org/x/text v0.4.0 // indirect
+	golang.org/x/sys v0.3.0 // indirect
+	golang.org/x/term v0.3.0 // indirect
+	golang.org/x/text v0.5.0 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	gomodules.xyz/envconfig v1.3.1-0.20190308184047-426f31af0d45 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
