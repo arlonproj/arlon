@@ -45,14 +45,7 @@ Similar assumptions are made for detecting Arlon installation as well: assuming 
 
 Use the customized setup if you would like to understand and potentially customize the different steps of the Arlon installation. For example, if you'd like to use Arlon with an existing instalation of ArgoCD. 
 
-## Management cluster
-
-You can use any Kubernetes cluster that you have admin access to. Ensure:
-
-- `kubectl` is in your path
-- `KUBECONFIG` is pointing to the right file and the context is set properly
-
-## ArgoCD
+## 1. Install ArgoCD
 
 - Follow steps 1-4 of the [ArgoCD installation guide](https://argo-cd.readthedocs.io/en/stable/getting_started/) to install ArgoCD onto your management cluster.
 After this step, you should be logged in as `admin` and a config file was created at `${HOME}/.config/argocd/config`
@@ -86,7 +79,7 @@ kind: ConfigMap
   the previous step. Save changes. This file will be used to configure the Arlon
   controller's ArgoCD credentials during the next steps.
 
-## Arlon controller
+## 2. Install Arlon controller
 
 - Create the arlon namespace: `kubectl create ns arlon`
 - Create the ArgoCD credentials secret from the temporary config file:
@@ -97,7 +90,7 @@ kind: ConfigMap
 - Deploy the controller: `kubectl apply -f deploy/manifests/`
 - Ensure the controller eventually enters the Running state: `watch kubectl -n arlon get pod`
 
-## Arlon CLI
+## 3. Install Arlon CLI
 
 Download the CLI for the [latest release](https://github.com/arlonproj/arlon/releases/latest) from GitHub.
 Currently, Linux and MacOS operating systems are supported.
@@ -116,12 +109,13 @@ The following instructions are to manually build CLI from this code repository.
   (e.g. `/usr/local/bin`) included in your ${PATH} to the `bin/arlon` binary
   to make it easy to invoke the command.
 
-## Cluster orchestration API providers
+## 4. Install Cluster Orchestration API providers
 
 Arlon currently supports Cluster API on AWS cloud. It also has experimental
-support for Crossplane on AWS.
+support for Crossplane on AWS. 
+Install one of the following. 
 
-### Cluster API
+### Install Cluster API
 
 Using the [Cluster API Quickstart Guide](https://cluster-api.sigs.k8s.io/user/quick-start.html)
 as reference, complete these steps:
@@ -131,7 +125,7 @@ as reference, complete these steps:
   In particular, follow instructions for your specific cloud provider (AWS in this example)
   Ensure `clusterctl init` completes successfully and produces the expected output.
 
-### Crossplane (experimental)
+### Install Crossplane (experimental)
 
 Using the [Upbound AWS Reference Platform Quickstart Guide](https://github.com/upbound/platform-ref-aws#quick-start)
 as reference, complete these steps:
