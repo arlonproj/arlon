@@ -54,7 +54,7 @@ func Prepare(fileName string, validateOnly bool, casMax, casMin int) (clusterNam
 			clusterName = info.Name
 		}
 		var modified bool
-		modified, err = removeNamespaceThenEncode(info.Object, enc, casMax, casMin)
+		modified, err = prepareCAPIManifestThenEncode(info.Object, enc, casMax, casMin)
 		if err != nil {
 			err = fmt.Errorf("failed to remove namespace or encode object: %s", err)
 			return
@@ -74,13 +74,12 @@ func Prepare(fileName string, validateOnly bool, casMax, casMin int) (clusterNam
 
 // -----------------------------------------------------------------------------
 
-func removeNamespaceThenEncode(obj runtime.Object, enc *yaml.Encoder, casMax, casMin int) (modified bool, err error) {
+func prepareCAPIManifestThenEncode(obj runtime.Object, enc *yaml.Encoder, casMax, casMin int) (modified bool, err error) {
 	log := logpkg.GetLogger()
 	unstr := &unstructured.Unstructured{}
 	if err := scheme.Scheme.Convert(obj, unstr, nil); err != nil {
 		return false, fmt.Errorf("failed to convert object: %s", err)
 	}
-	kind := unstr.GetKind()
 	ns := unstr.GetNamespace()
 	if ns != "" {
 		log.V(1).Info("removing namespace",
@@ -88,16 +87,13 @@ func removeNamespaceThenEncode(obj runtime.Object, enc *yaml.Encoder, casMax, ca
 		unstr.SetNamespace("")
 		modified = true
 	}
-	if kind == "MachineDeployment" {
+	if unstr.GetKind() == "MachineDeployment" {
 		annotations := unstr.GetAnnotations()
-		if annotations == nil {
-			annotations = map[string]string{}
+		annotations, changed := addClusterAutoscalerAnnotations(annotations, casMax, casMin)
+		if changed {
+			unstr.SetAnnotations(annotations)
+			modified = true
 		}
-
-		annotations[casMaxAnnotationMachineDeployments] = strconv.Itoa(casMax)
-		annotations[casMinAnnotationMachineDeployments] = strconv.Itoa(casMin)
-		unstr.SetAnnotations(annotations)
-		modified = true
 	}
 	if err := enc.Encode(unstr.Object); err != nil {
 		return false, fmt.Errorf("failed to encode object: %s", err)
@@ -257,4 +253,20 @@ func prepareDir(
 		}
 	}
 	return
+}
+
+func addClusterAutoscalerAnnotations(annotations map[string]string, casMax, casMin int) (map[string]string, bool) {
+	modified := false
+	if annotations == nil {
+		annotations = map[string]string{}
+	}
+	if annotations[casMaxAnnotationMachineDeployments] == "" {
+		annotations[casMaxAnnotationMachineDeployments] = strconv.Itoa(casMax)
+		modified = true
+	}
+	if annotations[casMinAnnotationMachineDeployments] == "" {
+		annotations[casMinAnnotationMachineDeployments] = strconv.Itoa(casMin)
+		modified = true
+	}
+	return annotations, modified
 }
