@@ -100,16 +100,15 @@ func DeleteOverridesDir(app *v1alpha1.Application, kubeClient *kubernetes.Client
 	}
 	wt, err := repo.Worktree()
 	fileInfo, err := wt.Filesystem.Lstat(repoPath)
-	if err == nil {
-		if !fileInfo.IsDir() {
-			return fmt.Errorf("unexpected file type for %s", repoPath)
-		}
-		_, err := wt.Remove(repoPath)
-		if err != nil {
-			return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
-		}
-	} else {
+	if err != nil {
 		return fmt.Errorf("Failed to find the directory to delete: %s", err)
+	}
+	if !fileInfo.IsDir() {
+		return fmt.Errorf("unexpected file type for %s", repoPath)
+	}
+	_, err = wt.Remove(repoPath)
+	if err != nil {
+		return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
 	}
 	commitMsg := "Deleted the files regarding to " + repoPath
 	changed, err := gitutils.CommitDeleteChanges(tmpDir, wt, commitMsg)
