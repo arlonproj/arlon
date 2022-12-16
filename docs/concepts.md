@@ -137,8 +137,10 @@ They currently include:
 
 NOTE: The 'Base Cluster' is a new and evolved way of specifying cluster configuration. It will become the default mechanism for specifying cluster configuration starting version 0.10.0 of Arlon
 
-The Base Cluster contains the desired settings when creating a new cluster.
-They currently include:
+A Base Cluster allows you to create workload clusters from a manifest file stored in a git repository. The manifest
+typically contains multiple related resources that together define an arbitrarily complex cluster.
+If you make subsequent changes to the Base Cluster manifest, workload clusters originally created from it will automatically acquire the changes.
+The Base Cluster defines:
 
 - A predefined list of Cluster API objects: Cluster, Machines, Machine Deployments, etc. to be deployed in the current namespace
 - The specific infrastructure provider to be used (e.g aws)
