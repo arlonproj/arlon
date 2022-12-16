@@ -361,7 +361,7 @@ arlon cluster create --cluster-name <clusterName> --repo-path <pathToDirectory> 
 arlon cluster create --cluster-name <clusterName> --repo-alias prod --repo-path <pathToDirectory> [--output-yaml] [--profile <profileName>] [--repo-revision <repoRevision>]
 ```
 
-## Update Cluster
+## 3. Update Cluster
 
 To update the profiles of a gen2 workload cluster:
 
@@ -378,7 +378,7 @@ to the existing cluster which will create profile app in argocd along with bundl
 An existing profile can be deleted from the cluster as well using the above command. Executing this command will delete the profile app and
 all the bundles associated with the profile in argocd.
 
-## Delete Cluster
+## 4. Delete Cluster
 
 To destroy a gen2 workload cluster:
 
