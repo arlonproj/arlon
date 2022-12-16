@@ -28,10 +28,8 @@ jobs:
     - name: Print the version of golang
       run: go version
     - name: Build
-      run: go build -v ./...
-    - name: Unit tests
-      run: make pkgtest
-    - name: Run coverage
+      run: make build
+    - name: Run unit tests with code coverage
       run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./pkg/...
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3      
