@@ -15,7 +15,7 @@ type BaseClusterInfo struct {
 	RepoUrl      string
 	RepoRevision string
 	RepoPath     string
-	OverRidden   string
+	Overridden   string
 }
 
 const clusterTypeLabelKey = "arlon.io/cluster-type"
