@@ -309,7 +309,7 @@ metadata:
 spec: {}
 ```
 
-### Create Cluster using Arlon
+## 2. Create Cluster using Arlon
 
 This manifest file needs to be pushed to the workspace repository before the manifest directory is prepped and then validated.
 
@@ -317,7 +317,7 @@ Before a manifest directory can be used as a base cluster, it must first be "pre
 by Arlon. The "prep" phase makes minor changes to the directory and manifest to help Arlon deploy
 multiple copies of the cluster without naming conflicts.
 
-#### Prepare the manifest directory 
+### Prepare the Manifest Directory 
 
 To prepare a git directory to serve as base cluster, use the `basecluster preparegit` command:
 
@@ -331,7 +331,7 @@ arlon basecluster preparegit --repo-path <pathToDirectory> [--repo-revision revi
 arlon basecluster preparegit --repo-alias prod --repo-path <pathToDirectory> [--repo-revision revision]
 ```
 
-#### Validate the manifest directory 
+### Validate the Manifest Directory 
 
 Post the successful preparation of the basecluster manifest directory using `basecluster preparegit`, the basecluster manifest directory needs to be validated before the basecluster is created.
 
@@ -347,7 +347,7 @@ arlon basecluster validategit --repo-path <pathToDirectory> [--repo-revision rev
 arlon basecluster validategit --repo-alias prod --repo-path <pathToDirectory> [--repo-revision revision]
 ```
 
-#### Create cluster
+### Create Cluster
 
 To create a gen2 workload cluster from the base cluster:
 
@@ -361,7 +361,7 @@ arlon cluster create --cluster-name <clusterName> --repo-path <pathToDirectory> 
 arlon cluster create --cluster-name <clusterName> --repo-alias prod --repo-path <pathToDirectory> [--output-yaml] [--profile <profileName>] [--repo-revision <repoRevision>]
 ```
 
-#### Update Cluster
+## Update Cluster
 
 To update the profiles of a gen2 workload cluster:
 
@@ -378,7 +378,7 @@ to the existing cluster which will create profile app in argocd along with bundl
 An existing profile can be deleted from the cluster as well using the above command. Executing this command will delete the profile app and
 all the bundles associated with the profile in argocd.
 
-#### Delete Cluster
+## Delete Cluster
 
 To destroy a gen2 workload cluster:
 
