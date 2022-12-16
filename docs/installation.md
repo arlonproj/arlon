@@ -7,6 +7,7 @@ Please follow the manual instructions in [this](#customised-setup) section for a
 
 # Pre-requisites
 
+Make sure that you have:
 - A 'Management cluster'. You can use any Kubernetes cluster that you have admin access to.
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) command line tool is installed and is in your path
 - Have a valid [kubeconfig](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) file (default location is `~/.kube/config`).
