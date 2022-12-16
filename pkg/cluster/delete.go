@@ -65,48 +65,12 @@ func Delete(
 	}
 	typ := app.Labels["arlon-type"]
 	if typ == "cluster-app" {
-		log := logpkg.GetLogger()
-		repoUrl := app.Annotations[baseClusterRepoUrlAnnotation]
-		repoRevision := app.Annotations[baseClusterRepoRevisionAnnotation]
-		repoPath := app.Annotations[baseClusterRepoPathAnnotation] + "/" + name
-		overRiden := app.Annotations[baseClusterOverridden]
-		if overRiden == "true" {
-			creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoUrl)
-			repo, tmpDir, auth, err := argocd.CloneRepo(creds, repoUrl, repoRevision)
+		overridden := app.Annotations[baseClusterOverridden]
+		if overridden == "true" {
+			err = DeleteOverrideDir(appIf, kubeClient, argocdNs, name)
 			if err != nil {
-				return fmt.Errorf("failed to clone repo: %s", err)
+				return fmt.Errorf("failed to delete the override directory: %s", err)
 			}
-			wt, err := repo.Worktree()
-			fileInfo, err := wt.Filesystem.Lstat(repoPath)
-			if err == nil {
-				if !fileInfo.IsDir() {
-					return fmt.Errorf("unexpected file type for %s", repoPath)
-				}
-				_, err := wt.Remove(repoPath)
-				if err != nil {
-					return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
-				}
-			}
-
-			commitMsg := "Deleted the files regarding to " + repoPath
-			changed, err := gitutils.CommitDeleteChanges(tmpDir, wt, commitMsg)
-			if err != nil {
-				return fmt.Errorf("failed to commit changes: %s", err)
-			}
-			if !changed {
-				log.Info("no changed files, skipping commit & push")
-				return nil
-			}
-			err = repo.Push(&gogit.PushOptions{
-				RemoteName: gogit.DefaultRemoteName,
-				Auth:       auth,
-				Progress:   nil,
-				CABundle:   nil,
-			})
-			if err != nil {
-				return fmt.Errorf("failed to push to remote repository: %s", err)
-			}
-			log.V(1).Info("successfully pushed working tree", "tmpDir", tmpDir)
 		}
 	}
 
@@ -123,6 +87,60 @@ func Delete(
 				app.Name, err)
 		}
 		fmt.Println("deleted related app:", app.Name)
+	}
+	return nil
+}
+
+func DeleteOverrideDir(appIf argoapp.ApplicationServiceClient, kubeClient *kubernetes.Clientset, argocdNs string, name string) error {
+	log := logpkg.GetLogger()
+	app, err := appIf.Get(context.Background(),
+		&apppkg.ApplicationQuery{
+			Name: &name,
+		})
+	if err != nil {
+		return fmt.Errorf("failed to get argocd application: %s", err)
+	}
+	typ := app.Labels["arlon-type"]
+	if typ == "cluster-app" {
+		repoUrl := app.Annotations[baseClusterRepoUrlAnnotation]
+		repoRevision := app.Annotations[baseClusterRepoRevisionAnnotation]
+		repoPath := app.Annotations[baseClusterRepoPathAnnotation] + "/" + name
+		creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoUrl)
+		repo, tmpDir, auth, err := argocd.CloneRepo(creds, repoUrl, repoRevision)
+		if err != nil {
+			return fmt.Errorf("failed to clone repo: %s", err)
+		}
+		wt, err := repo.Worktree()
+		fileInfo, err := wt.Filesystem.Lstat(repoPath)
+		if err == nil {
+			if !fileInfo.IsDir() {
+				return fmt.Errorf("unexpected file type for %s", repoPath)
+			}
+			_, err := wt.Remove(repoPath)
+			if err != nil {
+				return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
+			}
+		}
+
+		commitMsg := "Deleted the files regarding to " + repoPath
+		changed, err := gitutils.CommitDeleteChanges(tmpDir, wt, commitMsg)
+		if err != nil {
+			return fmt.Errorf("failed to commit changes: %s", err)
+		}
+		if !changed {
+			log.Info("no changed files, skipping commit & push")
+			return nil
+		}
+		err = repo.Push(&gogit.PushOptions{
+			RemoteName: gogit.DefaultRemoteName,
+			Auth:       auth,
+			Progress:   nil,
+			CABundle:   nil,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to push to remote repository: %s", err)
+		}
+		log.V(1).Info("successfully pushed working tree", "tmpDir", tmpDir)
 	}
 	return nil
 }

@@ -101,7 +101,7 @@ func createClusterCommand() *cobra.Command {
 				return fmt.Errorf("failed to create arlon app: %s", err)
 			}
 			// Create "cluster app" for cluster
-			if patchRepoUrl != "" {
+			if overridden {
 				clusterRepoUrl = patchRepoUrl
 				clusterRepoPath = patchRepoPath
 				clusterRepoRevision = patchRepoRevision

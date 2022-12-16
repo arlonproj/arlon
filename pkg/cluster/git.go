@@ -188,6 +188,7 @@ func ProcessDynamicProfile(
 }
 
 // -----------------------------------------------------------------------------
+
 func DeployPatchToGit(
 	creds *argocd.RepoCreds,
 	argocdNs string,

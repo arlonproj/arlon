@@ -20,10 +20,10 @@ func CreateClusterApp(
 	repoRevision string, // source revision
 	repoPath string, // source path
 	createInArgoCd bool,
-	overRiden bool,
+	overridden bool,
 ) (*argoappv1.Application, error) {
 	app := constructClusterApp(argocdNs, clusterName, baseClusterName,
-		repoUrl, repoRevision, repoPath, overRiden)
+		repoUrl, repoRevision, repoPath, overridden)
 	if createInArgoCd {
 		appCreateRequest := argoapp.ApplicationCreateRequest{
 			Application: app,
@@ -44,12 +44,9 @@ func constructClusterApp(
 	repoUrl string, // source repo
 	repoRevision string, // source revision
 	repoPath string, // source path
-	overRiden bool,
+	overridden bool,
 ) *argoappv1.Application {
-	clusterOverridden := "false"
-	if overRiden {
-		clusterOverridden = "true"
-	}
+	clusterOverridden := fmt.Sprintf("%v", overridden)
 	app := &argoappv1.Application{
 		TypeMeta: v1.TypeMeta{
 			Kind:       application.ApplicationKind,
@@ -106,7 +103,7 @@ func constructClusterApp(
 		SyncOptions: []string{"Prune=true", "RespectIgnoreDifferences=true"},
 	}
 	finalRepoPath := repoPath
-	if overRiden {
+	if overridden {
 		finalRepoPath = repoPath + "/" + clusterName
 	}
 	app.Spec.Source.RepoURL = repoUrl
