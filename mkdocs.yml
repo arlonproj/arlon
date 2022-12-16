@@ -15,6 +15,40 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
 
+plugins:
+  - search
+  - mkdocs_pymdownx_material_extras
+
+extra:
+  version:
+    default: stable
+    provider: mike
+
+extra_javascript:
+  - https://unpkg.com/mermaid@8.8.4/dist/mermaid.min.js
+  
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - pymdownx.striphtml:
+      strip_comments: true
+      strip_js_on_attributes: false
+  - pymdownx.superfences:
+      custom_fences:
+        # Mermaid diagrams
+        - name: diagram
+          class: diagram
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - toc:
+      permalink: true
+      
+nav:
+    - Home: 'README.md'
+    - Design: 'design.md'
+    - How to contribute to Arlon: 'contributing.md'
+    - Help with MkDocs: 'help.md'
+
 #  name: gitbook
 #  name: 'rtd-dropdown'
 #theme: ivory
