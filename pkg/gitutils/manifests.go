@@ -90,13 +90,13 @@ func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string,
 		src, err := os.OpenFile(newFilePath, os.O_RDONLY, os.ModePerm)
 		if err != nil {
 			_ = src.Close()
-			return fmt.Errorf("failed to open embedded file %s: %s", filePath, err)
+			return fmt.Errorf("failed to open patch file %s: %s", filePath, err)
 		}
 
 		kustomFile, err := ioutil.ReadFile(newFilePath)
 		if err != nil {
 			_ = src.Close()
-			return fmt.Errorf("Failed to read the embedded file %s", err)
+			return fmt.Errorf("Failed to read the patch file %s", err)
 		}
 		parsedData := make(map[interface{}]interface{})
 

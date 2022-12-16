@@ -21,23 +21,6 @@ import (
 var content embed.FS
 
 // -----------------------------------------------------------------------------
-type kustomizeyaml struct {
-	APIVersion string   `yaml:"apiVersion"`
-	Kind       string   `yaml:"kind"`
-	Resources  []string `yaml:"resources"`
-	Patches    []target `yaml:"patches"`
-}
-
-type target struct {
-	Target info   `yaml:"target"`
-	Path   string `yaml:"path"`
-}
-
-type info struct {
-	Group   string `yaml:"group"`
-	Version string `yaml:"version"`
-	Kind    string `yaml:"kind"`
-}
 
 func DeployToGit(
 	creds *argocd.RepoCreds,
