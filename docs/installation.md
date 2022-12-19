@@ -170,13 +170,13 @@ To install Arlon controller using the init command these pre-requisites need to 
 4. Set the `GITHUB_TOKEN` environment variable to the token create in the previous step.
 
 ## Pre-requisites for cluster-api providers
-This section outlines the requirements that need to be fulfilled for installing the `cluster-api` provider components that the `init` command installs on the management cluster by default.
+This section outlines the requirements that need to be fulfilled for installing the `cluster-api` provider components that the `init` or the `install` command installs on the management cluster.
 
 ### Docker
 There are no special requirements for docker provider, as it is largely used in an experimental setups.
 
 ### AWS
-The following environment variables need to be set before running `arlon init`:
+The following environment variables need to be set:
 - `AWS_SSH_KEY_NAME` (the SSH key name to use)
 - `AWS_REGION` (region where the cluster is deployed)
 - `AWS_ACCESS_KEY_ID` (access key id for the associated AWS account)
