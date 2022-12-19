@@ -99,6 +99,6 @@ They currently include:
 - The initial (worker) node count
 - The Kubernetes version
 
-## Base cluster
+## Cluster Template
 
-To know more about basecluster (Arlon gen2 clusters), read it [here](./baseclusters.md)
+To know more about cluster template (Arlon gen2 clusters), read it [here](./clustertemplate.md)

@@ -205,9 +205,9 @@ demo folder that contains all of these resources containing references to each o
  
 The user can then `kubectl apply -f` the whole folder and observe the automatic creation of the cluster(s), profiles, and apps.
 
-(Note: the workload clusters need a base cluster in git. This can be supplied by the Arlon repo itself. This does point to
-an issue that may become a problem later on: base clusters don't have a representation today. There is no registration
-mechanism for them. The user is expected to "know" where his/her base clusters reside, and is responsible for specifying
+(Note: the workload clusters need a cluster template in git. This can be supplied by the Arlon repo itself. This does point to
+an issue that may become a problem later on: cluster templates don't have a representation today. There is no registration
+mechanism for them. The user is expected to "know" where his/her cluster templates reside, and is responsible for specifying
 their git location when creating new workload clusters)
 
 ## Application Overrides

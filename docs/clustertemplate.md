@@ -1,9 +1,9 @@
-# Next-gen Cluster Provisioning using Base Clusters
+# Next-gen Cluster Provisioning using cluster template
 
 This proposal describes a new way of provisioning workload clusters in Arlon.
-The most significant change is the *Base Cluster* construct, which replaces the current ClusterSpec.
+The most significant change is the *Cluster Template* construct, which replaces the current ClusterSpec.
 To distinguish them from current generation
-clusters, the ones deployed from a base cluster are called next-gen clusters.
+clusters, the ones deployed from a cluster template are called next-gen clusters.
 
 ## Goals
 
@@ -11,7 +11,7 @@ clusters, the ones deployed from a base cluster are called next-gen clusters.
 - Fully declarative and gitops compatible: a cluster deployment should be composed of one or more
 self-sufficient manifests that the user can choose to either apply directly (via kubectl) or store in
 git for later-stage deployment by a gitops tool (mainly ArgoCD).
-- Support Linked Mode update: an update to the the base cluster should
+- Support Linked Mode update: an update to the the cluster template should
 automatically propagate to all workload clusters deployed from it.
 
 ## Profile support
@@ -24,24 +24,24 @@ One can be attached later.
 
 ## Architecture diagram
 
-This example shows a base cluster named `capi-quickstart` used to deploy two workload
+This example shows a cluster template named `capi-quickstart` used to deploy two workload
 clusters `cluster-a` and `cluster-b`. Additionally, `cluster-a` is given profile `xxx`,
 while `cluster-b` is given profile `yyy`.
 
 ![architecture](./images/arlon_gen2.png)
 
-## Base Cluster
+## Cluster Template
 
-A base cluster serves as a base for creating new workload clusters. The workload clusters
-are all exact copies of the base cluster, meaning that they acquire all unmodified resources of the
-base cluster, except for:
+A cluster template serves as a base for creating new workload clusters. The workload clusters
+are all exact copies of the cluster template, meaning that they acquire all unmodified resources of the
+cluster template, except for:
 
 - resource names, which are prefixed during the cluster creation process to make them unique to avoid conflicts
 - the namespace, which is set to a new namespace unique to the workload cluster
 
 ### Preparation
 
-- To create a base cluster, a user first creates a single YAML file containing the desired Cluster API
+- To create a cluster template, a user first creates a single YAML file containing the desired Cluster API
 cluster and all related resources (e.g. MachineDeployments, etc...), using whatever tool the user
 chooses (e.g. `clusterctl generate cluster`). The user is responsible for the correctness of the file
 and resources within. Arlon will not check for errors. For example, the specified Kubernetes version
@@ -53,20 +53,20 @@ cluster creation. The directory should be unique to the file, and not contain an
 - If not already registered, the git repository should also be registered in ArgoCD with
 the proper credentials for read/write access.
 
-To check whether the git directory is a compliant Arlon base cluster,
+To check whether the git directory is a compliant Arlon cluster template,
 the user runs:
 
 ```shell
-arlon basecluster validategit --repo-url <repoUrl> --repo-path <pathToDirectory> [--repo-revision revision]  
+arlon clustertemplate validategit --repo-url <repoUrl> --repo-path <pathToDirectory> [--repo-revision revision]  
 ```
 
 *Note: if --repo-revision is not specified, it defaults to main.*
 
 The command produces an error the first time because the git directory has not yet been "prepped".
-To "prep" the directory to become a compliant Arlon base cluster, the user runs:
+To "prep" the directory to become a compliant Arlon cluster template, the user runs:
 
 ```shell
-arlon basecluster preparegit --repo-url <repoUrl> --repo-path <pathToDirectory> [--repo-revision revision]  
+arlon clustertemplate preparegit --repo-url <repoUrl> --repo-path <pathToDirectory> [--repo-revision revision]  
 ```
 
 This pushes a commit to the repo with these changes:
@@ -77,13 +77,13 @@ mechanism. The content of the file is sourced from this [Scott Lowe blog article
 - All `namespace` properties in the cluster manifest are removed to allow Kustomize to override the
 namespace of all resources.
 
-If prep is successful, another invocation of `arlon basecluster validategit` should succeed as well.
+If prep is successful, another invocation of `arlon clustertemplate validategit` should succeed as well.
 
 ## Workload clusters
 
 ### Creation
 
-Use `arlon cluster create` to create a next-gen workload cluster from a base cluster
+Use `arlon cluster create` to create a next-gen workload cluster from a cluster template
 (*this is different from* `arlon cluster deploy` *for creating current-generation clusters*).
 The command creates between 2 and 3 (depending on whether a profile is used)
 ArgoCD application resources that together
@@ -103,25 +103,25 @@ The `--profile` flag is optional; a cluster can be created with no profile.
 ### Composition
 
 A workload cluster is composed of 2 to 3 ArgoCD application resources, which are named
-based on the name of the base cluster and the workload cluster. For illustration purposes,
-the following discussion assumes that the base cluster is named `capi-quickstart`, the
+based on the name of the cluster template and the workload cluster. For illustration purposes,
+the following discussion assumes that the cluster template is named `capi-quickstart`, the
 workload cluster is named `cluster-a`, and the optional profile is named `xxx`.
 
 #### Cluster app
 
 The `cluster-a` application is the *cluster app* for the cluster.
-It is responsible for deploying the base cluster resources, meaning the Cluster API manifests.
+It is responsible for deploying the cluster template resources, meaning the Cluster API manifests.
 It is named directly from the workload cluster name.
 
-The application's spec uses a ApplicationSourceKustomize that points to the base cluster's git
+The application's spec uses a ApplicationSourceKustomize that points to the bcluster template's git
 directory. The spec ensures that all deployed resources are configured to:
 
 - Reside in the `cluster-a` namespace, which is deployed by the *arlon app* (see below).
 This achieved by setting `app.Spec.Destination.Namespace` to the workload cluster's name
   (*this only works if the resources do not specify an explicit namespace; this requirement is
-taken care of by the "prep" step on the base cluster*).
+taken care of by the "prep" step on the cluster template*).
 - Be named `cluster-a-capi-quickstart`, meaning the workload cluster name followed by the
-base cluster name. This is achieved by setting `app.Spec.Source.Kustomize.NamePrefix` to
+cluster template name. This is achieved by setting `app.Spec.Source.Kustomize.NamePrefix` to
 the workload cluster name plus a hyphen.
 
 #### Arlon app
@@ -177,33 +177,33 @@ cluster and cleans up all related applications.
 
 ## Update Semantics
 
-A base cluster lives in git and is shared by all workload clusters created from it.
+A cluster template lives in git and is shared by all workload clusters created from it.
 This is sometimes referred to as *Linked Mode*.
 Any git update to the cluster can affect the associated workload clusters, therefore
 such updates must be planned and managed with care; there is a real risk of such an
 update breaking existing clusters.
 
 - By default, a workload's cluster *cluster app* is configured with auto-sync, meaning ArgoCD will
-immediately apply any changes in the base cluster to the deployed Cluster API cluster resources.
-- In general, a base cluster **does not need to be "prepped" again** after a modification to its main
+immediately apply any changes in the cluster template to the deployed Cluster API cluster resources.
+- In general, a cluster template **does not need to be "prepped" again** after a modification to its main
 manifest file (the one containing the Cluster API resources). So the user is free to edit the manifest
 directly, commit/push the changes, and expect to see immediate changes to already-deployed clusters
-created from that base cluster.
+created from that cluster template.
 
 ### Unsupported changes
 
 The controllers for Cluster API and its providers disallow changes to some fields belonging
 to already-deployed resources.
 
-- For example, changing the base cluster name (`medata.Name` of the `Cluster` resource) will have disastrous consequences on already-deployed
+- For example, changing the cluster template name (`medata.Name` of the `Cluster` resource) will have disastrous consequences on already-deployed
 clusters, causing many resources to enter the OutOfSync state and never recover because ArgoCD
 fails to apply the changes (they are rejected by the controllers). Consequently, a user should never
-change the name of a base cluster.
+change the name of a cluster template.
 - Besides the cluster name, other fields cannot change (this has been observed anecdotally, we don't
 yet have an exhaustive list).
 - Changing the Kubernetes version of the control plane or data plane *is* supported, so long as the new version
 is supported by the relevant providers. If accepted, such a change will result in a rolling update
 of the corresponding plane.
-- Specific to AWS: the `AWSMachineTemplate.spec` is immutable and a CAPI webhook disallows such updates. The user is advised to not make such modifications to a basecluster manifest.
+- Specific to AWS: the `AWSMachineTemplate.spec` is immutable and a CAPI webhook disallows such updates. The user is advised to not make such modifications to a cluster template manifest.
 In the event that such an event does happen, the user is advised to not manually sync in those changes via `argocd`. If a new cluster with a different `AWSMachineTemplate.spec` is desired,
 the recommended approach is to make a copy of the manifests in the workspace repository and then issue an `arlon cluster create` command which would then consume this manifest.
