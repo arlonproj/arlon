@@ -190,3 +190,15 @@ This command does the following:
 - Registers a `default` alias against the provided `repoUrl`.
 - Checks for pre-existing examples, and prompts to delete and proceed(if `-y` or `--no-confirm` flag is not set, else deletes the existing examples).
 - Pushes cluster template manifests to the provided GitHub repository.
+
+The Arlon repository also hosts some examples in the `examples` directory. In particular, the `examples/declarative` directory is a set of ready to use manifests 
+which allows us to deploy a cluster with the new `app` and `app-profiles`. To run these examples, simply clone the source code and run these commands:
+```shell
+cd <ARLON_SOURCE_REPO_PATH>
+kubectl apply -f examples/declarative
+```
+
+This creates an EKS cluster with managed machine pools in the `us-west-1` region, and attaches a few example "apps" to it in the form of two `app-profiles` namely `frontent` and `backend`.
+The `frontend` app-profile consists of the [guestbook](https://github.com/argoproj/argocd-example-apps/tree/master/guestbook) application and a sentinel non-existing app appropriately named `nonexistent-1`. 
+Similarly, the `backend` app-profile consists of the [redis](https://github.com/bitnami/charts/tree/main/bitnami/redis) and another non-existent app called `nonexistent-2`. 
+The sentinel, `nonexistent` apps are simply present to demonstrate the `description` field for the health field and the `invalidAppNames` which lists down the apps which do not exist.
