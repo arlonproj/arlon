@@ -1,0 +1,30 @@
+name: MkDocs deployment
+
+on:
+  push:
+    paths:
+      - docs/**
+    branches:
+      - main
+      - v0.3
+      - v0.9
+  pull_request:
+    branches:
+      - main
+      - v0.3
+      - v0.9
+
+jobs:
+  deploy_docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          token: ${{ secrets.GH_PAT }}
+          check-latest: true
+          cache: 'pip' # caching pip dependencies
+          cache-dependency-path: '**/requirements.txt'
+      - run: pip install -r docs/requirements.txt
+      - run: mkdocs gh-deploy --force
