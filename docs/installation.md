@@ -3,10 +3,21 @@
 
 Arlon CLI downloads are provided on GitHub. The CLI is not a self-contained standalone executable though.
 It is required to point the CLI to a management cluster and set up the Arlon controller in this management cluster.
+It is also recommended to have the tools described here to be installed for a seamless experience.
 
 For a quickstart minimal demonstration setup, follow the instructions to set up a KIND based testbed with Arlon and ArgoCD running  [here](https://github.com/arlonproj/arlon/blob/main/testing/README.md).
 
 Please follow the manual instructions in [this](#customised-setup) section for a customised setup or refer the instructions for automated installation [here](#automatic-setup).
+
+# Setting up tools
+To leverage the complete features provided by ArgoCD and Arlon, it is recommended to have the following tools installed:
+1. `git`
+1. ArgoCD CLI
+1. `kubectl`
+
+Barring the `git` installation, the Arlon CLI has the ability to install `argocd` and `kubectl` CLIs on a user's machine for Linux and macOS based systems. 
+To install these tools, run `arlon install --tools-only` to download and place these executables in `~/.local/bin`. It however, falls to the user to add the 
+aforementioned directory to `$PATH` if not present. This command also verifies the presence of `git` on your `$PATH`.
 
 # Customised Setup
 
