@@ -454,7 +454,7 @@ arlon bundle create cas-bundle --tags cas,devel,test --desc "CAS Bundle" --repo-
 Create a profile that contains this capi-cluster-autoscaler bundle.
 
 ```shell
-arlon profile create dynamic-cas --repo-url ${WORKSPACE_REPO_URL} --repo-base-path profiles --bundles cas-bundle --desc "dynamic cas profile" --tags examples
+arlon profile create dynamic-cas --repo-url <repoUrl> --repo-base-path profiles --bundles cas-bundle --desc "dynamic cas profile" --tags examples
 ```
 
 ### manifest directory preparation
