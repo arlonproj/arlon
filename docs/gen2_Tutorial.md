@@ -434,8 +434,8 @@ To create a gen2 cluster with autoscaler, we need:
 
 - bundle pointing to the bundle/capi-cluster-autoscaler in the arlon repository.
 - dynamic profile that contains the above bundle.
-- a basecluster manifest which has the CAPI annotations for min and max nodes set ( as a part of `preparegit` or manually add it )
-- run `arlon cluster create` with the repo-path pointing to the basecluster manifest described in setp 3, set the profile to be the one created in step 2 and pass the `autoscaler` flag
+- a basecluster manifest which has the CAPI annotations for min and max nodes set ( as a part of `preparegit` or manually add it ).
+- run `arlon cluster create` with the repo-path pointing to the basecluster manifest described in the step above, set the profile to  be the one created in step 2 and pass the `autoscaler` flag.
 
 ### Bundle creation
 
@@ -481,7 +481,7 @@ arlon basecluster preparegit --repo-path <pathToDirectory> --cas-min 1 --cas-max
 To determine if a git directory is eligible to serve as base cluster, run the `basecluster validategit` command:
 
 ```shell
-arlon basecluster preparegit --repo-path <pathToDirectory> --repo-url <repoUrl> 
+arlon basecluster validategit --repo-path <pathToDirectory> --repo-url <repoUrl> 
 ```
 
 ### gen2 cluster creation with autoscaling enabled

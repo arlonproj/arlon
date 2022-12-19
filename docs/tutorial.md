@@ -477,7 +477,7 @@ arlon profile create dynamic-cas --repo-url ${WORKSPACE_REPO_URL} --repo-base-pa
 Create a clusterspec with CAPI as ApiProvider and autoscaling enabled.In addition to this, the ClusterAutoscaler(Min|Max)Nodes properties are used to set 2 annotations on MachineDeployment required by the cluster autoscaler for CAPI.
 
 ```shell
-arlon clusterspec create cas-spec --api capi --cloud aws --type eks --kubeversion v1.21.10 --nodecount 2 --nodetype t2.medium --tags devel,test --desc "dev/test"  --region ${CLOUD_REGION} --sshkey ${SSH_KEY_NAME} --casenabled
+arlon clusterspec create cas-spec --api capi --cloud aws --type eks --kubeversion v1.21.10 --nodecount 2 --nodetype t2.medium --tags devel,test --desc "dev/test"  --region ${REGION} --sshkey ${SSH_KEY_NAME} --casenabled
 ```
 
 ### Cluster creation:
