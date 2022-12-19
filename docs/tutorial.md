@@ -458,12 +458,12 @@ arlon cluster update eks-1 --profile my-new-profile
 ### Bundle creation:
 Register a dynamic bundle pointing to the bundles/capi-cluster-autoscaler in the Arlon repo.
 
-The capi-cluster-autoscaler bundle requires the name of the cluster, so that it knows what namespace in the management cluster to scan for CAPI resources. To enable the cluster-autoscaler bundle, add one more parameter during cluster creation: `srcType`. This is the ArgoCD-defined application source type (Helm, Kustomize, Directory).
+To enable the cluster-autoscaler bundle, add one more parameter during cluster creation: `srcType`. This is the ArgoCD-defined application source type (Helm, Kustomize, Directory).
 
 This example creates a bundle pointing to the bundles/capi-cluster-autoscaler in Arlon repo
 
 ```shell
-arlon bundle create cas-bundle --tags cas,devel,test --desc "CAS Bundle" --repo-url https://github.com/arlonproj/arlon.git --repo-path bundles/capi-cluster-autoscaler --srctype helm
+arlon bundle create cas-bundle --tags cas,devel,test --desc "CAS Bundle" --repo-url https://github.com/arlonproj/arlon.git --repo-path bundles/capi-cluster-autoscaler --srctype helm --repo-revision v0.9
 ```
 
 ### Profile creation:

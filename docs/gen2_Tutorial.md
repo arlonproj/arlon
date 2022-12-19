@@ -434,19 +434,19 @@ To create a gen2 cluster with autoscaler, we need:
 
 - bundle pointing to the bundle/capi-cluster-autoscaler in the arlon repository.
 - dynamic profile that contains the above bundle.
-- a basecluster manifest which has the CAPI annotations for min and max nodes set ( as a part of `preparegit` or manually add it ).
+- a basecluster manifest(that makes use of MachineDeployment and not MachinePools) which has the CAPI annotations for min and max nodes set ( as a part of `preparegit` or manually add it ).
 - run `arlon cluster create` with the repo-path pointing to the basecluster manifest described in the step above, set the profile to  be the one created in step 2 and pass the `autoscaler` flag.
 
 ### Bundle creation
 
 Register a dynamic bundle pointing to the bundles/capi-cluster-autoscaler in the Arlon repo.
 
-The capi-cluster-autoscaler bundle requires the name of the cluster, so that it knows what namespace in the management cluster to scan for CAPI resources. To enable the cluster-autoscaler bundle, add one more parameter during cluster creation: `srcType`. This is the ArgoCD-defined application source type (Helm, Kustomize, Directory).
+To enable the cluster-autoscaler bundle, add one more parameter during cluster creation: `srcType`. This is the ArgoCD-defined application source type (Helm, Kustomize, Directory).
 
 This example creates a bundle pointing to the bundles/capi-cluster-autoscaler in Arlon repo
 
 ```shell
-arlon bundle create cas-bundle --tags cas,devel,test --desc "CAS Bundle" --repo-url https://github.com/arlonproj/arlon.git --repo-path bundles/capi-cluster-autoscaler --srctype helm
+arlon bundle create cas-bundle --tags cas,devel,test --desc "CAS Bundle" --repo-url https://github.com/arlonproj/arlon.git --repo-path bundles/capi-cluster-autoscaler --srctype helm --repo-revision v0.9
 ```
 
 ### Profile creation
