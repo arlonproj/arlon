@@ -76,13 +76,34 @@ Notice how the initial manifest takes advantage of those variables to set
 - `spec.template.metadata.name` to `{{cluster-name}}-app-myconfigmap`
 to ensure that any actual ArgoCD Application resources deployed from the ApplicationSet
 are uniquely named, by prefixing the cluster name.
-- `spec.template.spec.destination.server` to `{{cluster_server}}`
+- `spec.template.spec.destination.server` to `{{cluster_server}}` to target the correct workload cluster
+
+Arlon apps can be listed in two ways. The first is to use the `arlon app list` command. One advantage
+is that it's simple to use and also displays additional information about the app, such as which AppProfiles
+are currently associated with the app.
+
+Example:
+```
+$ arlon app list
+NAME         REPO                                     PATH              REVISION  APP_PROFILES
+myconfigmap  https://github.com/bcle/fleet-infra.git  apps/my-cfgmap-1  HEAD      [marketing]
+```
+The second way is to use pure kubectl to list ApplicationSets with a particular label:
+```
+$ k -n argocd get applicationset
+NAME          AGE
+myconfigmap   21d
+```
+
+Similarly, an Arlon app can be deleted in two ways:
+- `arlon app delete <appName>`
+- `kubectl -n argocd delete applicationset <appName>`
 
 ## AppProfile
 
 An AppProfile is simply a grouping (or set) of Arlon Apps.
 Unlike an Arlon Application (which is represented by an ApplicationSet resource),
-an AppProfile is represented by an Arlon-specific custom resource.
+an AppProfile is represented by an Arlon-native custom resource.
 
 An AppProfile specifies the apps it is associated with via the `appNames` list.
 It is legal for `appNames` to contain names of Arlon Apps that don't exist yet.
@@ -94,3 +115,30 @@ will update the resource's `status` section as follows:
   then `status.health` is set to `degraded`, and `status.invalidAppNames`
   lists the invalid names.
 
+Here is an example of an AppProfile manifest that includes 3 apps, one of which does not exist:
+```
+apiVersion: core.arlon.io/v1
+kind: AppProfile
+metadata:
+  name: marketing
+  namespace: arlon
+spec:
+  appNames:
+  - myconfigmap
+  - wordpress
+  - nonexistent-app
+status:
+  health: degraded
+  invalidAppNames:
+  - nonexistent-app
+```
+
+Since AppProfiles are defined by their own custom resource and are fairly straightforward, their lifecycle
+can be managed entirely using `kubectl`. That said, Arlon provides the `arlon appprofile list` to display
+useful information about current AppProfiles. Example:
+```
+$ arlon appprofile list
+NAME         APPS                     HEALTH   INVALID_APPS
+engineering  []                       healthy  []
+marketing    [myconfigmap wordpress]  degraded [nonexistent-app]
+```
