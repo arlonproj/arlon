@@ -73,6 +73,7 @@ func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string,
 	if err != nil {
 		return fmt.Errorf("failed to open the patch file %s:", err)
 	}
+	defer src.Close()
 	_, fileName := filepath.Split(filePath)
 	resourcestring := "git::" + baseRepoUrl + "//" + baseRepoPath + "?ref=" + baseRepoRevision
 	kustomizeresult := kustomizeyaml{
@@ -103,23 +104,21 @@ func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string,
 	if err != nil {
 		return fmt.Errorf("failed to create kustomization.yaml: %s", err)
 	}
+	defer file.Close()
 	err = tmpl.Execute(file, yamlData)
 	if err != nil {
 		return fmt.Errorf("failed to execute kustomization.yaml manifest")
 	}
-	_ = file.Close()
 	if err != nil {
 		return fmt.Errorf("failed to write to kustomization.yaml: %s", err)
 	}
 	dstPath := path.Join(clusterPath, fileName)
 	dst, err := wt.Filesystem.Create(dstPath)
 	if err != nil {
-		_ = src.Close()
 		return fmt.Errorf("failed to create destination file %s: %s", dstPath, err)
 	}
+	defer dst.Close()
 	_, err = io.Copy(dst, src)
-	_ = src.Close()
-	_ = dst.Close()
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded file: %s", err)
 	}
