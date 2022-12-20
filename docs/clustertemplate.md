@@ -1,9 +1,8 @@
-# Next-gen Cluster Provisioning using cluster template
+# Next-gen Cluster Provisioning using Cluster templates
 
 This proposal describes a new way of provisioning workload clusters in Arlon.
 The most significant change is the *Cluster Template* construct, which replaces the current ClusterSpec.
-To distinguish them from current generation
-clusters, the ones deployed from a cluster template are called next-gen clusters.
+To distinguish them from current generation, the ones deployed from a cluster template are called next-gen clusters or gen2 clusters.
 
 ## Goals
 
