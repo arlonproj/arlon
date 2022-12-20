@@ -17,25 +17,66 @@ meaning it will likely be retired in an upcoming release.
 ## Arlon Application (a.k.a. "Arlon App")
 
 An Arlon Application is similar to a Dynamic Bundle from earlier releases.
-It specifies a source of one or more manifests stored git in any
-"tool" format supported by ArgoCD (YAML, Helm, kustomize, etc ...)
+It specifies a source of one or more manifests stored in git in any
+["tool" format supported by ArgoCD](https://argo-cd.readthedocs.io/en/stable/user-guide/application_sources/)
 
-Internally, Arlon represents an App as a specialized ArgoCD ApplicationSet resource.
-This allows you to specify the manifest source in the Template section,
-while Arlon takes care of targeting the deployment to the correct workload clusters
-by automatically manipulating the Generators component.
-ApplicationSets owned by Arlon to represent apps are distinguished from
+Internally, Arlon represents an App as a specialized [ArgoCD ApplicationSet](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/) resource.
+This allows you to specify the manifest source in the `spec.template.spec` section,
+while Arlon takes care of targeting the deployment to the correct workload cluster(s)
+by automatically manipulating the `spec.generators` section.
+ApplicationSets managed by Arlon to represent apps are distinguished from
 other ApplicationSets via the `arlon-type=application` label.
-The ApplicationSet's Generators list must contain a single generator of List
+The ApplicationSet's Generators list must contain a single generator of [List](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-List/)
 type. The Arlon AppProfile controller will modify this list in real-time
 to deploy to application to the right workload clusters (or no cluster at all).
 
 While it is possible for you create and edit an ApplicationSet resource manifest
 satisfying the requirements to be an Arlon App from scratch, Arlon makes
-this easier with the `arlon app create --output-yaml` command. You can then
-save the output to a file and edit it to your liking before applying it to
-the management cluster to actually create it. (Without the ``--output-yaml` flag,
-the command will apply the resource for you).
+this easier with the `arlon app create --output-yaml` command, which outputs an
+initial compliant manifest that you can
+save to a file and edit to your liking before applying to
+the management cluster to actually create the app.
+(Without the ``--output-yaml` flag, the command will apply the resource for you).
+
+Here's an example of an initial Arlon Application manifest:
+```
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  labels:
+    arlon-type: application
+    managed-by: arlon
+  name: myconfigmap
+  namespace: argocd
+spec:
+  generators:
+  - list: {}
+  template:
+    metadata:
+      name: '{{cluster_name}}-app-myconfigmap'
+    spec:
+      destination:
+        namespace: default
+        server: '{{cluster_server}}'
+      project: default
+      source:
+        path: apps/my-cfgmap-1
+        repoURL: https://github.com/bcle/fleet-infra.git
+        targetRevision: HEAD
+      syncPolicy:
+        automated:
+          prune: true
+```
+
+The List generator that the AppProfile controller maintains supplies two variables for template substitution:
+- `cluster_name`: the name of the target workload cluster
+- `cluster_server`: the URL+FQDN of the workload cluster's Kubernetes API endpoint
+
+Notice how the initial manifest takes advantage of those variables to set
+- `spec.template.metadata.name` to `{{cluster-name}}-app-myconfigmap`
+to ensure that any actual ArgoCD Application resources deployed from the ApplicationSet
+are uniquely named, by prefixing the cluster name.
+- `spec.template.spec.destination.server` to `{{cluster_server}}`
 
 ## AppProfile
 
