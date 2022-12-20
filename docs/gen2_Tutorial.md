@@ -441,7 +441,7 @@ To create a gen2 cluster with autoscaler, we need:
 
 Register a dynamic bundle pointing to the bundles/capi-cluster-autoscaler in the Arlon repo.
 
-To enable the cluster-autoscaler bundle, add one more parameter during cluster creation: `srcType`. This is the ArgoCD-defined application source type (Helm, Kustomize, Directory). In addition to this, the `repo-revision` parameter should also be set to a stable arlon release branch ( in this case v0.9 ).
+To enable the cluster-autoscaler bundle, add one more parameter during cluster creation: `srcType`. This is the ArgoCD-defined application source type (Helm, Kustomize, Directory). In addition to this, the `repo-revision` parameter should also be set to a stable arlon release branch ( in this case v0.10 ).
 
 This example creates a bundle pointing to the bundles/capi-cluster-autoscaler in Arlon repo
 
