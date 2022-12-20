@@ -10,9 +10,10 @@ typically contains multiple related resources that together define an arbitraril
 If you make subsequent changes to the cluster template, workload clusters originally created from it
 will automatically acquire the changes.
 
-In the previous versions of arlon, we had referred present *cluster template* as *base clusters*. So, if the word base manifest is encountered anywhere in the document or code, it should be considered as a synonym for cluster manifest.
+In earlier versions of arlon (before v0.10), *cluster templates* were called *base clusters*.
+Some parts of the code still refer to base cluster manifests. This should be considered as a synonym for cluster template manifests. 
 
-**NB: Cluster Template only support dynamic profiles.**
+**Note: Cluster Templates only support dynamic profiles.**
 
 ## Creating Cluster-API cluster manifest
 
@@ -360,6 +361,8 @@ arlon clustertemplate validategit --repo-alias prod --repo-path <pathToDirectory
 
 ## gen2 cluster creation
 
+**Note: Cluster templates only support dynamic profiles.**
+
 To create a gen2 workload cluster from the cluster template:
 
 ```shell
@@ -430,6 +433,73 @@ an optional profile is specified at cluster creation time). When you destroy a g
 and clean them up.
 
 If the cluster which which is being deleted is a cluster created using patch files, the controller first cleans the git repo where the respective patch files of the cluster are present and then it destroys all the related ArgoCD applications and clean them up.
+
+## Enabling Cluster Autoscaler in the workload cluster
+To create a gen2 cluster with autoscaler, we need:
+
+- bundle pointing to the bundle/capi-cluster-autoscaler in the arlon repository.
+- dynamic profile that contains the above bundle.
+- a cluster template manifest(that makes use of MachineDeployment and not MachinePools) which has the CAPI annotations for min and max nodes set ( as a part of `preparegit` or manually add it ).
+- run `arlon cluster create` with the repo-path pointing to the cluster template manifest described in the step above, set the profile to  be the one created in step 2 and pass the `autoscaler` flag.
+
+### Bundle creation
+
+Register a dynamic bundle pointing to the bundles/capi-cluster-autoscaler in the Arlon repo.
+
+To enable the cluster-autoscaler bundle, add one more parameter during cluster creation: `srcType`. This is the ArgoCD-defined application source type (Helm, Kustomize, Directory). In addition to this, the `repo-revision` parameter should also be set to a stable arlon release branch ( in this case v0.10 ).
+
+This example creates a bundle pointing to the bundles/capi-cluster-autoscaler in Arlon repo
+
+```shell
+arlon bundle create cas-bundle --tags cas,devel,test --desc "CAS Bundle" --repo-url https://github.com/arlonproj/arlon.git --repo-path bundles/capi-cluster-autoscaler --srctype helm --repo-revision v0.10
+```
+
+### Profile creation
+
+Create a profile that contains this capi-cluster-autoscaler bundle.
+
+```shell
+arlon profile create dynamic-cas --repo-url <repoUrl> --repo-base-path profiles --bundles cas-bundle --desc "dynamic cas profile" --tags examples
+```
+
+### manifest directory preparation
+
+Two additional properties `cas-max` and `cas-min` are used to set 2 annotations for Max/Min nodes on MachineDeployment required by the cluster autoscaler for CAPI as a part of the manifest directory preparation. These are the annotations required by the MachineDeployment for autoscaling. 
+
+Note: These are the default values for the `cas-min` and `cas-max` properties
+```shell
+ annotations:
+     cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: '1'
+     cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: '9'
+```
+
+These annotations are added during the preparegit step. If these annotations are already present in the manifest file, then they will not be added again as a part of `preparegit`
+
+Preparing the git directory to serve as the cluster template: 
+
+```shell
+arlon basecluster preparegit --repo-path <pathToDirectory> --cas-min 1 --cas-max 9 --repo-url <repoUrl> 
+```
+
+### manifest directory validation
+
+To determine if a git directory is eligible to serve as cluster template, run the `basecluster validategit` command:
+
+```shell
+arlon basecluster validategit --repo-path <pathToDirectory> --repo-url <repoUrl> 
+```
+
+### gen2 cluster creation with autoscaling enabled
+
+To add CAS support for gen2 clusters, the cluster create sub-command of the arlon CLI has a `autoscaler` flag which deploys the capi-cluster-autoscaler helm chart on the management cluster.
+
+To create a gen2 workload with a cluster-autoscaler pod running, from the cluster template, run this command:
+
+Note: Use the dynamic profile that was created in the previous steps
+
+```shell
+arlon cluster create --cluster-name <clusterName> --repo-url <repoUrl> --repo-path <pathToDirectory> --profile dynamic-cas --autoscaler
+```
 
 ## Known issues and limitations
 
