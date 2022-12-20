@@ -478,7 +478,7 @@ These annotations are added during the preparegit step. If these annotations are
 Preparing the git directory to serve as the cluster template: 
 
 ```shell
-arlon basecluster preparegit --repo-path <pathToDirectory> --cas-min 1 --cas-max 9 --repo-url <repoUrl> 
+arlon clustertemplate preparegit --repo-path <pathToDirectory> --cas-min 1 --cas-max 9 --repo-url <repoUrl> 
 ```
 
 ### manifest directory validation
@@ -486,7 +486,7 @@ arlon basecluster preparegit --repo-path <pathToDirectory> --cas-min 1 --cas-max
 To determine if a git directory is eligible to serve as cluster template, run the `basecluster validategit` command:
 
 ```shell
-arlon basecluster validategit --repo-path <pathToDirectory> --repo-url <repoUrl> 
+arlon clustertemplate validategit --repo-path <pathToDirectory> --repo-url <repoUrl> 
 ```
 
 ### gen2 cluster creation with autoscaling enabled
