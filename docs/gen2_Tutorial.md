@@ -378,19 +378,30 @@ arlon cluster create --cluster-name <clusterName> --repo-alias prod --repo-path 
 
 ## gen2 cluster creation with overrides
 
-We call the concept of constructing various clusters with patches from the same cluster template as cluster overrides. 
-The cluster overrides feature is built on top of the existing cluster template design. So, A user can create a cluster from the cluster template using the same command as in the above step(gen2 cluster creation).
-Now, to create a cluster with overrides in the cluster template, a user should have the corresponding patch files in a dedicated folder in local which doesn't contain any other files except patch files. Example of a patch file where we want to override replicas count to 2 is:
+We call the concept of constructing various clusters with patches from the same base manifest as cluster overrides. 
+The cluster overrides feature is built on top of the existing base cluster design. So, A user can create a cluster from the base manifest using the same command as in the above step(gen2 cluster creation).
+Now, to create a cluster with overrides in the base manifest, a user should have the corresponding patch files in a single yaml file in local. Here is an example of a patch file where we want to override replicas count to 2 and change the sshkeyname:
 
 ```shell
-  ---
-  apiVersion: cluster.x-k8s.io/v1beta1
-  kind: MachineDeployment
-  metadata:
-    name: .*
-  spec:
-    replicas: 2
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: capi-quickstart-eks-md-0
+spec:
+  replicas: 2
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: AWSManagedControlPlane
+metadata:
+  name: capi-quickstart-eks-control-plane
+spec:
+  sshKeyName: random
+---
+
   ```
+
+Note: The metadata field in the patch file should be same as of the metadata field in the resources file.
 
 Refer to this [document](https://blog.scottlowe.org/2019/11/12/using-kustomize-with-cluster-api-manifests/) to know more about patch files
 
