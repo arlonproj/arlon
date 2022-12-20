@@ -483,7 +483,7 @@ arlon clustertemplate preparegit --repo-path <pathToDirectory> --cas-min 1 --cas
 
 ### manifest directory validation
 
-To determine if a git directory is eligible to serve as cluster template, run the `basecluster validategit` command:
+To determine if a git directory is eligible to serve as cluster template, run the `clustertemplate validategit` command:
 
 ```shell
 arlon clustertemplate validategit --repo-path <pathToDirectory> --repo-url <repoUrl> 
