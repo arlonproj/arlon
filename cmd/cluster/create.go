@@ -36,7 +36,7 @@ func createClusterCommand() *cobra.Command {
 	var patchRepoRevision string
 	var clusterRepoPath string
 	var clusterName string
-	var overridesDir string
+	var overridesPath string
 	var outputYaml bool
 	var profileName string
 	var gen2CASEnabled bool //gen2 specific flag to enable cluster autoscaler
@@ -63,14 +63,14 @@ func createClusterCommand() *cobra.Command {
 				return fmt.Errorf("failed to get repository credentials: %s", err)
 			}
 			overridden := false
-			if overridesDir != "" {
+			if overridesPath != "" {
 				_, err = appIf.Get(context.Background(),
 					&argoapp.ApplicationQuery{Name: &clusterName})
 				if err == nil {
 					return fmt.Errorf("arlon cluster already exists")
 				}
 				err = cluster.CreatePatchDir(config, clusterName, patchRepoUrl, argocdNs,
-					patchRepoPath, patchRepoRevision, clusterRepoRevision, overridesDir, clusterRepoUrl, clusterRepoPath)
+					patchRepoPath, patchRepoRevision, clusterRepoRevision, overridesPath, clusterRepoUrl, clusterRepoPath)
 				if err != nil {
 					return fmt.Errorf("failed to create patch files directory: %s", err)
 				}
@@ -168,7 +168,7 @@ func createClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&patchRepoRevision, "patch-repo-revision", "main", "the git revision for patch files")
 	command.Flags().StringVar(&clusterRepoPath, "repo-path", "", "the git repository path for cluster template")
 	command.Flags().StringVar(&clusterName, "cluster-name", "", "the cluster name")
-	command.Flags().StringVar(&overridesDir, "overrides-dir", "", "path to the corresponding patch file to the cluster")
+	command.Flags().StringVar(&overridesPath, "overrides-path", "", "path to the corresponding patch file to the cluster")
 	command.Flags().BoolVar(&outputYaml, "output-yaml", false, "output root applications YAML instead of deploying to ArgoCD")
 	command.Flags().StringVar(&profileName, "profile", "", "profile name (if specified, must refer to dynamic profile)")
 	command.Flags().BoolVar(&gen2CASEnabled, "autoscaler", false, "enable CAPI cluster autoscaler for cluster template based clusters")
