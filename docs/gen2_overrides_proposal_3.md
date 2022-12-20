@@ -74,7 +74,7 @@ This is an update to proposal of [Gen2 cluster overrides proposal-2](gen2_overri
 
 A user can pass the patch file for the cluster as an argument while executing the `arlon cluster create ..` command with the --override flag. The command would look like:
 
-`arlon cluster create <cluster-name> --repo-url <repo url where cluster template is present> --repo-path <repo path to the cluster template> --override <path to the patch file> --patch-repo-url <repo url where patch files should be stored> --patch-repo-path <repo path to store the patch files>` 
+`arlon cluster create <cluster-name> --repo-url <repo url where cluster template is present> --repo-path <repo path to the cluster template> --override <path to the patch file> --patch-repo-url <repo url where patch file should be stored> --patch-repo-path <repo path to store the patch file>` 
 
 The above command will create a cluster named folder in patch repo url which contains all the patch files and the argocd app created for the respective cluster will be pointing to the cluster named folder which has been created.
 

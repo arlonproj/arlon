@@ -1,8 +1,8 @@
 # Next-gen Cluster Provisioning using Cluster templates
 
-This proposal describes a new way of provisioning workload clusters in Arlon.
-The most significant change is the *Cluster Template* construct, which replaces the current ClusterSpec.
-To distinguish them from current generation, the ones deployed from a cluster template are called next-gen clusters or gen2 clusters.
+This document describes a new way of provisioning workload clusters in Arlon.
+The most significant change is the *Cluster Template* construct, which replaces the older ClusterSpec from gen1 clusters.
+To distinguish them from the older gen1 clusters, the ones deployed from a cluster template are called next-gen clusters or gen2 clusters.
 
 ## Goals
 
@@ -112,13 +112,13 @@ The `cluster-a` application is the *cluster app* for the cluster.
 It is responsible for deploying the cluster template resources, meaning the Cluster API manifests.
 It is named directly from the workload cluster name.
 
-The application's spec uses a ApplicationSourceKustomize that points to the bcluster template's git
+The application's spec uses a ApplicationSourceKustomize that points to the cluster template's git
 directory. The spec ensures that all deployed resources are configured to:
 
 - Reside in the `cluster-a` namespace, which is deployed by the *arlon app* (see below).
 This achieved by setting `app.Spec.Destination.Namespace` to the workload cluster's name
   (*this only works if the resources do not specify an explicit namespace; this requirement is
-taken care of by the "prep" step on the cluster template*).
+taken care of by the "prep" step on the *cluster template*).
 - Be named `cluster-a-capi-quickstart`, meaning the workload cluster name followed by the
 cluster template name. This is achieved by setting `app.Spec.Source.Kustomize.NamePrefix` to
 the workload cluster name plus a hyphen.
