@@ -105,7 +105,7 @@ func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string,
 	}
 	err = tmpl.Execute(file, yamlData)
 	if err != nil {
-		return fmt.Errorf("failed to execute kustomization.yaml manifest: %s", err)
+		return fmt.Errorf("failed to execute kustomization.yaml manifest")
 	}
 	_ = file.Close()
 	if err != nil {

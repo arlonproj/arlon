@@ -375,7 +375,7 @@ arlon cluster create --cluster-name <clusterName> --repo-alias prod --repo-path 
 
 We call the concept of constructing various clusters with patches from the same base manifest as cluster overrides. 
 The cluster overrides feature is built on top of the existing base cluster design. So, A user can create a cluster from the base manifest using the same command as in the above step(gen2 cluster creation).
-Now, to create a cluster with overrides in the base manifest, a user should have the corresponding patch files in a single yaml file in local. Example of a patch file where we want to override replicas count to 2 is and change the sshkeyname:
+Now, to create a cluster with overrides in the base manifest, a user should have the corresponding patch files in a single yaml file in local. Here is an example of a patch file where we want to override replicas count to 2 and change the sshkeyname:
 
 ```shell
 ---
@@ -403,7 +403,7 @@ Refer to this [document](https://blog.scottlowe.org/2019/11/12/using-kustomize-w
 Command to create a gen2 workload cluster form the base cluster manifest with overrides to the manifest is:
 
 ```shell
-arlon cluster create <cluster-name> --repo-url <repo url where base manifest is present> --repo-path <repo path to the base manifest> --overrides-path <path to the patch files folder> --patch-repo-url <repo url where patch files should be stored> --patch-repo-path <repo path to store the patch files>
+arlon cluster create <cluster-name> --repo-url <repo url where base manifest is present> --repo-path <repo path to the base manifest> --overrides-path <path to the patch file> --patch-repo-url <repo url where patch file should be stored> --patch-repo-path <repo path to store the patch file>
 ````
 Runnning the above command will create a cluster named folder in patch repo path of patch repo url which contains the patch files, kustomization.yaml and configurations.yaml which are used to create the cluster app.
 
