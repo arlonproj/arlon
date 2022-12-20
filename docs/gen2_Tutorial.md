@@ -408,7 +408,7 @@ Refer to this [document](https://blog.scottlowe.org/2019/11/12/using-kustomize-w
 Command to create a gen2 workload cluster form the cluster template manifest with overrides to the manifest is:
 
 ```shell
-arlon cluster create <cluster-name> --repo-url <repo url where cluster template is present> --repo-path <repo path to the cluster template> --override <path to the patch files folder> --patch-repo-url <repo url where patch files should be stored> --patch-repo-path <repo path to store the patch files>
+arlon cluster create <cluster-name> --repo-url <repo url where cluster template is present> --repo-path <repo path to the cluster template> --overrides-path <path to the patch file> --patch-repo-url <repo url where patch file should be stored> --patch-repo-path <repo path to store the patch files>
 ````
 Runnning the above command will create a cluster named folder in patch repo path of patch repo url which contains the patch files, kustomization.yaml and configurations.yaml which are used to create the cluster app.
 
