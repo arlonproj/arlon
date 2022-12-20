@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -72,8 +73,7 @@ func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string,
 	if err != nil {
 		return fmt.Errorf("failed to open the patch file %s:", err)
 	}
-	components := strings.Split(filePath, "/")
-	dstPath := path.Join(components[len(components)-1])
+	_, fileName := filepath.Split(filePath)
 	resourcestring := "git::" + baseRepoUrl + "//" + baseRepoPath + "?ref=" + baseRepoRevision
 	kustomizeresult := kustomizeyaml{
 		APIVersion: "kustomize.config.k8s.io/v1beta1",
@@ -85,7 +85,7 @@ func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string,
 			"configurations.yaml",
 		},
 		Patches: []string{
-			components[len(components)-1],
+			fileName,
 		},
 	}
 	var tmpl *template.Template
@@ -105,13 +105,13 @@ func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string,
 	}
 	err = tmpl.Execute(file, yamlData)
 	if err != nil {
-		return fmt.Errorf("failed to execute kustomization.yaml: %s", err)
+		return fmt.Errorf("failed to execute kustomization.yaml manifest: %s", err)
 	}
 	_ = file.Close()
 	if err != nil {
 		return fmt.Errorf("failed to write to kustomization.yaml: %s", err)
 	}
-	dstPath = path.Join(clusterPath, dstPath)
+	dstPath := path.Join(clusterPath, fileName)
 	dst, err := wt.Filesystem.Create(dstPath)
 	if err != nil {
 		_ = src.Close()
