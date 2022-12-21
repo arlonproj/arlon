@@ -1,8 +1,10 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
 
-site_name: Arlon 
+site_name: Arlon - GitOps-based Fleet Management for Kubernetes
 theme:
   name: material
+  logo: images/pictogram_arlon-stroke.svg
+  favicon: images/favicon-32x32.png  
   palette: 
     # Palette toggle for light mode
     - scheme: default
@@ -14,6 +16,8 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+  font:
+    text: Work Sans
 
 plugins:
   - search
@@ -52,10 +56,10 @@ nav:
     - Installation: 'installation.md'
     - Tutorial (gen1): 'tutorial.md' 
     - Tutorial (gen2): 'gen2_Tutorial.md'       
-    - Development:
+    - Developer Guide:
       - Setup: 'dev_setup.md'
       - Contributing: 'contributing.md'
-      - Help with MkDocs: 'docs_help.md'
+      - Help with Documentation: 'docs_help.md'
 
 #  name: gitbook
 #  name: 'rtd-dropdown'
