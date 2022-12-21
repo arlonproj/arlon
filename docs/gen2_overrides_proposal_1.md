@@ -1,4 +1,5 @@
 # Gen2 Cluster Overrides - Proposal 1
+
 This is a design proposal doc for gen2 cluster overrides. Right now, according to our gen2 design, we can deploy multiple clusters with same specifications from one cluster template. But what if we want to deploy cluster with a different sshkeyname from the same manifest?. To allow deploying clusters with different specifications from the same cluster template we are introducing the concept of clusteroverrides. So, clusteroverrides is being able to deploy clusters with different specs using same manifest and overriding the specs which we want to change.
 
 We have 2 different approches to override in a cluster:
@@ -43,7 +44,7 @@ The clustertemplate directory will store the cluster template for the final Clus
 
 The contents of kustomize file in clustertemplate folder is as follows:
 
-```
+```yaml
 resources:
 - clustertemplatemanifest.yaml
 ```
