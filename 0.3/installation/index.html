@@ -13,7 +13,7 @@
     
     
       
-        <title>Help with MkDocs - Arlon - GitOps-based Fleet Management for Kubernetes</title>
+        <title>Installation - Arlon - GitOps-based Fleet Management for Kubernetes</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#help-with-mkdocs" class="md-skip">
+        <a href="#installation" class="md-skip">
           Skip to content
         </a>
       
@@ -119,7 +119,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Help with MkDocs
+              Installation
             
           </span>
         </div>
@@ -289,11 +289,21 @@
 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../installation/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Installation
       </a>
+      
     </li>
   
 
@@ -334,59 +344,11 @@
 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Help with MkDocs
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../help/" class="md-nav__link">
         Help with MkDocs
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#commands" class="md-nav__link">
-    Commands
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#project-layout" class="md-nav__link">
-    Project layout
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -411,28 +373,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#commands" class="md-nav__link">
-    Commands
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#project-layout" class="md-nav__link">
-    Project layout
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -446,28 +386,111 @@
   
                   
 
-  <a href="https://github.com/arlonproj/arlon/edit/main/docs/help.md" title="Edit this page" class="md-content__button md-icon">
+  <a href="https://github.com/arlonproj/arlon/edit/main/docs/installation.md" title="Edit this page" class="md-content__button md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
   </a>
 
 
-<h1 id="help-with-mkdocs">Help with MkDocs<a class="headerlink" href="#help-with-mkdocs" title="Permanent link">&para;</a></h1>
-<p>Welcome to Arlon documentation with MkDocs</p>
-<p>For full documentation visit <a href="https://www.mkdocs.org">mkdocs.org</a>.</p>
-<h2 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">&para;</a></h2>
+<h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
+<p>Arlon CLI downloads are provided on GitHub. The CLI is not a self-contained standalone executable though.
+It is required to point the CLI to a management cluster and set up the Arlon controller in this management cluster.</p>
+<p>For a quickstart minimal demonstration setup, follow the instructions to set up a KIND based testbed with Arlon and ArgoCD running  <a href="https://github.com/arlonproj/arlon/blob/main/testing/README.md">here</a>.</p>
+<p>Please follow the manual instructions in <a href="#customised-setup">this</a> section for a customised setup or refer the instructions for automated installation <a href="#automatic-setup">here</a>.</p>
+<h1 id="customised-setup">Customised Setup<a class="headerlink" href="#customised-setup" title="Permanent link">&para;</a></h1>
+<h2 id="management-cluster">Management cluster<a class="headerlink" href="#management-cluster" title="Permanent link">&para;</a></h2>
+<p>You can use any Kubernetes cluster that you have admin access to. Ensure:</p>
 <ul>
-<li><code>mkdocs new [dir-name]</code> - Create a new project.</li>
-<li><code>mkdocs serve</code> - Start the live-reloading docs server.</li>
-<li><code>mkdocs build</code> - Build the documentation site.</li>
-<li><code>mkdocs -h</code> - Print help message and exit.</li>
+<li><code>kubectl</code> is in your path</li>
+<li><code>KUBECONFIG</code> is pointing to the right file and the context set properly</li>
 </ul>
-<h2 id="project-layout">Project layout<a class="headerlink" href="#project-layout" title="Permanent link">&para;</a></h2>
-<pre><code>mkdocs.yml    # The configuration file.
-docs/
-    index.md  # The documentation homepage.
-    ...       # Other markdown pages, images and other files.
-</code></pre>
+<h2 id="argocd">ArgoCD<a class="headerlink" href="#argocd" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Follow steps 1-4 of the <a href="https://argo-cd.readthedocs.io/en/stable/getting_started/">ArgoCD installation guide</a> to install ArgoCD onto your management cluster.
+After this step, you should be logged in as <code>admin</code> and a config file was created at <code>${HOME}/.config/argocd/config</code></li>
+<li>Create your workspace repository in your git provider if necessary, then register it.
+  Example: <code>argocd repo add https://github.com/myname/arlon_workspace --username myname --password secret</code>.
+   --  Note: type <code>argocd repo add --help</code> to see all available options.
+   --  For Arlon developers, this is not your fork of the Arlon source code repository,
+       but a separate git repo where some artifacts like profiles created by Arlon will be stored.</li>
+<li>Highly recommended: <a href="https://argo-cd.readthedocs.io/en/stable/operator-manual/webhook/">configure a webhook</a>
+  to immediately notify ArgoCD of changes to the repo. This will be especially useful
+  during the tutorial. Without a webhook, repo changes may take up to 3 minutes
+  to be detected, delaying cluster configuration updates.</li>
+<li><a href="https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/">Create a local user</a> named <code>arlon</code> with the <code>apiKey</code> capability.
+  This involves editing the <code>argocd-cm</code> ConfigMap using <code>kubectl</code>.</li>
+<li>Adjust the RBAC settings to grant admin permissions to the <code>arlon</code> user.
+  This involves editing the <code>argocd-rbac-cm</code> ConfigMap to add the entry
+  <code>g, arlon, role:admin</code> under the <code>policy.csv</code> section. Example:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span><span class="w"></span>
+<span class="nt">data</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">policy.csv</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span><span class="w"></span>
+<span class="w">    </span><span class="no">g, arlon, role:admin</span><span class="w"></span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ConfigMap</span><span class="w"></span>
+<span class="p p-Indicator">[</span><span class="nv">...</span><span class="p p-Indicator">]</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>Generate an account token: <code>argocd account generate-token --account arlon</code></li>
+<li>Make a temporary copy of this <a href="https://github.com/arlonproj/arlon/blob/main/testing/argocd-config-for-controller.template.yaml">config-file</a> in <code>/tmp/config</code> then
+  edit it to replace the value of <code>auth-token</code> with the token from
+  the previous step. Save changes. This file will be used to configure the Arlon
+  controller's ArgoCD credentials during the next steps.</li>
+</ul>
+<h2 id="arlon-controller">Arlon controller<a class="headerlink" href="#arlon-controller" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Create the arlon namespace: <code>kubectl create ns arlon</code></li>
+<li>Create the ArgoCD credentials secret from the temporary config file:
+  <code>kubectl -n arlon create secret generic argocd-creds --from-file /tmp/config</code></li>
+<li>Delete the temporary config file</li>
+<li>Clone the arlon git repo and cd to its top directory</li>
+<li>Create the CRDs: <code>kubectl apply -f config/crd/bases/</code></li>
+<li>Deploy the controller: <code>kubectl apply -f deploy/manifests/</code></li>
+<li>Ensure the controller eventually enters the Running state: <code>watch kubectl -n arlon get pod</code></li>
+</ul>
+<h2 id="arlon-cli">Arlon CLI<a class="headerlink" href="#arlon-cli" title="Permanent link">&para;</a></h2>
+<p>Download the CLI for the <a href="https://github.com/arlonproj/arlon/releases/latest">latest release</a> from GitHub.
+Currently, Linux and MacOS operating systems are supported.
+Uncompress the tarball, rename it as <code>arlon</code> and add to your PATH</p>
+<p>Run <code>arlon verify</code> to check for prerequisites.
+Run <code>arlon install</code> to install any missing prerequisites.</p>
+<p>The following instructions are to manually build CLI from this code repository.</p>
+<h3 id="building-the-cli">Building the CLI<a class="headerlink" href="#building-the-cli" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Clone this repository and pull the latest version of a branch (main by default)</li>
+<li>From the top directory, run <code>make build</code></li>
+<li>Optionally create a symlink from a directory
+  (e.g. <code>/usr/local/bin</code>) included in your ${PATH} to the <code>bin/arlon</code> binary
+  to make it easy to invoke the command.</li>
+</ul>
+<h2 id="cluster-orchestration-api-providers">Cluster orchestration API providers<a class="headerlink" href="#cluster-orchestration-api-providers" title="Permanent link">&para;</a></h2>
+<p>Arlon currently supports Cluster API on AWS cloud. It also has experimental
+support for Crossplane on AWS.</p>
+<h3 id="cluster-api">Cluster API<a class="headerlink" href="#cluster-api" title="Permanent link">&para;</a></h3>
+<p>Using the <a href="https://cluster-api.sigs.k8s.io/user/quick-start.html">Cluster API Quickstart Guide</a>
+as reference, complete these steps:</p>
+<ul>
+<li>Install <code>clusterctl</code></li>
+<li>Initialize the management cluster.
+  In particular, follow instructions for your specific cloud provider (AWS in this example)
+  Ensure <code>clusterctl init</code> completes successfully and produces the expected output.</li>
+</ul>
+<h3 id="crossplane-experimental">Crossplane (experimental)<a class="headerlink" href="#crossplane-experimental" title="Permanent link">&para;</a></h3>
+<p>Using the <a href="https://github.com/upbound/platform-ref-aws#quick-start">Upbound AWS Reference Platform Quickstart Guide</a>
+as reference, complete these steps:</p>
+<ul>
+<li><a href="https://github.com/upbound/platform-ref-aws#installing-uxp-on-a-kubernetes-cluster">Install UXP on your management cluster</a></li>
+<li><a href="https://github.com/upbound/platform-ref-aws#install-the-crossplane-kubectl-extension-for-convenience">Install Crossplane kubectl extension</a></li>
+<li><a href="https://github.com/upbound/platform-ref-aws#install-the-platform-configuration">Install the platform configuration</a></li>
+<li><a href="https://github.com/upbound/platform-ref-aws#configure-providers-in-your-platform">Configure the cloud provider credentials</a></li>
+</ul>
+<p>You do not need to go any further, but you're welcome to try the Network Fabric example.</p>
+<p>FYI: <em>we noticed the dozens/hundreds of CRDs that Crossplane installs in the management
+cluster can noticeably slow down kubectl, and you may see a warning that looks like</em>:</p>
+<div class="highlight"><pre><span></span><code>I0222 <span class="m">17</span>:31:14.112689   <span class="m">27922</span> request.go:668<span class="o">]</span> Waited <span class="k">for</span> <span class="m">1</span>.046146023s due to client-side throttling, not priority and fairness, request: GET:https://AA61XXXXXXXXXXX.gr7.us-west-2.eks.amazonaws.com/apis/servicediscovery.aws.crossplane.io/v1alpha1?timeout<span class="o">=</span>32s
+</code></pre></div>
+<h3 id="automatic-setup">Automatic setup<a class="headerlink" href="#automatic-setup" title="Permanent link">&para;</a></h3>
+<p>Starting from version 0.10 (v0.10), Arlon CLI provides an init command to install "itself" on a management cluster. This command performs a basic setup of argocd(if needed) and arlon controller.</p>
 
 
 
@@ -494,7 +517,7 @@ docs/
     >
       
         <a
-          href="../contributing/"
+          href="../design/"
           class="md-footer__link md-footer__link--prev"
           rel="prev"
         >
@@ -506,11 +529,29 @@ docs/
               <span class="md-footer__direction">
                 Previous
               </span>
-              How to contribute to Arlon
+              Design
             </div>
           </div>
         </a>
       
+      
+        <a
+          href="../tutorial/"
+          class="md-footer__link md-footer__link--next"
+          rel="next"
+        >
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Tutorial
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
       
     </nav>
   
