@@ -452,9 +452,8 @@ GitHub issues. There are a number of points to keep in mind when submitting a fe
 are merged to the <code>main</code> branch except backports, bookkeeping changes, library upgrades and some bugs that manifest only a particular version. Before contributing
 new code, contributors are encouraged to either write unit tests, e2e tests or perform some form of manual validation as a sanity-check. Please adhere to standard
 good practices for Golang and do ensure that the code is properly formatted and <code>vet</code> succeeds, for which we have <code>fmt</code> and <code>vet</code> targets respectively.</p>
-<p>Since Arlon is a growing project, various areas require improvements- improving code coverage with unit tests, <a href="./e2e_testing.md">e2e tests</a>, documentation, CI/CD pipelines using
-GitHub Actions are a few to name, we highly encourage to contribute to those areas to start with. The <a href="./e2e_testing.md">e2e test documentation</a> is an excellent starting point
-to grasp the workings of our e2e test setup.</p>
+<p>Since Arlon is a growing project, various areas require improvements- improving code coverage with unit tests, e2e tests (since v0.10), documentation, CI/CD pipelines using
+GitHub Actions are a few to name, we highly encourage to contribute to those areas to start with.</p>
 <h2 id="issues-bug-reports">Issues / Bug reports<a class="headerlink" href="#issues-bug-reports" title="Permanent link">&para;</a></h2>
 <p>We track issues on <a href="https://github.com/arlonproj/arlon/issues/">GitHub</a>. You are encouraged to browse through these, add relevant feedback, create new issues or
 participate in the development. If you are interested in a particular issue or feature request, please leave a comment to reach out to the team. In particular, the issues labeled
@@ -471,7 +470,7 @@ contents from the "docs" directory of Arlon source.</p>
 <li>From the root of the Arlon repository, run <code>pip3 install -r docs/requirements.txt</code> to install <code>mkdocs</code> and other pre-requisites.</li>
 </ol>
 </li>
-<li>To test your local changes, run <code>mkdocs serve</code> from the repository root.<ol>
+<li>To test your local changes, run <code>mike serve</code> from the repository root.<ol>
 <li>This starts a local server to host the documentation website where you can preview the changes.</li>
 </ol>
 </li>
