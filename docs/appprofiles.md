@@ -40,7 +40,7 @@ the management cluster to actually create the app.
 (Without the ``--output-yaml` flag, the command will apply the resource for you).
 
 Here's an example of an initial Arlon Application manifest:
-```
+```yaml
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
@@ -84,14 +84,14 @@ is that it's simple to use and also displays additional information about the ap
 are currently associated with the app.
 
 Example:
-```
+```shell
 $ arlon app list
 NAME         REPO                                     PATH              REVISION  APP_PROFILES
 myconfigmap  https://github.com/bcle/fleet-infra.git  apps/my-cfgmap-1  HEAD      [marketing]
 ```
 The second way is to use pure kubectl to list ApplicationSets with a particular label:
 ```
-$ k -n argocd get applicationset
+$ kubectl -n argocd get applicationset
 NAME          AGE
 myconfigmap   21d
 ```
@@ -117,7 +117,7 @@ will update the resource's `status` section as follows:
   lists the invalid names.
 
 Here is an example of an AppProfile manifest that includes 3 apps, one of which does not exist:
-```
+```yaml
 apiVersion: core.arlon.io/v1
 kind: AppProfile
 metadata:
@@ -169,7 +169,7 @@ In the running example, these two ArgoCD application resources will be generated
 - clust1-app-myconfigmap
 
 To detach all profiles from a cluster, simply remove the annotation:
-```
+```shell
 kubectl -n argocd annotate application clust1 arlon.io/profiles-
 ```
 
