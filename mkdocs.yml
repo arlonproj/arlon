@@ -50,6 +50,7 @@ markdown_extensions:
 nav:
     - Overview: 'README.md'
     - Design: 'design.md'
+    - Installation: 'installation.md'    
     - Tutorial: 'tutorial.md'
     - How to contribute to Arlon: 'contributing.md'
     - Help with MkDocs: 'help.md'
