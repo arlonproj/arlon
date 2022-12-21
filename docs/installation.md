@@ -128,6 +128,6 @@ To install Arlon controller using the init command these pre-requisites need to 
 - Pre-requisites for supported CAPI infrastructure providers(AWS and Docker as of now).
 
 To start the installation process, simply run `arlon init -e --username <GIT_USER> --repoURL <WORKSPACE_URL> --password <GIT_PASSWORD> --examples -y`.
-This installs the controller, argocd(if not already present) `-e` flag adds basecluster manifests to the <WORKSPACE_URL> for using the given credentials. To not add examples, just remove the `-e` flag.
+This installs the controller, argocd(if not already present) `-e` flag adds cluster template manifests to the <WORKSPACE_URL> for using the given credentials. To not add examples, just remove the `-e` flag.
 The `-y` flag refers to silent installation, which is useful for scripts.
 For an interactive installation, exclude the `-y` or `--no-confirm` flag.

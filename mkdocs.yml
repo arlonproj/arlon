@@ -50,7 +50,7 @@ markdown_extensions:
 nav:
     - Overview: 'README.md'
     - Concepts: 'concepts.md'
-    - Base clusters: 'baseclusters.md'
+    - Cluster template: 'clustertemplate.md'
     - Design: 'design.md'    
     - Architecture: 'architecture.md'
     - Installation: 'installation.md'
