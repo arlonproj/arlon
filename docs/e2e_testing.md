@@ -4,7 +4,7 @@
 
 - First, we run the `testing/e2e_setup.sh` script, which helps us setup a kind management cluster, a git-server [gitea](https://gitea.io/en-us) based workspace repository and installs services like argocd, arlon, capi in the management cluster. It also installs other required tools like kubectl, docker, kind, kuttl, clusterctl, helm and gitea.
   
-- In addition to this, the script also creates a capi-eks cluster manifest which serves as the basecluster manifest. This cluster is created as a part of the e2e tests and is pushed to the workspace repository created in the previous step.
+- In addition to this, the script also creates a capi-eks cluster manifest which serves as the cluster template manifest. This cluster is created as a part of the e2e tests and is pushed to the workspace repository created in the previous step.
   
 - This script also adds a  xenial bundle manifest to the workspace repository which is required for creating a xenial bundle and a corresponding profile which is consumed by the test.
 

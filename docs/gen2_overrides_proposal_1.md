@@ -4,22 +4,22 @@ This is a design proposal doc for gen2 cluster overrides. Right now, according t
 
 We have 2 different approches to override in a cluster:
 
-1. Converting the git repo where base cluster is present to helm charts
+1. Converting the git repo where cluster template is present to helm charts
 2. Overriding specifies fields using kustomize
 
-In the first approach, We first let user upload the base manifest in the repo and deploy the cluster from it and then convert it into helm chart, so that we will be able to override fields in the manifest. The downside of this approach is that we don't have a specific template for base manifest, a user can use any form of the template in which case we will not be able to convert the manifest to heml chart.
+In the first approach, We first let user upload the cluster template in the repo and deploy the cluster from it and then convert it into helm chart, so that we will be able to override fields in the manifest. The downside of this approach is that we don't have a specific template for cluster template, a user can use any form of the template in which case we will not be able to convert the manifest to heml chart.
 
-So, continuing with the 2nd approach, in the kustomize approach, we create an overlay folder parallel to the basecluster folder which contains folders named with the cluster name. These cluster named folders contain the specific override files to the cluster. An example of the folder structure is as belows:
+So, continuing with the 2nd approach, in the kustomize approach, we create an overlay folder parallel to the cluster template folder which contains folders named with the cluster name. These cluster named folders contain the specific override files to the cluster. An example of the folder structure is as belows:
 
-### A directory layout
+## Example directory layout
 
     .
-    ├── Basecluster                  # Basecluster folder(Contains base manifest)
-    ├── Overlays                     # Contains folders specific to each cluster created from base manifest
+    ├── ClusterTemplate              # ClusterTemplate folder(Contains cluster template)
+    ├── Overlays                     # Contains folders specific to each cluster created from cluster template
         ├── Cluster1                 # Contains overrides corresponding to cluster1 
         ├── Cluster2                 # Contains overrides corresponding to cluster2
 
-### Let's consider an example case to understand the kustomize approach
+## Example case to understand the kustomize approach
 
 1. Let's consider three different clusters on AWS. The management cluster already exists.
 
@@ -34,22 +34,22 @@ Now, we need to get our gitrepo ready by pushing the basemanifest into a folder 
 To accommodate this use case, we will need to use a directory structure that supports the use of kustomize overlays. Therefore, the directory structure would look like this for the project:
 
     (parent)
-    |- base
+    |- clustertemplate
     |- overlays
         |- usw2-cluster1
         |- usw2-cluster2
         |- use2-cluster1
 
-The base directory will store the base manifest for the final Cluster API manifests, as well as a kustomization.yaml file that identifies these Cluster API manifests as resources for kustomize to use.
+The clustertemplate directory will store the cluster template for the final Cluster API manifests, as well as a kustomization.yaml file that identifies these Cluster API manifests as resources for kustomize to use.
 
-The contents of kustomize file in base folder is as follows:
+The contents of kustomize file in clustertemplate folder is as follows:
 
     ```yaml
     resources:
     - basemanifest.yaml
     ```
 
-The kustomization.yaml states that the resources for cluster is in basemanifest.yaml file
+The kustomization.yaml states that the resources for cluster is in cluster templatemanifest.yaml file
 
 ## What consists in the cluster named folders?
 
@@ -90,7 +90,7 @@ You would once more require a reference to the patch file in kustomization for t
 
 This kustomization.yaml file will be pointing to both the basecluster manifest and patch file basically working like a link between both the basecluster and manifest.
 
-Using this particular approach the present basecluster approach will need to take a redesign as we will need to skip the name suffix method we using before to create a manifest for each cluster respectively with their own names.
+Using this particular approach the present cluster template approach will need to take a redesign as we will need to skip the name suffix method we using before to create a manifest for each cluster respectively with their own names.
 
 In this approach, Instead of the configurations.yaml(Needed for name suffix), we will have a folder for each cluster and argocd path pointing to the cluster folder. This will help us in skipping the name suffix method we were using before.
 
@@ -102,7 +102,7 @@ To provide a user the freedom to completely override any part of the base manife
 
 This would be easier to user as well because he/she would generate the manifest file anyway. So, they need to make changes to the already generated and point it.
 
-But we should even take care of the point that the base manifest in the git and the overriden manifest file are comparable. Example of a command:
+But we should even take care of the point that the cluster template manifest in the git and the overriden manifest file are comparable. Example of a command:
 
     ```shell
     arlon cluster create <cluster name> --repo-url <repo url> --repo-path <repo path> --overrides <path to overriden manifest file>

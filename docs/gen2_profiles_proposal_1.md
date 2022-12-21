@@ -107,7 +107,7 @@ Cons:
 * It's impossible to specify per-cluster overrides for an application.
   That's because an ApplicationSet can be deployed to multiple clusters if
   they have a matching profile label.
-  (To be fair, neither gen1 profiles nor gen2 base clusters support cluster overrides either, but for a different reason. This is tracked in a github issue)
+  (To be fair, neither gen1 profiles nor gen2 clusters support cluster overrides either, but for a different reason. This is tracked in a github issue)
 * Any limitations of ApplicationSets (for e.g. lack of Sync Wave support?) will apply to Arlon Apps using gen2 profiles.
 * The lightweight nature of this design may cause some to perceive Arlon's
   contribution to be very minimal (it's a thin wrapper around ArgoCD constructs).

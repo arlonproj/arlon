@@ -4,10 +4,10 @@ This is an update to proposal of [Gen2 cluster overrides proposal](gen2_override
 
 ### Broader idea of the proposal
 
-- Basically, in the cluster overrides we want to generate different clusters with patches from the same base manifest. So, considering this feature in enterprise scope, the user who is uploading the base manifest in git might be an admin and another employee who wants to create a cluster form the base manifest might not have access to the git repo where the base manifest is present. 
-- So, In this approach a user can use a different git repository to store the patches of a manifest and create the cluster from the base manifest which is in different repository.
+- Basically, in the cluster overrides we want to generate different clusters with patches from the same cluster template. So, considering this feature in enterprise scope, the user who is uploading the cluster template in git might be an admin and another employee who wants to create a cluster form the cluster template might not have access to the git repo where the cluster template is present. 
+- So, In this approach a user can use a different git repository to store the patches of a manifest and create the cluster from the cluster template which is in different repository.
 - Let's consider an example where our manifest is a repo called arlon-bc and with the repo path bc1. So, these are the files which will be present in bc1 folder:
-  1. Resouces file which is the base manifest
+  1. Resouces file which is the cluster template
   2. Kustomization.yaml
 
     Contents of the kustomization.yaml file are as follows:
@@ -17,7 +17,7 @@ This is an update to proposal of [Gen2 cluster overrides proposal](gen2_override
     - capi-quickstart-eks.yaml
     ```
 
-    In this case capi-quickstart-eks.yaml is the name of the base manifest.
+    In this case capi-quickstart-eks.yaml is the name of the cluster template.
 
 - Now, let's say that our patch file is in another repository. This repository should caontain a folder named with the cluster's name and the files inside the cluster named folder are:
   
@@ -45,7 +45,7 @@ This is an update to proposal of [Gen2 cluster overrides proposal](gen2_override
   3.  patch files
         These patch files contain the patches which we want to include for the cluster
 
-- As we can observe in the above example, the resource field in kustomization.yaml is pointing to a different repository which contains our base manifest.
+- As we can observe in the above example, the resource field in kustomization.yaml is pointing to a different repository which contains our cluster template.
 
 - This is how we first organize our repositories to deploy a cluster with patches
 - Once, we organize the clusters, while creating the argocd app, the path of the argocd app should point to the cluster named folder. The code will then run kustomize build in the patch file directory and that will produce our final manifest.
@@ -54,8 +54,8 @@ This is an update to proposal of [Gen2 cluster overrides proposal](gen2_override
 
 ### Limitations
 
-- Since, we are pointing to the repository where our patch file is present, the argocd won't be able to detect the changes in the base manifest repository. -
-- This can be an added feature aw well in one way because whenever there is a change in the base configuration, it won't be immediately picked up. This brings user the ability to promote base changes sensibly through each of our environments.
+- Since, we are pointing to the repository where our patch file is present, the argocd won't be able to detect the changes in the cluster template repository. -
+- This can be an added feature aw well in one way because whenever there is a change in the cluster template configuration, it won't be immediately picked up. This brings user the ability to promote cluster template changes sensibly through each of our environments.
 - Clean up of the cluster named folders when a user deletes a cluster is one of the issue which is still being addressed and looked up on.
 
 ### UX (User experience)
