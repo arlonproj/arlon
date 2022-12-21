@@ -90,7 +90,7 @@ func Update(
 	}
 	rootApp, err := ConstructRootApp(argocdNs, clusterName, "", repoUrl,
 		repoBranch, repoPath, clusterSpecName, clusterSpecCm, prof.Name,
-		managementClusterUrl)
+		managementClusterUrl, false)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct root app: %s", err)
 	}

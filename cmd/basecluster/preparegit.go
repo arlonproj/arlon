@@ -2,6 +2,7 @@ package basecluster
 
 import (
 	"fmt"
+
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	bcl "github.com/arlonproj/arlon/pkg/basecluster"
@@ -17,6 +18,8 @@ func prepareGitBaseClusterCommand() *cobra.Command {
 	var repoPath string
 	var repoAlias string
 	var repoRevision string
+	var casMin int
+	var casMax int
 	command := &cobra.Command{
 		Use:   "preparegit --repo-url repoUrl [--repo-revision revision] [--repo-path path]",
 		Short: "prepare base cluster directory in git",
@@ -38,7 +41,7 @@ func prepareGitBaseClusterCommand() *cobra.Command {
 				return fmt.Errorf("failed to get repository credentials: %s", err)
 			}
 			clusterName, changed, err := bcl.PrepareGitDir(creds,
-				repoUrl, repoRevision, repoPath)
+				repoUrl, repoRevision, repoPath, casMax, casMin)
 			if err != nil {
 				return fmt.Errorf("git preparation failed: %s", err)
 			}
@@ -58,6 +61,8 @@ func prepareGitBaseClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&repoAlias, "repo-alias", gitrepo.RepoDefaultCtx, "git repository alias to use")
 	command.Flags().StringVar(&repoRevision, "repo-revision", "main", "the git revision for base cluster directory")
 	command.Flags().StringVar(&repoPath, "repo-path", "", "the git repository path for base cluster directory")
+	command.Flags().IntVar(&casMin, "cas-min", 1, "set minimum number of nodes for capi-cluster autoscaler, for MachineDeployment based clusters")
+	command.Flags().IntVar(&casMax, "cas-max", 9, "set maximum number of nodes for capi-cluster autoscaler, for MachineDeployment based clusters")
 	command.MarkFlagsMutuallyExclusive("repo-url", "repo-alias")
 	return command
 }

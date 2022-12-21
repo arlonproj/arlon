@@ -31,6 +31,7 @@ func Create(
 	prof *arlonv1.Profile,
 	createInArgoCd bool,
 	managementClusterUrl string,
+	withCAS bool,
 ) (*argoappv1.Application, error) {
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
@@ -67,7 +68,7 @@ func Create(
 		profileName = prof.Name
 	}
 	rootApp, err := ConstructRootApp(argocdNs, clusterName, baseClusterName, repoUrl, repoBranch,
-		repoPath, clusterSpecName, cm, profileName, managementClusterUrl)
+		repoPath, clusterSpecName, cm, profileName, managementClusterUrl, withCAS)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct root app: %s", err)
 	}
@@ -98,4 +99,32 @@ func Create(
 		}
 	}
 	return rootApp, nil
+}
+
+func CreatePatchDir(
+	config *restclient.Config,
+	clusterName string,
+	repoURL string,
+	argocdNs string,
+	basePath string,
+	patchRepoRevision string,
+	baseRepoRevision string,
+	overridesPath string,
+	baseRepoUrl string,
+	baseRepoPath string) error {
+	kubeClient, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return fmt.Errorf("failed to get kube client: %s", err)
+	}
+	creds, err := argocd.GetRepoCredsFromArgoCd(kubeClient, argocdNs, repoURL)
+	if err != nil {
+		return fmt.Errorf("failed to get repo credentials: %s", err)
+	}
+
+	err = DeployPatchToGit(creds, argocdNs, clusterName,
+		repoURL, patchRepoRevision, baseRepoRevision, basePath, overridesPath, baseRepoUrl, baseRepoPath)
+	if err != nil {
+		return fmt.Errorf("failed to deploy git tree: %s", err)
+	}
+	return nil
 }

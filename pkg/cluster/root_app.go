@@ -21,6 +21,7 @@ func ConstructRootApp(
 	clusterSpecCm *corev1.ConfigMap, // nil for gen2
 	profileName string,
 	managementClusterUrl string,
+	gen2CAS bool, // false during gen1 cluster update
 ) (*argoappv1.Application, error) {
 	appName := clusterName // gen1 default
 	arlonType := "cluster" // gen1 default
@@ -47,6 +48,8 @@ func ConstructRootApp(
 	}
 	var apiProvider string
 	var cs *clusterspec.ClusterSpec
+	helmParams := []argoappv1.HelmParameter{}
+	ignoreDiffs := []argoappv1.ResourceIgnoreDifferences{}
 	if clusterSpecCm != nil {
 		// gen1
 		var err error
@@ -60,21 +63,39 @@ func ConstructRootApp(
 		app.ObjectMeta.Labels["arlon-cluster"] = clusterName
 		// assume CAPI for now
 		apiProvider = "capi"
+		if gen2CAS {
+			var err error
+			helmParams, ignoreDiffs, err = enableClusterAutoscaler(apiProvider, helmParams, ignoreDiffs)
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
-	helmParams := []argoappv1.HelmParameter{
-		{
+	if innerClusterName != "" {
+		helmParams = append(helmParams, argoappv1.HelmParameter{
+			Name:  "global.clusterFullNameWithInnerCluster",
+			Value: fmt.Sprintf("%s-%s", clusterName, innerClusterName),
+		})
+	} else {
+		helmParams = append(helmParams, argoappv1.HelmParameter{
+			Name:  "global.clusterFullNameWithInnerCluster",
+			Value: clusterName,
+		})
+	}
+	helmParams = append(helmParams,
+		argoappv1.HelmParameter{
 			Name:  "global.clusterName",
 			Value: clusterName,
 		},
-		{
+		argoappv1.HelmParameter{
 			Name:  "global.kubeconfigSecretKeyName",
 			Value: clusterspec.KubeconfigSecretKeyNameByApiProvider[apiProvider],
 		},
-		{
+		argoappv1.HelmParameter{
 			Name:  "global.managementClusterUrl",
 			Value: managementClusterUrl,
 		},
-	}
+	)
 	if innerClusterName != "" {
 		innerClusterNameWithDashSuffix := innerClusterName + "-"
 		helmParams = append(helmParams, argoappv1.HelmParameter{
@@ -101,22 +122,11 @@ func ConstructRootApp(
 			Name:  fmt.Sprintf("tags.%s", subchartName),
 			Value: "true",
 		})
-		var ignoreDiffs []argoappv1.ResourceIgnoreDifferences
 		if cs.ClusterAutoscalerEnabled {
-			casSubchartName, err := clusterspec.ClusterAutoscalerSubchartNameFromClusterSpec(cs)
+			helmParams, ignoreDiffs, err = enableClusterAutoscaler(cs.ApiProvider, helmParams, ignoreDiffs)
 			if err != nil {
-				return nil, fmt.Errorf("failed to get cluster autoscaler subchart name: %s", err)
+				return nil, fmt.Errorf("failed to enable cluster autoscaler for %s: %w", cs.ApiProvider, err)
 			}
-			helmParams = append(helmParams, argoappv1.HelmParameter{
-				Name:  fmt.Sprintf("tags.%s", casSubchartName),
-				Value: "true",
-			})
-			// Cluster autoscaler will change replicas so ignore it
-			ignoreDiffs = append(ignoreDiffs, argoappv1.ResourceIgnoreDifferences{
-				Group:        "cluster.x-k8s.io",
-				Kind:         "MachineDeployment",
-				JSONPointers: []string{"/spec/replicas"},
-			})
 		}
 		// Ignore CAPI EKS control plane's spec.version because the AWS controller(s)
 		// appear to update it with a value that is less precise than the requested
@@ -142,4 +152,24 @@ func ConstructRootApp(
 		SyncOptions: []string{"Prune=true"},
 	}
 	return app, nil
+}
+
+func enableClusterAutoscaler(apiProvider string, helmParams []argoappv1.HelmParameter, ignoreDiffs []argoappv1.ResourceIgnoreDifferences) ([]argoappv1.HelmParameter, []argoappv1.ResourceIgnoreDifferences, error) {
+	casSubchartName := clusterspec.ClusterAutoscalerSubchartNameFromApiProvider(apiProvider)
+	if len(casSubchartName) == 0 {
+		return nil, nil, fmt.Errorf("failed to get cluster autoscaler subchart name for %s", apiProvider)
+	}
+	helmParams = append(helmParams, argoappv1.HelmParameter{
+		Name:  fmt.Sprintf("tags.%s", casSubchartName),
+		Value: "true",
+	})
+
+	// Cluster autoscaler will change replicas so ignore it
+	ignoreDiffs = append(ignoreDiffs, argoappv1.ResourceIgnoreDifferences{
+		Group:        "cluster.x-k8s.io",
+		Kind:         "MachineDeployment",
+		JSONPointers: []string{"/spec/replicas"},
+	})
+
+	return helmParams, ignoreDiffs, nil
 }

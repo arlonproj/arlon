@@ -4,20 +4,20 @@ go 1.19
 
 require (
 	github.com/argoproj/argo-cd/v2 v2.4.17
-	github.com/aws/aws-sdk-go v1.44.131
+	github.com/aws/aws-sdk-go v1.44.161
 	github.com/deckarep/golang-set v1.8.0
 	github.com/deckarep/golang-set/v2 v2.1.0
 	github.com/go-git/go-billy/v5 v5.3.1
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-logr/logr v1.2.3
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.24.1
+	github.com/onsi/gomega v1.24.2
 	github.com/otiai10/copy v1.9.0
 	github.com/spf13/cobra v1.6.1
 	google.golang.org/grpc v1.51.0
 	k8s.io/api v0.23.14
 	k8s.io/apimachinery v0.23.14
-	k8s.io/client-go v0.23.14
+	k8s.io/client-go v11.0.1-0.20190816222228-6d55c1b1f1ca+incompatible
 	sigs.k8s.io/cluster-api v1.1.6 //v1.1.x will upgrade k8s APIs to v0.23.x
 	sigs.k8s.io/controller-runtime v0.11.2 //v1.11 will upgrade k8s APIs to v0.23.x
 )
@@ -36,6 +36,8 @@ require (
 	sigs.k8s.io/cluster-api-provider-aws v1.5.2
 	sigs.k8s.io/kustomize/kyaml v0.13.0
 )
+
+require gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 
 require (
 	cloud.google.com/go v0.99.0 // indirect
@@ -95,6 +97,7 @@ require (
 	github.com/fvbommel/sortorder v1.0.1 // indirect
 	github.com/go-errors/errors v1.0.1 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
+	github.com/go-git/go-billy v4.2.0+incompatible
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-logr/zapr v1.2.0 // indirect
 	github.com/go-openapi/analysis v0.19.5 // indirect
@@ -222,12 +225,12 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/exp v0.0.0-20210901193431-a062eea981d2 // indirect
-	golang.org/x/net v0.2.0 // indirect
+	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20220608161450-d0670ef3b1eb // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
-	golang.org/x/sys v0.2.0 // indirect
-	golang.org/x/term v0.2.0 // indirect
-	golang.org/x/text v0.4.0 // indirect
+	golang.org/x/sys v0.3.0 // indirect
+	golang.org/x/term v0.3.0 // indirect
+	golang.org/x/text v0.5.0 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	gomodules.xyz/envconfig v1.3.1-0.20190308184047-426f31af0d45 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
@@ -243,7 +246,7 @@ require (
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apiserver v0.23.14 // indirect
 	k8s.io/cluster-bootstrap v0.23.0 // indirect

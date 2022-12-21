@@ -63,7 +63,6 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	log := log.FromContext(ctx)
 	log.V(1).Info("arlon callhomeconfig")
 	var chc arlonv1.CallHomeConfig
-
 	if err := r.Get(ctx, req.NamespacedName, &chc); err != nil {
 		if apierrors.IsNotFound(err) {
 			log.Info("callhomeconfig is gone -- ok")
@@ -72,6 +71,7 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		log.Info(fmt.Sprintf("unable to get callhomeconfig (%s) ... requeuing", err))
 		return ctrl.Result{Requeue: true}, nil
 	}
+
 	if chc.Status.State == "complete" {
 		log.V(1).Info("callhomeconfig is already complete")
 		return ctrl.Result{}, nil
@@ -81,6 +81,7 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		return ctrl.Result{}, nil
 	}
 	var secret corev1.Secret
+	// get workload cluster kubeconfig secret
 	secretNamespacedName := types.NamespacedName{
 		Namespace: req.NamespacedName.Namespace,
 		Name:      chc.Spec.KubeconfigSecretName,
@@ -99,18 +100,21 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			fmt.Sprintf("secret subkey %s does not exist",
 				chc.Spec.KubeconfigSecretKeyName), ctrl.Result{})
 	}
+	// rest config
 	conf, err := clientcmd.RESTConfigFromKubeConfig(data)
 	if err != nil {
 		return updateCallHomeConfigState(r, log, &chc, "error",
 			fmt.Sprintf("failed to read kubeconfig from secret: %s", err),
 			ctrl.Result{})
 	}
+	// clientset to communicate with it
 	clientset, err := kubernetes.NewForConfig(conf)
 	if err != nil {
 		return updateCallHomeConfigState(r, log, &chc, "error",
 			fmt.Sprintf("failed to get clientset from config: %s", err),
 			ctrl.Result{})
 	}
+	// get the secret.... in workload cluster
 	secretsApi := clientset.CoreV1().Secrets(chc.Spec.TargetNamespace)
 	_, err = secretsApi.Get(context.Background(), chc.Spec.TargetSecretName,
 		metav1.GetOptions{})
@@ -139,28 +143,39 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			fmt.Sprintf("unexpected error getting service account: %s", err),
 			ctrl.Result{})
 	}
-	if len(sa.Secrets) < 1 {
-		return retryLater(r, log, &chc, "serviceaccount",
-			namespacedName.Name, "does not have a token")
-	}
-	tokenSecretName := sa.Secrets[0]
-	var token corev1.Secret
-	if err := r.Get(ctx, types.NamespacedName{
+	var secretList corev1.SecretList
+	var kubeconfigSecret corev1.Secret
+	secretFound := false
+	if err := r.List(ctx, &secretList, &client.ListOptions{
 		Namespace: req.Namespace,
-		Name:      tokenSecretName.Name,
-	}, &token); err != nil {
-		if apierrors.IsNotFound(err) {
-			return retryLater(r, log, &chc, "token secret",
-				tokenSecretName.Name, "does not exist yet")
+	}); err != nil {
+		return retryLater(r, log, &chc, "namespace", req.Namespace, "cannot list secrets")
+	}
+	if len(secretList.Items) == 0 {
+		return retryLater(r, log, &chc, "secrets", req.Namespace, "no secrets in the namespace")
+	}
+	for _, secret := range secretList.Items {
+		annotations := secret.GetAnnotations()
+		if annotations != nil {
+			if annotations["kubernetes.io/service-account.name"] == chc.Spec.ServiceAccountName {
+				kubeconfigSecret = secret
+				secretFound = true
+				break
+			}
 		}
-		return updateCallHomeConfigState(r, log, &chc, "error",
-			fmt.Sprintf("unexpected error getting service account: %s", err),
-			ctrl.Result{})
+	}
+	if !secretFound {
+		return retryLater(r, log, &chc, "secret", "", "containing service account token not found")
+	}
+
+	if len(kubeconfigSecret.Data["token"]) == 0 {
+		return retryLater(r, log, &chc, "secret",
+			namespacedName.Name, "does not have a token")
 	}
 	cfg := clientcmdapi.NewConfig()
 	clst := clientcmdapi.NewCluster()
 	clst.Server = chc.Spec.ManagementClusterUrl
-	clst.CertificateAuthorityData = token.Data["ca.crt"]
+	clst.CertificateAuthorityData = kubeconfigSecret.Data["ca.crt"]
 	if clst.CertificateAuthorityData == nil {
 		return updateCallHomeConfigState(r, log, &chc, "error",
 			"token secret does not have ca.crt",
@@ -168,12 +183,12 @@ func (r *CallHomeConfigReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	}
 	cfg.Clusters["management"] = clst
 	user := clientcmdapi.NewAuthInfo()
-	if token.Data["token"] == nil {
+	if kubeconfigSecret.Data["token"] == nil {
 		return updateCallHomeConfigState(r, log, &chc, "error",
 			"token secret does not have token",
 			ctrl.Result{})
 	}
-	user.Token = string(token.Data["token"])
+	user.Token = string(kubeconfigSecret.Data["token"])
 	cfg.AuthInfos["sa"] = user
 	contx := clientcmdapi.NewContext()
 	contx.Cluster = "management"

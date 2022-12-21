@@ -71,10 +71,12 @@ func (a *awsInstaller) EnsureRequisites() error {
 					Message:  fmt.Sprintf("%s environment variable not set", env.name),
 				}
 			}
-			if !a.recoverOnFail(env.msg) {
-				return &ErrBootstrap{
-					HardFail: true,
-					Message:  fmt.Sprintf("%s environment variable not set", env.name),
+			if !a.silence {
+				if !a.recoverOnFail(env.msg) {
+					return &ErrBootstrap{
+						HardFail: true,
+						Message:  fmt.Sprintf("%s environment variable not set", env.name),
+					}
 				}
 			}
 		}
