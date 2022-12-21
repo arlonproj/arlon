@@ -18,11 +18,8 @@ are merged to the `main` branch except backports, bookkeeping changes, library u
 new code, contributors are encouraged to either write unit tests, e2e tests or perform some form of manual validation as a sanity-check. Please adhere to standard
 good practices for Golang and do ensure that the code is properly formatted and `vet` succeeds, for which we have `fmt` and `vet` targets respectively.
 
-
-Since Arlon is a growing project, various areas require improvements- improving code coverage with unit tests, [e2e tests](./e2e_testing.md), documentation, CI/CD pipelines using
-GitHub Actions are a few to name, we highly encourage to contribute to those areas to start with. The [e2e test documentation](./e2e_testing.md) is an excellent starting point
-to grasp the workings of our e2e test setup.
-
+Since Arlon is a growing project, various areas require improvements- improving code coverage with unit tests, e2e tests (since v0.10), documentation, CI/CD pipelines using
+GitHub Actions are a few to name, we highly encourage to contribute to those areas to start with.
 
 ## Issues / Bug reports
 
@@ -42,8 +39,7 @@ For making changes to the documentation, please follow the below steps:
     1. Ensure that `python3`, `pip3` is installed.
     1. Optionally, create a `venv` by running `python3 -m venv ./venv` to create a virtual environment if you don't have one.
     1. From the root of the Arlon repository, run `pip3 install -r docs/requirements.txt` to install `mkdocs` and other pre-requisites.
-1. To test your local changes, run `mkdocs serve` from the repository root.
+1. To test your local changes, run `mike serve` from the repository root.
     1. This starts a local server to host the documentation website where you can preview the changes.
 1. To publish the changes, just push the changes to your fork repository and open a PR (pull request).
 1. Once your PR is accepted by one of the maintainers/ owners of Arlon project, the Arlon website will be updated.
-
