@@ -51,7 +51,6 @@ nav:
     - Overview: 'README.md'
     - Concepts: 'concepts.md'
     - Base clusters: 'baseclusters.md'
-    - Design: 'design.md'    
     - Architecture: 'architecture.md'
     - Installation: 'installation.md'
     - Tutorial: 'gen2_Tutorial.md'       
