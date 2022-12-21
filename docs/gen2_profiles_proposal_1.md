@@ -15,8 +15,9 @@ Arlon objects.
 * Cluster: any cluster registered in ArgoCD. Not limited to clusters created by Arlon.
 
 Observations:
-- A profile can be associated with any number of applications. And an application can be associated with multiple profiles.
-- A cluster is said to be associated with a profile if it is labeled with `arlon.io/profile=<profileName>`.
+
+* A profile can be associated with any number of applications. And an application can be associated with multiple profiles.
+* A cluster is said to be associated with a profile if it is labeled with `arlon.io/profile=<profileName>`.
 A cluster can be associated with at most one profile. A profile may be associated (attached to) any number of clusters.
 
 ## Usage
@@ -29,19 +30,20 @@ It is initially empty.
 The prototype does not currently support direct Arlon application creation.
 (This is easy to add later as a new command)
 An Arlon app has to be created manually by one of these methods:
+
 - Create a new ApplicationSet from a YAML file with
   - The `managed-by=arlon` label
   - The spec as follows:
-```
-spec:
-  generators:
-  - clusters:
-      selector:
-        matchExpressions:
-        - key: arlon.io/profile
-          operator: In
-          values: []
-```
+  ```yaml
+  spec:
+    generators:
+    - clusters:
+        selector:
+          matchExpressions:
+          - key: arlon.io/profile
+            operator: In
+            values: []
+  ```
 - Modify an existing ApplicationSet with the above requirements
 
 ### Managing profiles
@@ -85,11 +87,13 @@ with the `arlon.io/profile=<profileName>` key value pair.
 ## Discussion
 
 Pros of the design:
+
 * Lightweight, elegant, simple
 * Fully declarative (no new resources introduced, relies entirely on existing ArgoCD resources)
 * Does not require "workspace git repo" since a profile has no compiled component.
 
 Cons:
+
 * Profiles are not first class objects. A profile can cease to exist if it
   becomes unreferenced from any application. This can be confusing to users.
   For the same reason, you can't create an empty profile and add apps to it later.
@@ -138,12 +142,12 @@ as necessary, so the user doesn't see it in practice.
 
 * Deleting a profile: this deletes the profile from all apps in which it appears in the label list. The operation is idempotent. If the profile did not initially exist, a warning will be printed by no error occurs.
 
-
 ### Issue: declarative installation and inconsistent states
 
 A user may want to provision profiles and applications in a declarative way, meaning with manifests and "kubectl apply -f". Those manifests contain applicationsets that satisfy the "arlon application" requirement. The user does not know about the null app. Therefore the user's declared applicationsets (with the arlon requirements) will solely completely define the arlon applications and profiles. We assume that the user has no interest in declaratively create empty profiles, only profiles that have at least one associated application.
 
-Arlon must allow a partially inconsistent state, meaning, at any point in time, some profiles may not exist in the null app. This is fine, since the null app's only purpose is to maintain the existence of empty profiles. During an inconsistent state, profiles that exist in some apps but not in the null app are, by definition, existent, since they appear in at least one app. However, one enhancement is necessary on the "remove app from profile" operation: 
+Arlon must allow a partially inconsistent state, meaning, at any point in time, some profiles may not exist in the null app. This is fine, since the null app's only purpose is to maintain the existence of empty profiles. During an inconsistent state, profiles that exist in some apps but not in the null app are, by definition, existent, since they appear in at least one app. However, one enhancement is necessary on the "remove app from profile" operation:
+
 - In addition to removing the profile from the app's label list, the operation must ensure the existence of the profile in null app, meaning add it if it's not already there. This will ensure that at the end of the operation, the profile still exists in the null app. If it no longer exists anywhere else, then by definition it is empty.
 
 ## Full Custom Resource
@@ -152,7 +156,8 @@ Arlon must allow a partially inconsistent state, meaning, at any point in time, 
 
 We could represent Gen2 profiles using a custom resource, either a new type, or by overloading
 the existing Profile CR already used by Gen1. The downside is an increase
-in implementation complexity, for e.g
+in implementation complexity, e.g
+
 * where is the source of truth for app-to-profile associations?
 * what if an app refers to a profile label value not represented by any Profile CR?
 

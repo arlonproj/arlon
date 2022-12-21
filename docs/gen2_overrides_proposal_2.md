@@ -1,4 +1,5 @@
 ## Gen2 cluster overrides - Proposal 2
+
 This is an update to proposal of [Gen2 cluster overrides proposal](gen2_overrides_proposal_1.md) design to add the ability to override the Gen 2 cluster. This update doc has a more clear version of the proposal.
 
 ### Broader idea of the proposal
@@ -11,7 +12,7 @@ This is an update to proposal of [Gen2 cluster overrides proposal](gen2_override
 
     Contents of the kustomization.yaml file are as follows:
 
-    ```
+    ```yaml
     resources:
     - capi-quickstart-eks.yaml
     ```
@@ -24,7 +25,8 @@ This is an update to proposal of [Gen2 cluster overrides proposal](gen2_override
         configurations.yaml file corresponds to name suffix addition to the yaml file.
   2.  kustomization.yaml
         kustomization.yaml file contains fields for resouces, configurations and patches as shown in the example below:
-        ```
+
+        ```yaml
         ---
         apiVersion: kustomize.config.k8s.io/v1beta1
         kind: Kustomization
@@ -50,14 +52,14 @@ This is an update to proposal of [Gen2 cluster overrides proposal](gen2_override
 - A user can just print out the manifest without letting the code apply it. This makes this approach declarative. At the same time, a user can even opt to apply the manifest to argocd app from the code.
 - This is a clear proposal of the approach which we will be following for Gen2 cluster overrides.
 
-### Limitations:
+### Limitations
 
 - Since, we are pointing to the repository where our patch file is present, the argocd won't be able to detect the changes in the base manifest repository. -
 - This can be an added feature aw well in one way because whenever there is a change in the base configuration, it won't be immediately picked up. This brings user the ability to promote base changes sensibly through each of our environments.
 - Clean up of the cluster named folders when a user deletes a cluster is one of the issue which is still being addressed and looked up on.
 
-### UX (User experience):
+### UX (User experience)
 
 A user can pass the patch file for the cluster as an argument while executing the `arlon cluster create ..` command with the --override flag. The command would look like:
 
-`arlon cluster create <cluster-name> --repo-url <repo url where patch files should be present> --repo-path <repo path to cluster named folder> --override <path to the patch file>` 
+`arlon cluster create <cluster-name> --repo-url <repo url where patch files should be present> --repo-path <repo path to cluster named folder> --override <path to the patch file>`

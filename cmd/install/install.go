@@ -267,7 +267,7 @@ func installArgoCDPlatform() error {
 // Downloads the latest version of argocd
 func downloadArgoCD(osPlatform string) error {
 	var downloadArgoCD string
-	argocdVersion := "v2.4.17"
+	argocdVersion := "v2.4.18"
 	if osPlatform == "windows" {
 		downloadArgoCD = "https://github.com/argoproj/argo-cd/releases/download/" + argocdVersion + "/argocd-" + osPlatform + "-amd64.exe"
 	} else {

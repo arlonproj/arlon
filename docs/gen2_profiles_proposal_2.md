@@ -35,6 +35,7 @@ but clusters and ApplicationSets as well since they are all inter linked.
   A user may want to associate an external cluster with an app profile.
 
 Observations:
+
 - An app profile can be associated with (or "contain") any number of applications
 - And an app can be associated with multiple profiles.
 - A cluster is said to be associated with a profile if it is labeled with `arlon.io/profile=<profileName>`.
@@ -53,6 +54,7 @@ This table summarizes the actual resources backing the objects:
 Just like in proposal 1, associating a cluster with an app profile is done by labeling the cluster
 with the profile's name, and ensuring that that name is included in the corresponding ApplicationSet's
 `matchExpressions` values list. But there are some differences:
+
 - For an Arlon cluster, which is anchored by an ArgoCD Application resource,
   the user should label the Application resource, not the corresponding ArgoCD cluster.
   The new AppProfile controller will propagate the label to the corresponding ArgoCD cluster.
@@ -67,6 +69,7 @@ with the profile's name, and ensuring that that name is included in the correspo
 
 A new controller was developed to not only reconcile AppProfiles, but also clusters and ApplicationSets
 (those representing Arlon Applications) since they are now all inter linked through profiles.
+
 - The main controller logic resides in `pkg/appprofile/reconcile.go` and `controllers/appprofile_controller.go`.
 - Additionally, logic was added to reconcile ArgoCD applications (representing Arlon clusters) and
   ArgoCD ApplicationSets (representing Arlon apps) with the relationships defined by AppProfiles:
@@ -91,6 +94,7 @@ create the resource directly or dump its YAML to standard out. (This command is 
 in the initial Proposal 2 prototype).
 
 The requirements on the ApplicationSet are:
+
 - Must have the `arlon-type=application` label.
 - The spec's `generators` section must use a single generator with a `matchExpressions` selector with
   the `arlon.io/profile` key and `In` as operator.  (Note: the `values` field will later be
@@ -100,7 +104,8 @@ The requirements on the ApplicationSet are:
   `spec` subsection to target any manifest or Helm chart in git.
 
 Example:
-```
+
+```yaml
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
@@ -136,7 +141,8 @@ spec:
 ### Managing Application Profiles
 
 An AppProfile is a new custom resource with a simple spec: a list of Arlon Application names:
-```
+
+```yaml
 apiVersion: core.arlon.io/v1
 kind: AppProfile
 metadata:
@@ -189,6 +195,7 @@ and abstract out the labeling.
 
 An external cluster does not have an Arlon representation (meaning there is no "anchor" ArgoCD Application with the same name).
 It can still be associated with an AppProfile by labeling the raw ArgoCD cluster:
+
 - Unfortunately as of ArgoCD 2.4, there is no argocd CLI command to label a cluster
 - A user can still manually label the **secret** resource where ArgoCD stores the cluster's metadata and credentials. This requires some work,
   as those secrets are named using an non-obvious convention.
@@ -199,10 +206,11 @@ It can still be associated with an AppProfile by labeling the raw ArgoCD cluster
 Now that all Arlon concepts are represented by declarative resources, it is now possible to provision a complete set of resources
 with a single `kubectl apply -f` on a file or folder of manifests. In particular, we can now develop a fully self-contained
 demo folder that contains all of these resources containing references to each other:
+
 - App Profiles
 - Apps
 - Arlon Clusters
- 
+
 The user can then `kubectl apply -f` the whole folder and observe the automatic creation of the cluster(s), profiles, and apps.
 
 (Note: the workload clusters need a base cluster in git. This can be supplied by the Arlon repo itself. This does point to
@@ -214,6 +222,7 @@ their git location when creating new workload clusters)
 
 Given that an Arlon Application is just a specialized ApplicationSet, it inherits an ApplicationSet's
 ability to specify a full ArgoCD Application spec, and this spec can contain overrides for Helm charts.
+
 - This does mean that every different permutation of override values requires a new ApplicationSet, and therefore Arlon Application.
 - This may be reasonable if we accept that an Arlon Application is not a true application, but rather, an intermediate object that points
   to the true application source residing in Git. The intermediate object can be viewed as a customization or specialization of the
@@ -222,6 +231,7 @@ ability to specify a full ArgoCD Application spec, and this spec can contain ove
 ## Issues & Limitations
 
 The remaining issues & limitations raised in Proposal 1 still apply:
+
 - Only one profile per cluster
 - Inherits any limitations of ApplicationSets
 - Does not support ApplicationSets with other types of generators
@@ -234,4 +244,3 @@ The remaining issues & limitations raised in Proposal 1 still apply:
 The pseudocode looks something like:
 
 ![image](arlon-gen2-profiles-reconc-algo.png)
-

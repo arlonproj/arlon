@@ -1,6 +1,5 @@
 ## Arlon e2e tests
 
-
 ### Setup
 
 - First, we run the `testing/e2e_setup.sh` script, which helps us setup a kind management cluster, a git-server [gitea](https://gitea.io/en-us) based workspace repository and installs services like argocd, arlon, capi in the management cluster. It also installs other required tools like kubectl, docker, kind, kuttl, clusterctl, helm and gitea.
@@ -10,7 +9,6 @@
 - This script also adds a  xenial bundle manifest to the workspace repository which is required for creating a xenial bundle and a corresponding profile which is consumed by the test.
 
 - Any prerequisites for any e2e test must be added to this script or to a seperate script as a part of the setup for the e2e test. These scripts must be executed as a part of the e2e test setup before any additional arlon commands can be executed.
-
 
 ### e2e integration tests using KUTTL
 
@@ -36,7 +34,6 @@
 
 - All the test steps and test asserts run in order and each must be successful for the test case to be considered successful. If any test step or test assertion fails then the test will fail.
 
-
 ### Testbed Teardown
 
 - Currently, as a part of the `/testing/e2e_setup_teardown.sh` script, we delete the kind management cluster, the cloned workspace repository, bundles, profiles and cluster manifests present in this repository.
@@ -44,7 +41,6 @@
 - This script runs at the end of every e2e test run regardless of the success or failure of the test for cleaning up any resources that might have been created as a part of the test.
 
 - Any additional resource that needs to be cleaned up post the e2e test should be added to this script.
-
 
 ### e2e tests integration with Github Actions
 
