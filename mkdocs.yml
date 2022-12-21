@@ -1,8 +1,10 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
 
-site_name: Arlon 
+site_name: Arlon - GitOps-based Fleet Management for Kubernetes
 theme:
   name: material
+  logo: images/pictogram_arlon-stroke.svg
+  favicon: images/favicon-32x32.png  
   palette: 
     # Palette toggle for light mode
     - scheme: default
@@ -14,6 +16,8 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+  font:
+    text: Work Sans
 
 plugins:
   - search
@@ -44,13 +48,12 @@ markdown_extensions:
       permalink: true
       
 nav:
-    - Home: 'README.md'
+    - Overview: 'README.md'
     - Design: 'design.md'
     - How to contribute to Arlon: 'contributing.md'
     - Help with MkDocs: 'help.md'
 
-#  name: gitbook
-#  name: 'rtd-dropdown'
-#theme: ivory
+# The default edit_uri is : edit/master/docs/
+edit_uri: edit/main/docs/
 repo_url: https://github.com/arlonproj/arlon
 repo_name: arlonproj/arlon
