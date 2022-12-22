@@ -11,6 +11,7 @@ Please follow the manual instructions in [this](#customised-setup) section for a
 
 # Setting up tools
 To leverage the complete features provided by ArgoCD and Arlon, it is recommended to have the following tools installed:
+
 1. `git`
 1. ArgoCD CLI
 1. `kubectl`
@@ -95,7 +96,7 @@ The following instructions are to manually build CLI from this code repository.
 ## Cluster orchestration API providers
 
 Arlon currently supports Cluster API on AWS cloud. It also has experimental
-support for Crossplane on AWS. It `cluster-api` cloud provider components on 
+support for Crossplane on AWS. `cluster-api` cloud provider components on 
 a management cluster can be installed by following the official guide, as instructed [here](#cluster-api).
 In addition to this, the Arlon CLI also ships with an `install` command to facilitate, the installation of supported 
 infrastructure providers by mimicking the behaviour of `clusterctl` CLI used in the official setup instructions. The details 
@@ -147,11 +148,10 @@ This command performs a basic setup of `argocd`(if needed) and `arlon` controlle
 It makes the following assumptions while installing `arlon`:
 
 - For ArgoCD:
-    - If `argocd` is present, it is present the in namespace `argocd` and the `admin` password is the same as in `argocd-initial-admin-secret` ConfigMap.
+    - If ArgoCD is present, it is present the in namespace `argocd` and the `admin` password is the same as in `argocd-initial-admin-secret` ConfigMap.
 
 - For Arlon:
     - assuming that the existence of `arlon` namespace means Arlon controller exists.
-
 
 To install Arlon controller using the init command these pre-requisites need to be met:
 
