@@ -3,11 +3,9 @@ name: Unit Tests and Build
 on:
   push:
     branches:
-      - main
       - v0.3
   pull_request:
     branches:
-      - main
       - v0.3
 
 jobs:
