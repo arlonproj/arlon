@@ -1,4 +1,4 @@
-name: Go
+name: Unit Tests and Build
 
 on:
   push:
@@ -6,15 +6,17 @@ on:
       - main
       - v0.3
       - v0.9
+      - v0.10
   pull_request:
     branches:
       - main
       - v0.3
       - v0.9
+      - v0.10
 
 jobs:
   build_and_unit_test:
-    environment: arlon
+    environment: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
