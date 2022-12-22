@@ -3,15 +3,13 @@
 Arlon CLI downloads are provided on GitHub. The CLI is not a self-contained standalone executable though.
 It is required to point the CLI to a management cluster and set up the Arlon controller in this management cluster.
 
-For a quickstart minimal demonstration setup, follow the instructions to set up a KIND based testbed with Arlon and ArgoCD running  [here](https://github.com/arlonproj/arlon/blob/main/testing/README.md).
-
-Please follow the manual instructions in [this](#customised-setup) section for a customised setup or refer the instructions for automated installation [here](#automatic-setup).
-
 # Customised Setup
+
+Please follow the instructions in this section for a customised setup that includes installation of ArgoCD, Arlon CLI and Arlon controller.
 
 ## Management cluster
 
-You can use any Kubernetes cluster that you have admin access to. Ensure:
+As a prerequisite, you need a Kubernetes cluster as management cluster for Arlon. You can use any Kubernetes cluster that you have admin access to. Ensure:
 
 - `kubectl` is in your path
 - `KUBECONFIG` is pointing to the right file and the context set properly
@@ -113,6 +111,7 @@ cluster can noticeably slow down kubectl, and you may see a warning that looks l
 ```shell
 I0222 17:31:14.112689   27922 request.go:668] Waited for 1.046146023s due to client-side throttling, not priority and fairness, request: GET:https://AA61XXXXXXXXXXX.gr7.us-west-2.eks.amazonaws.com/apis/servicediscovery.aws.crossplane.io/v1alpha1?timeout=32s
 ```
+
 ### Automatic setup
 
-Starting from version 0.10 (v0.10), Arlon CLI provides an init command to install "itself" on a management cluster. This command performs a basic setup of argocd(if needed) and arlon controller.
+Starting from version 0.10 (v0.10), Arlon CLI provides an init command to install "itself" on a management cluster. This command performs a basic setup of argocd(if needed) and arlon controller. Refer documentation for v0.10+ for the details.
