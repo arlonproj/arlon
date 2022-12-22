@@ -18,7 +18,7 @@ env:
   GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
 jobs:
   e2e:
-    environment: arlon
+    environment: E2E Tests and Release
     runs-on: ubuntu-latest
     steps:
       -

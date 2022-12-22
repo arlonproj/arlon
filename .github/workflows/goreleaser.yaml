@@ -8,7 +8,7 @@ on:
       - '!v0.9*'
 jobs:
   goreleaser:
-    environment: arlon
+    environment: E2E Tests and Release
     runs-on: ubuntu-latest
     steps:
       -
