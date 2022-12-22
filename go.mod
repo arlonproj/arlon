@@ -17,7 +17,7 @@ require (
 	google.golang.org/grpc v1.51.0
 	k8s.io/api v0.23.14
 	k8s.io/apimachinery v0.23.14
-	k8s.io/client-go v11.0.1-0.20190816222228-6d55c1b1f1ca+incompatible
+	k8s.io/client-go v0.23.14
 	sigs.k8s.io/cluster-api v1.1.6 //v1.1.x will upgrade k8s APIs to v0.23.x
 	sigs.k8s.io/controller-runtime v0.11.2 //v1.11 will upgrade k8s APIs to v0.23.x
 )
@@ -31,7 +31,7 @@ require (
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/zap v1.19.1
 	gotest.tools/v3 v3.4.0
-	k8s.io/apiextensions-apiserver v0.23.5
+	k8s.io/apiextensions-apiserver v0.23.14
 	k8s.io/cli-runtime v0.23.14
 	sigs.k8s.io/cluster-api-provider-aws v1.5.2
 	sigs.k8s.io/kustomize/kyaml v0.13.0
