@@ -6,11 +6,11 @@
 ## What Is Arlon?
 
 Arlon is a declarative, gitops based fleet management tool for Kubernetes clusters.
-It allows administrators to: 
+It allows administrators to:
 
-- Deploy and upgrade a large number of *workload clusters* 
+- Deploy and upgrade a large number of *workload clusters*
 - Secure clusters by installing and configuring policies
-- Install a set of applications / add-ons on the clusters 
+- Install a set of applications / add-ons on the clusters
 
 all in a structured, predictable manner. Arlon makes Kubernetes cluster fleet management secure, version controlled, auditable and easy to perform at scale. 
 
@@ -25,18 +25,17 @@ e.g. Kubernetes version, cloud provider, cluster type, node instance type.
 - *Profile*: a grouping of configuration bundles which will be installed into the cluster
 - *Configuration bundle*: a unit of configuration which contains (or references) one or
 more Kubernetes manifests. A bundle can encapsulate anything that can be deployed onto a cluster:
-an RBAC ruleset, an add-on, an application, etc... 
+an RBAC ruleset, an add-on, an application, etc...
 
 ## Arlon Benefits
 
 - Improves time to market by enabling better velocity for developers through infrastructure management that is more fluid and agile. Define, store, change and enforce your cluster infrastructure & application add-ons at scale.  
-- Reduces the risk of unexpected infrastructure downtime and outages, or unexpected security misconfiguration, with consistent management of infrastructure and security policies.   
-- Allows IT and Platform Ops admins to operate large scale of clusters, infrastructure & add-ons with significantly reduced team size & operational overhead, using GitOps. 
+- Reduces the risk of unexpected infrastructure downtime and outages, or unexpected security misconfiguration, with consistent management of infrastructure and security policies.
+- Allows IT and Platform Ops admins to operate large scale of clusters, infrastructure & add-ons with significantly reduced team size & operational overhead, using GitOps.
 
 ## Contents
 
-- [Concepts](./concepts.md) 
+- [Concepts](./concepts.md)
 - [Installation](./installation.md)
-- [Tutorial (gen-1)](./tutorial.md)
-- [Tutorial (gen-2)](./gen2_Tutorial.md)
+- [Tutorial](./gen2_Tutorial.md)
 - [Architecture](./architecture.md)

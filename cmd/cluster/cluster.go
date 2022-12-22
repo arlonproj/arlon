@@ -22,9 +22,11 @@ func NewCommand() *cobra.Command {
 			c.Usage()
 		},
 	}
-	command.AddCommand(deployClusterCommand())
+	// `cluster deploy` is only for gen1 clusters
+	//command.AddCommand(deployClusterCommand())
 	command.AddCommand(listClustersCommand())
-	command.AddCommand(updateClusterCommand())
+	// `cluster update` is only for gen1 clusters
+	//command.AddCommand(updateClusterCommand())
 	command.AddCommand(manageClusterCommand())
 	command.AddCommand(unmanageClusterCommand())
 	command.AddCommand(createClusterCommand())

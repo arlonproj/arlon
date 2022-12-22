@@ -3,8 +3,9 @@ package cluster
 import (
 	_ "embed"
 	"fmt"
-	"github.com/arlonproj/arlon/pkg/gitrepo"
 	"os"
+
+	"github.com/arlonproj/arlon/pkg/gitrepo"
 
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/argoproj/argo-cd/v2/util/cli"
@@ -19,6 +20,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+// `cluster deploy` is gen1 only and is now deprecated.
 func deployClusterCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
 	var argocdNs string

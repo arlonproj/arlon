@@ -158,7 +158,7 @@ func createClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&argocdNs, "argocd-ns", "argocd", "the argocd namespace")
 	command.Flags().StringVar(&arlonNs, "arlon-ns", "arlon", "the arlon namespace")
 	command.Flags().StringVar(&arlonRepoUrl, "arlon-repo-url", "https://github.com/arlonproj/arlon.git", "the git repository url for arlon template")
-	command.Flags().StringVar(&arlonRepoRevision, "arlon-repo-revision", "private/Rohitrajak1807/chc-debug", "the git revision for arlon template")
+	command.Flags().StringVar(&arlonRepoRevision, "arlon-repo-revision", "v0.10.0", "the git revision for arlon template")
 	command.Flags().StringVar(&arlonRepoPath, "arlon-repo-path", "pkg/cluster/manifests", "the git repository path for arlon template")
 	command.Flags().StringVar(&patchRepoUrl, "patch-repo-url", "", "the git repository url for base cluster template")
 	command.Flags().StringVar(&patchRepoPath, "patch-repo-path", "", "the git repository path for base cluster template")

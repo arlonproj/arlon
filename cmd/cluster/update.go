@@ -16,6 +16,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+// `cluster update` is gen1 only and is now deprecated.
 func updateClusterCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
 	var argocdNs string
