@@ -375,10 +375,9 @@ arlon cluster create --cluster-name <clusterName> --repo-path <pathToDirectory> 
 arlon cluster create --cluster-name <clusterName> --repo-alias prod --repo-path <pathToDirectory> [--output-yaml] [--profile <profileName>] [--repo-revision <repoRevision>]
 ```
 
-
 ## gen2 cluster creation with overrides
 
-We call the concept of constructing various clusters with patches from the same base manifest as cluster overrides. 
+We call the concept of constructing various clusters with patches from the same base manifest as cluster overrides.
 The cluster overrides feature is built on top of the existing base cluster design. So, A user can create a cluster from the base manifest using the same command as in the above step(gen2 cluster creation).
 Now, to create a cluster with overrides in the base manifest, a user should have the corresponding patch files in a single yaml file in local. Here is an example of a patch file where we want to override replicas count to 2 and change the sshkeyname:
 
@@ -410,6 +409,7 @@ Command to create a gen2 workload cluster form the cluster template manifest wit
 ```shell
 arlon cluster create <cluster-name> --repo-url <repo url where cluster template is present> --repo-path <repo path to the cluster template> --overrides-path <path to the patch file> --patch-repo-url <repo url where patch file should be stored> --patch-repo-path <repo path to store the patch files>
 ````
+
 Runnning the above command will create a cluster named folder in patch repo path of patch repo url which contains the patch files, kustomization.yaml and configurations.yaml which are used to create the cluster app.
 
 Note that the patch file repo url can be different or same from the cluster template repo url acoording to the requirement of the user. A user can use a different repo url for string patch files for the cluster.
@@ -446,6 +446,7 @@ and clean them up.
 If the cluster which which is being deleted is a cluster created using patch files, the controller first cleans the git repo where the respective patch files of the cluster are present and then it destroys all the related ArgoCD applications and clean them up.
 
 ## Enabling Cluster Autoscaler in the workload cluster
+
 To create a gen2 cluster with autoscaler, we need:
 
 - bundle pointing to the bundle/capi-cluster-autoscaler in the arlon repository.
@@ -478,6 +479,7 @@ arlon profile create dynamic-cas --repo-url <repoUrl> --repo-base-path profiles 
 Two additional properties `cas-max` and `cas-min` are used to set 2 annotations for Max/Min nodes on MachineDeployment required by the cluster autoscaler for CAPI as a part of the manifest directory preparation. These are the annotations required by the MachineDeployment for autoscaling. 
 
 Note: These are the default values for the `cas-min` and `cas-max` properties
+
 ```shell
  annotations:
      cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: '1'
@@ -486,7 +488,7 @@ Note: These are the default values for the `cas-min` and `cas-max` properties
 
 These annotations are added during the preparegit step. If these annotations are already present in the manifest file, then they will not be added again as a part of `preparegit`
 
-Preparing the git directory to serve as the cluster template: 
+Preparing the git directory to serve as the cluster template:
 
 ```shell
 arlon clustertemplate preparegit --repo-path <pathToDirectory> --cas-min 1 --cas-max 9 --repo-url <repoUrl> 
@@ -533,7 +535,6 @@ Examples of mutable properties in Cluster API resources:
 Examples of immutable properties:
 
 * Most fields of AWSMachineTemplate (instance type, labels, etc...)
-
 
 ## For more information
 

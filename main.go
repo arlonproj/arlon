@@ -20,12 +20,14 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"go.uber.org/zap/zapcore"
 	"os"
+
+	"go.uber.org/zap/zapcore"
 
 	"github.com/arlonproj/arlon/cmd/app"
 	"github.com/arlonproj/arlon/cmd/appprofile"
 	"github.com/arlonproj/arlon/cmd/appprofilecontroller"
+	"github.com/arlonproj/arlon/cmd/webhook"
 
 	apppkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	"github.com/argoproj/argo-cd/v2/util/io"
@@ -33,7 +35,6 @@ import (
 	"github.com/arlonproj/arlon/cmd/bundle"
 	"github.com/arlonproj/arlon/cmd/callhomecontroller"
 	"github.com/arlonproj/arlon/cmd/cluster"
-	"github.com/arlonproj/arlon/cmd/clusterspec"
 	"github.com/arlonproj/arlon/cmd/controller"
 	"github.com/arlonproj/arlon/cmd/gitrepo"
 	"github.com/arlonproj/arlon/cmd/initialize"
@@ -42,7 +43,6 @@ import (
 	"github.com/arlonproj/arlon/cmd/profile"
 	"github.com/arlonproj/arlon/cmd/verify"
 	"github.com/arlonproj/arlon/cmd/version"
-	"github.com/arlonproj/arlon/cmd/webhook"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/spf13/cobra"
 
@@ -74,7 +74,8 @@ func main() {
 	command.AddCommand(list_clusters.NewCommand())
 	command.AddCommand(bundle.NewCommand())
 	command.AddCommand(profile.NewCommand())
-	command.AddCommand(clusterspec.NewCommand())
+	// `clusterspec` is gen-1 only
+	//command.AddCommand(clusterspec.NewCommand())
 	command.AddCommand(cluster.NewCommand())
 	command.AddCommand(webhook.NewCommand())
 	command.AddCommand(basecluster.NewCommand())
