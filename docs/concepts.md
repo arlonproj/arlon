@@ -22,6 +22,12 @@ To distinguish them from the older gen1 clusters, the ones deployed from a clust
 
 ## Cluster Template (gen2 cluster)
 
+A cluster template is a base cluster manifest that can be "cloned" to produce
+one or more identical or similar workload clusters.
+To create a cluster template, you first compose a manifest containing one or more
+declarative resources that define the kind and shape of cluster that you desire.
+You then store the manifest in its own directoy somewhere in git.
+You then instruct Arlon to "prep" the directory to promote it to cluster template.
 To know more about cluster template for Arlon gen2 clusters including the difference
 with cluster spec and the process to create gen2 clusters; read the document [cluster template](./clustertemplate.md)
 
