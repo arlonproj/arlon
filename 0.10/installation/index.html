@@ -499,9 +499,20 @@
 
 <h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
 <p>Arlon CLI downloads are provided on GitHub. The CLI is not a self-contained standalone executable though.
-It is required to point the CLI to a management cluster and set up the Arlon controller in this management cluster.</p>
+It is required to point the CLI to a management cluster and set up the Arlon controller in this management cluster.
+It is also recommended to have the tools described <a href="#setting-up-tools">here</a> to be installed for a seamless experience.</p>
 <p>For a quickstart minimal demonstration setup, follow the instructions to set up a KIND based testbed with Arlon and ArgoCD running  <a href="https://github.com/arlonproj/arlon/blob/main/testing/README.md">here</a>.</p>
 <p>Please follow the manual instructions in <a href="#customised-setup">this</a> section for a customised setup or refer the instructions for automated installation <a href="#automatic-setup">here</a>.</p>
+<h1 id="setting-up-tools">Setting up tools<a class="headerlink" href="#setting-up-tools" title="Permanent link">&para;</a></h1>
+<p>To leverage the complete features provided by ArgoCD and Arlon, it is recommended to have the following tools installed:</p>
+<ol>
+<li><code>git</code></li>
+<li>ArgoCD CLI</li>
+<li><code>kubectl</code></li>
+</ol>
+<p>Barring the <code>git</code> installation, the Arlon CLI has the ability to install <code>argocd</code> and <code>kubectl</code> CLIs on a user's machine for Linux and macOS based systems. 
+To install these tools, run <code>arlon install --tools-only</code> to download and place these executables in <code>~/.local/bin</code>. It however, falls to the user to add the 
+aforementioned directory to <code>$PATH</code> if not present. This command also verifies the presence of <code>git</code> on your <code>$PATH</code>.</p>
 <h1 id="customised-setup">Customised Setup<a class="headerlink" href="#customised-setup" title="Permanent link">&para;</a></h1>
 <h2 id="management-cluster">Management cluster<a class="headerlink" href="#management-cluster" title="Permanent link">&para;</a></h2>
 <p>You can use any Kubernetes cluster that you have admin access to. Ensure:</p>
@@ -511,13 +522,13 @@ It is required to point the CLI to a management cluster and set up the Arlon con
 </ul>
 <h2 id="argocd">ArgoCD<a class="headerlink" href="#argocd" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Follow steps 1-4 of the <a href="https://argo-cd.readthedocs.io/en/stable/getting_started/">ArgoCD installation guide</a> to install ArgoCD onto your management cluster.
-After this step, you should be logged in as <code>admin</code> and a config file was created at <code>${HOME}/.config/argocd/config</code></li>
+<li>Follow steps 1-4 of the <a href="https://argo-cd.readthedocs.io/en/stable/getting_started/">ArgoCD installation guide</a> to install ArgoCD onto your management cluster.</li>
+<li>After this step, you should be logged in as <code>admin</code> and a config file was created at <code>${HOME}/.config/argocd/config</code></li>
 <li>Create your workspace repository in your git provider if necessary, then register it.
-  Example: <code>argocd repo add https://github.com/myname/arlon_workspace --username myname --password secret</code>.
-   --  Note: type <code>argocd repo add --help</code> to see all available options.
-   --  For Arlon developers, this is not your fork of the Arlon source code repository,
-       but a separate git repo where some artifacts like profiles created by Arlon will be stored.</li>
+  Example: <code>argocd repo add https://github.com/myname/arlon_workspace --username myname --password secret</code>.</li>
+<li>Note: type <code>argocd repo add --help</code> to see all available options.</li>
+<li>For Arlon developers, this is not your fork of the Arlon source code repository,
+  but a separate git repo where some artifacts like profiles created by Arlon will be stored.</li>
 <li>Highly recommended: <a href="https://argo-cd.readthedocs.io/en/stable/operator-manual/webhook/">configure a webhook</a>
   to immediately notify ArgoCD of changes to the repo. This will be especially useful
   during the tutorial. Without a webhook, repo changes may take up to 3 minutes
@@ -533,7 +544,7 @@ After this step, you should be logged in as <code>admin</code> and a config file
 <span class="w">  </span><span class="nt">policy.csv</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span><span class="w"></span>
 <span class="w">    </span><span class="no">g, arlon, role:admin</span><span class="w"></span>
 <span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ConfigMap</span><span class="w"></span>
-<span class="p p-Indicator">[</span><span class="nv">...</span><span class="p p-Indicator">]</span><span class="w"></span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">[...]</span><span class="w"></span>
 </code></pre></div>
 <ul>
 <li>Generate an account token: <code>argocd account generate-token --account arlon</code></li>
@@ -555,7 +566,7 @@ After this step, you should be logged in as <code>admin</code> and a config file
 </ul>
 <h2 id="arlon-cli">Arlon CLI<a class="headerlink" href="#arlon-cli" title="Permanent link">&para;</a></h2>
 <p>Download the CLI for the <a href="https://github.com/arlonproj/arlon/releases/latest">latest release</a> from GitHub.
-Currently, Linux and MacOS operating systems are supported.
+Currently, Linux and macOS operating systems are supported.
 Uncompress the tarball, rename it as <code>arlon</code> and add to your PATH</p>
 <p>Run <code>arlon verify</code> to check for prerequisites.
 Run <code>arlon install</code> to install any missing prerequisites.</p>
@@ -570,8 +581,13 @@ Run <code>arlon install</code> to install any missing prerequisites.</p>
 </ul>
 <h2 id="cluster-orchestration-api-providers">Cluster orchestration API providers<a class="headerlink" href="#cluster-orchestration-api-providers" title="Permanent link">&para;</a></h2>
 <p>Arlon currently supports Cluster API on AWS cloud. It also has experimental
-support for Crossplane on AWS.</p>
+support for Crossplane on AWS. <code>cluster-api</code> cloud provider components on 
+a management cluster can be installed by following the official guide, as instructed <a href="#cluster-api">here</a>.
+In addition to this, the Arlon CLI also ships with an <code>install</code> command to facilitate, the installation of supported 
+infrastructure providers by mimicking the behaviour of <code>clusterctl</code> CLI used in the official setup instructions. The details 
+for which can be found <a href="#using-arlon-cli">here</a>.</p>
 <h3 id="cluster-api">Cluster API<a class="headerlink" href="#cluster-api" title="Permanent link">&para;</a></h3>
+<h4 id="manual-installation">Manual Installation<a class="headerlink" href="#manual-installation" title="Permanent link">&para;</a></h4>
 <p>Using the <a href="https://cluster-api.sigs.k8s.io/user/quick-start.html">Cluster API Quickstart Guide</a>
 as reference, complete these steps:</p>
 <ul>
@@ -580,6 +596,12 @@ as reference, complete these steps:</p>
   In particular, follow instructions for your specific cloud provider (AWS in this example)
   Ensure <code>clusterctl init</code> completes successfully and produces the expected output.</li>
 </ul>
+<h4 id="using-arlon-cli">Using Arlon CLI<a class="headerlink" href="#using-arlon-cli" title="Permanent link">&para;</a></h4>
+<p>To install <code>cluster-api</code> components on the management cluster, the <code>install</code> command provides a 
+helpful wrapper around <code>clusterctl</code> CLI tool.</p>
+<p>To install a provider, all the pre-requisites must be met as mentioned <a href="#pre-requisites-for-cluster-api-providers">here</a>.
+After which, simply running <code>arlon install --capi-only --infrastructure aws,docker</code> will install the latest available version 
+of AWS and Docker provider components onto the management cluster.</p>
 <h3 id="crossplane-experimental">Crossplane (experimental)<a class="headerlink" href="#crossplane-experimental" title="Permanent link">&para;</a></h3>
 <p>Using the <a href="https://github.com/upbound/platform-ref-aws#quick-start">Upbound AWS Reference Platform Quickstart Guide</a>
 as reference, complete these steps:</p>
@@ -597,18 +619,76 @@ cluster can noticeably slow down kubectl, and you may see a warning that looks l
 <h1 id="automatic-setup">Automatic Setup<a class="headerlink" href="#automatic-setup" title="Permanent link">&para;</a></h1>
 <p>Arlon CLI provides an <code>init</code> command to install "itself" on a management cluster.
 This command performs a basic setup of <code>argocd</code>(if needed) and <code>arlon</code> controller.
-If <code>argocd</code> is already installed, it assumes that <code>admin</code> password is the same as in <code>argocd-initial-admin-secret</code> ConfigMap and that <code>argocd</code> resides in the <code>argocd</code> namespace.
-Similar assumptions are made for detecting Arlon installation as well: assuming that the existence of <code>arlon</code> namespace means Arlon controller exists.
-To install Arlon controller using the init command these pre-requisites need to be met:</p>
+It makes the following assumptions while installing <code>arlon</code>:</p>
 <ul>
-<li>A valid kubeconfig pointing to the management cluster.</li>
-<li>A hosted Git repository with at least a <code>README</code> file present.</li>
-<li>Pre-requisites for supported CAPI infrastructure providers(AWS and Docker as of now).</li>
+<li>
+<p>For ArgoCD:</p>
+<ul>
+<li>If ArgoCD is present, it is present the in namespace <code>argocd</code> and the <code>admin</code> password is the same as in <code>argocd-initial-admin-secret</code> ConfigMap.</li>
 </ul>
-<p>To start the installation process, simply run <code>arlon init -e --username &lt;GIT_USER&gt; --repoURL &lt;WORKSPACE_URL&gt; --password &lt;GIT_PASSWORD&gt; --examples -y</code>.
+</li>
+<li>
+<p>For Arlon:</p>
+<ul>
+<li>assuming that the existence of <code>arlon</code> namespace means Arlon controller exists.</li>
+</ul>
+</li>
+</ul>
+<p>To install Arlon controller using the init command these pre-requisites need to be met:</p>
+<ol>
+<li>A valid kubeconfig pointing to the management cluster.</li>
+<li>Port <strong>8080</strong> should not be in use by other programs. Arlon init uses it to port-forward <code>argocd</code>.</li>
+<li>A hosted Git repository with at least a <code>README</code> file present and a valid GitHub token(<a href="#setting-up-the-workspace-repository">detailed here</a>) for:</li>
+<li>Adding a repository to ArgoCD.</li>
+<li>Avoiding rate limiting of GitHub API while fetching <code>cluster-api</code> related manifests.</li>
+<li>Pushing cluster template manifests to the workspace repository.</li>
+<li>Pre-requisites for supported CAPI infrastructure providers(AWS and Docker as of now) as <a href="#pre-requisites-for-cluster-api-providers">described below</a>.</li>
+</ol>
+<h2 id="setting-up-the-workspace-repository">Setting up the workspace repository<a class="headerlink" href="#setting-up-the-workspace-repository" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Create a GitHub repository if you don't already have it.</li>
+<li>Ensure that the repository at least has a README file because empty repository cannot be added to ArgoCD.</li>
+<li>Create a Personal Access Token for authentication, the token will need <code>repo:write</code> scope to push the cluster template example manifests.</li>
+<li>Set the <code>GITHUB_TOKEN</code> environment variable to the token create in the previous step.</li>
+</ol>
+<h2 id="pre-requisites-for-cluster-api-providers">Pre-requisites for cluster-api providers<a class="headerlink" href="#pre-requisites-for-cluster-api-providers" title="Permanent link">&para;</a></h2>
+<p>This section outlines the requirements that need to be fulfilled for installing the <code>cluster-api</code> provider components that the <code>init</code> or the <code>install</code> command installs on the management cluster.</p>
+<h3 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">&para;</a></h3>
+<p>There are no special requirements for docker provider, as it is largely used in an experimental setups.</p>
+<h3 id="aws">AWS<a class="headerlink" href="#aws" title="Permanent link">&para;</a></h3>
+<p>The following environment variables need to be set:
+- <code>AWS_SSH_KEY_NAME</code> (the SSH key name to use)
+- <code>AWS_REGION</code> (region where the cluster is deployed)
+- <code>AWS_ACCESS_KEY_ID</code> (access key id for the associated AWS account)
+- <code>AWS_SECRET_ACCESS_KEY</code> (secret access key for the associated AWS account)
+- <code>AWS_NODE_MACHINE_TYPE</code> (machine type for cluster nodes)
+- <code>AWS_CONTROL_PLANE_MACHINE_TYPE</code> (machine type for control plane)
+- <code>AWS_SESSION_TOKEN</code> (optional: only for MFA enabled accounts)</p>
+<h2 id="starting-the-installation">Starting the installation<a class="headerlink" href="#starting-the-installation" title="Permanent link">&para;</a></h2>
+<p>Once the above requirements are met, start the installation process, simply running <code>arlon init -e --username &lt;GIT_USER&gt; --repoURL &lt;WORKSPACE_URL&gt; --password &lt;GIT_PASSWORD&gt; --examples -y</code>.
 This installs the controller, argocd(if not already present) <code>-e</code> flag adds cluster template manifests to the <WORKSPACE_URL> for using the given credentials. To not add examples, just remove the <code>-e</code> flag.
 The <code>-y</code> flag refers to silent installation, which is useful for scripts.
 For an interactive installation, exclude the <code>-y</code> or <code>--no-confirm</code> flag.</p>
+<p>This command does the following:</p>
+<ul>
+<li>Installs ArgoCD if not present.</li>
+<li>Installs Arlon if not present.</li>
+<li>Creates the Arlon user account in ArgoCD with <code>admin</code> rights.</li>
+<li>Installs <code>cluster-api</code> with the latest versions of <code>docker</code> and <code>aws</code> providers.</li>
+<li>Removes the <code>repoctx</code> file created by <code>arlon git register</code> if present.</li>
+<li>Registers a <code>default</code> alias against the provided <code>repoUrl</code>.</li>
+<li>Checks for pre-existing examples, and prompts to delete and proceed(if <code>-y</code> or <code>--no-confirm</code> flag is not set, else deletes the existing examples).</li>
+<li>Pushes cluster template manifests to the provided GitHub repository.</li>
+</ul>
+<p>The Arlon repository also hosts some examples in the <code>examples</code> directory. In particular, the <code>examples/declarative</code> directory is a set of ready to use manifests 
+which allows us to deploy a cluster with the new <code>app</code> and <code>app-profiles</code>. To run these examples, simply clone the source code and run these commands:
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span> &lt;ARLON_SOURCE_REPO_PATH&gt;
+kubectl apply -f examples/declarative
+</code></pre></div></p>
+<p>This creates an EKS cluster with managed machine pools in the <code>us-west-1</code> region, and attaches a few example "apps" to it in the form of two <code>app-profiles</code> namely <code>frontent</code> and <code>backend</code>.
+The <code>frontend</code> app-profile consists of the <a href="https://github.com/argoproj/argocd-example-apps/tree/master/guestbook">guestbook</a> application and a sentinel non-existing app appropriately named <code>nonexistent-1</code>. 
+Similarly, the <code>backend</code> app-profile consists of the <a href="https://github.com/bitnami/charts/tree/main/bitnami/redis">redis</a> and another non-existent app called <code>nonexistent-2</code>. 
+The sentinel, <code>nonexistent</code> apps are simply present to demonstrate the <code>description</code> field for the health field and the <code>invalidAppNames</code> which lists down the apps which do not exist.</p>
 
 
 

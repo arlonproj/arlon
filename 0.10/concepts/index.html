@@ -385,8 +385,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cluster-spec" class="md-nav__link">
-    Cluster spec
+  <a href="#cluster-spec-gen1-clusters-deprecated-since-010" class="md-nav__link">
+    Cluster spec (gen1 clusters : deprecated since 0.10)
   </a>
   
 </li>
@@ -673,8 +673,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cluster-spec" class="md-nav__link">
-    Cluster spec
+  <a href="#cluster-spec-gen1-clusters-deprecated-since-010" class="md-nav__link">
+    Cluster spec (gen1 clusters : deprecated since 0.10)
   </a>
   
 </li>
@@ -774,8 +774,10 @@ or acquire new bundles in real time.</p>
 <p>An Arlon cluster, also known as workload cluster, is a Kubernetes cluster
 that Arlon creates and manages via a git directory structure stored in
 the workspace repository.</p>
-<p>(Under construction)</p>
-<h2 id="cluster-spec">Cluster spec<a class="headerlink" href="#cluster-spec" title="Permanent link">&para;</a></h2>
+<p>The new way of provisioning workload clusters in Arlon since v0.9 is gen2 clusters using <em>cluster template</em> that replace gen1 clusters using <em>cluster spec</em>
+The most significant change in gen2 clusters is the <em>Cluster Template</em> construct, which replaces the older cluster spec from gen1 clusters.
+To distinguish them from the older gen1 clusters, the ones deployed from a cluster template are called next-gen clusters or gen2 clusters.</p>
+<h2 id="cluster-spec-gen1-clusters-deprecated-since-010">Cluster spec (gen1 clusters : deprecated since 0.10)<a class="headerlink" href="#cluster-spec-gen1-clusters-deprecated-since-010" title="Permanent link">&para;</a></h2>
 <p>A cluster spec contains desired settings when creating a new cluster.
 They currently include:</p>
 <ul>
@@ -787,7 +789,7 @@ They currently include:</p>
 <li>The Kubernetes version</li>
 </ul>
 <h2 id="cluster-template">Cluster Template<a class="headerlink" href="#cluster-template" title="Permanent link">&para;</a></h2>
-<p>To know more about cluster template (Arlon gen2 clusters), read it <a href="../clustertemplate/">here</a></p>
+<p>To know more about cluster template for Arlon gen2 clusters including the difference with cluster spec and the process to create gen2 clusters; read the document <a href="../clustertemplate/">cluster template</a></p>
 
 
 

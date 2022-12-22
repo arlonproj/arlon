@@ -520,10 +520,12 @@
 <p>The Application Profiles feature, also known as Gen2 Profiles, is an
 addition to Arlon v0.10.0 that provides a new way to describe, group,
 and deploy manifests to workload clusters. The new feature introduces
-these concepts:
-* Arlon Application (or just "App")
-* Application Profile (a.k.a. AppProfile)
-* Targeting application profiles to workload clusters via annotation</p>
+these concepts:</p>
+<ul>
+<li>Arlon Application (or just "App")</li>
+<li>Application Profile (a.k.a. AppProfile)</li>
+<li>Targeting application profiles to workload clusters via annotation</li>
+</ul>
 <p>The feature provides an alternative to the Bundle and Profile concepts
 ("the old way") of earlier versions of Arlon. Specifically,
 the Arlon Application can be viewed as a replacement for Bundles,
@@ -550,7 +552,7 @@ initial compliant manifest that you can
 save to a file and edit to your liking before applying to
 the management cluster to actually create the app.
 (Without the <code>`--output-yaml</code> flag, the command will apply the resource for you).</p>
-<p>Here's an example of an initial Arlon Application manifest:
+<p>Here's an example of an initial Arlon Application manifest:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">argoproj.io/v1alpha1</span><span class="w"></span>
 <span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ApplicationSet</span><span class="w"></span>
 <span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
@@ -577,31 +579,36 @@ the management cluster to actually create the app.
 <span class="w">      </span><span class="nt">syncPolicy</span><span class="p">:</span><span class="w"></span>
 <span class="w">        </span><span class="nt">automated</span><span class="p">:</span><span class="w"></span>
 <span class="w">          </span><span class="nt">prune</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-</code></pre></div></p>
-<p>The List generator that the AppProfile controller maintains supplies two variables for template substitution:
-- <code>cluster_name</code>: the name of the target workload cluster
-- <code>cluster_server</code>: the URL+FQDN of the workload cluster's Kubernetes API endpoint</p>
-<p>Notice how the initial manifest takes advantage of those variables to set
-- <code>spec.template.metadata.name</code> to <code>{{cluster-name}}-app-myconfigmap</code>
-to ensure that any actual ArgoCD Application resources deployed from the ApplicationSet
-are uniquely named, by prefixing the cluster name.
-- <code>spec.template.spec.destination.server</code> to <code>{{cluster_server}}</code> to target the correct workload cluster</p>
+</code></pre></div>
+<p>The List generator that the AppProfile controller maintains supplies two variables for template substitution:</p>
+<ul>
+<li><code>cluster_name</code>: the name of the target workload cluster</li>
+<li><code>cluster_server</code>: the URL+FQDN of the workload cluster's Kubernetes API endpoint</li>
+</ul>
+<p>Notice how the initial manifest takes advantage of those variables to set</p>
+<ul>
+<li><code>spec.template.metadata.name</code> to <code>{{cluster-name}}-app-myconfigmap</code>
+to ensure that any actual ArgoCD Application resources deployed from the ApplicationSet are uniquely named, by prefixing the cluster name.</li>
+<li><code>spec.template.spec.destination.server</code> to <code>{{cluster_server}}</code> to target the correct workload cluster</li>
+</ul>
 <p>Arlon apps can be listed in two ways. The first is to use the <code>arlon app list</code> command. One advantage
 is that it's simple to use and also displays additional information about the app, such as which AppProfiles
 are currently associated with the app.</p>
-<p>Example:
+<p>Example:</p>
 <div class="highlight"><pre><span></span><code>$ arlon app list
 NAME         REPO                                     PATH              REVISION  APP_PROFILES
 myconfigmap  https://github.com/bcle/fleet-infra.git  apps/my-cfgmap-1  HEAD      <span class="o">[</span>marketing<span class="o">]</span>
 </code></pre></div>
-The second way is to use pure kubectl to list ApplicationSets with a particular label:
+<p>The second way is to use pure kubectl to list ApplicationSets with a particular label:</p>
 <div class="highlight"><pre><span></span><code>$ kubectl -n argocd get applicationset
 NAME          AGE
 myconfigmap   21d
-</code></pre></div></p>
-<p>Similarly, an Arlon app can be deleted in two ways:
-- <code>arlon app delete &lt;appName&gt;</code>
-- <code>kubectl -n argocd delete applicationset &lt;appName&gt;</code></p>
+</code></pre></div>
+<p>Similarly, an Arlon app can be deleted in two ways:</p>
+<ul>
+<li><code>arlon app delete &lt;appName&gt;</code></li>
+<li><code>kubectl -n argocd delete applicationset &lt;appName&gt;</code></li>
+</ul>
 <h2 id="appprofile">AppProfile<a class="headerlink" href="#appprofile" title="Permanent link">&para;</a></h2>
 <p>An AppProfile is simply a grouping (or set) of Arlon Apps.
 Unlike an Arlon Application (which is represented by an ApplicationSet resource),
@@ -609,13 +616,15 @@ an AppProfile is represented by an Arlon-native custom resource.</p>
 <p>An AppProfile specifies the apps it is associated with via the <code>appNames</code> list.
 It is legal for <code>appNames</code> to contain names of Arlon Apps that don't exist yet.
 To indicate whether some app names are currently invalid, the AppProfile controller
-will update the resource's <code>status</code> section as follows:
-- If all specified app names refer to valid Arlon apps, <code>status.health</code>
-  is set to <code>healthy</code>.
-- If one or more specified app names refer to non-existent Arlon apps,
+will update the resource's <code>status</code> section as follows:</p>
+<ul>
+<li>If all specified app names refer to valid Arlon apps, <code>status.health</code>
+  is set to <code>healthy</code>.</li>
+<li>If one or more specified app names refer to non-existent Arlon apps,
   then <code>status.health</code> is set to <code>degraded</code>, and <code>status.invalidAppNames</code>
-  lists the invalid names.</p>
-<p>Here is an example of an AppProfile manifest that includes 3 apps, one of which does not exist:
+  lists the invalid names.</li>
+</ul>
+<p>Here is an example of an AppProfile manifest that includes 3 apps, one of which does not exist:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">core.arlon.io/v1</span><span class="w"></span>
 <span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AppProfile</span><span class="w"></span>
 <span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
@@ -630,36 +639,38 @@ will update the resource's <code>status</code> section as follows:
 <span class="w">  </span><span class="nt">health</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">degraded</span><span class="w"></span>
 <span class="w">  </span><span class="nt">invalidAppNames</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nonexistent-app</span><span class="w"></span>
-</code></pre></div></p>
+</code></pre></div>
 <blockquote>
 <p>Note: AppProfile resources reside in the <code>arlon</code> namespace.
 This is in contrast to Arlon App resources, which reside in the <code>argocd</code> namespace since they are actually ArgoCD ApplicationSet resources.</p>
 </blockquote>
 <p>Since AppProfiles are defined by their own custom resource and are fairly straightforward, their lifecycle
 can be managed entirely using <code>kubectl</code>. That said, Arlon provides the <code>arlon appprofile list</code> to display
-useful information about current AppProfiles. Example:
+useful information about current AppProfiles. Example:</p>
 <div class="highlight"><pre><span></span><code>$ arlon appprofile list
 NAME         APPS                     HEALTH   INVALID_APPS
-engineering  [wordpress]              healthy  []
-marketing    [myconfigmap wordpress]  degraded [nonexistent-app]
-</code></pre></div></p>
+engineering  <span class="o">[</span>wordpress<span class="o">]</span>              healthy  <span class="o">[]</span>
+marketing    <span class="o">[</span>myconfigmap wordpress<span class="o">]</span>  degraded <span class="o">[</span>nonexistent-app<span class="o">]</span>
+</code></pre></div>
 <p>As the example illustrates, it is totally legal for two or more AppProfiles to include the same app(s).
 When those AppProfiles are targeted to a workload cluster, the cluster receives the union of these app sets.</p>
 <h2 id="targeting-appprofiles-to-workload-clusters">Targeting AppProfiles to Workload Clusters<a class="headerlink" href="#targeting-appprofiles-to-workload-clusters" title="Permanent link">&para;</a></h2>
 <p>Apps are actually deployed to workload clusters by annotating the desired cluster(s) with <code>arlon.io/profiles=&lt;comma separated list of AppProfiles&gt;</code>. This is supported only on Arlon Gen2 clusters, which themselves are represented as ArgoCD Application resources.</p>
-<p>Example: suppose we have a Gen2 workload cluster named <strong>clust1</strong>.  Since the cluster is represented as an ArgoCD Application resource, targeting the <code>engineering</code> and <code>marketing</code> app profiles to it is achieved with:
-<div class="highlight"><pre><span></span><code>kubectl -n argocd annotate --overwrite application clust1 arlon.io/profiles=engineering,marketing
-</code></pre></div></p>
+<p>Example: suppose we have a Gen2 workload cluster named <strong>clust1</strong>.  Since the cluster is represented as an ArgoCD Application resource, targeting the <code>engineering</code> and <code>marketing</code> app profiles to it is achieved with:</p>
+<div class="highlight"><pre><span></span><code>kubectl -n argocd annotate --overwrite application clust1 arlon.io/profiles<span class="o">=</span>engineering,marketing
+</code></pre></div>
 <p>The set of app profiles for a cluster can always be updated that way, in real time. Behind the scenes, Arlon's AppProfile controller
 updates the <code>spec.generators</code> section of each affected app to target the cluster. The set of apps targeting a cluster is the union
 of all the valid appNames from every app profile listed in the annotation.</p>
 <p>By default, every ArgoCD Application Resource generated by the app's ApplicationSet is named with the pattern <code>&lt;clustername&gt;-app-&lt;appname&gt;</code>.
-In the running example, these two ArgoCD application resources will be generated:
-- clust1-app-wordpress
-- clust1-app-myconfigmap</p>
-<p>To detach all profiles from a cluster, simply remove the annotation:
+In the running example, these two ArgoCD application resources will be generated:</p>
+<ul>
+<li>clust1-app-wordpress</li>
+<li>clust1-app-myconfigmap</li>
+</ul>
+<p>To detach all profiles from a cluster, simply remove the annotation:</p>
 <div class="highlight"><pre><span></span><code>kubectl -n argocd annotate application clust1 arlon.io/profiles-
-</code></pre></div></p>
+</code></pre></div>
 <p>The last command will automatically destroy any ArgoCD application resources generated for that cluster (assuming they originate from Arlon apps).</p>
 <blockquote>
 <p>Note: users are free to create and maintain their own ApplicationSets not managed by Arlon. Those will work side-by-side with the ones

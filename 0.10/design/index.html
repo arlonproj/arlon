@@ -386,52 +386,12 @@
     Cluster Specification/ Metadata
   </a>
   
-    <nav class="md-nav" aria-label="Cluster Specification/ Metadata">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#gen1" class="md-nav__link">
-    gen1
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gen2" class="md-nav__link">
-    gen2
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
   <a href="#cluster-preparation" class="md-nav__link">
     Cluster Preparation
   </a>
-  
-    <nav class="md-nav" aria-label="Cluster Preparation">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#gen1_1" class="md-nav__link">
-    gen1
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gen2_1" class="md-nav__link">
-    gen2
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -446,20 +406,6 @@
           <li class="md-nav__item">
   <a href="#cluster-chart" class="md-nav__link">
     Cluster Chart
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gen1_2" class="md-nav__link">
-    gen1
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gen2_2" class="md-nav__link">
-    gen2
   </a>
   
 </li>
@@ -690,52 +636,12 @@
     Cluster Specification/ Metadata
   </a>
   
-    <nav class="md-nav" aria-label="Cluster Specification/ Metadata">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#gen1" class="md-nav__link">
-    gen1
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gen2" class="md-nav__link">
-    gen2
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
   <a href="#cluster-preparation" class="md-nav__link">
     Cluster Preparation
   </a>
-  
-    <nav class="md-nav" aria-label="Cluster Preparation">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#gen1_1" class="md-nav__link">
-    gen1
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gen2_1" class="md-nav__link">
-    gen2
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -750,20 +656,6 @@
           <li class="md-nav__item">
   <a href="#cluster-chart" class="md-nav__link">
     Cluster Chart
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gen1_2" class="md-nav__link">
-    gen1
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gen2_2" class="md-nav__link">
-    gen2
   </a>
   
 </li>
@@ -850,22 +742,8 @@ It is composed of</p>
 <h2 id="cluster">Cluster<a class="headerlink" href="#cluster" title="Permanent link">&para;</a></h2>
 <h3 id="cluster-specification-metadata">Cluster Specification/ Metadata<a class="headerlink" href="#cluster-specification-metadata" title="Permanent link">&para;</a></h3>
 <p>A Cluster Specification contains desired settings when creating a new cluster. These settings are the values that define the shape and the configurations of the cluster.</p>
-<p>Currently, there is a difference in the cluster specification for gen1 and gen2 clusters. The main difference in these cluster specifications is that gen2 Cluster Specification allow users to deploy arbitrarily complex clusters using the full Cluster API feature set.This is also closer to the gitops and declarative style of cluster creation and gives users more control over the cluster that they deploy.</p>
-<h4 id="gen1">gen1<a class="headerlink" href="#gen1" title="Permanent link">&para;</a></h4>
-<p>A <code>clusterspec</code> contains desired settings when creating a new cluster. For gen1 clusters, this Cluster Specification is called <a href="https://github.com/arlonproj/arlon/blob/main/docs/concepts.md#cluster-spec">ClusterSpec</a>.</p>
-<p>Clusterspec currently includes:</p>
-<ul>
-<li>Stack: the cluster provisioning stack, for e.g. <em>cluster-api</em> or <em>crossplane</em></li>
-<li>Provider: the specific cluster management provider under that stack,
-  if applicable. Example:
-  for <em>cluster-api</em>, the possible values are <em>eks</em> and <em>kubeadm</em></li>
-<li>Other settings that specify the "shape" of the cluster, such as the size of
-  the control plane and the initial number of nodes of the data plane.</li>
-<li>The pod networking technology (under discussion: this may be moved to a
-  bundle because most if not all CNI providers can be installed as manifests)  </li>
-</ul>
-<h4 id="gen2">gen2<a class="headerlink" href="#gen2" title="Permanent link">&para;</a></h4>
-<p>for gen2 clusters, the Cluster Specification is called the cluster template, which is described in detail <a href="https://github.com/arlonproj/arlon/blob/main/docs/clustertemplate.md">here</a>.</p>
+<p>There is a difference in the cluster specification for gen1 (deprecated) and gen2 clusters. The main difference in these cluster specifications is that gen2 Cluster Specification allow users to deploy arbitrarily complex clusters using the full Cluster API feature set. This is also closer to the gitops and declarative style of cluster creation and gives users more control over the cluster that they deploy.</p>
+<p>The Cluster Specification of gen-2 clusrers is called the cluster template, which is described in detail <a href="https://github.com/arlonproj/arlon/blob/main/docs/clustertemplate.md">here</a>.</p>
 <p>A cluster template manifest consists of:</p>
 <ul>
 <li>A predefined list of Cluster API objects: Cluster, Machines, Machine Deployments, etc. to be deployed in the current namespace</li>
@@ -875,9 +753,6 @@ It is composed of</p>
 </ul>
 <h3 id="cluster-preparation">Cluster Preparation<a class="headerlink" href="#cluster-preparation" title="Permanent link">&para;</a></h3>
 <p>Once these cluster specifications are created successfully, the next step is to prepare the cluster for deployment.</p>
-<h4 id="gen1_1">gen1<a class="headerlink" href="#gen1_1" title="Permanent link">&para;</a></h4>
-<p>Once the clusterspec is created for a gen-1 cluster, there is no need to prepare a workspace repository to create a new cluster.</p>
-<h4 id="gen2_1">gen2<a class="headerlink" href="#gen2_1" title="Permanent link">&para;</a></h4>
 <p>Once the cluster template manifest is created, the next step is to preare the workspace repository directory in which this cluster template manifest is present. This is explained in detail <a href="https://github.com/arlonproj/arlon/blob/main/docs/clustertemplate.md#preparation">here</a></p>
 <h3 id="cluster-creation">Cluster Creation<a class="headerlink" href="#cluster-creation" title="Permanent link">&para;</a></h3>
 <p>Now, all the prerequisites for creating a cluster are completed and the cluster can be created/deployed.</p>
@@ -894,9 +769,6 @@ It is composed of</p>
   copied/unpacked into its own subdirectory.</li>
 <li>One ArgoCD Application resource for each bundle.</li>
 </ul>
-<h4 id="gen1_2">gen1<a class="headerlink" href="#gen1_2" title="Permanent link">&para;</a></h4>
-<p>Cluster deployment is explained <a href="https://github.com/arlonproj/arlon/blob/main/docs/tutorial.md#clusters-gen1">here</a></p>
-<h4 id="gen2_2">gen2<a class="headerlink" href="#gen2_2" title="Permanent link">&para;</a></h4>
 <p>cluster template creation is explained <a href="https://github.com/arlonproj/arlon/blob/main/docs/clustertemplate.md#creation">here</a></p>
 
 
