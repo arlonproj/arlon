@@ -85,9 +85,11 @@ An Arlon cluster, also known as workload cluster, is a Kubernetes cluster
 that Arlon creates and manages via a git directory structure stored in
 the workspace repository.
 
-(Under construction)
+The new way of provisioning workload clusters in Arlon since v0.9 is gen2 clusters using *cluster template* that replace gen1 clusters using *cluster spec*
+The most significant change in gen2 clusters is the *Cluster Template* construct, which replaces the older cluster spec from gen1 clusters.
+To distinguish them from the older gen1 clusters, the ones deployed from a cluster template are called next-gen clusters or gen2 clusters.
 
-## Cluster spec
+## Cluster spec (gen1 clusters : deprecated since 0.10)
 
 A cluster spec contains desired settings when creating a new cluster.
 They currently include:
@@ -101,4 +103,4 @@ They currently include:
 
 ## Cluster Template
 
-To know more about cluster template (Arlon gen2 clusters), read it [here](./clustertemplate.md)
+To know more about cluster template for Arlon gen2 clusters including the difference with cluster spec and the process to create gen2 clusters; read the document [cluster template](./clustertemplate.md)

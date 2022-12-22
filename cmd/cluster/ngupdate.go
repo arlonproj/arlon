@@ -39,18 +39,18 @@ func ngupdateClusterCommand() *cobra.Command {
 				return fmt.Errorf("failed to list apps related to cluster: %s", err)
 			}
 			if len(apps.Items) == 0 {
-				return fmt.Errorf("Failed to get the given cluster")
+				return fmt.Errorf("failed to get the given cluster")
 			}
 			if !deleteProfileName {
 				_, err = cluster.NgUpdate(appIf, config, argocdNs, arlonNs, name, profileName, true)
 				if err != nil {
 
-					return fmt.Errorf("Error: %s", err)
+					return fmt.Errorf("error: %s", err)
 				}
 			} else {
 				err = cluster.DestroyProfileApps(appIf, name)
 				if err != nil {
-					return fmt.Errorf("Failed to delete the profile app")
+					return fmt.Errorf("failed to delete the profile app")
 				}
 			}
 			return nil
