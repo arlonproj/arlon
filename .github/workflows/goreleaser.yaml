@@ -6,7 +6,7 @@ on:
       - 'v0.3*'
 jobs:
   goreleaser:
-    environment: arlon
+    environment: E2E Tests and Release
     runs-on: ubuntu-latest
     steps:
       -
@@ -49,6 +49,6 @@ jobs:
           args: release --rm-dist
         env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           # Your GoReleaser Pro key, if you are using the 'goreleaser-pro' distribution
           # GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
