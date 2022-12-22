@@ -70,4 +70,4 @@ refer to [AppProfiles article](./appprofiles.md)
 
 Apps and AppProfiles are a newer version ("gen2") of Arlon profiles.
 There is an older version called "gen1", which is composed of the concepts
-of Bundles and Profiles. For more details, see (Bundles and Profiles)[./gen1_profiles.md]
+of Bundles and Profiles. For more details, see [Bundles and Profiles](./gen1_profiles.md)
