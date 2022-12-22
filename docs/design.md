@@ -58,26 +58,9 @@ It is composed of
 
 A Cluster Specification contains desired settings when creating a new cluster. These settings are the values that define the shape and the configurations of the cluster.
 
-Currently, there is a difference in the cluster specification for gen1 and gen2 clusters. The main difference in these cluster specifications is that gen2 Cluster Specification allow users to deploy arbitrarily complex clusters using the full Cluster API feature set.This is also closer to the gitops and declarative style of cluster creation and gives users more control over the cluster that they deploy.
+There is a difference in the cluster specification for gen1 (deprecated) and gen2 clusters. The main difference in these cluster specifications is that gen2 Cluster Specification allow users to deploy arbitrarily complex clusters using the full Cluster API feature set. This is also closer to the gitops and declarative style of cluster creation and gives users more control over the cluster that they deploy.
 
-#### gen1
-
-A `clusterspec` contains desired settings when creating a new cluster. For gen1 clusters, this Cluster Specification is called [ClusterSpec](https://github.com/arlonproj/arlon/blob/main/docs/concepts.md#cluster-spec).
-
-Clusterspec currently includes:
-
-- Stack: the cluster provisioning stack, for e.g. *cluster-api* or *crossplane*
-- Provider: the specific cluster management provider under that stack,
-  if applicable. Example:
-  for *cluster-api*, the possible values are *eks* and *kubeadm*
-- Other settings that specify the "shape" of the cluster, such as the size of
-  the control plane and the initial number of nodes of the data plane.
-- The pod networking technology (under discussion: this may be moved to a
-  bundle because most if not all CNI providers can be installed as manifests)  
-
-#### gen2
-
-for gen2 clusters, the Cluster Specification is called the cluster template, which is described in detail [here](https://github.com/arlonproj/arlon/blob/main/docs/clustertemplate.md).
+The Cluster Specification of gen-2 clusrers is called the cluster template, which is described in detail [here](https://github.com/arlonproj/arlon/blob/main/docs/clustertemplate.md).
 
 A cluster template manifest consists of:
 
@@ -89,12 +72,6 @@ A cluster template manifest consists of:
 ### Cluster Preparation
 
 Once these cluster specifications are created successfully, the next step is to prepare the cluster for deployment.
-
-#### gen1
-
-Once the clusterspec is created for a gen-1 cluster, there is no need to prepare a workspace repository to create a new cluster.
-
-#### gen2
 
 Once the cluster template manifest is created, the next step is to preare the workspace repository directory in which this cluster template manifest is present. This is explained in detail [here](https://github.com/arlonproj/arlon/blob/main/docs/clustertemplate.md#preparation)
 
@@ -116,11 +93,5 @@ Here is a summary of the kinds of resources generated and deployed by the chart:
   of the expanded bundles. Every bundle referenced by the profile is
   copied/unpacked into its own subdirectory.
 - One ArgoCD Application resource for each bundle.
-
-#### gen1
-
-Cluster deployment is explained [here](https://github.com/arlonproj/arlon/blob/main/docs/tutorial.md#clusters-gen1)
-
-#### gen2
 
 cluster template creation is explained [here](https://github.com/arlonproj/arlon/blob/main/docs/clustertemplate.md#creation)
