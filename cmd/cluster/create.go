@@ -80,7 +80,7 @@ func createClusterCommand() *cobra.Command {
 			baseClusterName, err := bcl.ValidateGitDir(creds,
 				clusterRepoUrl, clusterRepoRevision, clusterRepoPath)
 			if err != nil {
-				return fmt.Errorf("failed to validate base cluster: %s", err)
+				return fmt.Errorf("failed to validate cluster template: %s", err)
 			}
 			var prof *arlonv1.Profile
 			if profileName != "" {

@@ -22,8 +22,8 @@ func prepareGitBaseClusterCommand() *cobra.Command {
 	var casMax int
 	command := &cobra.Command{
 		Use:   "preparegit --repo-url repoUrl [--repo-revision revision] [--repo-path path]",
-		Short: "prepare base cluster directory in git",
-		Long:  "prepare base cluster directory in git",
+		Short: "prepare cluster template directory in git",
+		Long:  "prepare cluster template directory in git",
 		RunE: func(c *cobra.Command, args []string) error {
 			if repoUrl == "" {
 				var err error
@@ -50,17 +50,17 @@ func prepareGitBaseClusterCommand() *cobra.Command {
 			} else {
 				fmt.Println("the files for cluster <",
 					clusterName,
-					"> are already compliant as base cluster, no preparation necessary")
+					"> are already compliant as cluster template, no preparation necessary")
 			}
 			return nil
 		},
 	}
 	clientConfig = cli.AddKubectlFlagsToCmd(command)
 	command.Flags().StringVar(&argocdNs, "argocd-ns", "argocd", "the argocd namespace")
-	command.Flags().StringVar(&repoUrl, "repo-url", "", "the git repository url for base cluster directory")
+	command.Flags().StringVar(&repoUrl, "repo-url", "", "the git repository url for cluster template directory")
 	command.Flags().StringVar(&repoAlias, "repo-alias", gitrepo.RepoDefaultCtx, "git repository alias to use")
-	command.Flags().StringVar(&repoRevision, "repo-revision", "main", "the git revision for base cluster directory")
-	command.Flags().StringVar(&repoPath, "repo-path", "", "the git repository path for base cluster directory")
+	command.Flags().StringVar(&repoRevision, "repo-revision", "main", "the git revision for cluster template directory")
+	command.Flags().StringVar(&repoPath, "repo-path", "", "the git repository path for cluster template directory")
 	command.Flags().IntVar(&casMin, "cas-min", 1, "set minimum number of nodes for capi-cluster autoscaler, for MachineDeployment based clusters")
 	command.Flags().IntVar(&casMax, "cas-max", 9, "set maximum number of nodes for capi-cluster autoscaler, for MachineDeployment based clusters")
 	command.MarkFlagsMutuallyExclusive("repo-url", "repo-alias")

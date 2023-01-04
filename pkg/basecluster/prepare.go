@@ -131,7 +131,7 @@ func PrepareGitDir(
 		return "", false, fmt.Errorf("failed to prepare directory: %s", err)
 	}
 	changed, err = gitutils.CommitChanges(tmpDir, wt,
-		"prepare base cluster files for "+path.Join(repoPath, manifestFileName))
+		"prepare cluster template files for "+path.Join(repoPath, manifestFileName))
 	if err != nil {
 		err = fmt.Errorf("failed to commit changes: %s", err)
 		return
@@ -154,7 +154,7 @@ func PrepareGitDir(
 
 // -----------------------------------------------------------------------------
 
-// Prepares specified directory to use as base cluster, and returns the
+// prepareDir prepares specified directory to use as cluster template, and returns the
 // name of the cluster resource. dirRelPath is the name of the directory
 // relative to the file system, and actualFsRootDir is the actual path
 // of the file system's root directory on the native file system.
@@ -193,7 +193,7 @@ func prepareDir(
 		manifestFileName = info.Name()
 	}
 	if manifestFileName == "" {
-		err = fmt.Errorf("failed to find base cluster manifest file")
+		err = fmt.Errorf("failed to find cluster template manifest file")
 		return
 	}
 	manifestRelPath := path.Join(dirRelPath, manifestFileName)
