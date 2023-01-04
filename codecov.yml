@@ -6,6 +6,8 @@ coverage:
     patch:
       default:
         informational: true
+comment:
+  layout: diff
 
 
 # When modifying this file, please validate using

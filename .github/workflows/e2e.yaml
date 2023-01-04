@@ -12,7 +12,7 @@ env:
   AWS_CONTROL_PLANE_MACHINE_TYPE: ${{ secrets.AWS_CONTROL_PLANE_MACHINE_TYPE }}
   AWS_NODE_MACHINE_TYPE: ${{ secrets.AWS_NODE_MACHINE_TYPE }}
   AWS_SSH_KEY_NAME: ${{ secrets.AWS_SSH_KEY_NAME }}
-  GITHUB_TOKEN: ${{ secrets.GH_PAT }} # to take care of gh api rate limit when fetching capi provider manifests
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # to take care of gh api rate limit when fetching capi provider manifests
   GIT_USER: ${{ secrets.GIT_USER }}
   GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
   GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
@@ -30,7 +30,7 @@ jobs:
         name: Set up Go
         uses: actions/setup-go@v3
         with:
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           go-version: 1.19
           check-latest: true
       -
