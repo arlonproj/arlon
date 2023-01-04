@@ -13,8 +13,8 @@ func prepareBaseClusterCommand() *cobra.Command {
 	var casMax int
 	command := &cobra.Command{
 		Use:   "prepare <filename> [flags]",
-		Short: "prepare base cluster",
-		Long:  "prepare base cluster",
+		Short: "prepare cluster template",
+		Long:  "prepare cluster template",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			fileName := args[0]

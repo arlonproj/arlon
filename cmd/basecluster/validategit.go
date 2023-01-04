@@ -19,8 +19,8 @@ func validateGitBaseClusterCommand() *cobra.Command {
 	var repoRevision string
 	command := &cobra.Command{
 		Use:   "validategit --repo-url repoUrl [--repo-revision revision] [--repo-path path]",
-		Short: "validate base cluster directory in git",
-		Long:  "validate base cluster directory in git",
+		Short: "validate cluster template directory in git",
+		Long:  "validate cluster template directory in git",
 		RunE: func(c *cobra.Command, args []string) error {
 			if repoUrl == "" {
 				var err error
@@ -47,10 +47,10 @@ func validateGitBaseClusterCommand() *cobra.Command {
 	}
 	clientConfig = cli.AddKubectlFlagsToCmd(command)
 	command.Flags().StringVar(&argocdNs, "argocd-ns", "argocd", "the argocd namespace")
-	command.Flags().StringVar(&repoUrl, "repo-url", "", "the git repository url for base cluster directory")
+	command.Flags().StringVar(&repoUrl, "repo-url", "", "the git repository url for cluster template directory")
 	command.Flags().StringVar(&repoAlias, "repo-alias", gitrepo.RepoDefaultCtx, "git repository alias to use")
-	command.Flags().StringVar(&repoRevision, "repo-revision", "main", "the git revision for base cluster directory")
-	command.Flags().StringVar(&repoPath, "repo-path", "", "the git repository path for base cluster directory")
+	command.Flags().StringVar(&repoRevision, "repo-revision", "main", "the git revision for cluster template directory")
+	command.Flags().StringVar(&repoPath, "repo-path", "", "the git repository path for cluster template directory")
 	command.MarkFlagsMutuallyExclusive("repo-url", "repo-alias")
 	return command
 }

@@ -5,8 +5,8 @@ import "github.com/spf13/cobra"
 func NewCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:               "basecluster",
-		Short:             "Manage base clusters",
-		Long:              "Manage base clusters",
+		Short:             "Manage cluster templates",
+		Long:              "Manage cluster templates",
 		Aliases:           []string{"clustertemplate"},
 		DisableAutoGenTag: true,
 		Run: func(c *cobra.Command, args []string) {
