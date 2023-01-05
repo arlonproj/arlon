@@ -68,8 +68,8 @@ func ValidateGitDir(
 
 // -----------------------------------------------------------------------------
 
-// Given a list of file entries from a directory, validates whether
-// conditions are met for using the directory as a base cluster.
+// validateDir when given a list of file entries from a directory, validates whether
+// conditions are met for using the directory as a cluster template directory.
 func validateDir(dirPath string, infos []os.FileInfo) (clusterName string, err error) {
 	var kustomizationFound bool
 	var configurationsFound bool
