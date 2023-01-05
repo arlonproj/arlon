@@ -1,0 +1,9 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 3600
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  namespace: cas-e2e-cluster
+  name: cas-e2e-cluster-capi-quickstart
