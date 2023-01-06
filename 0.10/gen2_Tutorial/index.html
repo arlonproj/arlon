@@ -1125,7 +1125,7 @@ arlon cluster create --cluster-name &lt;clusterName&gt; --repo-alias prod --repo
 </code></pre></div>
 <h2 id="gen2-cluster-creation-with-overrides">gen2 cluster creation with overrides<a class="headerlink" href="#gen2-cluster-creation-with-overrides" title="Permanent link">&para;</a></h2>
 <p>We call the concept of constructing various clusters with patches from the same base manifest as cluster overrides.
-The cluster overrides feature is built on top of the existing base cluster design. So, A user can create a cluster from the base manifest using the same command as in the above step(gen2 cluster creation).
+The cluster overrides feature is built on top of the existing cluster template design. So, A user can create a cluster from the base manifest using the same command as in the above step(gen2 cluster creation).
 Now, to create a cluster with overrides in the base manifest, a user should have the corresponding patch files in a single yaml file in local. Here is an example of a patch file where we want to override replicas count to 2 and change the sshkeyname:</p>
 <div class="highlight"><pre><span></span><code>---
 apiVersion: cluster.x-k8s.io/v1beta1
