@@ -6,6 +6,8 @@ coverage:
     patch:
       default:
         informational: true
+github_checks:
+  annotations: false
 
 
 # When modifying this file, please validate using

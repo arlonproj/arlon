@@ -15,8 +15,8 @@ func validateBaseClusterCommand() *cobra.Command {
 	*/
 	command := &cobra.Command{
 		Use:   "validate <filename> [flags]",
-		Short: "validate base cluster file",
-		Long:  "validate base cluster file",
+		Short: "validate cluster template files",
+		Long:  "validate cluster template files",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			/*

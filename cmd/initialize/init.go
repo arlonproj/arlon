@@ -285,7 +285,7 @@ func NewCommand() *cobra.Command {
 		},
 	}
 	cmd.Flags().BoolVarP(&noConfirm, "no-confirm", "y", false, "this flag disables the prompts for argocd and arlon installation on the management cluster")
-	cmd.Flags().BoolVarP(&addExamples, "examples", "e", false, "this flag adds example base cluster manifests")
+	cmd.Flags().BoolVarP(&addExamples, "examples", "e", false, "this flag adds example cluster template manifests")
 	cmd.Flags().StringVar(&gitUser, "username", "", "the git username for the workspace repository")
 	cmd.Flags().StringVar(&password, "password", "", "the password for git user")
 	cmd.Flags().StringVar(&repoUrl, "repoUrl", "", "URL for the workspace repository")
