@@ -13,7 +13,7 @@
     
     
       
-        <title>Concepts - Arlon - GitOps-based Fleet Management for Kubernetes</title>
+        <title>Bundles and Profiles - Concepts - Arlon - GitOps-based Fleet Management for Kubernetes</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#concepts" class="md-skip">
+        <a href="#bundles-and-profiles-concepts" class="md-skip">
           Skip to content
         </a>
       
@@ -119,7 +119,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Concepts
+              Bundles and Profiles - Concepts
             
           </span>
         </div>
@@ -274,101 +274,11 @@
 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Concepts
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../concepts/" class="md-nav__link">
         Concepts
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#management-cluster" class="md-nav__link">
-    Management cluster
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#workload-cluster" class="md-nav__link">
-    Workload Cluster
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cluster-template-gen2-cluster" class="md-nav__link">
-    Cluster Template (gen2 cluster)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cluster-spec-gen1-clusters-deprecated-since-010" class="md-nav__link">
-    Cluster spec (gen1 clusters : deprecated since 0.10)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#application-app" class="md-nav__link">
-    Application (App)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#application-profile-appprofile" class="md-nav__link">
-    Application Profile (AppProfile)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#deploying-apps-to-workload-clusters" class="md-nav__link">
-    Deploying apps to workload clusters
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gen1-profiles" class="md-nav__link">
-    Gen1 Profiles
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -565,58 +475,63 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#management-cluster" class="md-nav__link">
-    Management cluster
+  <a href="#configuration-bundle" class="md-nav__link">
+    Configuration bundle
   </a>
+  
+    <nav class="md-nav" aria-label="Configuration bundle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#static-bundle" class="md-nav__link">
+    Static bundle
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dynamic-bundle" class="md-nav__link">
+    Dynamic bundle
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-properties" class="md-nav__link">
+    Other properties
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#workload-cluster" class="md-nav__link">
-    Workload Cluster
+  <a href="#profile" class="md-nav__link">
+    Profile
+  </a>
+  
+    <nav class="md-nav" aria-label="Profile">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#static-profile" class="md-nav__link">
+    Static profile
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#cluster-template-gen2-cluster" class="md-nav__link">
-    Cluster Template (gen2 cluster)
+        
+          <li class="md-nav__item">
+  <a href="#dynamic-profile" class="md-nav__link">
+    Dynamic profile
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#cluster-spec-gen1-clusters-deprecated-since-010" class="md-nav__link">
-    Cluster spec (gen1 clusters : deprecated since 0.10)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#application-app" class="md-nav__link">
-    Application (App)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#application-profile-appprofile" class="md-nav__link">
-    Application Profile (AppProfile)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#deploying-apps-to-workload-clusters" class="md-nav__link">
-    Deploying apps to workload clusters
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gen1-profiles" class="md-nav__link">
-    Gen1 Profiles
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -635,75 +550,67 @@
   
                   
 
-  <a href="https://github.com/arlonproj/arlon/edit/main/docs/concepts.md" title="Edit this page" class="md-content__button md-icon">
+  <a href="https://github.com/arlonproj/arlon/edit/main/docs/gen1_profiles.md" title="Edit this page" class="md-content__button md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
   </a>
 
 
-<h1 id="concepts">Concepts<a class="headerlink" href="#concepts" title="Permanent link">&para;</a></h1>
-<h2 id="management-cluster">Management cluster<a class="headerlink" href="#management-cluster" title="Permanent link">&para;</a></h2>
-<p>This Kubernetes cluster hosts the following components:</p>
+<h1 id="bundles-and-profiles-concepts">Bundles and Profiles - Concepts<a class="headerlink" href="#bundles-and-profiles-concepts" title="Permanent link">&para;</a></h1>
+<h2 id="configuration-bundle">Configuration bundle<a class="headerlink" href="#configuration-bundle" title="Permanent link">&para;</a></h2>
+<p>A configuration bundle (or just "bundle") is grouping of data files that
+produce a set of Kubernetes manifests via a <em>tool</em>. This closely follows ArgoCD's
+definition of <em>tool types</em>. Consequently, the list of supported bundle
+types mirrors ArgoCD's supported set of manifest-producing tools.
+Each bundle is defined using a Kubernetes ConfigMap resource in the arlon namespace.</p>
+<h3 id="static-bundle">Static bundle<a class="headerlink" href="#static-bundle" title="Permanent link">&para;</a></h3>
+<p>A static bundle embeds the manifest's YAML data itself ("static bundle").
+A cluster consuming a static bundle will always have a snapshot copy of
+the bundle at the time the cluster was created, and is not affected by subsequent
+changes to the bundle's manifest data.</p>
+<h3 id="dynamic-bundle">Dynamic bundle<a class="headerlink" href="#dynamic-bundle" title="Permanent link">&para;</a></h3>
+<p>A dynamic bundle contains a reference to the manifest data stored in git.
+A dynamic bundle is distinguished
+by having these fields set to non-empty values:</p>
 <ul>
-<li>ArgoCD</li>
-<li>Arlon</li>
-<li>Cluster management stacks e.g. Cluster API and/or Crossplane</li>
+<li>git URL of the repo</li>
+<li>Directory path within the repo</li>
 </ul>
-<p>The Arlon state and controllers reside in the arlon namespace.</p>
-<h2 id="workload-cluster">Workload Cluster<a class="headerlink" href="#workload-cluster" title="Permanent link">&para;</a></h2>
-<p>An Arlon workload cluster is a Kubernetes cluster
-that Arlon creates and manages via a git directory structure stored in
-the workspace repository.</p>
-<p>The new way of provisioning workload clusters in Arlon since v0.9 is gen2 clusters using <em>cluster template</em> that replace gen1 clusters using <em>cluster spec</em>
-The most significant change in gen2 clusters is the <em>Cluster Template</em> construct, which replaces the older cluster spec from gen1 clusters.
-To distinguish them from the older gen1 clusters, the ones deployed from a cluster template are called next-gen clusters or gen2 clusters.</p>
-<h2 id="cluster-template-gen2-cluster">Cluster Template (gen2 cluster)<a class="headerlink" href="#cluster-template-gen2-cluster" title="Permanent link">&para;</a></h2>
-<p>A cluster template is a base cluster manifest that can be "cloned" to produce
-one or more identical or similar workload clusters.
-To create a cluster template, you first compose a manifest containing one or more
-declarative resources that define the kind and shape of cluster that you desire.
-You then store the manifest in its own directoy somewhere in git.
-You then instruct Arlon to "prep" the directory to promote it to cluster template.
-To know more about cluster template for Arlon gen2 clusters including the difference
-with cluster spec and the process to create gen2 clusters; read the document <a href="../clustertemplate/">cluster template</a></p>
-<h2 id="cluster-spec-gen1-clusters-deprecated-since-010">Cluster spec (gen1 clusters : deprecated since 0.10)<a class="headerlink" href="#cluster-spec-gen1-clusters-deprecated-since-010" title="Permanent link">&para;</a></h2>
-<p>A cluster spec contains desired settings when creating a new cluster.
-They currently include:</p>
-<ul>
-<li>API Provider: the cluster orchestration technology. Supported values are <code>CAPI</code> (Cluster API) and <code>xplane</code> (Crossplane)</li>
-<li>Cloud Provider: the infrastructure cloud provider. The currently supported values is <code>aws</code>, with <code>gcp</code> and <code>azure</code> support coming later.</li>
-<li>Type: the cluster type. Some API providers support more than one type. On <code>aws</code> cloud, Cluster API supports <code>kubeadm</code> and <code>eks</code>, whereas Crossplane only supports <code>eks</code>.</li>
-<li>The (worker) node instance type</li>
-<li>The initial (worker) node count</li>
-<li>The Kubernetes version</li>
-</ul>
-<h2 id="application-app">Application (App)<a class="headerlink" href="#application-app" title="Permanent link">&para;</a></h2>
-<p>An Arlon Application (or "App" for short) defines a source of Kubernetes
-manifests that can be applied/deployed to a workload cluster. It can
-take the form of raw YAML files, a Helm chart, or a Kustomize directory.
-The source resides in a git repository.
-Arlon represents an App as a specialized ArgoCD ApplicationSet resource.
-An App is not limited traditional "applications" and can refer to any set of
-deployable resources, for e.g. Kubernetes RBAC rules or other types
-of configurations.
-For more details about Apps, refer to <a href="../appprofiles/">AppProfiles article</a></p>
-<h2 id="application-profile-appprofile">Application Profile (AppProfile)<a class="headerlink" href="#application-profile-appprofile" title="Permanent link">&para;</a></h2>
-<p>An AppProfile is simply a set of App names referring to Arlon Apps.
-You use AppProfile resources to define common groupings of apps, for example
-"monitoring-stack", or "security-policies-1".
-It is perfectly legal for multiple AppProfiles to refer to some common App names,
-meaning they can overlap.
-For more details about AppProfiles, refer to <a href="../appprofiles/">AppProfiles article</a></p>
-<h2 id="deploying-apps-to-workload-clusters">Deploying apps to workload clusters<a class="headerlink" href="#deploying-apps-to-workload-clusters" title="Permanent link">&para;</a></h2>
-<p>You deploy apps to workload clusters by annotating a workload cluster
-with the desired AppProfile(s). The union of all Apps referenced by those
-AppProfiles is deployed to the cluster.
-For more details about annotating/targeting clusters,
-refer to <a href="../appprofiles/">AppProfiles article</a></p>
-<h2 id="gen1-profiles">Gen1 Profiles<a class="headerlink" href="#gen1-profiles" title="Permanent link">&para;</a></h2>
-<p>Apps and AppProfiles are a newer version ("gen2") of Arlon profiles.
-There is an older version called "gen1", which is composed of the concepts
-of Bundles and Profiles. For more details, see <a href="../gen1_profiles/">Bundles and Profiles</a></p>
+<p>The git URL must be registered in ArgoCD as a valid repository. The content of
+the specified directory can contain manifests in any of the <em>tool</em> formats supported
+by ArgoCD, including plain YAML, Helm and Kustomize.</p>
+<p>When the user updates a dynamic bundle in git, all clusters consuming that bundle
+(through a profile specified at cluster creation time) will acquire the change.</p>
+<h3 id="other-properties">Other properties<a class="headerlink" href="#other-properties" title="Permanent link">&para;</a></h3>
+<p>A bundle can also have a comma-separated list of tags, and a description.
+Tags can be useful for classifying bundles, for e.g. by type
+("addon", "cni", "rbac", "app").</p>
+<h2 id="profile">Profile<a class="headerlink" href="#profile" title="Permanent link">&para;</a></h2>
+<p>A profile expresses a desired configuration for a Kubernetes cluster.
+It is just a set of references to bundles (static, dynamic, or a combination).
+A profile can be static or dynamic.</p>
+<h3 id="static-profile">Static profile<a class="headerlink" href="#static-profile" title="Permanent link">&para;</a></h3>
+<p>When a cluster consumes a static profile
+at creation time, the set of bundles for the cluster is fixed at that time
+and does not change over time even when the static bundle is updated.
+(Note: the contents of some of those bundles referenced by the static
+profile may however change over time if they are dynamic).
+A static profile is stored as an item
+in the Arlon database (specifically, as a CR in the Management Cluster).</p>
+<h3 id="dynamic-profile">Dynamic profile<a class="headerlink" href="#dynamic-profile" title="Permanent link">&para;</a></h3>
+<p>A dynamic profile, on the other hand, has two components: the specification
+stored in the Arlon database, and a <em>compiled</em> component living in the workspace
+repository at a path specified by the user.
+(Note: this repository is usually the workspace repo, but it technically doesn't
+have to be, as long as it's a valid repo registered in ArgoCD)
+The compiled component is essentially a
+Helm chart of multiple ArgoCD app resources, each one pointing to a bundle.
+Arlon automatically creates and maintains the compiled component.
+When a user updates the composition of a dynamic profile, meaning redefines its
+bundle set, the Arlon library updates the compiled component to point to the
+bundles specified in the new set. Any cluster
+consuming that dynamic profile will be affected by the change, meaning it may lose
+or acquire new bundles in real time.</p>
 
 
 
@@ -723,50 +630,6 @@ of Bundles and Profiles. For more details, see <a href="../gen1_profiles/">Bundl
         
 
 <footer class="md-footer">
-  
-    <nav
-      class="md-footer__inner md-grid"
-      aria-label="Footer"
-    >
-      
-        <a
-          href=".."
-          class="md-footer__link md-footer__link--prev"
-          rel="prev"
-        >
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              Overview
-            </div>
-          </div>
-        </a>
-      
-      
-        <a
-          href="../clustertemplate/"
-          class="md-footer__link md-footer__link--next"
-          rel="next"
-        >
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              Cluster template
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
-          </div>
-        </a>
-      
-    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
