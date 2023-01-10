@@ -48,7 +48,7 @@ metadata:
     arlon.io/profiles: frontend,backend
     arlon.io/basecluster-name: mycluster
     arlon.io/basecluster-repo-path: examples/clustertemplates/eks-managed-mpool
-    arlon.io/basecluster-repo-revision: private/leb/multiprofiles
+    arlon.io/basecluster-repo-revision: v0.10
     arlon.io/basecluster-repo-url: https://github.com/arlonproj/arlon.git
   finalizers:
   - resources-finalizer.argocd.argoproj.io/foreground
@@ -81,7 +81,7 @@ spec:
       namePrefix: example-1-
     repoURL: https://github.com/arlonproj/arlon.git
     path: examples/clustertemplates/eks-managed-mpool
-    targetRevision: private/leb/multiprofiles
+    targetRevision: v0.10
   syncPolicy:
     automated:
       prune: true
