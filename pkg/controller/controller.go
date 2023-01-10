@@ -2,7 +2,9 @@ package controller
 
 import (
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
-	appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
+	//appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
+	"os"
+
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"github.com/arlonproj/arlon/controllers"
 	"github.com/arlonproj/arlon/pkg/argocd"
@@ -11,7 +13,6 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
-	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
@@ -26,7 +27,7 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(arlonv1.AddToScheme(scheme))
-	utilruntime.Must(appset.AddToScheme(scheme))
+	utilruntime.Must(argoapp.AddToScheme(scheme))
 	utilruntime.Must(argoapp.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }

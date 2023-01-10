@@ -3,10 +3,12 @@ package app
 import (
 	"context"
 	"fmt"
-	appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
+	"os"
+
+	//appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
+	appset "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/arlonproj/arlon/pkg/app"
 	"github.com/arlonproj/arlon/pkg/ctrlruntimeclient"
-	"os"
 
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/spf13/cobra"
