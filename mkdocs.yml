@@ -7,7 +7,7 @@ theme:
   favicon: images/favicon-32x32.png
   palette: 
     # Palette toggle for light mode
-    - scheme: default
+    scheme: default
   font:
     text: Work Sans
 
