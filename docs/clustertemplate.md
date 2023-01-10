@@ -113,7 +113,7 @@ The application spec's ApplicationSource points to the existing Arlon Helm chart
 located here by default:
 
 - Repo: [https://github.com/arlonproj/arlon.git](https://github.com/arlonproj/arlon.git)
-- Revision: private/leb/gen2 (IMPORTANT: NEEDS TO CHANGE TO STABLE BRANCH OR TAG)
+- Revision: v0.10
 - Path: pkg/cluster/manifests
 
 This is the same Helm chart that gen1 clusters using `arlon cluster deploy` are deployed from.
