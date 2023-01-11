@@ -30,7 +30,7 @@ ApplicationSets managed by Arlon to represent apps are distinguished from
 other ApplicationSets via the `arlon-type=application` label.
 The ApplicationSet's Generators list must contain a single generator of [List](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-List/)
 type. The Arlon AppProfile controller will modify this list in real-time
-to deploy to application to the right workload clusters (or no cluster at all).
+to deploy the application to the right workload clusters (or no cluster at all).
 
 While it is possible for you create and edit an ApplicationSet resource manifest
 satisfying the requirements to be an Arlon App from scratch, Arlon makes
@@ -38,7 +38,7 @@ this easier with the `arlon app create --output-yaml` command, which outputs an
 initial compliant manifest that you can
 save to a file and edit to your liking before applying to
 the management cluster to actually create the app.
-(Without the ``--output-yaml` flag, the command will apply the resource for you).
+(Without the `--output-yaml` flag, the command will apply the resource for you).
 
 Here's an example of an initial Arlon Application manifest:
 
@@ -94,10 +94,10 @@ NAME         REPO                                     PATH              REVISION
 myconfigmap  https://github.com/bcle/fleet-infra.git  apps/my-cfgmap-1  HEAD      [marketing]
 ```
 
-The second way is to use pure kubectl to list ApplicationSets with a particular label:
+The second way is to use pure kubectl to list ApplicationSets with the Arlon specific label:
 
 ```shell
-$ kubectl -n argocd get applicationset
+$ kubectl -n argocd get applicationset -l arlon-type=application
 NAME          AGE
 myconfigmap   21d
 ```
