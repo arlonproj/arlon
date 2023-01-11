@@ -77,14 +77,14 @@ Clusterspec currently includes:
 
 #### gen2
 
-for gen2 clusters, the Cluster Specification is called the base cluster, which is described in detail [here](https://github.com/arlonproj/arlon/blob/main/docs/baseclusters.md).
+for gen2 clusters, the Cluster Specification is called the cluster template, which is described in detail [here](https://github.com/arlonproj/arlon/blob/main/docs/baseclusters.md).
 
-A base cluster manifest consists of:
+A cluster template consists of:
 
 - A predefined list of Cluster API objects: Cluster, Machines, Machine Deployments, etc. to be deployed in the current namespace
 - The specific infrastructure provider to be used (e.g aws).ß
 - Kubernetes version
-- Cluster templates/ flavors that need to be used for creating the cluster manifest (e.g eks, eks-managedmachinepool)
+- Cluster templates/ flavors that need to be used for creating the cluster template (e.g eks, eks-managedmachinepool)
 
 ### Cluster Preparation
 
@@ -96,7 +96,7 @@ Once the clusterspec is created for a gen-1 cluster, there is no need to prepare
 
 #### gen2
 
-Once the base cluster manifest is created, the next step is to preare the workspace repository directory in which this base cluster manifest is present. This is explained in detail [here](https://github.com/arlonproj/arlon/blob/main/docs/baseclusters.md#preparation)
+Once the cluster manifest is created, the next step is to preare the workspace repository directory in which this cluster manifest is present. This is explained in detail [here](https://github.com/arlonproj/arlon/blob/main/docs/baseclusters.md#preparation)
 
 ### Cluster Creation
 
@@ -123,4 +123,4 @@ Cluster deployment is explained [here](https://github.com/arlonproj/arlon/blob/m
 
 #### gen2
 
-Base cluster creation is explained [here](https://github.com/arlonproj/arlon/blob/main/docs/baseclusters.md#creation)
+cluster template creation is explained [here](https://github.com/arlonproj/arlon/blob/main/docs/baseclusters.md#creation)

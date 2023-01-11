@@ -43,7 +43,7 @@ nav:
     - Home: 'README.md'
     - Concepts: 'concepts.md'
     - Design: 'design.md'    
-    - Base clusters: 'baseclusters.md'
+    - Cluster template: 'clustertemplate.md'
     - Architecture: 'architecture.md'
     - Installation: 'installation.md'
     - Tutorial (gen1): 'tutorial.md' 
