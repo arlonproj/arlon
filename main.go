@@ -31,6 +31,8 @@ import (
 
 	apppkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	"github.com/argoproj/argo-cd/v2/util/io"
+	"github.com/spf13/cobra"
+
 	"github.com/arlonproj/arlon/cmd/basecluster"
 	"github.com/arlonproj/arlon/cmd/bundle"
 	"github.com/arlonproj/arlon/cmd/callhomecontroller"
@@ -44,7 +46,6 @@ import (
 	"github.com/arlonproj/arlon/cmd/verify"
 	"github.com/arlonproj/arlon/cmd/version"
 	"github.com/arlonproj/arlon/pkg/argocd"
-	"github.com/spf13/cobra"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
