@@ -2,14 +2,15 @@ package cluster
 
 import (
 	"fmt"
+	"os"
+	"text/tabwriter"
+
 	"github.com/argoproj/argo-cd/v2/util/cli"
 	"github.com/argoproj/argo-cd/v2/util/io"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	"github.com/arlonproj/arlon/pkg/cluster"
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/tools/clientcmd"
-	"os"
-	"text/tabwriter"
 )
 
 func listClustersCommand() *cobra.Command {
@@ -46,7 +47,7 @@ func listClusters(clientConfig clientcmd.ClientConfig, argocdNs string) error {
 
 func printClusterTable(clist []cluster.Cluster) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintf(w, "NAME\tEXTERNAL\tBASECLUSTER\tCLUSTERSPEC\tPROFILE\t\n")
+	_, _ = fmt.Fprintf(w, "NAME\tEXTERNAL\tCLUSTERTEMPLATE\tCLUSTERSPEC\tPROFILE\t\n")
 	for _, c := range clist {
 		var baseClusterName string
 		if c.BaseCluster != nil {
