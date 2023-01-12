@@ -145,8 +145,8 @@ github.com/apparentlymart/go-cidr v1.1.0 h1:2mAhrMoF+nhXqxTzSZMUzDHkLjmIHC+Zzn4t
 github.com/apparentlymart/go-cidr v1.1.0/go.mod h1:EBcsNrHc3zQeuaeCeCtQruQm+n9/YjEn/vI25Lg7Gwc=
 github.com/appscode/go v0.0.0-20190808133642-1d4ef1f1c1e0/go.mod h1:iy07dV61Z7QQdCKJCIvUoDL21u6AIceRhZzyleh2ymc=
 github.com/appscode/go v0.0.0-20191119085241-0887d8ec2ecc/go.mod h1:OawnOmAL4ZX3YaPdN+8HTNwBveT1jMsqP74moa9XUbE=
-github.com/argoproj/argo-cd/v2 v2.5.5 h1:ezKJ9x1JZ6SGibQkZEWLzWSx7Uwc9GYsubfbNyQtf3g=
-github.com/argoproj/argo-cd/v2 v2.5.5/go.mod h1:3ToENm286PFVlZKNMutBzOwNyhevz4fw9dcgyiq3FIY=
+github.com/argoproj/argo-cd/v2 v2.5.6 h1:KTGlds24B0tGPjpospUU+vjINxV13BvJ3xb6uAGSA7E=
+github.com/argoproj/argo-cd/v2 v2.5.6/go.mod h1:3ToENm286PFVlZKNMutBzOwNyhevz4fw9dcgyiq3FIY=
 github.com/argoproj/gitops-engine v0.7.1-0.20221004132320-98ccd3d43fd9 h1:pXN64mJfrg8qx4mgWDnJ9E2T5ikZupvVRSXYMoe39Y8=
 github.com/argoproj/gitops-engine v0.7.1-0.20221004132320-98ccd3d43fd9/go.mod h1:WpA/B7tgwfz+sdNE3LqrTrb7ArEY1FOPI2pAGI0hfPc=
 github.com/argoproj/notifications-engine v0.3.1-0.20220812180936-4d8552b0775f h1:xTts6TJ/SBbY9zV8qpueokUd3+SlJN6Abt4W6lAjOKM=
