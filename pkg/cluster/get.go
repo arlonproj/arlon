@@ -3,6 +3,7 @@ package cluster
 import (
 	"context"
 	"fmt"
+
 	apppkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	"github.com/arlonproj/arlon/pkg/common"
@@ -89,8 +90,8 @@ func (c *Cluster) String() string {
 	if c.IsExternal {
 		s = s + ", Type: external"
 	} else if c.BaseCluster != nil {
-		s = s + ", Type: next-gen, Base Cluster Repo Url: " + c.BaseCluster.RepoUrl +
-			", Base Cluster Repo Path: " + c.BaseCluster.RepoPath
+		s = s + ", Type: next-gen, Cluster template Repo Url: " + c.BaseCluster.RepoUrl +
+			", Cluster template Repo Path: " + c.BaseCluster.RepoPath
 	} else {
 		s = s + ", Type: previous gen, Cluster Spec: " + c.ClusterSpecName
 	}
