@@ -34,7 +34,7 @@ while `cluster-b` is given profile `yyy`.
 
 A cluster manifest serves as a base for creating new workload clusters. The workload clusters
 are all exact copies of the cluster manifest, meaning that they acquire all unmodified resources of the
-bcluster manifest, except for:
+cluster manifest, except for:
 
 - resource names, which are prefixed during the cluster creation process to make them unique to avoid conflicts
 - the namespace, which is set to a new namespace unique to the workload cluster
