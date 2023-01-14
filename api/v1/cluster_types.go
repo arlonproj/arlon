@@ -27,15 +27,42 @@ import (
 type ClusterSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	ClusterTemplate RepoSpec        `json:"clusterTemplate"`
+	Override        *OverrideSpec   `json:"override,omitempty"`
+	Autoscaler      *AutoscalerSpec `json:"autoscaler,omitempty"`
+	ArlonHelmChart  *RepoSpec       `json:"arlonHelmChart,omitempty"`
+}
 
-	// Foo is an example field of Cluster. Edit cluster_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+type RepoSpec struct {
+	Url      string `json:"url"`
+	Path     string `json:"path"`
+	Revision string `json:"revision"`
+}
+
+type OverrideSpec struct {
+	Patch string   `json:"patch"`
+	Repo  RepoSpec `json:"repo"`
+}
+
+type AutoscalerSpec struct {
+	MgmtClusterHost string `json:"host"`
 }
 
 // ClusterStatus defines the observed state of Cluster
 type ClusterStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// State has these possible values
+	// - empty string: never processed by controller
+	// - retrying: encountered a (possibly temporary) error, will retry later
+	// - created: all resources created
+	State string `json:"state,omitempty"`
+
+	// Indicates whether the override portion of the cluster
+	// (the patch files in git) has been successfully created. Only
+	// applicable to a cluster that specifies an override.
+	OverrideSuccessful bool `json:"overrideSuccessful,omitempty"`
+
+	// An optional message with details about the error for a 'retrying' state
+	Message string `json:"message,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -58,6 +85,10 @@ type ClusterList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Cluster `json:"items"`
 }
+
+const (
+	ClusterFinalizer = "clusterregistration.core.arlon.io"
+)
 
 func init() {
 	SchemeBuilder.Register(&Cluster{}, &ClusterList{})

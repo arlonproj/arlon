@@ -42,8 +42,8 @@ func createClusterCommand() *cobra.Command {
 	var gen2CASEnabled bool //gen2 specific flag to enable cluster autoscaler
 	command := &cobra.Command{
 		Use:   "create",
-		Short: "create new cluster from a base",
-		Long:  "create new cluster from a base",
+		Short: "create new workload cluster from a cluster template",
+		Long:  "create new workload cluster from a cluster template",
 		RunE: func(c *cobra.Command, args []string) error {
 			if clusterRepoUrl == "" {
 				var err error

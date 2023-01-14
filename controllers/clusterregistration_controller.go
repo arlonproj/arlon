@@ -64,7 +64,7 @@ type ClusterRegistrationReconciler struct {
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
 func (r *ClusterRegistrationReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx)
-	log.V(1).Info("arlo clusterregistration")
+	log.V(1).Info("arlon clusterregistration")
 	var cr arlonv1.ClusterRegistration
 
 	if err := r.Get(ctx, req.NamespacedName, &cr); err != nil {

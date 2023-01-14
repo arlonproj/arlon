@@ -37,6 +37,8 @@ func Create(
 	if err != nil {
 		return nil, fmt.Errorf("failed to get kube client: %s", err)
 	}
+	// FIXME: the following check is wrong for a gen2 cluster, whose name
+	//        is actually ${clusterName}-arlon
 	_, err = appIf.Get(context.Background(),
 		&argoapp.ApplicationQuery{Name: &clusterName})
 	if err == nil {
