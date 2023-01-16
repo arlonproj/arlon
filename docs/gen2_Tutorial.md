@@ -554,7 +554,7 @@ The CLI can be downloaded from [GitHub releases](https://github.com/arlonproj/ar
 The official releases follow a semver versioning scheme. All patches to a minor version are non-breaking changes. For instance, the transition from `v0.9.9` to `v0.9.10` will not introduce any breaking changes.
 However, a change in either minor or the major versions doesn't guarantee this.
 
-To check if there are patches available for the current minor version of the CLI, Arlon has a `version check` command. If patches for a CLI minor version, the command will request to download the newer version.
+To check if there are patches available for the current minor version of the CLI, Arlon has a `version check` command. If upgrade patch for a CLI minor version is available, the command will request to download the newer version.
 For example:
 ```shell
 arlon version check
@@ -563,5 +563,5 @@ Arlon CLI version 0.10.0 is outdated. New patch 0.10.1 available
 Otherwise, the CLI reports that it is up-to date.
 ```shell
 arlon version check
-"Arlon CLI version 0.10.0 up-to-date
+"Arlon CLI version 0.10.0 is up-to-date
 ```

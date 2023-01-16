@@ -45,7 +45,7 @@ func check() *cobra.Command {
 				fmt.Printf("Arlon CLI version %s is outdated. New patch %s available\n", cliVersion, ver.String())
 				return nil
 			}
-			fmt.Printf("Arlon CLI version %s up-to-date\n", cliVersion)
+			fmt.Printf("Arlon CLI version %s is up-to-date\n", cliVersion)
 			return nil
 		},
 	}
