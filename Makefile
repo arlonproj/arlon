@@ -179,5 +179,12 @@ test-e2e-appprofiles:
 	./testing/e2e_setup.sh
 	kubectl kuttl test --start-kind=false ./testing/e2e-appprofiles/ --test 00-deploy
 
+test-e2e-cas:
+	./testing/e2e_cas_setup.sh
+	kubectl kuttl test --start-kind=false ./testing/e2e-cas/ --test 00-cas
+
 e2e-teardown:
 	./testing/e2e_setup_teardown.sh
+
+e2e-teardown-cas:
+	./testing/e2e_cas_teardown.sh

@@ -1,0 +1,8 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  - command: arlon bundle create cas-bundle --tags cas,devel,test --desc "CAS Bundle" --repo-url https://github.com/arlonproj/arlon.git --repo-path bundles/capi-cluster-autoscaler --srctype helm --repo-revision v0.10
+  - command: arlon profile create dynamic-cas --repo-base-path profiles --bundles cas-bundle --desc "dynamic cas profile" --tags examples
+  - command: arlon clustertemplate preparegit --repo-path basecluster/cas-cluster --cas-min 1 --cas-max 9
+  - command: arlon clustertemplate validategit --repo-path basecluster/cas-cluster
+  - command: arlon cluster create --cluster-name cas-e2e-cluster --repo-path basecluster/cas-cluster --profile dynamic-cas --autoscaler

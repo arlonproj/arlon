@@ -1,0 +1,58 @@
+name: cas-e2e-test
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v0.10*'
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_CONTROL_PLANE_MACHINE_TYPE: ${{ secrets.AWS_CONTROL_PLANE_MACHINE_TYPE }}
+  AWS_NODE_MACHINE_TYPE: ${{ secrets.AWS_NODE_MACHINE_TYPE }}
+  AWS_SSH_KEY_NAME: ${{ secrets.AWS_SSH_KEY_NAME }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # to take care of gh api rate limit when fetching capi provider manifests
+  GIT_USER: ${{ secrets.GIT_USER }}
+  GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
+  GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+jobs:
+  e2e:
+    environment: CAS E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      -
+        name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          go-version: 1.19
+          check-latest: true
+      -
+        name: Print the version of golang
+        run: |
+          go version
+      -
+        name: Cache go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      -
+        name: Run e2e-tests
+        run: |
+          make test-e2e-cas
+      - 
+        name: Teardown arlon gitserver
+        if: success() || failure()
+        run: |
+          make e2e-teardown-cas

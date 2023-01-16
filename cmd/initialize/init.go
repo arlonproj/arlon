@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -170,6 +171,7 @@ func NewCommand() *cobra.Command {
 			}
 			installCmd := install.NewCommand()
 			_ = installCmd.Flag("capi-only").Value.Set("true")
+			_ = installCmd.Flag("no-confirm").Value.Set(strconv.FormatBool(noConfirm))
 			if err := installCmd.RunE(installCmd, []string{}); err != nil {
 				return err
 			}
