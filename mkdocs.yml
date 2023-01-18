@@ -7,7 +7,7 @@ theme:
   favicon: images/favicon-32x32.png
   palette: 
     # Palette toggle for light mode
-    - scheme: default
+    scheme: default
   font:
     text: Work Sans
 
@@ -21,7 +21,7 @@ extra:
     provider: mike
 
 extra_javascript:
-  - https://unpkg.com/mermaid@8.8.4/dist/mermaid.min.js
+  - https://unpkg.com/mermaid@9.3.0/dist/mermaid.min.js
   
 extra_css:
   - stylesheets/extra.css
