@@ -24,12 +24,15 @@ import (
 	"github.com/argoproj/argo-cd/v2/util/io"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	corev1 "github.com/arlonproj/arlon/api/v1"
+	"github.com/arlonproj/arlon/pkg/argocd"
+	bcl "github.com/arlonproj/arlon/pkg/basecluster"
 	"github.com/arlonproj/arlon/pkg/cluster"
 	"github.com/go-logr/logr"
 	grpccodes "google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	restclient "k8s.io/client-go/rest"
 	"sigs.k8s.io/cluster-api/util/patch"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -52,6 +55,9 @@ type ClusterReconciler struct {
 	client.Client
 	Scheme       *runtime.Scheme
 	ArgocdClient apiclient.Client
+	Config       *restclient.Config
+	ArgoCdNs     string
+	ArlonNs      string
 }
 
 //+kubebuilder:rbac:groups=core.arlon.io,resources=clusters,verbs=get;list;watch;create;update;patch;delete
@@ -107,14 +113,33 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 		return ctrl.Result{}, nil
 	}
+	ctmpl := &cr.Spec.ClusterTemplate
+	if cr.Status.InnerClusterName == "" {
+		log.Info("validating cluster template ...")
+		_, creds, err := argocd.GetKubeclientAndRepoCreds(r.Config, r.ArgoCdNs,
+			ctmpl.Url)
+		if err != nil {
+			msg := fmt.Sprintf("failed to get repo creds: %s", err)
+			return r.UpdateState(log, &cr, "retrying", msg, retryDelayAsResult)
+		}
+		innerClusterName, err := bcl.ValidateGitDir(creds, ctmpl.Url, ctmpl.Revision, ctmpl.Path)
+		if err != nil {
+			msg := fmt.Sprintf("failed to validate cluster template: %s", err)
+			return r.UpdateState(log, &cr, "retrying", msg, retryDelayAsResult)
+		}
+		cr.Status.InnerClusterName = innerClusterName
+		return r.UpdateState(log, &cr, "initializing",
+			"cluster template validation successful", ctrl.Result{})
+	}
 	conn, appIf, err := r.ArgocdClient.NewApplicationClient()
 	if err != nil {
 		msg := fmt.Sprintf("failed to get argocd application client: %s", err)
 		return r.UpdateState(log, &cr, "retrying", msg, retryDelayAsResult)
 	}
 	defer io.Close(conn)
-	arlonAppName := fmt.Sprintf("%s-arlon", cr.Name)
+
 	// Check if arlon app already exists
+	arlonAppName := fmt.Sprintf("%s-arlon", cr.Name)
 	_, err = appIf.Get(context.Background(), &argoapp.ApplicationQuery{Name: &arlonAppName})
 	if err != nil {
 		grpcStatus, ok := grpcstatus.FromError(err)
@@ -132,15 +157,42 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			helmChartInfo = &defaultArlonChart
 		}
 		casMgmtClusterHost := ""
-		if cr.Spec.Autoscaler != nil {
+		innerClusterName := ""
+		gen2CASEnabled := cr.Spec.Autoscaler != nil
+		if gen2CASEnabled {
 			casMgmtClusterHost = cr.Spec.Autoscaler.MgmtClusterHost
+			innerClusterName = cr.Status.InnerClusterName
 		}
-		arlonApp, err := cluster.Create(appIf, config, argocdNs, arlonNs,
-			clusterName, baseClusterName, arlonRepoUrl, arlonRepoRevision,
-			arlonRepoPath, "",
-			nil, createInArgoCd, config.Host, gen2CASEnabled)
+		arlonHelmChart := cr.Spec.ArlonHelmChart
+		if arlonHelmChart == nil {
+			arlonHelmChart = &defaultArlonChart
+		}
+		_, err = cluster.Create(appIf, r.Config, r.ArgoCdNs, r.ArlonNs,
+			cr.Name, innerClusterName, arlonHelmChart.Url, arlonHelmChart.Revision,
+			arlonHelmChart.Path, "",
+			nil, false, casMgmtClusterHost, gen2CASEnabled)
+		if err != nil {
+			msg := fmt.Sprintf("failed to create arlon application: %s", err)
+			return r.UpdateState(log, &cr, "retrying", msg, retryDelayAsResult)
+		}
 	}
-	return ctrl.Result{}, nil
+	// Check if cluster app already exists
+	_, err = appIf.Get(context.Background(), &argoapp.ApplicationQuery{Name: &cr.Name})
+	if err == nil {
+		// We're done
+		return r.UpdateState(log, &cr, "created",
+			"cluster app already exists -- ok", ctrl.Result{})
+	}
+	overridden := false
+	_, err = cluster.CreateClusterApp(appIf, r.ArgoCdNs,
+		cr.Name, cr.Status.InnerClusterName, ctmpl.Url, ctmpl.Revision,
+		ctmpl.Path, false, overridden)
+	if err != nil {
+		msg := fmt.Sprintf("failed to create cluster application: %s", err)
+		return r.UpdateState(log, &cr, "retrying", msg, retryDelayAsResult)
+	}
+	return r.UpdateState(log, &cr, "created",
+		"cluster creation successful", retryDelayAsResult)
 }
 
 func (r *ClusterReconciler) UpdateState(

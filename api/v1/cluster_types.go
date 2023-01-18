@@ -45,6 +45,7 @@ type OverrideSpec struct {
 }
 
 type AutoscalerSpec struct {
+	// The external URL or host:port of the management cluster
 	MgmtClusterHost string `json:"host"`
 }
 
@@ -55,6 +56,10 @@ type ClusterStatus struct {
 	// - retrying: encountered a (possibly temporary) error, will retry later
 	// - created: all resources created
 	State string `json:"state,omitempty"`
+
+	// The inner name of the Cluster resource in the cluster template.
+	// Empty value means that the cluster template has not yet been validated.
+	InnerClusterName string `json:"innerClusterName,omitempty"`
 
 	// Indicates whether the override portion of the cluster
 	// (the patch files in git) has been successfully created. Only
