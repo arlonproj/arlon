@@ -1,7 +1,6 @@
 package install
 
 type dockerInstaller struct {
-	silence bool
 }
 
 // haven't encountered any soft failures when installing capd(yet)

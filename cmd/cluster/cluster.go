@@ -20,7 +20,7 @@ func NewCommand() *cobra.Command {
 		Aliases:           []string{"clusters"},
 		PersistentPreRun:  checkForArgocd,
 		Run: func(c *cobra.Command, args []string) {
-			c.Usage()
+			_ = c.Usage()
 		},
 	}
 	// `cluster deploy` is only for gen1 clusters

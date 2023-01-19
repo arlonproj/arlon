@@ -10,7 +10,7 @@ func NewCommand() *cobra.Command {
 		Aliases:           []string{"basecluster", "clustertemplates", "baseclusters"},
 		DisableAutoGenTag: true,
 		Run: func(c *cobra.Command, args []string) {
-			c.Usage()
+			_ = c.Usage()
 		},
 	}
 	command.AddCommand(validateBaseClusterCommand())

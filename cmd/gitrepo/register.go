@@ -109,6 +109,6 @@ func register() *cobra.Command {
 	command.Flags().StringVar(&userName, "user", "", "username for the repository configuration")
 	command.Flags().StringVar(&password, "password", "", "password of the user")
 	command.Flags().StringVar(&alias, "alias", gitrepo.RepoDefaultCtx, "alias for the git repository")
-	command.MarkFlagRequired("user")
+	_ = command.MarkFlagRequired("user")
 	return command
 }

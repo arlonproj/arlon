@@ -183,7 +183,7 @@ func ReconcileEverything(
 		dirty := false
 		beforeInvalidNames := sets.NewSet[string](prof.Status.InvalidAppNames...)
 		afterInvalidNames := sets.NewSet[string]()
-		clustersUsingThisProfile, _ := profileToClusters[prof.Name]
+		clustersUsingThisProfile := profileToClusters[prof.Name]
 		for _, appName := range prof.Spec.AppNames {
 			if !validAppNames.Contains(appName) {
 				afterInvalidNames.Add(appName)

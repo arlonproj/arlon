@@ -10,7 +10,7 @@ func NewCommand() *cobra.Command {
 		DisableAutoGenTag: true,
 		Aliases:           []string{"appprofiles"},
 		Run: func(c *cobra.Command, args []string) {
-			c.Usage()
+			_ = c.Usage()
 		},
 	}
 	command.AddCommand(listAppProfilesCommand())

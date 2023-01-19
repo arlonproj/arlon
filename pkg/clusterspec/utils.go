@@ -80,7 +80,7 @@ var (
 
 func ValidValues(vals map[string]bool) string {
 	var allKeys []string
-	for key, _ := range vals {
+	for key := range vals {
 		allKeys = append(allKeys, key)
 	}
 	sort.Strings(allKeys)

@@ -153,9 +153,7 @@ func StringListFromCommaSeparated(cs string) (sl []string) {
 	if cs == "" {
 		return
 	}
-	for _, item := range strings.Split(cs, ",") {
-		sl = append(sl, item)
-	}
+	sl = append(sl, strings.Split(cs, ",")...)
 	return
 }
 

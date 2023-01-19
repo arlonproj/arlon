@@ -176,7 +176,7 @@ func createClusterCommand() *cobra.Command {
 	command.Flags().BoolVar(&outputYaml, "output-yaml", false, "output root applications YAML instead of deploying to ArgoCD")
 	command.Flags().StringVar(&profileName, "profile", "", "profile name (if specified, must refer to dynamic profile)")
 	command.Flags().BoolVar(&gen2CASEnabled, "autoscaler", false, "enable CAPI cluster autoscaler for cluster template based clusters")
-	command.MarkFlagRequired("cluster-name")
+	_ = command.MarkFlagRequired("cluster-name")
 	command.MarkFlagsMutuallyExclusive("repo-url", "repo-alias")
 	return command
 }

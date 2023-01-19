@@ -66,6 +66,9 @@ func Update(
 	}
 	// Ensure subchart name (api, cloud, clustertype) hasn't changed
 	subchartName, err := clusterspec.SubchartName(clusterSpecCm)
+	if err != nil {
+		return nil, err
+	}
 	helmParamName := fmt.Sprintf("tags.%s", subchartName)
 	found := false
 	for _, param := range oldApp.Spec.Source.Helm.Parameters {

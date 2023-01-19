@@ -43,6 +43,7 @@ func createFileSystemBasedRepo(t *testing.T, subdirName string) (*gogit.Reposito
 	wt, err := repo.Worktree()
 	assert.NilError(t, err, "failed to get worktree")
 	changed, err := gitutils.CommitChanges(tmpDir, wt, "initial commit")
+	assert.NilError(t, err)
 	assert.Assert(t, changed, "unexpected changed status from CommitChanges()")
 	t.Cleanup(func() { os.RemoveAll(tmpDir) })
 	return repo, tmpDir

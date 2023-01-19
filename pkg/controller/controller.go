@@ -21,7 +21,6 @@ import (
 var (
 	scheme   = runtime.NewScheme()
 	setupLog = ctrl.Log.WithName("setup")
-	cmd      string
 )
 
 func init() {

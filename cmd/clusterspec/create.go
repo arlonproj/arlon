@@ -62,7 +62,7 @@ func createClusterspecCommand() *cobra.Command {
 	command.Flags().BoolVar(&clusterAutoscalerEnabled, "casenabled", false, "enable cluster autoscaler")
 	command.Flags().IntVar(&clusterAutoscalerMinNodes, "casmin", 1, "minimum number of nodes for cluster autoscaling")
 	command.Flags().IntVar(&clusterAutoscalerMaxNodes, "casmax", 9, "maximum number of nodes for cluster autoscaling")
-	command.MarkFlagRequired("sshkey")
-	command.MarkFlagRequired("region")
+	_ = command.MarkFlagRequired("sshkey")
+	_ = command.MarkFlagRequired("region")
 	return command
 }

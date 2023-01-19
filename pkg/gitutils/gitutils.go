@@ -65,7 +65,7 @@ func CommitDeleteChanges(tmpDir string, wt *gogit.Worktree, commitMsg string) (c
 	if err != nil {
 		return false, fmt.Errorf("failed to get worktree status: %s", err)
 	}
-	for file, _ := range status {
+	for file := range status {
 		_, _ = wt.Add(file)
 		changed = true
 	}

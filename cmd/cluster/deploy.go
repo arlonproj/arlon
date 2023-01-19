@@ -99,7 +99,7 @@ func deployClusterCommand() *cobra.Command {
 	command.Flags().StringVar(&clusterSpecName, "cluster-spec", "", "the clusterspec to use (only for gen1 clusters)")
 	command.Flags().StringVar(&basePath, "repo-path", "clusters", "the git repository base path (cluster subdirectory will be created under this for gen1 clusters)")
 	command.Flags().BoolVar(&outputYaml, "output-yaml", false, "output root application YAML instead of deploying to ArgoCD")
-	command.MarkFlagRequired("cluster-name")
+	_ = command.MarkFlagRequired("cluster-name")
 	command.MarkFlagsMutuallyExclusive("repo-url", "repo-alias")
 	return command
 }
