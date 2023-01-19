@@ -7,7 +7,7 @@ func NewCommand() *cobra.Command {
 		Use:               "basecluster",
 		Short:             "Manage cluster templates",
 		Long:              "Manage cluster templates",
-		Aliases:           []string{"clustertemplate"},
+		Aliases:           []string{"clustertemplate", "clustertemplates", "baseclusters"},
 		DisableAutoGenTag: true,
 		Run: func(c *cobra.Command, args []string) {
 			c.Usage()
