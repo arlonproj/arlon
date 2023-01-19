@@ -35,13 +35,88 @@ spec:
           spec:
             description: ClusterSpec defines the desired state of Cluster
             properties:
-              foo:
-                description: Foo is an example field of Cluster. Edit cluster_types.go
-                  to remove/update
-                type: string
+              arlonHelmChart:
+                properties:
+                  path:
+                    type: string
+                  revision:
+                    type: string
+                  url:
+                    type: string
+                required:
+                - path
+                - revision
+                - url
+                type: object
+              autoscaler:
+                properties:
+                  host:
+                    description: The external URL or host:port of the management cluster
+                    type: string
+                required:
+                - host
+                type: object
+              clusterTemplate:
+                description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+                  Important: Run "make" to regenerate code after modifying this file'
+                properties:
+                  path:
+                    type: string
+                  revision:
+                    type: string
+                  url:
+                    type: string
+                required:
+                - path
+                - revision
+                - url
+                type: object
+              override:
+                properties:
+                  patch:
+                    type: string
+                  repo:
+                    properties:
+                      path:
+                        type: string
+                      revision:
+                        type: string
+                      url:
+                        type: string
+                    required:
+                    - path
+                    - revision
+                    - url
+                    type: object
+                required:
+                - patch
+                - repo
+                type: object
+            required:
+            - clusterTemplate
             type: object
           status:
             description: ClusterStatus defines the observed state of Cluster
+            properties:
+              innerClusterName:
+                description: The inner name of the Cluster resource in the cluster
+                  template. Empty value means that the cluster template has not yet
+                  been validated.
+                type: string
+              message:
+                description: An optional message with details about the error for
+                  a 'retrying' state
+                type: string
+              overrideSuccessful:
+                description: Indicates whether the override portion of the cluster
+                  (the patch files in git) has been successfully created. Only applicable
+                  to a cluster that specifies an override.
+                type: boolean
+              state:
+                description: 'State has these possible values - empty string: never
+                  processed by controller - retrying: encountered a (possibly temporary)
+                  error, will retry later - created: all resources created'
+                type: string
             type: object
         type: object
     served: true

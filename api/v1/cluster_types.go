@@ -25,12 +25,14 @@ import (
 
 // ClusterSpec defines the desired state of Cluster
 type ClusterSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-	ClusterTemplate RepoSpec        `json:"clusterTemplate"`
-	Override        *OverrideSpec   `json:"override,omitempty"`
-	Autoscaler      *AutoscalerSpec `json:"autoscaler,omitempty"`
-	ArlonHelmChart  *RepoSpec       `json:"arlonHelmChart,omitempty"`
+	// The git location of the cluster template
+	ClusterTemplate RepoSpec `json:"clusterTemplate"`
+	// Optional override specification
+	Override *OverrideSpec `json:"override,omitempty"`
+	// Optional autoscaler specification
+	Autoscaler *AutoscalerSpec `json:"autoscaler,omitempty"`
+	// Optional Arlon Helm chart specification if defaults are not desired
+	ArlonHelmChart *RepoSpec `json:"arlonHelmChart,omitempty"`
 }
 
 type RepoSpec struct {
