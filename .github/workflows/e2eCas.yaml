@@ -52,7 +52,7 @@ jobs:
         run: |
           make test-e2e-cas
       - 
-        name: Teardown arlon gitserver
+        name: Teardown
         if: success() || failure()
         run: |
           make e2e-teardown-cas
