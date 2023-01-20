@@ -36,5 +36,5 @@ workspace_repo="/tmp/arlon-testbed-git-clone/myrepo"
 helm uninstall gitea
 kubectl delete deploy -n kube-system coredns ebs-csi-controller
 
-clusterName=`cat ~/.clustername`
-eksctl delete cluster --name $clusterName --region ${AWS_REGION} --disable-nodegroup-eviction
+clusterName=`cat ~/clustername`
+eksctl delete cluster --name $clusterName --disable-nodegroup-eviction

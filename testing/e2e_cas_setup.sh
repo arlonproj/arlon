@@ -104,6 +104,18 @@ if ! which kubectl-kuttl &>/dev/null; then
   chmod +x "${HOME}/.local/bin/kubectl-kuttl"
 fi
 
+if ! which clusterctl &>/dev/null; then
+  echo Downloading clusterctl CLI
+  curl -L -o "${HOME}/.local/bin/clusterctl" https://github.com/kubernetes-sigs/cluster-api/releases/download/v1.1.6/clusterctl-${os}-${arch} -o clusterctl
+  chmod +x "${HOME}/.local/bin/clusterctl"
+fi
+
+if ! which clusterawsadm &>/dev/null; then
+  echo Downloading clusterawsadm CLI
+  curl -L -o "${HOME}/.local/bin/clusterawsadm" https://github.com/kubernetes-sigs/cluster-api-provider-aws/releases/download/v1.5.0/clusterawsadm-${os}-${arch} -o clusterawsadm
+  chmod +x "${HOME}/.local/bin/clusterawsadm"
+fi
+
 if ! which eksctl &>/dev/null; then
   curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
   sudo mv /tmp/eksctl "${HOME}/.local/bin/"
