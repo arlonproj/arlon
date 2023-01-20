@@ -8,6 +8,7 @@ func NewCommand() *cobra.Command {
 		Short:             "Manage application profiles",
 		Long:              "Manage application profiles",
 		DisableAutoGenTag: true,
+		Aliases:           []string{"appprofiles"},
 		Run: func(c *cobra.Command, args []string) {
 			c.Usage()
 		},
