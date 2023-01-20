@@ -7,6 +7,7 @@ func NewCommand() *cobra.Command {
 		Use:               "bundle",
 		Short:             "Manage configuration bundles",
 		Long:              "Manage configuration bundles",
+		Aliases:           []string{"bundles"},
 		DisableAutoGenTag: true,
 		Run: func(c *cobra.Command, args []string) {
 			c.Usage()

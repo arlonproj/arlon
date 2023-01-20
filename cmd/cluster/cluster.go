@@ -17,6 +17,7 @@ func NewCommand() *cobra.Command {
 		Short:             "Manage clusters",
 		Long:              "Manage clusters",
 		DisableAutoGenTag: true,
+		Aliases:           []string{"clusters"},
 		PersistentPreRun:  checkForArgocd,
 		Run: func(c *cobra.Command, args []string) {
 			c.Usage()
