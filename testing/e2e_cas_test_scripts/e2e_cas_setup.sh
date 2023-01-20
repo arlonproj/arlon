@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -e
-set -x
 set -o pipefail
 
 # $1 = expression
@@ -103,6 +102,18 @@ if ! which kubectl-kuttl &>/dev/null; then
   echo Downloading kuttl plugin to run e2e tests
   curl -s -Lo "${HOME}/.local/bin/kubectl-kuttl" "https://github.com/kudobuilder/kuttl/releases/download/v0.14.0/kubectl-kuttl_0.14.0_${os}_${cpu}"
   chmod +x "${HOME}/.local/bin/kubectl-kuttl"
+fi
+
+if ! which clusterctl &>/dev/null; then
+  echo Downloading clusterctl CLI
+  curl -L -o "${HOME}/.local/bin/clusterctl" https://github.com/kubernetes-sigs/cluster-api/releases/download/v1.1.6/clusterctl-${os}-${arch} -o clusterctl
+  chmod +x "${HOME}/.local/bin/clusterctl"
+fi
+
+if ! which clusterawsadm &>/dev/null; then
+  echo Downloading clusterawsadm CLI
+  curl -L -o "${HOME}/.local/bin/clusterawsadm" https://github.com/kubernetes-sigs/cluster-api-provider-aws/releases/download/v1.5.0/clusterawsadm-${os}-${arch} -o clusterawsadm
+  chmod +x "${HOME}/.local/bin/clusterawsadm"
 fi
 
 if ! which eksctl &>/dev/null; then
