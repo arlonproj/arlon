@@ -174,13 +174,12 @@ func ProcessDynamicProfile(
 
 func DeployPatchToGit(
 	creds *argocd.RepoCreds,
-	argocdNs string,
 	clusterName string,
 	repoUrl string,
 	patchRepoRevision string,
 	baseRepoRevision string,
 	basePath string,
-	overrides string,
+	patchContent []byte,
 	baseRepoUrl string,
 	baseRepoPath string,
 ) error {
@@ -205,7 +204,7 @@ func DeployPatchToGit(
 			return fmt.Errorf("failed to recursively delete cluster directory: %s", err)
 		}
 	}
-	err = gitutils.CopyPatchManifests(wt, overrides, clusterPath, baseRepoUrl, baseRepoPath, baseRepoRevision)
+	err = gitutils.CopyPatchManifests(wt, patchContent, clusterPath, baseRepoUrl, baseRepoPath, baseRepoRevision)
 	if err != nil {
 		return fmt.Errorf("failed to copy embedded content: %s", err)
 	}

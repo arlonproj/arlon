@@ -1,12 +1,11 @@
 package gitutils
 
 import (
+	"bytes"
 	"embed"
 	"fmt"
 	"io"
-	"os"
 	"path"
-	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -66,15 +65,19 @@ func CopyManifests(wt *gogit.Worktree, fs embed.FS, root string, mgmtPath string
 
 // -----------------------------------------------------------------------------
 
-func CopyPatchManifests(wt *gogit.Worktree, filePath string, clusterPath string,
+func CopyPatchManifests(wt *gogit.Worktree, patchContent []byte, clusterPath string,
 	baseRepoUrl string, baseRepoPath string, baseRepoRevision string) error {
 	log := log.GetLogger()
-	src, err := os.OpenFile(filePath, os.O_RDONLY, os.ModePerm)
-	if err != nil {
-		return fmt.Errorf("failed to open the patch file %s:", err)
-	}
-	defer src.Close()
-	_, fileName := filepath.Split(filePath)
+	/*
+		src, err := os.OpenFile(filePath, os.O_RDONLY, os.ModePerm)
+		if err != nil {
+			return fmt.Errorf("failed to open the patch file %s: %s", filePath, err)
+		}
+		defer src.Close()
+	*/
+	// _, fileName := filepath.Split(filePath)
+	src := bytes.NewReader(patchContent)
+	fileName := "patches.yaml"
 	resourcestring := "git::" + baseRepoUrl + "//" + baseRepoPath + "?ref=" + baseRepoRevision
 	kustomizeresult := kustomizeyaml{
 		APIVersion: "kustomize.config.k8s.io/v1beta1",
