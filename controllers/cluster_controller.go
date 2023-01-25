@@ -122,15 +122,18 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, nil
 	}
 	ctmpl := &cr.Spec.ClusterTemplate
+	repoUrl := ctmpl.Url
+	repoRevision := ctmpl.Revision
+	repoPath := ctmpl.Path
 	if cr.Status.InnerClusterName == "" {
 		log.Info("validating cluster template ...")
 		_, creds, err := argocd.GetKubeclientAndRepoCreds(r.Config, r.ArgoCdNs,
-			ctmpl.Url)
+			repoUrl)
 		if err != nil {
 			msg := fmt.Sprintf("failed to get repo creds: %s", err)
 			return r.UpdateState(ctx, log, &cr, "retrying", msg, retryDelayAsResult)
 		}
-		innerClusterName, err := bcl.ValidateGitDir(creds, ctmpl.Url, ctmpl.Revision, ctmpl.Path)
+		innerClusterName, err := bcl.ValidateGitDir(creds, repoUrl, repoRevision, repoPath)
 		if err != nil {
 			msg := fmt.Sprintf("failed to validate cluster template: %s", err)
 			return r.UpdateState(ctx, log, &cr, "retrying", msg, retryDelayAsResult)
@@ -141,18 +144,25 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	ovr := cr.Spec.Override
-	if ovr != nil && !cr.Status.OverrideSuccessful {
-		// Handle override
-		err = cluster.CreatePatchDir(r.Config, cr.Name, ovr.Repo.Url, r.ArgoCdNs,
-			ovr.Repo.Path, ovr.Repo.Revision,
-			ctmpl.Revision, []byte(ovr.Patch), ctmpl.Url, ctmpl.Path)
-		if err != nil {
-			msg := fmt.Sprintf("failed to create override patch in git: %s", err)
-			return r.UpdateState(ctx, log, &cr, "retrying", msg, retryDelayAsResult)
+	overridden := ovr != nil
+	if overridden {
+		if !cr.Status.OverrideSuccessful {
+			// Handle override
+			err = cluster.CreatePatchDir(r.Config, cr.Name, ovr.Repo.Url, r.ArgoCdNs,
+				ovr.Repo.Path, ovr.Repo.Revision,
+				repoRevision, []byte(ovr.Patch), repoUrl, repoPath)
+			if err != nil {
+				msg := fmt.Sprintf("failed to create override patch in git: %s", err)
+				return r.UpdateState(ctx, log, &cr, "retrying", msg, retryDelayAsResult)
+			}
+			cr.Status.OverrideSuccessful = true
+			return r.UpdateState(ctx, log, &cr, "override-created",
+				"override patch creation successful", ctrl.Result{})
 		}
-		cr.Status.OverrideSuccessful = true
-		return r.UpdateState(ctx, log, &cr, "override-created",
-			"override patch creation successful", ctrl.Result{})
+		// Point the cluster to the override instead of cluster template
+		repoUrl = ovr.Repo.Url
+		repoRevision = ovr.Repo.Revision
+		repoPath = ovr.Repo.Path
 	}
 
 	// Check if arlon app already exists
@@ -170,11 +180,10 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				retryDelayAsResult)
 		}
 		casMgmtClusterHost := ""
-		innerClusterName := ""
+		innerClusterName := cr.Status.InnerClusterName
 		gen2CASEnabled := cr.Spec.Autoscaler != nil
 		if gen2CASEnabled {
 			casMgmtClusterHost = cr.Spec.Autoscaler.MgmtClusterHost
-			innerClusterName = cr.Status.InnerClusterName
 		}
 		arlonHelmChart := cr.Spec.ArlonHelmChart
 		if arlonHelmChart == nil {
@@ -183,7 +192,7 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		_, err = cluster.Create(appIf, r.Config, r.ArgoCdNs, r.ArlonNs,
 			cr.Name, innerClusterName, arlonHelmChart.Url, arlonHelmChart.Revision,
 			arlonHelmChart.Path, "",
-			nil, false, casMgmtClusterHost, gen2CASEnabled)
+			nil, true, casMgmtClusterHost, gen2CASEnabled)
 		if err != nil {
 			msg := fmt.Sprintf("failed to create arlon application: %s", err)
 			return r.UpdateState(ctx, log, &cr, "retrying", msg, retryDelayAsResult)
@@ -196,10 +205,10 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return r.UpdateState(ctx, log, &cr, "created",
 			"cluster app already exists -- ok", ctrl.Result{})
 	}
-	overridden := false
+	// FIXME: I think url, revision and path are wrong if overridden
 	_, err = cluster.CreateClusterApp(appIf, r.ArgoCdNs,
-		cr.Name, cr.Status.InnerClusterName, ctmpl.Url, ctmpl.Revision,
-		ctmpl.Path, false, overridden)
+		cr.Name, cr.Status.InnerClusterName, repoUrl, repoRevision,
+		repoPath, true, overridden)
 	if err != nil {
 		msg := fmt.Sprintf("failed to create cluster application: %s", err)
 		return r.UpdateState(ctx, log, &cr, "retrying", msg, retryDelayAsResult)
@@ -234,8 +243,12 @@ func (r *ClusterReconciler) reconcileDelete(
 	appIf argoapp.ApplicationServiceClient,
 ) (ctrl.Result, error) {
 	// Check if cluster app exists
-	_, err := appIf.Get(ctx, &argoapp.ApplicationQuery{Name: &cr.Name})
+	clusterApp, err := appIf.Get(ctx, &argoapp.ApplicationQuery{Name: &cr.Name})
 	if err == nil {
+		if !clusterApp.DeletionTimestamp.IsZero() {
+			log.Info("cluster app deletion already pending -- will check again later")
+			return retryDelayAsResult, nil
+		}
 		// Delete it
 		cascade := true
 		_, err = appIf.Delete(ctx, &argoapp.ApplicationDeleteRequest{
@@ -250,11 +263,27 @@ func (r *ClusterReconciler) reconcileDelete(
 		return r.UpdateState(ctx, log, cr, "deleting-cluster-app",
 			"deleting cluster app", ctrl.Result{})
 	}
+	grpcStatus, ok := grpcstatus.FromError(err)
+	if !ok {
+		return r.UpdateState(ctx, log, cr, "delete-retrying",
+			"failed to get grpc status from argocd API", retryDelayAsResult)
+	}
+	if grpcStatus.Code() != grpccodes.NotFound {
+		return r.UpdateState(ctx, log, cr, "delete-retrying",
+			fmt.Sprintf("unexpected grpc status: %d", grpcStatus.Code()),
+			retryDelayAsResult)
+	}
+
 	// Check if arlon app already exists
+	aan := arlonAppName(cr.Name)
+	arlonApp, err := appIf.Get(ctx, &argoapp.ApplicationQuery{Name: &aan})
 	if err == nil {
+		if !arlonApp.DeletionTimestamp.IsZero() {
+			log.Info("arlon app deletion already pending -- will check again later")
+			return retryDelayAsResult, nil
+		}
 		// Delete it
 		cascade := true
-		aan := arlonAppName(cr.Name)
 		_, err = appIf.Delete(ctx, &argoapp.ApplicationDeleteRequest{
 			Name:    &aan,
 			Cascade: &cascade,
@@ -267,9 +296,19 @@ func (r *ClusterReconciler) reconcileDelete(
 		return r.UpdateState(ctx, log, cr, "deleting-arlon-app",
 			"deleting arlon app", ctrl.Result{})
 	}
+	grpcStatus, ok = grpcstatus.FromError(err)
+	if !ok {
+		return r.UpdateState(ctx, log, cr, "delete-retrying",
+			"failed to get grpc status from argocd API", retryDelayAsResult)
+	}
+	if grpcStatus.Code() != grpccodes.NotFound {
+		return r.UpdateState(ctx, log, cr, "delete-retrying",
+			fmt.Sprintf("unexpected grpc status: %d", grpcStatus.Code()),
+			retryDelayAsResult)
+	}
 	controllerutil.RemoveFinalizer(cr, arlonv1.ClusterFinalizer)
 	if err := patchHelper.Patch(ctx, cr); err != nil {
-		log.Info(fmt.Sprintf("failed to patch cluster: %s", err))
+		log.Info(fmt.Sprintf("failed to remove finalizer from cluster: %s", err))
 		return ctrl.Result{}, err
 	}
 	log.Info(fmt.Sprintf("removed finalizer from cluster '%s'",

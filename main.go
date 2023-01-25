@@ -20,6 +20,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/arlonproj/arlon/cmd/clustercontroller"
 	"os"
 
 	"go.uber.org/zap/zapcore"
@@ -72,6 +73,7 @@ func main() {
 	command.AddCommand(controller.NewCommand())
 	command.AddCommand(callhomecontroller.NewCommand())
 	command.AddCommand(appprofilecontroller.NewCommand())
+	command.AddCommand(clustercontroller.NewCommand())
 	command.AddCommand(list_clusters.NewCommand())
 	command.AddCommand(bundle.NewCommand())
 	command.AddCommand(profile.NewCommand())
