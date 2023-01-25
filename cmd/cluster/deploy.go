@@ -21,6 +21,8 @@ import (
 )
 
 // `cluster deploy` is gen1 only and is now deprecated.
+//
+//nolint:all
 func deployClusterCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
 	var argocdNs string

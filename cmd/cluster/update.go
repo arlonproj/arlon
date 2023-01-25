@@ -17,6 +17,8 @@ import (
 )
 
 // `cluster update` is gen1 only and is now deprecated.
+//
+//nolint:all
 func updateClusterCommand() *cobra.Command {
 	var clientConfig clientcmd.ClientConfig
 	var argocdNs string
