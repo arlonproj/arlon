@@ -24,6 +24,7 @@ import (
 	"github.com/argoproj/argo-cd/v2/util/io"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	corev1 "github.com/arlonproj/arlon/api/v1"
+	arlonapp "github.com/arlonproj/arlon/pkg/app"
 	"github.com/arlonproj/arlon/pkg/argocd"
 	bcl "github.com/arlonproj/arlon/pkg/basecluster"
 	"github.com/arlonproj/arlon/pkg/cluster"
@@ -104,10 +105,12 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		// Handle deletion reconciliation loop.
 		return r.reconcileDelete(ctx, log, &cr, patchHelper, appIf)
 	}
-	if cr.Status.State == "created" {
-		log.V(1).Info("Cluster is already created")
-		return ctrl.Result{}, nil
-	}
+	/*
+		if cr.Status.State == "created" {
+			log.V(1).Info("Cluster is already created")
+			return ctrl.Result{}, nil
+		}
+	*/
 	// Add finalizer first if not exist to avoid the race condition between init and delete
 	if !controllerutil.ContainsFinalizer(&cr, arlonv1.ClusterFinalizer) {
 		controllerutil.AddFinalizer(&cr, arlonv1.ClusterFinalizer)
@@ -199,22 +202,52 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 	}
 	// Check if cluster app already exists
-	_, err = appIf.Get(ctx, &argoapp.ApplicationQuery{Name: &cr.Name})
-	if err == nil {
-		// We're done
+	clusterApp, err := appIf.Get(ctx, &argoapp.ApplicationQuery{Name: &cr.Name})
+	if err != nil {
+		grpcStatus, ok := grpcstatus.FromError(err)
+		if !ok {
+			return r.UpdateState(ctx, log, &cr, "retrying",
+				"failed to get grpc status from argocd API", retryDelayAsResult)
+		}
+		if grpcStatus.Code() != grpccodes.NotFound {
+			return r.UpdateState(ctx, log, &cr, "retrying",
+				fmt.Sprintf("unexpected grpc status: %d", grpcStatus.Code()),
+				retryDelayAsResult)
+		}
+		// Create cluster app
+		_, err = cluster.CreateClusterApp(appIf, r.ArgoCdNs,
+			cr.Name, cr.Status.InnerClusterName, repoUrl, repoRevision,
+			repoPath, true, overridden)
+		if err != nil {
+			msg := fmt.Sprintf("failed to create cluster application: %s", err)
+			return r.UpdateState(ctx, log, &cr, "retrying", msg, retryDelayAsResult)
+		}
+		return r.UpdateState(ctx, log, &cr, "created",
+			"cluster app creation successful", ctrl.Result{})
+	}
+
+	// Sync profile annotation from Cluster to cluster app if necessary
+	if cr.Annotations != nil && (clusterApp.Annotations == nil ||
+		cr.Annotations[arlonapp.ProfilesAnnotationKey] !=
+			clusterApp.Annotations[arlonapp.ProfilesAnnotationKey]) {
+		log.Info("updating profiles annotation of cluster app")
+		if clusterApp.Annotations == nil {
+			clusterApp.Annotations = make(map[string]string)
+		}
+		clusterApp.Annotations[arlonapp.ProfilesAnnotationKey] = cr.Annotations[arlonapp.ProfilesAnnotationKey]
+		_, err = appIf.Update(ctx, &argoapp.ApplicationUpdateRequest{
+			Application: clusterApp,
+		})
+		if err != nil {
+			msg := fmt.Sprintf("failed to update cluster application: %s", err)
+			return r.UpdateState(ctx, log, &cr, "retrying", msg, retryDelayAsResult)
+		}
+	}
+	if cr.Status.State != "created" {
 		return r.UpdateState(ctx, log, &cr, "created",
 			"cluster app already exists -- ok", ctrl.Result{})
 	}
-	// FIXME: I think url, revision and path are wrong if overridden
-	_, err = cluster.CreateClusterApp(appIf, r.ArgoCdNs,
-		cr.Name, cr.Status.InnerClusterName, repoUrl, repoRevision,
-		repoPath, true, overridden)
-	if err != nil {
-		msg := fmt.Sprintf("failed to create cluster application: %s", err)
-		return r.UpdateState(ctx, log, &cr, "retrying", msg, retryDelayAsResult)
-	}
-	return r.UpdateState(ctx, log, &cr, "created",
-		"cluster creation successful", ctrl.Result{})
+	return ctrl.Result{}, nil
 }
 
 func (r *ClusterReconciler) UpdateState(
