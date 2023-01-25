@@ -105,12 +105,7 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		// Handle deletion reconciliation loop.
 		return r.reconcileDelete(ctx, log, &cr, patchHelper, appIf)
 	}
-	/*
-		if cr.Status.State == "created" {
-			log.V(1).Info("Cluster is already created")
-			return ctrl.Result{}, nil
-		}
-	*/
+
 	// Add finalizer first if not exist to avoid the race condition between init and delete
 	if !controllerutil.ContainsFinalizer(&cr, arlonv1.ClusterFinalizer) {
 		controllerutil.AddFinalizer(&cr, arlonv1.ClusterFinalizer)
