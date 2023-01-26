@@ -240,7 +240,7 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 	if cr.Status.State != "created" {
 		return r.UpdateState(ctx, log, &cr, "created",
-			"cluster app already exists -- ok", ctrl.Result{})
+			"cluster app already exists but state needs updating -- ok", ctrl.Result{})
 	}
 	return ctrl.Result{}, nil
 }
