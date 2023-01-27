@@ -8,8 +8,14 @@
       
       
       
+      
+        <link rel="prev" href="../architecture/">
+      
+      
+        <link rel="next" href="../gen2_Tutorial/">
+      
       <link rel="icon" href="../images/favicon-32x32.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.6">
     
     
       
@@ -17,11 +23,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.975780f9.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.558e4712.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
-        
       
       
 
@@ -43,7 +48,7 @@
     
       <link rel="stylesheet" href="../stylesheets/extra.css">
     
-      <link rel="stylesheet" href="../assets/pymdownx-extras/extra-34c51d7bc1.css">
+      <link rel="stylesheet" href="../assets/pymdownx-extras/extra-3531de4046.css">
     
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -94,7 +99,7 @@
 <header class="md-header" data-md-component="header">
   <nav
     class="md-header__inner md-grid"
-    aria-label="Header"
+    aria-label=""
   >
     <a
       href=".."
@@ -188,7 +193,7 @@
           <div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
@@ -292,7 +297,22 @@
   
     <li class="md-nav__item">
       <a href="../clustertemplate/" class="md-nav__link">
-        Cluster template
+        Cluster Template
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../appprofiles/" class="md-nav__link">
+        Application Profile
       </a>
     </li>
   
@@ -379,18 +399,19 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
       
       
-      
-        <label class="md-nav__link" for="__nav_8">
+        <label class="md-nav__link" for="__nav_9" tabindex="0" aria-expanded="false">
           Developer Guide
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Developer Guide" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
           Developer Guide
         </label>
@@ -491,10 +512,9 @@
   
                   
 
-  <a href="https://github.com/arlonproj/arlon/edit/main/docs/installation.md" title="Edit this page" class="md-content__button md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
-  </a>
+  
+  
+
 
 
 <h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
@@ -539,12 +559,12 @@ aforementioned directory to <code>$PATH</code> if not present. This command also
   This involves editing the <code>argocd-rbac-cm</code> ConfigMap to add the entry
   <code>g, arlon, role:admin</code> under the <code>policy.csv</code> section. Example:</li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span><span class="w"></span>
-<span class="nt">data</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">policy.csv</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span><span class="w"></span>
-<span class="w">    </span><span class="no">g, arlon, role:admin</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ConfigMap</span><span class="w"></span>
-<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">[...]</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+<span class="nt">data</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">policy.csv</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">    </span><span class="no">g, arlon, role:admin</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ConfigMap</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">[...]</span>
 </code></pre></div>
 <ul>
 <li>Generate an account token: <code>argocd account generate-token --account arlon</code></li>
@@ -614,7 +634,7 @@ as reference, complete these steps:</p>
 <p>You do not need to go any further, but you're welcome to try the Network Fabric example.</p>
 <p>FYI: <em>we noticed the dozens/hundreds of CRDs that Crossplane installs in the management
 cluster can noticeably slow down kubectl, and you may see a warning that looks like</em>:</p>
-<div class="highlight"><pre><span></span><code>I0222 <span class="m">17</span>:31:14.112689   <span class="m">27922</span> request.go:668<span class="o">]</span> Waited <span class="k">for</span> <span class="m">1</span>.046146023s due to client-side throttling, not priority and fairness, request: GET:https://AA61XXXXXXXXXXX.gr7.us-west-2.eks.amazonaws.com/apis/servicediscovery.aws.crossplane.io/v1alpha1?timeout<span class="o">=</span>32s
+<div class="highlight"><pre><span></span><code>I0222<span class="w"> </span><span class="m">17</span>:31:14.112689<span class="w">   </span><span class="m">27922</span><span class="w"> </span>request.go:668<span class="o">]</span><span class="w"> </span>Waited<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="m">1</span>.046146023s<span class="w"> </span>due<span class="w"> </span>to<span class="w"> </span>client-side<span class="w"> </span>throttling,<span class="w"> </span>not<span class="w"> </span>priority<span class="w"> </span>and<span class="w"> </span>fairness,<span class="w"> </span>request:<span class="w"> </span>GET:https://AA61XXXXXXXXXXX.gr7.us-west-2.eks.amazonaws.com/apis/servicediscovery.aws.crossplane.io/v1alpha1?timeout<span class="o">=</span>32s
 </code></pre></div>
 <h1 id="automatic-setup">Automatic Setup<a class="headerlink" href="#automatic-setup" title="Permanent link">&para;</a></h1>
 <p>Arlon CLI provides an <code>init</code> command to install "itself" on a management cluster.
@@ -682,8 +702,8 @@ For an interactive installation, exclude the <code>-y</code> or <code>--no-confi
 </ul>
 <p>The Arlon repository also hosts some examples in the <code>examples</code> directory. In particular, the <code>examples/declarative</code> directory is a set of ready to use manifests 
 which allows us to deploy a cluster with the new <code>app</code> and <code>app-profiles</code>. To run these examples, simply clone the source code and run these commands:
-<div class="highlight"><pre><span></span><code><span class="nb">cd</span> &lt;ARLON_SOURCE_REPO_PATH&gt;
-kubectl apply -f examples/declarative
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>&lt;ARLON_SOURCE_REPO_PATH&gt;
+kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>examples/declarative
 </code></pre></div></p>
 <p>This creates an EKS cluster with managed machine pools in the <code>us-west-1</code> region, and attaches a few example "apps" to it in the form of two <code>app-profiles</code> namely <code>frontent</code> and <code>backend</code>.
 The <code>frontend</code> app-profile consists of the <a href="https://github.com/argoproj/argocd-example-apps/tree/master/guestbook">guestbook</a> application and a sentinel non-existing app appropriately named <code>nonexistent-1</code>. 
@@ -711,7 +731,7 @@ The sentinel, <code>nonexistent</code> apps are simply present to demonstrate th
   
     <nav
       class="md-footer__inner md-grid"
-      aria-label="Footer"
+      aria-label=""
     >
       
         <a
@@ -778,16 +798,15 @@ The sentinel, <code>nonexistent</code> apps are simply present to demonstrate th
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.51d95adb.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@8.8.4/dist/mermaid.min.js"></script>
       
         <script src="../assets/pymdownx-extras/extra-loader-52693605.js"></script>
       
-    
     
   </body>
 </html>

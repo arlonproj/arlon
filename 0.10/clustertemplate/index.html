@@ -8,20 +8,25 @@
       
       
       
+      
+        <link rel="prev" href="../concepts/">
+      
+      
+        <link rel="next" href="../appprofiles/">
+      
       <link rel="icon" href="../images/favicon-32x32.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.6">
     
     
       
-        <title>Cluster template - Arlon - GitOps-based Fleet Management for Kubernetes</title>
+        <title>Cluster Template - Arlon - GitOps-based Fleet Management for Kubernetes</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.975780f9.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.558e4712.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
-        
       
       
 
@@ -43,7 +48,7 @@
     
       <link rel="stylesheet" href="../stylesheets/extra.css">
     
-      <link rel="stylesheet" href="../assets/pymdownx-extras/extra-34c51d7bc1.css">
+      <link rel="stylesheet" href="../assets/pymdownx-extras/extra-3531de4046.css">
     
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -74,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#next-gen-cluster-provisioning-using-cluster-templates" class="md-skip">
+        <a href="#cluster-templates" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +99,7 @@
 <header class="md-header" data-md-component="header">
   <nav
     class="md-header__inner md-grid"
-    aria-label="Header"
+    aria-label=""
   >
     <a
       href=".."
@@ -119,7 +124,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Cluster template
+              Cluster Template
             
           </span>
         </div>
@@ -188,7 +193,7 @@
           <div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
@@ -301,12 +306,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Cluster template
+          Cluster Template
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Cluster template
+        Cluster Template
       </a>
       
         
@@ -325,37 +330,16 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#goals" class="md-nav__link">
-    Goals
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#profile-support" class="md-nav__link">
-    Profile support
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#architecture-diagram" class="md-nav__link">
     Architecture diagram
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cluster-template" class="md-nav__link">
-    Cluster Template
-  </a>
-  
-    <nav class="md-nav" aria-label="Cluster Template">
+    <nav class="md-nav" aria-label="Architecture diagram">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#preparation" class="md-nav__link">
-    Preparation
+  <a href="#template-creation-workflow" class="md-nav__link">
+    Template Creation Workflow
   </a>
   
 </li>
@@ -462,6 +446,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../appprofiles/" class="md-nav__link">
+        Application Profile
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../design/" class="md-nav__link">
         Design
       </a>
@@ -525,18 +524,19 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
       
       
-      
-        <label class="md-nav__link" for="__nav_8">
+        <label class="md-nav__link" for="__nav_9" tabindex="0" aria-expanded="false">
           Developer Guide
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Developer Guide" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
           Developer Guide
         </label>
@@ -631,37 +631,16 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#goals" class="md-nav__link">
-    Goals
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#profile-support" class="md-nav__link">
-    Profile support
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#architecture-diagram" class="md-nav__link">
     Architecture diagram
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cluster-template" class="md-nav__link">
-    Cluster Template
-  </a>
-  
-    <nav class="md-nav" aria-label="Cluster Template">
+    <nav class="md-nav" aria-label="Architecture diagram">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#preparation" class="md-nav__link">
-    Preparation
+  <a href="#template-creation-workflow" class="md-nav__link">
+    Template Creation Workflow
   </a>
   
 </li>
@@ -767,39 +746,25 @@
   
                   
 
-  <a href="https://github.com/arlonproj/arlon/edit/main/docs/clustertemplate.md" title="Edit this page" class="md-content__button md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
-  </a>
+  
+  
 
 
-<h1 id="next-gen-cluster-provisioning-using-cluster-templates">Next-gen Cluster Provisioning using Cluster templates<a class="headerlink" href="#next-gen-cluster-provisioning-using-cluster-templates" title="Permanent link">&para;</a></h1>
-<p>This document describes a new way of provisioning workload clusters in Arlon.
-The most significant change is the <em>Cluster Template</em> construct, which replaces the older ClusterSpec from gen1 clusters.
-To distinguish them from the older gen1 clusters, the ones deployed from a cluster template are called next-gen clusters or gen2 clusters.</p>
-<h2 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Allow users to deploy arbitrarily complex clusters using the full Cluster API feature set.</li>
-<li>Fully declarative and gitops compatible: a cluster deployment should be composed of one or more self-sufficient manifests that the user can choose to either apply directly (via kubectl) or store in git for later-stage deployment by a gitops tool (mainly ArgoCD).</li>
-<li>Support Linked Mode update: an update to the the cluster template should
-automatically propagate to all workload clusters deployed from it.</li>
-</ul>
-<h2 id="profile-support">Profile support<a class="headerlink" href="#profile-support" title="Permanent link">&para;</a></h2>
-<ul>
-<li>While profiles are also being re-architected, the first implementation of next-gen clusters fully integrates with current-generation profiles, which are expressed as Profile custom resources and compiled into a set of intermediate files in a git repository.</li>
-<li>Profiles are optional, and a next-gen cluster can be created without a profile.
-One can be attached later.</li>
-</ul>
-<h2 id="architecture-diagram">Architecture diagram<a class="headerlink" href="#architecture-diagram" title="Permanent link">&para;</a></h2>
-<p>This example shows a cluster template named <code>capi-quickstart</code> used to deploy two workload clusters <code>cluster-a</code> and <code>cluster-b</code>. Additionally, <code>cluster-a</code> is given profile <code>xxx</code>, while <code>cluster-b</code> is given profile <code>yyy</code>.</p>
-<p><img alt="architecture" src="../images/arlon_gen2.png" /></p>
-<h2 id="cluster-template">Cluster Template<a class="headerlink" href="#cluster-template" title="Permanent link">&para;</a></h2>
-<p>A cluster template serves as a base for creating new workload clusters. The workload clusters are all exact copies of the cluster template, meaning that they acquire all unmodified resources of the cluster template, except for:</p>
+
+<h1 id="cluster-templates">Cluster Templates<a class="headerlink" href="#cluster-templates" title="Permanent link">&para;</a></h1>
+<p>The Cluster Template object is designed with the following goals:
+- Allow users to deploy arbitrarily complex clusters using the full Cluster API feature set.
+- Fully declarative and gitops compatible: a cluster deployment should be composed of one or more self-sufficient manifests that the user can choose to either apply directly (via kubectl) or store in git for later-stage deployment by a gitops tool (mainly ArgoCD).
+- Support Linked Mode update: an update to the the cluster template should automatically propagate to all workload clusters deployed from it.</p>
+<p>A Cluster Template serves as a base for creating new workload clusters. The workload clusters are all exact copies of the cluster template, meaning that they acquire all unmodified resources of the cluster template, except for:</p>
 <ul>
 <li>resource names, which are prefixed during the cluster creation process to make them unique to avoid conflicts</li>
 <li>the namespace, which is set to a new namespace unique to the workload cluster</li>
 </ul>
-<h3 id="preparation">Preparation<a class="headerlink" href="#preparation" title="Permanent link">&para;</a></h3>
+<h2 id="architecture-diagram">Architecture diagram<a class="headerlink" href="#architecture-diagram" title="Permanent link">&para;</a></h2>
+<p>This example shows a cluster template named <code>capi-quickstart</code> used to deploy two workload clusters <code>cluster-a</code> and <code>cluster-b</code>. Additionally, <code>cluster-a</code> is given profile <code>xxx</code>, while <code>cluster-b</code> is given profile <code>yyy</code>.</p>
+<p><img alt="architecture" src="../images/arlon_gen2.png" /></p>
+<h3 id="template-creation-workflow">Template Creation Workflow<a class="headerlink" href="#template-creation-workflow" title="Permanent link">&para;</a></h3>
 <ul>
 <li>To create a cluster template, a user first creates a single YAML file containing the desired Cluster API cluster and all related resources (e.g. MachineDeployments, etc...), using whatever tool the user chooses (e.g. <code>clusterctl generate cluster</code>). The user is responsible for the correctness of the file and resources within. Arlon will not check for errors. For example, the specified Kubernetes version must be supported by the Cluster API providers currently installed in the management cluster. If it isn't, resulting clusters will fail and enter a perpetual OutOfSync state.</li>
 <li>The user then commits and pushes the manifest file to a dedicated directory in a git repository.
@@ -808,12 +773,12 @@ The name of the cluster resource does not matter, it will be used as a suffix du
 </ul>
 <p>To check whether the git directory is a compliant Arlon cluster template,
 the user runs:</p>
-<div class="highlight"><pre><span></span><code>arlon clustertemplate validategit --repo-url &lt;repoUrl&gt; --repo-path &lt;pathToDirectory&gt; <span class="o">[</span>--repo-revision revision<span class="o">]</span>  
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>clustertemplate<span class="w"> </span>validategit<span class="w"> </span>--repo-url<span class="w"> </span>&lt;repoUrl&gt;<span class="w"> </span>--repo-path<span class="w"> </span>&lt;pathToDirectory&gt;<span class="w"> </span><span class="o">[</span>--repo-revision<span class="w"> </span>revision<span class="o">]</span><span class="w">  </span>
 </code></pre></div>
 <p><em>Note: if --repo-revision is not specified, it defaults to main.</em></p>
 <p>The command produces an error the first time because the git directory has not yet been "prepped".
 To "prep" the directory to become a compliant Arlon cluster template, the user runs:</p>
-<div class="highlight"><pre><span></span><code>arlon clustertemplate preparegit --repo-url &lt;repoUrl&gt; --repo-path &lt;pathToDirectory&gt; <span class="o">[</span>--repo-revision revision<span class="o">]</span>  
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>clustertemplate<span class="w"> </span>preparegit<span class="w"> </span>--repo-url<span class="w"> </span>&lt;repoUrl&gt;<span class="w"> </span>--repo-path<span class="w"> </span>&lt;pathToDirectory&gt;<span class="w"> </span><span class="o">[</span>--repo-revision<span class="w"> </span>revision<span class="o">]</span><span class="w">  </span>
 </code></pre></div>
 <p>This pushes a commit to the repo with these changes:</p>
 <ul>
@@ -829,7 +794,7 @@ mechanism. The content of the file is sourced from this <a href="https://blog.sc
 (<em>this is different from</em> <code>arlon cluster deploy</code> <em>for creating older gen1 clusters</em>).
 The command creates between 2 and 3 (depending on whether a profile is used)
 ArgoCD application resources that together make up the cluster and its contents. The general usage is:</p>
-<div class="highlight"><pre><span></span><code>arlon cluster create --cluster-name &lt;clusterName&gt; --repo-url &lt;repoUrl&gt; --repo-path &lt;pathToDirectory&gt; <span class="o">[</span>--output-yaml<span class="o">]</span> <span class="o">[</span>--profile &lt;profileName&gt;<span class="o">]</span> <span class="o">[</span>--repo-revision &lt;repoRevision&gt;<span class="o">]</span>
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>cluster<span class="w"> </span>create<span class="w"> </span>--cluster-name<span class="w"> </span>&lt;clusterName&gt;<span class="w"> </span>--repo-url<span class="w"> </span>&lt;repoUrl&gt;<span class="w"> </span>--repo-path<span class="w"> </span>&lt;pathToDirectory&gt;<span class="w"> </span><span class="o">[</span>--output-yaml<span class="o">]</span><span class="w"> </span><span class="o">[</span>--profile<span class="w"> </span>&lt;profileName&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>--repo-revision<span class="w"> </span>&lt;repoRevision&gt;<span class="o">]</span>
 </code></pre></div>
 <p>The command supports two modes of operation:</p>
 <ul>
@@ -928,7 +893,7 @@ the recommended approach is to make a copy of the manifests in the workspace rep
   
     <nav
       class="md-footer__inner md-grid"
-      aria-label="Footer"
+      aria-label=""
     >
       
         <a
@@ -951,7 +916,7 @@ the recommended approach is to make a copy of the manifests in the workspace rep
       
       
         <a
-          href="../design/"
+          href="../appprofiles/"
           class="md-footer__link md-footer__link--next"
           rel="next"
         >
@@ -960,7 +925,7 @@ the recommended approach is to make a copy of the manifests in the workspace rep
               <span class="md-footer__direction">
                 Next
               </span>
-              Design
+              Application Profile
             </div>
           </div>
           <div class="md-footer__button md-icon">
@@ -995,16 +960,15 @@ the recommended approach is to make a copy of the manifests in the workspace rep
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.51d95adb.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@8.8.4/dist/mermaid.min.js"></script>
       
         <script src="../assets/pymdownx-extras/extra-loader-52693605.js"></script>
       
-    
     
   </body>
 </html>

@@ -8,8 +8,10 @@
       
       
       
+      
+      
       <link rel="icon" href="../images/favicon-32x32.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.6">
     
     
       
@@ -17,11 +19,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.975780f9.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.558e4712.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
-        
       
       
 
@@ -43,7 +44,7 @@
     
       <link rel="stylesheet" href="../stylesheets/extra.css">
     
-      <link rel="stylesheet" href="../assets/pymdownx-extras/extra-34c51d7bc1.css">
+      <link rel="stylesheet" href="../assets/pymdownx-extras/extra-3531de4046.css">
     
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -94,7 +95,7 @@
 <header class="md-header" data-md-component="header">
   <nav
     class="md-header__inner md-grid"
-    aria-label="Header"
+    aria-label=""
   >
     <a
       href=".."
@@ -188,7 +189,7 @@
           <div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
@@ -292,7 +293,22 @@
   
     <li class="md-nav__item">
       <a href="../clustertemplate/" class="md-nav__link">
-        Cluster template
+        Cluster Template
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../appprofiles/" class="md-nav__link">
+        Application Profile
       </a>
     </li>
   
@@ -369,18 +385,19 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
       
       
-      
-        <label class="md-nav__link" for="__nav_8">
+        <label class="md-nav__link" for="__nav_9" tabindex="0" aria-expanded="false">
           Developer Guide
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Developer Guide" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
           Developer Guide
         </label>
@@ -633,10 +650,9 @@
   
                   
 
-  <a href="https://github.com/arlonproj/arlon/edit/main/docs/tutorial.md" title="Edit this page" class="md-content__button md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
-  </a>
+  
+  
+
 
 
 <h1 id="tutorial-gen1">Tutorial (gen1)<a class="headerlink" href="#tutorial-gen1" title="Permanent link">&para;</a></h1>
@@ -658,22 +674,22 @@ to send change notifications to ArgoCD via a webhook. See the Installation secti
 and cluster types (kubeadm vs EKS).
 One of the cluster specs is for an unconfigured API provider (Crossplane);
 this is for illustrative purposes, since we will not use it in this tutorial.</p>
-<div class="highlight"><pre><span></span><code>arlon clusterspec create capi-kubeadm-3node --api capi --cloud aws --type kubeadm --kubeversion v1.21.10 --nodecount <span class="m">3</span> --nodetype t2.medium --tags devel,test --desc <span class="s2">&quot;3 node kubeadm for dev/test&quot;</span> --region <span class="si">${</span><span class="nv">CLOUD_REGION</span><span class="si">}</span> --sshkey <span class="si">${</span><span class="nv">SSH_KEY_NAME</span><span class="si">}</span>
-arlon clusterspec create capi-eks --api capi --cloud aws --type eks --kubeversion v1.21.10 --nodecount <span class="m">2</span> --nodetype t2.large --tags staging --desc <span class="s2">&quot;2 node eks for general purpose&quot;</span> --region <span class="si">${</span><span class="nv">CLOUD_REGION</span><span class="si">}</span> --sshkey <span class="si">${</span><span class="nv">SSH_KEY_NAME</span><span class="si">}</span>
-arlon clusterspec create xplane-eks-3node --api xplane --cloud aws --type eks --kubeversion v1.21.10 --nodecount <span class="m">4</span> --nodetype t2.small --tags experimental --desc <span class="s2">&quot;4 node eks managed by crossplane&quot;</span> --region <span class="si">${</span><span class="nv">CLOUD_REGION</span><span class="si">}</span> --sshkey <span class="si">${</span><span class="nv">SSH_KEY_NAME</span><span class="si">}</span>
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>clusterspec<span class="w"> </span>create<span class="w"> </span>capi-kubeadm-3node<span class="w"> </span>--api<span class="w"> </span>capi<span class="w"> </span>--cloud<span class="w"> </span>aws<span class="w"> </span>--type<span class="w"> </span>kubeadm<span class="w"> </span>--kubeversion<span class="w"> </span>v1.21.10<span class="w"> </span>--nodecount<span class="w"> </span><span class="m">3</span><span class="w"> </span>--nodetype<span class="w"> </span>t2.medium<span class="w"> </span>--tags<span class="w"> </span>devel,test<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;3 node kubeadm for dev/test&quot;</span><span class="w"> </span>--region<span class="w"> </span><span class="si">${</span><span class="nv">CLOUD_REGION</span><span class="si">}</span><span class="w"> </span>--sshkey<span class="w"> </span><span class="si">${</span><span class="nv">SSH_KEY_NAME</span><span class="si">}</span>
+arlon<span class="w"> </span>clusterspec<span class="w"> </span>create<span class="w"> </span>capi-eks<span class="w"> </span>--api<span class="w"> </span>capi<span class="w"> </span>--cloud<span class="w"> </span>aws<span class="w"> </span>--type<span class="w"> </span>eks<span class="w"> </span>--kubeversion<span class="w"> </span>v1.21.10<span class="w"> </span>--nodecount<span class="w"> </span><span class="m">2</span><span class="w"> </span>--nodetype<span class="w"> </span>t2.large<span class="w"> </span>--tags<span class="w"> </span>staging<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;2 node eks for general purpose&quot;</span><span class="w"> </span>--region<span class="w"> </span><span class="si">${</span><span class="nv">CLOUD_REGION</span><span class="si">}</span><span class="w"> </span>--sshkey<span class="w"> </span><span class="si">${</span><span class="nv">SSH_KEY_NAME</span><span class="si">}</span>
+arlon<span class="w"> </span>clusterspec<span class="w"> </span>create<span class="w"> </span>xplane-eks-3node<span class="w"> </span>--api<span class="w"> </span>xplane<span class="w"> </span>--cloud<span class="w"> </span>aws<span class="w"> </span>--type<span class="w"> </span>eks<span class="w"> </span>--kubeversion<span class="w"> </span>v1.21.10<span class="w"> </span>--nodecount<span class="w"> </span><span class="m">4</span><span class="w"> </span>--nodetype<span class="w"> </span>t2.small<span class="w"> </span>--tags<span class="w"> </span>experimental<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;4 node eks managed by crossplane&quot;</span><span class="w"> </span>--region<span class="w"> </span><span class="si">${</span><span class="nv">CLOUD_REGION</span><span class="si">}</span><span class="w"> </span>--sshkey<span class="w"> </span><span class="si">${</span><span class="nv">SSH_KEY_NAME</span><span class="si">}</span>
 </code></pre></div>
 <p>Ensure you can now list the cluster specs:</p>
-<div class="highlight"><pre><span></span><code>$ arlon clusterspec list
-NAME                APIPROV  CLOUDPROV  TYPE     KUBEVERSION  NODETYPE   NODECNT  MSTNODECNT  SSHKEY  CAS    CASMIN  CASMAX  TAGS          DESCRIPTION
-capi-eks            capi     aws        eks      v1.21.10     t2.large   <span class="m">2</span>        <span class="m">3</span>           leb     <span class="nb">false</span>  <span class="m">1</span>       <span class="m">9</span>       staging       <span class="m">2</span> node eks <span class="k">for</span> general purpose
-capi-kubeadm-3node  capi     aws        kubeadm  v1.21.10     t2.medium  <span class="m">3</span>        <span class="m">3</span>           leb     <span class="nb">false</span>  <span class="m">1</span>       <span class="m">9</span>       devel,test    <span class="m">3</span> node kubeadm <span class="k">for</span> dev/test
-xplane-eks-3node    xplane   aws        eks      v1.21.10     t2.small   <span class="m">4</span>        <span class="m">3</span>           leb     <span class="nb">false</span>  <span class="m">1</span>       <span class="m">9</span>       experimental  <span class="m">4</span> node eks managed by crossplane
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arlon<span class="w"> </span>clusterspec<span class="w"> </span>list
+NAME<span class="w">                </span>APIPROV<span class="w">  </span>CLOUDPROV<span class="w">  </span>TYPE<span class="w">     </span>KUBEVERSION<span class="w">  </span>NODETYPE<span class="w">   </span>NODECNT<span class="w">  </span>MSTNODECNT<span class="w">  </span>SSHKEY<span class="w">  </span>CAS<span class="w">    </span>CASMIN<span class="w">  </span>CASMAX<span class="w">  </span>TAGS<span class="w">          </span>DESCRIPTION
+capi-eks<span class="w">            </span>capi<span class="w">     </span>aws<span class="w">        </span>eks<span class="w">      </span>v1.21.10<span class="w">     </span>t2.large<span class="w">   </span><span class="m">2</span><span class="w">        </span><span class="m">3</span><span class="w">           </span>leb<span class="w">     </span><span class="nb">false</span><span class="w">  </span><span class="m">1</span><span class="w">       </span><span class="m">9</span><span class="w">       </span>staging<span class="w">       </span><span class="m">2</span><span class="w"> </span>node<span class="w"> </span>eks<span class="w"> </span><span class="k">for</span><span class="w"> </span>general<span class="w"> </span>purpose
+capi-kubeadm-3node<span class="w">  </span>capi<span class="w">     </span>aws<span class="w">        </span>kubeadm<span class="w">  </span>v1.21.10<span class="w">     </span>t2.medium<span class="w">  </span><span class="m">3</span><span class="w">        </span><span class="m">3</span><span class="w">           </span>leb<span class="w">     </span><span class="nb">false</span><span class="w">  </span><span class="m">1</span><span class="w">       </span><span class="m">9</span><span class="w">       </span>devel,test<span class="w">    </span><span class="m">3</span><span class="w"> </span>node<span class="w"> </span>kubeadm<span class="w"> </span><span class="k">for</span><span class="w"> </span>dev/test
+xplane-eks-3node<span class="w">    </span>xplane<span class="w">   </span>aws<span class="w">        </span>eks<span class="w">      </span>v1.21.10<span class="w">     </span>t2.small<span class="w">   </span><span class="m">4</span><span class="w">        </span><span class="m">3</span><span class="w">           </span>leb<span class="w">     </span><span class="nb">false</span><span class="w">  </span><span class="m">1</span><span class="w">       </span><span class="m">9</span><span class="w">       </span>experimental<span class="w">  </span><span class="m">4</span><span class="w"> </span>node<span class="w"> </span>eks<span class="w"> </span>managed<span class="w"> </span>by<span class="w"> </span>crossplane
 </code></pre></div>
 <h2 id="bundles">Bundles<a class="headerlink" href="#bundles" title="Permanent link">&para;</a></h2>
 <p>First create a static bundle containing raw YAML for the <code>guestbook</code>
 sample application from this example file:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">cd</span> <span class="si">${</span><span class="nv">ARLON_REPO</span><span class="si">}</span>
-arlon bundle create guestbook-static --tags applications --desc <span class="s2">&quot;guestbook app&quot;</span> --from-file examples/bundles/guestbook.yaml
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ARLON_REPO</span><span class="si">}</span>
+arlon<span class="w"> </span>bundle<span class="w"> </span>create<span class="w"> </span>guestbook-static<span class="w"> </span>--tags<span class="w"> </span>applications<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;guestbook app&quot;</span><span class="w"> </span>--from-file<span class="w"> </span>examples/bundles/guestbook.yaml
 </code></pre></div>
 <p>(<em>Note: the YAML is simply a concatenation of the files found in the
 <a href="https://github.com/argoproj/argocd-example-apps/tree/master/guestbook">ArgoCD Example Apps repo</a></em>)</p>
@@ -683,26 +699,26 @@ git directory containing the YAML. We could point it directly to the copy in the
 <a href="https://github.com/argoproj/argocd-example-apps/tree/master/guestbook">ArgoCD Example Apps repo</a>,
 but we'll want to make modifications to it, so we instead create a new directory
 to host our own copy in our workspace directory:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">cd</span> <span class="si">${</span><span class="nv">WORKSPACE_REPO</span><span class="si">}</span>
-mkdir -p bundles/guestbook
-cp <span class="si">${</span><span class="nv">ARLON_REPO</span><span class="si">}</span>/examples/bundles/guestbook.yaml bundles/guestbook
-git add bundles/guestbook
-git commit -m <span class="s2">&quot;add guestbook&quot;</span>
-git push origin main
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">WORKSPACE_REPO</span><span class="si">}</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>bundles/guestbook
+cp<span class="w"> </span><span class="si">${</span><span class="nv">ARLON_REPO</span><span class="si">}</span>/examples/bundles/guestbook.yaml<span class="w"> </span>bundles/guestbook
+git<span class="w"> </span>add<span class="w"> </span>bundles/guestbook
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;add guestbook&quot;</span>
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
 </code></pre></div>
-<div class="highlight"><pre><span></span><code>arlon bundle create guestbook-dynamic --tags applications --desc <span class="s2">&quot;guestbook app (dynamic)&quot;</span> --repo-url <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span> --repo-path bundles/guestbook
-            <span class="c1"># OR</span>
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>bundle<span class="w"> </span>create<span class="w"> </span>guestbook-dynamic<span class="w"> </span>--tags<span class="w"> </span>applications<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;guestbook app (dynamic)&quot;</span><span class="w"> </span>--repo-url<span class="w"> </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w"> </span>--repo-path<span class="w"> </span>bundles/guestbook
+<span class="w">            </span><span class="c1"># OR</span>
 <span class="c1"># using repository aliases</span>
-  <span class="c1"># using the default alias</span>
-arlon bundle create guestbook-dynamic --tags applications --desc <span class="s2">&quot;guestbook app (dynamic)&quot;</span> --repo-path bundles/guestbook
-  <span class="c1"># using the prod alias</span>
-arlon bundle create guestbook-dynamic --tags applications --desc <span class="s2">&quot;guestbook app (dynamic)&quot;</span> --repo-path bundles/guestbook --repo-alias prod
+<span class="w">  </span><span class="c1"># using the default alias</span>
+arlon<span class="w"> </span>bundle<span class="w"> </span>create<span class="w"> </span>guestbook-dynamic<span class="w"> </span>--tags<span class="w"> </span>applications<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;guestbook app (dynamic)&quot;</span><span class="w"> </span>--repo-path<span class="w"> </span>bundles/guestbook
+<span class="w">  </span><span class="c1"># using the prod alias</span>
+arlon<span class="w"> </span>bundle<span class="w"> </span>create<span class="w"> </span>guestbook-dynamic<span class="w"> </span>--tags<span class="w"> </span>applications<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;guestbook app (dynamic)&quot;</span><span class="w"> </span>--repo-path<span class="w"> </span>bundles/guestbook<span class="w"> </span>--repo-alias<span class="w"> </span>prod
 </code></pre></div>
 <p>Next, we create a static bundle for another "dummy" application,
 an Ubuntu pod (OS version: "Xenial") that does nothing but print the date-time
 in an infinite sleep loop:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">cd</span> <span class="si">${</span><span class="nv">ARLON_REPO</span><span class="si">}</span>
-arlon bundle create xenial-static --tags applications --desc <span class="s2">&quot;xenial pod&quot;</span> --from-file examples/bundles/xenial.yaml
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ARLON_REPO</span><span class="si">}</span>
+arlon<span class="w"> </span>bundle<span class="w"> </span>create<span class="w"> </span>xenial-static<span class="w"> </span>--tags<span class="w"> </span>applications<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;xenial pod&quot;</span><span class="w"> </span>--from-file<span class="w"> </span>examples/bundles/xenial.yaml
 </code></pre></div>
 <p>Finally, we create a bundle for the Calico CNI, which provides pod networking.
 Some types of clusters (e.g. kubeadm) require a CNI provider to be installed
@@ -710,85 +726,85 @@ onto a newly created cluster, so encapsulating the provider as a bundle will
 give us a flexible way to install it. We download a known copy from the
 authoritative source and store it the workspace repo in order to create a
 dynamic bundle from it:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">cd</span> <span class="si">${</span><span class="nv">WORKSPACE_REPO</span><span class="si">}</span>
-mkdir -p bundles/calico
-curl https://docs.projectcalico.org/v3.21/manifests/calico.yaml -o bundles/calico/calico.yaml
-git add bundles/calico
-git commit -m <span class="s2">&quot;add calico&quot;</span>
-git push origin main
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">WORKSPACE_REPO</span><span class="si">}</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>bundles/calico
+curl<span class="w"> </span>https://docs.projectcalico.org/v3.21/manifests/calico.yaml<span class="w"> </span>-o<span class="w"> </span>bundles/calico/calico.yaml
+git<span class="w"> </span>add<span class="w"> </span>bundles/calico
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;add calico&quot;</span>
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
 </code></pre></div>
-<div class="highlight"><pre><span></span><code>arlon bundle create calico --tags networking,cni --desc <span class="s2">&quot;Calico CNI&quot;</span> --repo-url <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span> --repo-path bundles/calico
-            <span class="c1"># OR</span>
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>bundle<span class="w"> </span>create<span class="w"> </span>calico<span class="w"> </span>--tags<span class="w"> </span>networking,cni<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;Calico CNI&quot;</span><span class="w"> </span>--repo-url<span class="w"> </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w"> </span>--repo-path<span class="w"> </span>bundles/calico
+<span class="w">            </span><span class="c1"># OR</span>
 <span class="c1"># using repository aliases</span>
-  <span class="c1"># using the default alias</span>
-arlon bundle create calico --tags networking,cni --desc <span class="s2">&quot;Calico CNI&quot;</span> --repo-path bundles/calico
-  <span class="c1"># using the prod alias</span>
-arlon bundle create calico --tags networking,cni --desc <span class="s2">&quot;Calico CNI&quot;</span> --repo-path bundles/calico --repo-alias prod
+<span class="w">  </span><span class="c1"># using the default alias</span>
+arlon<span class="w"> </span>bundle<span class="w"> </span>create<span class="w"> </span>calico<span class="w"> </span>--tags<span class="w"> </span>networking,cni<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;Calico CNI&quot;</span><span class="w"> </span>--repo-path<span class="w"> </span>bundles/calico
+<span class="w">  </span><span class="c1"># using the prod alias</span>
+arlon<span class="w"> </span>bundle<span class="w"> </span>create<span class="w"> </span>calico<span class="w"> </span>--tags<span class="w"> </span>networking,cni<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;Calico CNI&quot;</span><span class="w"> </span>--repo-path<span class="w"> </span>bundles/calico<span class="w"> </span>--repo-alias<span class="w"> </span>prod
 </code></pre></div>
 <p>List your bundles to verify they were correctly entered:</p>
-<div class="highlight"><pre><span></span><code>$ arlon bundle list
-NAME               TYPE     TAGS                 REPO-URL                                             REPO-PATH              DESCRIPTION
-calico             dynamic  networking,cni       <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span>                                bundles/calico         Calico CNI
-guestbook-dynamic  dynamic  applications         <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span>                                bundles/guestbook      guestbook app <span class="o">(</span>dynamic<span class="o">)</span>
-guestbook-static   static   applications         <span class="o">(</span>N/A<span class="o">)</span>                                                <span class="o">(</span>N/A<span class="o">)</span>                  guestbook app
-xenial-static      static   applications         <span class="o">(</span>N/A<span class="o">)</span>                                                <span class="o">(</span>N/A<span class="o">)</span>                  ubuntu pod <span class="k">in</span> infinite sleep loop
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arlon<span class="w"> </span>bundle<span class="w"> </span>list
+NAME<span class="w">               </span>TYPE<span class="w">     </span>TAGS<span class="w">                 </span>REPO-URL<span class="w">                                             </span>REPO-PATH<span class="w">              </span>DESCRIPTION
+calico<span class="w">             </span>dynamic<span class="w">  </span>networking,cni<span class="w">       </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w">                                </span>bundles/calico<span class="w">         </span>Calico<span class="w"> </span>CNI
+guestbook-dynamic<span class="w">  </span>dynamic<span class="w">  </span>applications<span class="w">         </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w">                                </span>bundles/guestbook<span class="w">      </span>guestbook<span class="w"> </span>app<span class="w"> </span><span class="o">(</span>dynamic<span class="o">)</span>
+guestbook-static<span class="w">   </span>static<span class="w">   </span>applications<span class="w">         </span><span class="o">(</span>N/A<span class="o">)</span><span class="w">                                                </span><span class="o">(</span>N/A<span class="o">)</span><span class="w">                  </span>guestbook<span class="w"> </span>app
+xenial-static<span class="w">      </span>static<span class="w">   </span>applications<span class="w">         </span><span class="o">(</span>N/A<span class="o">)</span><span class="w">                                                </span><span class="o">(</span>N/A<span class="o">)</span><span class="w">                  </span>ubuntu<span class="w"> </span>pod<span class="w"> </span><span class="k">in</span><span class="w"> </span>infinite<span class="w"> </span>sleep<span class="w"> </span>loop
 </code></pre></div>
 <h2 id="profiles">Profiles<a class="headerlink" href="#profiles" title="Permanent link">&para;</a></h2>
 <p>We can now create profiles to group bundles into useful, deployable sets.
 First, create a static profile containing bundles xenial-static and guestbook-static:</p>
-<div class="highlight"><pre><span></span><code>arlon profile create static-1 --static --bundles guestbook-static,xenial-static --desc <span class="s2">&quot;static profile 1&quot;</span> --tags examples
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>profile<span class="w"> </span>create<span class="w"> </span>static-1<span class="w"> </span>--static<span class="w"> </span>--bundles<span class="w"> </span>guestbook-static,xenial-static<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;static profile 1&quot;</span><span class="w"> </span>--tags<span class="w"> </span>examples
 </code></pre></div>
 <p>Secondly, create a dynamic version of the same profile. We'll store the compiled
 form of the profile in the <code>profiles/dynamic-1</code> directory of the workspace repo. We don't create
 it manually; instead, the arlon CLI will create it for us, and it will push
 the change to git:</p>
-<div class="highlight"><pre><span></span><code>arlon profile create dynamic-1 --repo-url <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span> --repo-base-path profiles --bundles guestbook-static,xenial-static --desc <span class="s2">&quot;dynamic test 1&quot;</span> --tags examples
-            <span class="c1"># OR</span>
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>profile<span class="w"> </span>create<span class="w"> </span>dynamic-1<span class="w"> </span>--repo-url<span class="w"> </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w"> </span>--repo-base-path<span class="w"> </span>profiles<span class="w"> </span>--bundles<span class="w"> </span>guestbook-static,xenial-static<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;dynamic test 1&quot;</span><span class="w"> </span>--tags<span class="w"> </span>examples
+<span class="w">            </span><span class="c1"># OR</span>
 <span class="c1"># using repository aliases</span>
-  <span class="c1"># using the default alias</span>
-arlon profile create dynamic-1 --repo-base-path profiles --bundles guestbook-static,xenial-static --desc <span class="s2">&quot;dynamic test 1&quot;</span> --tags examples
-  <span class="c1"># using the prod alias</span>
-arlon profile create dynamic-1 --repo-alias prod --repo-base-path profiles --bundles guestbook-static,xenial-static --desc <span class="s2">&quot;dynamic test 1&quot;</span> --tags examples
+<span class="w">  </span><span class="c1"># using the default alias</span>
+arlon<span class="w"> </span>profile<span class="w"> </span>create<span class="w"> </span>dynamic-1<span class="w"> </span>--repo-base-path<span class="w"> </span>profiles<span class="w"> </span>--bundles<span class="w"> </span>guestbook-static,xenial-static<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;dynamic test 1&quot;</span><span class="w"> </span>--tags<span class="w"> </span>examples
+<span class="w">  </span><span class="c1"># using the prod alias</span>
+arlon<span class="w"> </span>profile<span class="w"> </span>create<span class="w"> </span>dynamic-1<span class="w"> </span>--repo-alias<span class="w"> </span>prod<span class="w"> </span>--repo-base-path<span class="w"> </span>profiles<span class="w"> </span>--bundles<span class="w"> </span>guestbook-static,xenial-static<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;dynamic test 1&quot;</span><span class="w"> </span>--tags<span class="w"> </span>examples
 </code></pre></div>
 <p><em>Note: the <code>--repo-base-path profiles</code> option tells <code>arlon</code> to create the profile
 under a base directory <code>profiles/</code> (to be created if it doesn't exist). That
 is in fact the default value of that option, so it is not necessary to specify
 it in this case.</em></p>
 <p>To verify that the compiled profile was created correctly:</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nb">cd</span> <span class="si">${</span><span class="nv">WORKSPACE_REPO</span><span class="si">}</span>
-$ git pull
-$ tree profiles
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">WORKSPACE_REPO</span><span class="si">}</span>
+$<span class="w"> </span>git<span class="w"> </span>pull
+$<span class="w"> </span>tree<span class="w"> </span>profiles
 profiles
-├── dynamic-1
-│   ├── mgmt
-│   │   ├── Chart.yaml
-│   │   └── templates
-│   │       ├── guestbook-dynamic.yaml
-│   │       ├── placeholder_configmap.yaml
-│   │       └── xenial.yaml
-│   └── workload
-│       └── xenial
-│           └── xenial.yaml
+├──<span class="w"> </span>dynamic-1
+│<span class="w">   </span>├──<span class="w"> </span>mgmt
+│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>Chart.yaml
+│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>templates
+│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>guestbook-dynamic.yaml
+│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>placeholder_configmap.yaml
+│<span class="w">   </span>│<span class="w">       </span>└──<span class="w"> </span>xenial.yaml
+│<span class="w">   </span>└──<span class="w"> </span>workload
+│<span class="w">       </span>└──<span class="w"> </span>xenial
+│<span class="w">           </span>└──<span class="w"> </span>xenial.yaml
 <span class="o">[</span>...<span class="o">]</span>
 </code></pre></div>
 <p>Since <code>xenial</code> is a static bundle, a copy of its YAML was stored in <code>workload/xenial/xenial.yaml</code>.
 This is not done for <code>guestbook-dynamic</code> because it is dynamic.</p>
 <p>Finally, we create another variant of the same profile, with the only difference
 being the addition of Calico bundle. It'll be used on clusters that need a CNI provider:</p>
-<div class="highlight"><pre><span></span><code>arlon profile create dynamic-2-calico --repo-url <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span> --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial-static --desc <span class="s2">&quot;dynamic test 1&quot;</span> --tags examples
-            <span class="c1"># OR</span>
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>profile<span class="w"> </span>create<span class="w"> </span>dynamic-2-calico<span class="w"> </span>--repo-url<span class="w"> </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w"> </span>--repo-base-path<span class="w"> </span>profiles<span class="w"> </span>--bundles<span class="w"> </span>calico,guestbook-dynamic,xenial-static<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;dynamic test 1&quot;</span><span class="w"> </span>--tags<span class="w"> </span>examples
+<span class="w">            </span><span class="c1"># OR</span>
 <span class="c1"># using repository aliases</span>
-  <span class="c1"># using the default alias</span>
-arlon profile create dynamic-2-calico --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial-static --desc <span class="s2">&quot;dynamic test 1&quot;</span> --tags examples
-  <span class="c1"># using the prod alias</span>
-arlon profile create dynamic-2-calico --repo-alias prod --repo-base-path profiles --bundles calico,guestbook-dynamic,xenial-static --desc <span class="s2">&quot;dynamic test 1&quot;</span> --tags examples
+<span class="w">  </span><span class="c1"># using the default alias</span>
+arlon<span class="w"> </span>profile<span class="w"> </span>create<span class="w"> </span>dynamic-2-calico<span class="w"> </span>--repo-base-path<span class="w"> </span>profiles<span class="w"> </span>--bundles<span class="w"> </span>calico,guestbook-dynamic,xenial-static<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;dynamic test 1&quot;</span><span class="w"> </span>--tags<span class="w"> </span>examples
+<span class="w">  </span><span class="c1"># using the prod alias</span>
+arlon<span class="w"> </span>profile<span class="w"> </span>create<span class="w"> </span>dynamic-2-calico<span class="w"> </span>--repo-alias<span class="w"> </span>prod<span class="w"> </span>--repo-base-path<span class="w"> </span>profiles<span class="w"> </span>--bundles<span class="w"> </span>calico,guestbook-dynamic,xenial-static<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;dynamic test 1&quot;</span><span class="w"> </span>--tags<span class="w"> </span>examples
 </code></pre></div>
 <p>Listing the profiles should show:</p>
-<div class="highlight"><pre><span></span><code>$ arlon profile list
-NAME              TYPE     BUNDLES                                 REPO-URL               REPO-PATH                  TAGS         DESCRIPTION
-dynamic-1         dynamic  guestbook-static,xenial-static          <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span>  profiles/dynamic-1         examples     dynamic <span class="nb">test</span> <span class="m">1</span>
-dynamic-2-calico  dynamic  calico,guestbook-static,xenial-static   <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span>  profiles/dynamic-2-calico  examples     dynamic <span class="nb">test</span> <span class="m">1</span>
-static-1          static   guestbook-dynamic,xenial-static         <span class="o">(</span>N/A<span class="o">)</span>                  <span class="o">(</span>N/A<span class="o">)</span>                      examples     static profile <span class="m">1</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arlon<span class="w"> </span>profile<span class="w"> </span>list
+NAME<span class="w">              </span>TYPE<span class="w">     </span>BUNDLES<span class="w">                                 </span>REPO-URL<span class="w">               </span>REPO-PATH<span class="w">                  </span>TAGS<span class="w">         </span>DESCRIPTION
+dynamic-1<span class="w">         </span>dynamic<span class="w">  </span>guestbook-static,xenial-static<span class="w">          </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w">  </span>profiles/dynamic-1<span class="w">         </span>examples<span class="w">     </span>dynamic<span class="w"> </span><span class="nb">test</span><span class="w"> </span><span class="m">1</span>
+dynamic-2-calico<span class="w">  </span>dynamic<span class="w">  </span>calico,guestbook-static,xenial-static<span class="w">   </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w">  </span>profiles/dynamic-2-calico<span class="w">  </span>examples<span class="w">     </span>dynamic<span class="w"> </span><span class="nb">test</span><span class="w"> </span><span class="m">1</span>
+static-1<span class="w">          </span>static<span class="w">   </span>guestbook-dynamic,xenial-static<span class="w">         </span><span class="o">(</span>N/A<span class="o">)</span><span class="w">                  </span><span class="o">(</span>N/A<span class="o">)</span><span class="w">                      </span>examples<span class="w">     </span>static<span class="w"> </span>profile<span class="w"> </span><span class="m">1</span>
 </code></pre></div>
 <h2 id="clusters-gen1">Clusters (gen1)<a class="headerlink" href="#clusters-gen1" title="Permanent link">&para;</a></h2>
 <p>We are now ready to deploy our first cluster. It will be of type EKS. Since
@@ -802,77 +818,77 @@ The arlon <code>deploy</code> command
 accepts a git URL and path for this git location. Any git repo can be used (so long
 as it's registered with ArgoCD), but we'll use the workspace cluster for
 convenience:</p>
-<div class="highlight"><pre><span></span><code>arlon cluster deploy --repo-url <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span> --cluster-name eks-1 --profile dynamic-1 --cluster-spec capi-eks
-            <span class="c1"># OR</span>
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>cluster<span class="w"> </span>deploy<span class="w"> </span>--repo-url<span class="w"> </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w"> </span>--cluster-name<span class="w"> </span>eks-1<span class="w"> </span>--profile<span class="w"> </span>dynamic-1<span class="w"> </span>--cluster-spec<span class="w"> </span>capi-eks
+<span class="w">            </span><span class="c1"># OR</span>
 <span class="c1"># using repository aliases</span>
-  <span class="c1"># using the default alias</span>
-arlon cluster deploy --cluster-name eks-1 --profile dynamic-1 --cluster-spec capi-eks
-  <span class="c1"># using the prod alias</span>
-arlon cluster deploy --repo-alias prod --cluster-name eks-1 --profile dynamic-1 --cluster-spec capi-eks
+<span class="w">  </span><span class="c1"># using the default alias</span>
+arlon<span class="w"> </span>cluster<span class="w"> </span>deploy<span class="w"> </span>--cluster-name<span class="w"> </span>eks-1<span class="w"> </span>--profile<span class="w"> </span>dynamic-1<span class="w"> </span>--cluster-spec<span class="w"> </span>capi-eks
+<span class="w">  </span><span class="c1"># using the prod alias</span>
+arlon<span class="w"> </span>cluster<span class="w"> </span>deploy<span class="w"> </span>--repo-alias<span class="w"> </span>prod<span class="w"> </span>--cluster-name<span class="w"> </span>eks-1<span class="w"> </span>--profile<span class="w"> </span>dynamic-1<span class="w"> </span>--cluster-spec<span class="w"> </span>capi-eks
 </code></pre></div>
 <p>The git directory hosting the cluster Helm chart is created as a subdirectory
 of a base path in the repo. The base path can be specified with <code>--base-path</code>, but
 we'll leave it unspecified in order to use the default value of <code>clusters</code>.
 Consequently, this example produces the directory <code>clusters/eks-1/</code> in the repo.
 To verify its presence:</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nb">cd</span> <span class="si">${</span><span class="nv">WORKSPACE_REPO</span><span class="si">}</span>
-$ git pull
-$ tree clusters/eks-1
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">WORKSPACE_REPO</span><span class="si">}</span>
+$<span class="w"> </span>git<span class="w"> </span>pull
+$<span class="w"> </span>tree<span class="w"> </span>clusters/eks-1
 clusters/eks-1
-└── mgmt
-    ├── charts
-    │   ├── capi-aws-eks
-    │   │   ├── Chart.yaml
-    │   │   └── templates
-    │   │       └── cluster.yaml
-    │   ├── capi-aws-kubeadm
-    │   │   ├── Chart.yaml
-    │   │   └── templates
-    │   │       └── cluster.yaml
-    │   └── xplane-aws-eks
-    │       ├── Chart.yaml
-    │       └── templates
-    │           ├── cluster.yaml
-    │           └── network.yaml
-    ├── Chart.yaml
-    ├── templates
-    │   ├── clusterregistration.yaml
-    │   ├── ns.yaml
-    │   ├── profile.yaml
-    │   └── rbac.yaml
-    └── values.yaml
+└──<span class="w"> </span>mgmt
+<span class="w">    </span>├──<span class="w"> </span>charts
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>capi-aws-eks
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>Chart.yaml
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>templates
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">       </span>└──<span class="w"> </span>cluster.yaml
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>capi-aws-kubeadm
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>Chart.yaml
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>templates
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">       </span>└──<span class="w"> </span>cluster.yaml
+<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span>xplane-aws-eks
+<span class="w">    </span>│<span class="w">       </span>├──<span class="w"> </span>Chart.yaml
+<span class="w">    </span>│<span class="w">       </span>└──<span class="w"> </span>templates
+<span class="w">    </span>│<span class="w">           </span>├──<span class="w"> </span>cluster.yaml
+<span class="w">    </span>│<span class="w">           </span>└──<span class="w"> </span>network.yaml
+<span class="w">    </span>├──<span class="w"> </span>Chart.yaml
+<span class="w">    </span>├──<span class="w"> </span>templates
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>clusterregistration.yaml
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>ns.yaml
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>profile.yaml
+<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span>rbac.yaml
+<span class="w">    </span>└──<span class="w"> </span>values.yaml
 </code></pre></div>
 <p>The chart contains several subcharts under <code>mgmt/charts/</code>,
 one for each supported type of cluster. Only one of them will be enabled,
 in this case <code>capi-aws-eks</code> (Cluster API on AWS with type EKS).</p>
 <p>At this point, the cluster is provisioning and can be seen in arlon and AWS EKS:</p>
-<div class="highlight"><pre><span></span><code>$ arlon cluster list
-NAME       CLUSTERSPEC  PROFILE  
-eks-1      capi-eks     dynamic-1
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arlon<span class="w"> </span>cluster<span class="w"> </span>list
+NAME<span class="w">       </span>CLUSTERSPEC<span class="w">  </span>PROFILE<span class="w">  </span>
+eks-1<span class="w">      </span>capi-eks<span class="w">     </span>dynamic-1
 
-$ aws eks list-clusters
+$<span class="w"> </span>aws<span class="w"> </span>eks<span class="w"> </span>list-clusters
 <span class="o">{</span>
-    <span class="s2">&quot;clusters&quot;</span>: <span class="o">[</span>
-        <span class="s2">&quot;eks-1_eks-1-control-plane&quot;</span>,
-    <span class="o">]</span>
+<span class="w">    </span><span class="s2">&quot;clusters&quot;</span>:<span class="w"> </span><span class="o">[</span>
+<span class="w">        </span><span class="s2">&quot;eks-1_eks-1-control-plane&quot;</span>,
+<span class="w">    </span><span class="o">]</span>
 <span class="o">}</span>
 </code></pre></div>
 <p>Eventually, it will also be seen as a registered cluster in argocd, but this
 won't be visible for a while, because the cluster is not registered until
 its control plane (the Kubernetes API) is ready:</p>
-<div class="highlight"><pre><span></span><code>$ argocd cluster list
-SERVER                                                                    NAME        VERSION  STATUS      MESSAGE
-https://9F07DC211252C6F7686F90FA5B8B8447.gr7.us-west-2.eks.amazonaws.com  eks-1       <span class="m">1</span>.18+    Successful  
-https://kubernetes.default.svc                                            <span class="k">in</span>-cluster  <span class="m">1</span>.20+    Successful  
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>argocd<span class="w"> </span>cluster<span class="w"> </span>list
+SERVER<span class="w">                                                                    </span>NAME<span class="w">        </span>VERSION<span class="w">  </span>STATUS<span class="w">      </span>MESSAGE
+https://9F07DC211252C6F7686F90FA5B8B8447.gr7.us-west-2.eks.amazonaws.com<span class="w">  </span>eks-1<span class="w">       </span><span class="m">1</span>.18+<span class="w">    </span>Successful<span class="w">  </span>
+https://kubernetes.default.svc<span class="w">                                            </span><span class="k">in</span>-cluster<span class="w">  </span><span class="m">1</span>.20+<span class="w">    </span>Successful<span class="w">  </span>
 </code></pre></div>
 <p>To monitor the progress of the cluster deployment, check the status of
 the ArgoCD app of the same name:</p>
-<div class="highlight"><pre><span></span><code>$ argocd app list
-NAME                         CLUSTER                         NAMESPACE  PROJECT  STATUS  HEALTH   SYNCPOLICY  CONDITIONS  REPO                   PATH                                          TARGET
-eks-1                        https://kubernetes.default.svc  default    default  Synced  Healthy  Auto-Prune  &lt;none&gt;      <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span>  clusters/eks-1/mgmt                           main
-eks-1-guestbook-static                                       default    default  Synced  Healthy  Auto-Prune  &lt;none&gt;      <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span>  profiles/dynamic-1/workload/guestbook-static  HEAD
-eks-1-profile-dynamic-1      https://kubernetes.default.svc  argocd     default  Synced  Healthy  Auto-Prune  &lt;none&gt;      <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span>  profiles/dynamic-1/mgmt                       HEAD
-eks-1-xenial                                                 default    default  Synced  Healthy  Auto-Prune  &lt;none&gt;      <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span>  profiles/dynamic-1/workload/xenial            HEAD
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>argocd<span class="w"> </span>app<span class="w"> </span>list
+NAME<span class="w">                         </span>CLUSTER<span class="w">                         </span>NAMESPACE<span class="w">  </span>PROJECT<span class="w">  </span>STATUS<span class="w">  </span>HEALTH<span class="w">   </span>SYNCPOLICY<span class="w">  </span>CONDITIONS<span class="w">  </span>REPO<span class="w">                   </span>PATH<span class="w">                                          </span>TARGET
+eks-1<span class="w">                        </span>https://kubernetes.default.svc<span class="w">  </span>default<span class="w">    </span>default<span class="w">  </span>Synced<span class="w">  </span>Healthy<span class="w">  </span>Auto-Prune<span class="w">  </span>&lt;none&gt;<span class="w">      </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w">  </span>clusters/eks-1/mgmt<span class="w">                           </span>main
+eks-1-guestbook-static<span class="w">                                       </span>default<span class="w">    </span>default<span class="w">  </span>Synced<span class="w">  </span>Healthy<span class="w">  </span>Auto-Prune<span class="w">  </span>&lt;none&gt;<span class="w">      </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w">  </span>profiles/dynamic-1/workload/guestbook-static<span class="w">  </span>HEAD
+eks-1-profile-dynamic-1<span class="w">      </span>https://kubernetes.default.svc<span class="w">  </span>argocd<span class="w">     </span>default<span class="w">  </span>Synced<span class="w">  </span>Healthy<span class="w">  </span>Auto-Prune<span class="w">  </span>&lt;none&gt;<span class="w">      </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w">  </span>profiles/dynamic-1/mgmt<span class="w">                       </span>HEAD
+eks-1-xenial<span class="w">                                                 </span>default<span class="w">    </span>default<span class="w">  </span>Synced<span class="w">  </span>Healthy<span class="w">  </span>Auto-Prune<span class="w">  </span>&lt;none&gt;<span class="w">      </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w">  </span>profiles/dynamic-1/workload/xenial<span class="w">            </span>HEAD
 </code></pre></div>
 <p>The top-level app <code>eks-1</code> is the root of all argocd apps that make up the
 cluster and its configuration contents. The next level app <code>eks-1-profile-dynamic-1</code>
@@ -890,7 +906,7 @@ open the detailed view of the <code>eks-1-guestbook-static</code> application,
 which applies the <code>guestbook-static</code> bundle to the <code>eks-1</code> cluster.
 Note that there is only one <code>guestbook-ui</code> pod.</p>
 <p>Next, update the <code>guestbook-static</code> bundle to have 3 replicas of the pod:</p>
-<div class="highlight"><pre><span></span><code>arlon bundle update guestbook-static --from-file examples/bundles/guestbook-3replicas.yaml
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>bundle<span class="w"> </span>update<span class="w"> </span>guestbook-static<span class="w"> </span>--from-file<span class="w"> </span>examples/bundles/guestbook-3replicas.yaml
 </code></pre></div>
 <p>Note that the UI continues to show one pod. Only new clusters consuming
 this bundle will have the 3 replicas.</p>
@@ -900,7 +916,7 @@ dynamic profiles, since this will help understand the relationship between
 profiles and bundles.
 To illustrate how a profile can be updated, we remove <code>guestbook-static</code> bundle
 from <code>dynamic-1</code> by specifying a new bundle set:</p>
-<div class="highlight"><pre><span></span><code>arlon profile update dynamic-1 --bundles xenial
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>profile<span class="w"> </span>update<span class="w"> </span>dynamic-1<span class="w"> </span>--bundles<span class="w"> </span>xenial
 </code></pre></div>
 <p>Since the old bundle set was <code>guestbook-static,xenial-static</code>, that command resulted
 in the removal of <code>guestbook-static</code> from the profile.
@@ -917,18 +933,18 @@ It would only affect new clusters created with the profile.</p>
 <h3 id="dynamic-bundle">Dynamic bundle<a class="headerlink" href="#dynamic-bundle" title="Permanent link">&para;</a></h3>
 <p>To illustrate the defining characteristic of a dynamic bundle, we first add
 <code>guestbook-dynamic</code> to <code>dynamic-1</code>:</p>
-<div class="highlight"><pre><span></span><code>arlon profile update dynamic-1 --bundles xenial,guestbook-dynamic
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>profile<span class="w"> </span>update<span class="w"> </span>dynamic-1<span class="w"> </span>--bundles<span class="w"> </span>xenial,guestbook-dynamic
 </code></pre></div>
 <p>Observe the re-appearance of the guestbook application, which is managed
 by the <code>eks-1-guestbook-dynamic</code> ArgoCD app. A detailed view of the app
 shows 1 guestbook-ui pod. Remember that a dynamic bundle's
 manifest content is stored in git. Use these commands to change the number
 of pod replicas to 3:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">cd</span> <span class="si">${</span><span class="nv">WORKSPACE_REPO</span><span class="si">}</span>
-git pull <span class="c1"># to get all latest changes pushed by arlon</span>
-vim bundles/guestbook/guestbook.yaml <span class="c1"># edit to change deployment&#39;s replicas to 3</span>
-git commit -am <span class="s2">&quot;increase guestbook replicas&quot;</span>
-git push origin main
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">WORKSPACE_REPO</span><span class="si">}</span>
+git<span class="w"> </span>pull<span class="w"> </span><span class="c1"># to get all latest changes pushed by arlon</span>
+vim<span class="w"> </span>bundles/guestbook/guestbook.yaml<span class="w"> </span><span class="c1"># edit to change deployment&#39;s replicas to 3</span>
+git<span class="w"> </span>commit<span class="w"> </span>-am<span class="w"> </span><span class="s2">&quot;increase guestbook replicas&quot;</span>
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
 </code></pre></div>
 <p>Observe the number of pods increasing to 3 in the UI. Any existing cluster
 consuming this dynamic bundle will be updated similarly, regardless of whether
@@ -980,74 +996,74 @@ the old and new profiles are static or dynamic.</p>
 <h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
 <p>These sequence of commands updates a clusterspec to a newer Kubernetes version
 and a higher node count, then upgrades the cluster to the newer specifications:</p>
-<div class="highlight"><pre><span></span><code>arlon clusterspec update capi-eks --nodecount <span class="m">3</span> --kubeversion v1.19.15
-arlon cluster update eks-1
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>clusterspec<span class="w"> </span>update<span class="w"> </span>capi-eks<span class="w"> </span>--nodecount<span class="w"> </span><span class="m">3</span><span class="w"> </span>--kubeversion<span class="w"> </span>v1.19.15
+arlon<span class="w"> </span>cluster<span class="w"> </span>update<span class="w"> </span>eks-1
 </code></pre></div>
 <p>Note that the 2nd command didn't need any flags because the clusterspec used
 is the same as before.</p>
 <p>This example updates a cluster to use a new profile <code>my-new-profile</code>:</p>
-<div class="highlight"><pre><span></span><code>arlon cluster update eks-1 --profile my-new-profile
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>cluster<span class="w"> </span>update<span class="w"> </span>eks-1<span class="w"> </span>--profile<span class="w"> </span>my-new-profile
 </code></pre></div>
 <h2 id="enabling-cluster-autoscaler-in-the-workload-cluster">Enabling Cluster Autoscaler in the workload cluster:<a class="headerlink" href="#enabling-cluster-autoscaler-in-the-workload-cluster" title="Permanent link">&para;</a></h2>
 <h3 id="bundle-creation">Bundle creation:<a class="headerlink" href="#bundle-creation" title="Permanent link">&para;</a></h3>
 <p>Register a dynamic bundle pointing to the bundles/capi-cluster-autoscaler in the Arlon repo.</p>
 <p>To enable the cluster-autoscaler bundle, add one more parameter during cluster creation: <code>srcType</code>. This is the ArgoCD-defined application source type (Helm, Kustomize, Directory). In addition to this, the <code>repo-revision</code> parameter should also be set to a stable arlon release branch ( in this case v0.10 ).</p>
 <p>This example creates a bundle pointing to the bundles/capi-cluster-autoscaler in Arlon repo</p>
-<div class="highlight"><pre><span></span><code>arlon bundle create cas-bundle --tags cas,devel,test --desc <span class="s2">&quot;CAS Bundle&quot;</span> --repo-url https://github.com/arlonproj/arlon.git --repo-path bundles/capi-cluster-autoscaler --srctype helm --repo-revision v0.10.0
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>bundle<span class="w"> </span>create<span class="w"> </span>cas-bundle<span class="w"> </span>--tags<span class="w"> </span>cas,devel,test<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;CAS Bundle&quot;</span><span class="w"> </span>--repo-url<span class="w"> </span>https://github.com/arlonproj/arlon.git<span class="w"> </span>--repo-path<span class="w"> </span>bundles/capi-cluster-autoscaler<span class="w"> </span>--srctype<span class="w"> </span>helm<span class="w"> </span>--repo-revision<span class="w"> </span>v0.10.0
 </code></pre></div>
 <h3 id="profile-creation">Profile creation:<a class="headerlink" href="#profile-creation" title="Permanent link">&para;</a></h3>
 <p>Create a profile that contains this capi-cluster-autoscaler bundle. </p>
-<div class="highlight"><pre><span></span><code>arlon profile create dynamic-cas --repo-url <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span> --repo-base-path profiles --bundles cas-bundle --desc <span class="s2">&quot;dynamic cas profile&quot;</span> --tags examples
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>profile<span class="w"> </span>create<span class="w"> </span>dynamic-cas<span class="w"> </span>--repo-url<span class="w"> </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w"> </span>--repo-base-path<span class="w"> </span>profiles<span class="w"> </span>--bundles<span class="w"> </span>cas-bundle<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;dynamic cas profile&quot;</span><span class="w"> </span>--tags<span class="w"> </span>examples
 </code></pre></div>
 <h3 id="clusterspec-creation">Clusterspec creation:<a class="headerlink" href="#clusterspec-creation" title="Permanent link">&para;</a></h3>
 <p>Create a clusterspec with CAPI as ApiProvider and autoscaling enabled.In addition to this, the ClusterAutoscaler(Min|Max)Nodes properties are used to set 2 annotations on MachineDeployment required by the cluster autoscaler for CAPI.</p>
-<div class="highlight"><pre><span></span><code>arlon clusterspec create cas-spec --api capi --cloud aws --type eks --kubeversion v1.21.10 --nodecount <span class="m">2</span> --nodetype t2.medium --tags devel,test --desc <span class="s2">&quot;dev/test&quot;</span>  --region <span class="si">${</span><span class="nv">REGION</span><span class="si">}</span> --sshkey <span class="si">${</span><span class="nv">SSH_KEY_NAME</span><span class="si">}</span> --casenabled
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>clusterspec<span class="w"> </span>create<span class="w"> </span>cas-spec<span class="w"> </span>--api<span class="w"> </span>capi<span class="w"> </span>--cloud<span class="w"> </span>aws<span class="w"> </span>--type<span class="w"> </span>eks<span class="w"> </span>--kubeversion<span class="w"> </span>v1.21.10<span class="w"> </span>--nodecount<span class="w"> </span><span class="m">2</span><span class="w"> </span>--nodetype<span class="w"> </span>t2.medium<span class="w"> </span>--tags<span class="w"> </span>devel,test<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;dev/test&quot;</span><span class="w">  </span>--region<span class="w"> </span><span class="si">${</span><span class="nv">REGION</span><span class="si">}</span><span class="w"> </span>--sshkey<span class="w"> </span><span class="si">${</span><span class="nv">SSH_KEY_NAME</span><span class="si">}</span><span class="w"> </span>--casenabled
 </code></pre></div>
 <h3 id="cluster-creation">Cluster creation:<a class="headerlink" href="#cluster-creation" title="Permanent link">&para;</a></h3>
 <p>Deploy a cluster from this cluster spec and profile created in the previous steps.</p>
-<p><div class="highlight"><pre><span></span><code>arlon cluster deploy --repo-url <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span> --cluster-name cas-cluster --profile dynamic-cas --cluster-spec cas-spec
+<p><div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>cluster<span class="w"> </span>deploy<span class="w"> </span>--repo-url<span class="w"> </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w"> </span>--cluster-name<span class="w"> </span>cas-cluster<span class="w"> </span>--profile<span class="w"> </span>dynamic-cas<span class="w"> </span>--cluster-spec<span class="w"> </span>cas-spec
 </code></pre></div>
 Consequently, this example produces the directory <code>clusters/cas-cluster/</code> in the repo. This will contain the capi-autoscaler subchart and manifests <code>mgmt/charts/</code>.
 To verify its contents:</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nb">cd</span> <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span>
-$ tree clusters/cas-cluster
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span>
+$<span class="w"> </span>tree<span class="w"> </span>clusters/cas-cluster
 clusters/cas-cluster
-└── mgmt
-    ├── Chart.yaml
-    ├── charts
-    │   ├── capi-aws-eks
-    │   │   ├── Chart.yaml
-    │   │   └── templates
-    │   │       └── cluster.yaml
-    │   ├── capi-aws-kubeadm
-    │   │   ├── Chart.yaml
-    │   │   └── templates
-    │   │       └── cluster.yaml
-    │   ├── capi-cluster-autoscaler
-    │   │   ├── Chart.yaml
-    │   │   └── templates
-    │   │       ├── callhomeconfig.yaml
-    │   │       └── rbac.yaml
-    │   └── xplane-aws-eks
-    │       ├── Chart.yaml
-    │       └── templates
-    │           ├── cluster.yaml
-    │           └── network.yaml
-    ├── templates
-    │   ├── clusterregistration.yaml
-    │   ├── ns.yaml
-    │   ├── profile.yaml
-    │   └── rbac.yaml
-    └── values.yaml
+└──<span class="w"> </span>mgmt
+<span class="w">    </span>├──<span class="w"> </span>Chart.yaml
+<span class="w">    </span>├──<span class="w"> </span>charts
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>capi-aws-eks
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>Chart.yaml
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>templates
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">       </span>└──<span class="w"> </span>cluster.yaml
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>capi-aws-kubeadm
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>Chart.yaml
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>templates
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">       </span>└──<span class="w"> </span>cluster.yaml
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>capi-cluster-autoscaler
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>Chart.yaml
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>templates
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>callhomeconfig.yaml
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">       </span>└──<span class="w"> </span>rbac.yaml
+<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span>xplane-aws-eks
+<span class="w">    </span>│<span class="w">       </span>├──<span class="w"> </span>Chart.yaml
+<span class="w">    </span>│<span class="w">       </span>└──<span class="w"> </span>templates
+<span class="w">    </span>│<span class="w">           </span>├──<span class="w"> </span>cluster.yaml
+<span class="w">    </span>│<span class="w">           </span>└──<span class="w"> </span>network.yaml
+<span class="w">    </span>├──<span class="w"> </span>templates
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>clusterregistration.yaml
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>ns.yaml
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>profile.yaml
+<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span>rbac.yaml
+<span class="w">    </span>└──<span class="w"> </span>values.yaml
 </code></pre></div>
 <p>At this point, the cluster is provisioning. To monitor the progress of the cluster deployment, check the status of
 the ArgoCD app of the same name. Eventually, the ArgoCD apps will be synced and healthy.</p>
-<div class="highlight"><pre><span></span><code>$ argocd app list
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>argocd<span class="w"> </span>app<span class="w"> </span>list
 
-NAME                           CLUSTER                         NAMESPACE  PROJECT  STATUS     HEALTH   SYNCPOLICY  CONDITIONS  REPO                                            PATH                             TARGET
-cas-cluster                    https://kubernetes.default.svc  default    default Synced  Healthy  Auto-Prune  &lt;none&gt;  <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span>   clusters/cas-cluster/mgmt        main
-cas-cluster-cas-bundle           cas-cluster                 default    default  Synced     Healthy  Auto-Prune  &lt;none&gt;   https://github.com/arlonproj/arlon.git   bundles/capi-cluster-autoscaler  HEAD
-cas-cluster-profile-dynamic-cas  https://kubernetes.default.svc  argocd     default  Synced     Healthy  Auto-Prune  &lt;none&gt;      <span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span> profiles/dynamic-cas/mgmt
+NAME<span class="w">                           </span>CLUSTER<span class="w">                         </span>NAMESPACE<span class="w">  </span>PROJECT<span class="w">  </span>STATUS<span class="w">     </span>HEALTH<span class="w">   </span>SYNCPOLICY<span class="w">  </span>CONDITIONS<span class="w">  </span>REPO<span class="w">                                            </span>PATH<span class="w">                             </span>TARGET
+cas-cluster<span class="w">                    </span>https://kubernetes.default.svc<span class="w">  </span>default<span class="w">    </span>default<span class="w"> </span>Synced<span class="w">  </span>Healthy<span class="w">  </span>Auto-Prune<span class="w">  </span>&lt;none&gt;<span class="w">  </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w">   </span>clusters/cas-cluster/mgmt<span class="w">        </span>main
+cas-cluster-cas-bundle<span class="w">           </span>cas-cluster<span class="w">                 </span>default<span class="w">    </span>default<span class="w">  </span>Synced<span class="w">     </span>Healthy<span class="w">  </span>Auto-Prune<span class="w">  </span>&lt;none&gt;<span class="w">   </span>https://github.com/arlonproj/arlon.git<span class="w">   </span>bundles/capi-cluster-autoscaler<span class="w">  </span>HEAD
+cas-cluster-profile-dynamic-cas<span class="w">  </span>https://kubernetes.default.svc<span class="w">  </span>argocd<span class="w">     </span>default<span class="w">  </span>Synced<span class="w">     </span>Healthy<span class="w">  </span>Auto-Prune<span class="w">  </span>&lt;none&gt;<span class="w">      </span><span class="si">${</span><span class="nv">WORKSPACE_REPO_URL</span><span class="si">}</span><span class="w"> </span>profiles/dynamic-cas/mgmt
 </code></pre></div>
 
 
@@ -1094,16 +1110,15 @@ cas-cluster-profile-dynamic-cas  https://kubernetes.default.svc  argocd     defa
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.51d95adb.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@8.8.4/dist/mermaid.min.js"></script>
       
         <script src="../assets/pymdownx-extras/extra-loader-52693605.js"></script>
       
-    
     
   </body>
 </html>

@@ -8,8 +8,14 @@
       
       
       
+      
+        <link rel="prev" href="../design/">
+      
+      
+        <link rel="next" href="../installation/">
+      
       <link rel="icon" href="../images/favicon-32x32.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.6">
     
     
       
@@ -17,11 +23,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.975780f9.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.558e4712.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
-        
       
       
 
@@ -43,7 +48,7 @@
     
       <link rel="stylesheet" href="../stylesheets/extra.css">
     
-      <link rel="stylesheet" href="../assets/pymdownx-extras/extra-34c51d7bc1.css">
+      <link rel="stylesheet" href="../assets/pymdownx-extras/extra-3531de4046.css">
     
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -94,7 +99,7 @@
 <header class="md-header" data-md-component="header">
   <nav
     class="md-header__inner md-grid"
-    aria-label="Header"
+    aria-label=""
   >
     <a
       href=".."
@@ -188,7 +193,7 @@
           <div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
@@ -292,7 +297,22 @@
   
     <li class="md-nav__item">
       <a href="../clustertemplate/" class="md-nav__link">
-        Cluster template
+        Cluster Template
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../appprofiles/" class="md-nav__link">
+        Application Profile
       </a>
     </li>
   
@@ -477,18 +497,19 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
       
       
-      
-        <label class="md-nav__link" for="__nav_8">
+        <label class="md-nav__link" for="__nav_9" tabindex="0" aria-expanded="false">
           Developer Guide
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Developer Guide" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
           Developer Guide
         </label>
@@ -671,10 +692,9 @@
   
                   
 
-  <a href="https://github.com/arlonproj/arlon/edit/main/docs/architecture.md" title="Edit this page" class="md-content__button md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
-  </a>
+  
+  
+
 
 
 <h1 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h1>
@@ -726,22 +746,22 @@ There are two subcommands i.e., <code>arlon git register</code> and <code>arlon 
 Lastly we also write this repository information to the local configuration file.
 This contains two pieces of information for each repository- it’s URL and the alias.
 The structure of the file is as shown:</p>
-<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">        </span><span class="nt">&quot;alias&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;default&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="p">},</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;repos&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
-<span class="w">        </span><span class="p">{</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;alias&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;default&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="p">},</span><span class="w"></span>
-<span class="w">        </span><span class="p">{</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;alias&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;not_default&quot;</span><span class="w"></span>
-<span class="w">       </span><span class="p">},</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
-<span class="w">    </span><span class="p">]</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;alias&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;default&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;repos&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;alias&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;default&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;alias&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;not_default&quot;</span>
+<span class="w">       </span><span class="p">},</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
 </code></pre></div>
 <p>On running <code>arlon git unregister ALIAS</code>, it removes that entry from the configuration file. However, it does NOT remove the repository from <code>argocd</code>. When the "default" alias is deleted, we also clear the "default" entry from the JSON file.</p>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
@@ -749,20 +769,20 @@ The structure of the file is as shown:</p>
 <h5 id="registering-repositories">Registering Repositories<a class="headerlink" href="#registering-repositories" title="Permanent link">&para;</a></h5>
 <p>Registering a repository requires the repository link, the GitHub username(<code>--user</code>), and a personal access token(<code>--password</code>).
 When the <code>--password</code> flag isn't provided at the command line, the CLI will prompt for a password(this is the recommended approach).</p>
-<div class="highlight"><pre><span></span><code>arlon git register https://github.com/GhUser/manifests --user GhUser
-arlon git register https://github.com/GhUser/prod-manifests --user GhUser --alias prod
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>git<span class="w"> </span>register<span class="w"> </span>https://github.com/GhUser/manifests<span class="w"> </span>--user<span class="w"> </span>GhUser
+arlon<span class="w"> </span>git<span class="w"> </span>register<span class="w"> </span>https://github.com/GhUser/prod-manifests<span class="w"> </span>--user<span class="w"> </span>GhUser<span class="w"> </span>--alias<span class="w"> </span>prod
 </code></pre></div>
 <p>For non-interactive registrations, the <code>--password</code> flag can be used.</p>
-<div class="highlight"><pre><span></span><code><span class="nb">export</span> <span class="nv">GH_PAT</span><span class="o">=</span><span class="s2">&quot;...&quot;</span>
-arlon git register https://github.com/GhUser/manifests --user GhUser --password <span class="nv">$GH_PAT</span>
-arlon git register https://github.com/GhUser/prod-manifests --user GhUser --alias prod --password <span class="nv">$GH_PAT</span>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">GH_PAT</span><span class="o">=</span><span class="s2">&quot;...&quot;</span>
+arlon<span class="w"> </span>git<span class="w"> </span>register<span class="w"> </span>https://github.com/GhUser/manifests<span class="w"> </span>--user<span class="w"> </span>GhUser<span class="w"> </span>--password<span class="w"> </span><span class="nv">$GH_PAT</span>
+arlon<span class="w"> </span>git<span class="w"> </span>register<span class="w"> </span>https://github.com/GhUser/prod-manifests<span class="w"> </span>--user<span class="w"> </span>GhUser<span class="w"> </span>--alias<span class="w"> </span>prod<span class="w"> </span>--password<span class="w"> </span><span class="nv">$GH_PAT</span>
 </code></pre></div>
 <h5 id="unregistering-repositories">Unregistering Repositories<a class="headerlink" href="#unregistering-repositories" title="Permanent link">&para;</a></h5>
 <p>Unregistering an alias only requires a positional argument: the repository alias.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># unregister the default alias locally</span>
-arlon git unregister default
+arlon<span class="w"> </span>git<span class="w"> </span>unregister<span class="w"> </span>default
 <span class="c1"># unregister some other alias locally</span>
-arlon git unregister prod
+arlon<span class="w"> </span>git<span class="w"> </span>unregister<span class="w"> </span>prod
 </code></pre></div>
 
 
@@ -786,7 +806,7 @@ arlon git unregister prod
   
     <nav
       class="md-footer__inner md-grid"
-      aria-label="Footer"
+      aria-label=""
     >
       
         <a
@@ -853,16 +873,15 @@ arlon git unregister prod
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.51d95adb.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@8.8.4/dist/mermaid.min.js"></script>
       
         <script src="../assets/pymdownx-extras/extra-loader-52693605.js"></script>
       
-    
     
   </body>
 </html>

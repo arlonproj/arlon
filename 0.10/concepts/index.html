@@ -8,8 +8,14 @@
       
       
       
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../clustertemplate/">
+      
       <link rel="icon" href="../images/favicon-32x32.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.6">
     
     
       
@@ -17,11 +23,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.975780f9.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.558e4712.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
-        
       
       
 
@@ -43,7 +48,7 @@
     
       <link rel="stylesheet" href="../stylesheets/extra.css">
     
-      <link rel="stylesheet" href="../assets/pymdownx-extras/extra-34c51d7bc1.css">
+      <link rel="stylesheet" href="../assets/pymdownx-extras/extra-3531de4046.css">
     
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -94,7 +99,7 @@
 <header class="md-header" data-md-component="header">
   <nav
     class="md-header__inner md-grid"
-    aria-label="Header"
+    aria-label=""
   >
     <a
       href=".."
@@ -188,7 +193,7 @@
           <div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
@@ -324,15 +329,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cluster-template-gen2-cluster" class="md-nav__link">
-    Cluster Template (gen2 cluster)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cluster-spec-gen1-clusters-deprecated-since-010" class="md-nav__link">
-    Cluster spec (gen1 clusters : deprecated since 0.10)
+  <a href="#cluster-template" class="md-nav__link">
+    Cluster Template
   </a>
   
 </li>
@@ -358,13 +356,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#gen1-profiles" class="md-nav__link">
-    Gen1 Profiles
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -382,7 +373,22 @@
   
     <li class="md-nav__item">
       <a href="../clustertemplate/" class="md-nav__link">
-        Cluster template
+        Cluster Template
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../appprofiles/" class="md-nav__link">
+        Application Profile
       </a>
     </li>
   
@@ -459,18 +465,19 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
       
       
-      
-        <label class="md-nav__link" for="__nav_8">
+        <label class="md-nav__link" for="__nav_9" tabindex="0" aria-expanded="false">
           Developer Guide
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Developer Guide" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
           Developer Guide
         </label>
@@ -579,15 +586,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cluster-template-gen2-cluster" class="md-nav__link">
-    Cluster Template (gen2 cluster)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cluster-spec-gen1-clusters-deprecated-since-010" class="md-nav__link">
-    Cluster spec (gen1 clusters : deprecated since 0.10)
+  <a href="#cluster-template" class="md-nav__link">
+    Cluster Template
   </a>
   
 </li>
@@ -613,13 +613,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#gen1-profiles" class="md-nav__link">
-    Gen1 Profiles
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -635,10 +628,9 @@
   
                   
 
-  <a href="https://github.com/arlonproj/arlon/edit/main/docs/concepts.md" title="Edit this page" class="md-content__button md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
-  </a>
+  
+  
+
 
 
 <h1 id="concepts">Concepts<a class="headerlink" href="#concepts" title="Permanent link">&para;</a></h1>
@@ -657,7 +649,7 @@ the workspace repository.</p>
 <p>The new way of provisioning workload clusters in Arlon since v0.9 is gen2 clusters using <em>cluster template</em> that replace gen1 clusters using <em>cluster spec</em>
 The most significant change in gen2 clusters is the <em>Cluster Template</em> construct, which replaces the older cluster spec from gen1 clusters.
 To distinguish them from the older gen1 clusters, the ones deployed from a cluster template are called next-gen clusters or gen2 clusters.</p>
-<h2 id="cluster-template-gen2-cluster">Cluster Template (gen2 cluster)<a class="headerlink" href="#cluster-template-gen2-cluster" title="Permanent link">&para;</a></h2>
+<h2 id="cluster-template">Cluster Template<a class="headerlink" href="#cluster-template" title="Permanent link">&para;</a></h2>
 <p>A cluster template is a base cluster manifest that can be "cloned" to produce
 one or more identical or similar workload clusters.
 To create a cluster template, you first compose a manifest containing one or more
@@ -666,17 +658,6 @@ You then store the manifest in its own directoy somewhere in git.
 You then instruct Arlon to "prep" the directory to promote it to cluster template.
 To know more about cluster template for Arlon gen2 clusters including the difference
 with cluster spec and the process to create gen2 clusters; read the document <a href="../clustertemplate/">cluster template</a></p>
-<h2 id="cluster-spec-gen1-clusters-deprecated-since-010">Cluster spec (gen1 clusters : deprecated since 0.10)<a class="headerlink" href="#cluster-spec-gen1-clusters-deprecated-since-010" title="Permanent link">&para;</a></h2>
-<p>A cluster spec contains desired settings when creating a new cluster.
-They currently include:</p>
-<ul>
-<li>API Provider: the cluster orchestration technology. Supported values are <code>CAPI</code> (Cluster API) and <code>xplane</code> (Crossplane)</li>
-<li>Cloud Provider: the infrastructure cloud provider. The currently supported values is <code>aws</code>, with <code>gcp</code> and <code>azure</code> support coming later.</li>
-<li>Type: the cluster type. Some API providers support more than one type. On <code>aws</code> cloud, Cluster API supports <code>kubeadm</code> and <code>eks</code>, whereas Crossplane only supports <code>eks</code>.</li>
-<li>The (worker) node instance type</li>
-<li>The initial (worker) node count</li>
-<li>The Kubernetes version</li>
-</ul>
 <h2 id="application-app">Application (App)<a class="headerlink" href="#application-app" title="Permanent link">&para;</a></h2>
 <p>An Arlon Application (or "App" for short) defines a source of Kubernetes
 manifests that can be applied/deployed to a workload cluster. It can
@@ -700,10 +681,6 @@ with the desired AppProfile(s). The union of all Apps referenced by those
 AppProfiles is deployed to the cluster.
 For more details about annotating/targeting clusters,
 refer to <a href="../appprofiles/">AppProfiles article</a></p>
-<h2 id="gen1-profiles">Gen1 Profiles<a class="headerlink" href="#gen1-profiles" title="Permanent link">&para;</a></h2>
-<p>Apps and AppProfiles are a newer version ("gen2") of Arlon profiles.
-There is an older version called "gen1", which is composed of the concepts
-of Bundles and Profiles. For more details, see <a href="../gen1_profiles/">Bundles and Profiles</a></p>
 
 
 
@@ -726,7 +703,7 @@ of Bundles and Profiles. For more details, see <a href="../gen1_profiles/">Bundl
   
     <nav
       class="md-footer__inner md-grid"
-      aria-label="Footer"
+      aria-label=""
     >
       
         <a
@@ -758,7 +735,7 @@ of Bundles and Profiles. For more details, see <a href="../gen1_profiles/">Bundl
               <span class="md-footer__direction">
                 Next
               </span>
-              Cluster template
+              Cluster Template
             </div>
           </div>
           <div class="md-footer__button md-icon">
@@ -793,16 +770,15 @@ of Bundles and Profiles. For more details, see <a href="../gen1_profiles/">Bundl
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.51d95adb.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@8.8.4/dist/mermaid.min.js"></script>
       
         <script src="../assets/pymdownx-extras/extra-loader-52693605.js"></script>
       
-    
     
   </body>
 </html>

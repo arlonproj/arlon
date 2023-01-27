@@ -8,8 +8,14 @@
       
       
       
+      
+        <link rel="prev" href="../installation/">
+      
+      
+        <link rel="next" href="../dev_setup/">
+      
       <link rel="icon" href="../images/favicon-32x32.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.6">
     
     
       
@@ -17,11 +23,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.975780f9.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.558e4712.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
-        
       
       
 
@@ -43,7 +48,7 @@
     
       <link rel="stylesheet" href="../stylesheets/extra.css">
     
-      <link rel="stylesheet" href="../assets/pymdownx-extras/extra-34c51d7bc1.css">
+      <link rel="stylesheet" href="../assets/pymdownx-extras/extra-3531de4046.css">
     
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -74,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#next-generation-gen2-clusters-new-in-version-09x" class="md-skip">
+        <a href="#tutorial" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +99,7 @@
 <header class="md-header" data-md-component="header">
   <nav
     class="md-header__inner md-grid"
-    aria-label="Header"
+    aria-label=""
   >
     <a
       href=".."
@@ -188,7 +193,7 @@
           <div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
@@ -292,7 +297,22 @@
   
     <li class="md-nav__item">
       <a href="../clustertemplate/" class="md-nav__link">
-        Cluster template
+        Cluster Template
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../appprofiles/" class="md-nav__link">
+        Application Profile
       </a>
     </li>
   
@@ -385,11 +405,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#creating-cluster-api-cluster-manifest" class="md-nav__link">
-    Creating Cluster-API cluster manifest
+  <a href="#pre-requisites" class="md-nav__link">
+    Pre-requisites
   </a>
   
-    <nav class="md-nav" aria-label="Creating Cluster-API cluster manifest">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-cluster-api-cluster-manifest" class="md-nav__link">
+    Creating Cluster-API Cluster Manifest
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating Cluster-API Cluster Manifest">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -419,8 +446,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gen2-cluster-creation-using-arlon" class="md-nav__link">
-    gen2 cluster creation using Arlon
+  <a href="#prepare-manifest" class="md-nav__link">
+    Prepare Manifest
   </a>
   
 </li>
@@ -440,22 +467,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gen2-cluster-creation" class="md-nav__link">
-    gen2 cluster creation
+  <a href="#create-cluster" class="md-nav__link">
+    Create Cluster
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#gen2-cluster-creation-with-overrides" class="md-nav__link">
-    gen2 cluster creation with overrides
+  <a href="#create-cluster-with-overrides" class="md-nav__link">
+    Create Cluster with Overrides
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#gen2-cluster-deletion" class="md-nav__link">
-    gen2 cluster deletion
+  <a href="#delete-cluster" class="md-nav__link">
+    Delete Cluster
   </a>
   
 </li>
@@ -497,8 +524,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gen2-cluster-creation-with-autoscaling-enabled" class="md-nav__link">
-    gen2 cluster creation with autoscaling enabled
+  <a href="#cluster-creation-with-autoscaling-enabled" class="md-nav__link">
+    Cluster creation with autoscaling enabled
   </a>
   
 </li>
@@ -541,18 +568,19 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
       
       
-      
-        <label class="md-nav__link" for="__nav_8">
+        <label class="md-nav__link" for="__nav_9" tabindex="0" aria-expanded="false">
           Developer Guide
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Developer Guide" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
           Developer Guide
         </label>
@@ -647,11 +675,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#creating-cluster-api-cluster-manifest" class="md-nav__link">
-    Creating Cluster-API cluster manifest
+  <a href="#pre-requisites" class="md-nav__link">
+    Pre-requisites
   </a>
   
-    <nav class="md-nav" aria-label="Creating Cluster-API cluster manifest">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-cluster-api-cluster-manifest" class="md-nav__link">
+    Creating Cluster-API Cluster Manifest
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating Cluster-API Cluster Manifest">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -681,8 +716,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gen2-cluster-creation-using-arlon" class="md-nav__link">
-    gen2 cluster creation using Arlon
+  <a href="#prepare-manifest" class="md-nav__link">
+    Prepare Manifest
   </a>
   
 </li>
@@ -702,22 +737,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gen2-cluster-creation" class="md-nav__link">
-    gen2 cluster creation
+  <a href="#create-cluster" class="md-nav__link">
+    Create Cluster
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#gen2-cluster-creation-with-overrides" class="md-nav__link">
-    gen2 cluster creation with overrides
+  <a href="#create-cluster-with-overrides" class="md-nav__link">
+    Create Cluster with Overrides
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#gen2-cluster-deletion" class="md-nav__link">
-    gen2 cluster deletion
+  <a href="#delete-cluster" class="md-nav__link">
+    Delete Cluster
   </a>
   
 </li>
@@ -759,8 +794,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gen2-cluster-creation-with-autoscaling-enabled" class="md-nav__link">
-    gen2 cluster creation with autoscaling enabled
+  <a href="#cluster-creation-with-autoscaling-enabled" class="md-nav__link">
+    Cluster creation with autoscaling enabled
   </a>
   
 </li>
@@ -799,124 +834,120 @@
   
                   
 
-  <a href="https://github.com/arlonproj/arlon/edit/main/docs/gen2_Tutorial.md" title="Edit this page" class="md-content__button md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
-  </a>
+  
+  
 
 
-<h1 id="next-generation-gen2-clusters-new-in-version-09x">Next-Generation (gen2) Clusters - New in version 0.9.x<a class="headerlink" href="#next-generation-gen2-clusters-new-in-version-09x" title="Permanent link">&para;</a></h1>
-<p>Gen1 clusters are limited in capability by the Helm chart used to deploy the infrastructure resources.
-Advanced Cluster API configurations, such as those using multiple MachinePools, each with different
-instance types, is not supported.</p>
-<p>Gen2 clusters solve this problem by allowing you to create workload clusters from a <em>cluster template</em>
-that you design and provide in the form of a manifest file stored in a git directory. The manifest
-typically contains multiple related resources that together define an arbitrarily complex cluster.
-If you make subsequent changes to the cluster template, workload clusters originally created from it
-will automatically acquire the changes.</p>
-<p>In earlier versions of arlon (before v0.10), <em>cluster templates</em> were called <em>base clusters</em>.
-Some parts of the code still refer to base cluster manifests. This should be considered as a synonym for cluster template manifests. </p>
-<p><strong>Note: Cluster Templates only support dynamic profiles.</strong></p>
-<h2 id="creating-cluster-api-cluster-manifest">Creating Cluster-API cluster manifest<a class="headerlink" href="#creating-cluster-api-cluster-manifest" title="Permanent link">&para;</a></h2>
+
+<h1 id="tutorial">Tutorial<a class="headerlink" href="#tutorial" title="Permanent link">&para;</a></h1>
+<p>This tutorial will go through the step by step process to create a Cluster Template and then deploy one or more AWS EKS Clusters using Arlon. </p>
+<p>Arlon allows you to create one or more workload clusters from a <em>Cluster Template</em> that you design and provide in the form of a Cluster API manifest file stored in a git directory. The manifest typically contains multiple related resources that together define an arbitrarily complex cluster. 
+If you make subsequent changes to the Cluster Template, workload clusters originally created from it will automatically acquire the changes.</p>
+<p>(NOTE: In earlier versions of arlon (before v0.10), <em>Cluster Templates</em> were called <em>Base Clusters</em>.
+Some parts of the code still refer to base cluster manifests. This should be considered as a synonym for cluster template manifests.)</p>
+<h2 id="pre-requisites">Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permanent link">&para;</a></h2>
 <p>Note: The CAPA version used here is v2.0 and the manifests created here are in accordance with this version.</p>
 <p>Refer the <a href="https://github.com/kubernetes-sigs/cluster-api-provider-aws#compatibility-with-cluster-api-and-kubernetes-versions">compatibility matrix for Cluster API provider and CAPA versions</a> for supported versions.</p>
-<p>Before deploying a EKS cluster, make sure to setup the AWS Environment as stated in the <a href="https://cluster-api.sigs.k8s.io/user/quick-start.html">quickstart giude for CAPI</a></p>
+<p>Before deploying a EKS cluster, make sure to setup the AWS Environment as stated in the <a href="https://cluster-api.sigs.k8s.io/user/quick-start.html">quickstart guide for CAPI</a></p>
+<p>Please read here to understand the <a href="https://cluster-api.sigs.k8s.io/user/concepts.html?highlight=machine#machine">Cluster API concepts</a> that we will use in rest of this Tutorial. </p>
+<h2 id="creating-cluster-api-cluster-manifest">Creating Cluster-API Cluster Manifest<a class="headerlink" href="#creating-cluster-api-cluster-manifest" title="Permanent link">&para;</a></h2>
+<p>In this section, we will go through the steps to create a CAPI cluster manifest for the three different types of node pooling constructs that CAPI EKS clusters support.</p>
 <h3 id="machinedeployment">MachineDeployment<a class="headerlink" href="#machinedeployment" title="Permanent link">&para;</a></h3>
-<p>Here is an example of a manifest file that we can use to create a <em>cluster template</em>. This manifest file helps in
-deploying an EKS cluster with 'machine deployment' component from the cluster API (CAPI). This file has been generated by the following command</p>
-<div class="highlight"><pre><span></span><code>clusterctl generate cluster capi-quickstart --flavor eks <span class="se">\</span>
-  --kubernetes-version v1.24.0 <span class="se">\</span>
-  --control-plane-machine-count<span class="o">=</span><span class="m">3</span> <span class="se">\</span>
-  --worker-machine-count<span class="o">=</span><span class="m">3</span> <span class="se">\</span>
-  &gt; capi-quickstart.yaml
+<p>Here is an example of a manifest file that we can use to create a <em>Cluster Template</em>. This manifest file helps in
+creating an EKS cluster with 'Machine Deployment' component from the Cluster API (CAPI). This file has been generated by the following command</p>
+<div class="highlight"><pre><span></span><code>clusterctl<span class="w"> </span>generate<span class="w"> </span>cluster<span class="w"> </span>capi-quickstart<span class="w"> </span>--flavor<span class="w"> </span>eks<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--kubernetes-version<span class="w"> </span>v1.24.0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--control-plane-machine-count<span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--worker-machine-count<span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>&gt;<span class="w"> </span>capi-quickstart.yaml
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1"># YAML</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cluster.x-k8s.io/v1beta1</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Cluster</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">clusterNetwork</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">pods</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">cidrBlocks</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">192.168.0.0/16</span><span class="w"></span>
-<span class="w">  </span><span class="nt">controlPlaneRef</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">controlplane.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedControlPlane</span><span class="w"></span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart-control-plane</span><span class="w"></span>
-<span class="w">  </span><span class="nt">infrastructureRef</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedCluster</span><span class="w"></span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart</span><span class="w"></span>
-<span class="nn">---</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedCluster</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w"></span>
-<span class="nn">---</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">controlplane.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedControlPlane</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart-control-plane</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">region</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">REGION</span><span class="p p-Indicator">}</span><span class="w"></span>
-<span class="w">  </span><span class="nt">sshKeyName</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">SSH_KEYNAME</span><span class="p p-Indicator">}</span><span class="w"></span>
-<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.24.0</span><span class="w"></span>
-<span class="nn">---</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cluster.x-k8s.io/v1beta1</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MachineDeployment</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart-md-0</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">clusterName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart</span><span class="w"></span>
-<span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"></span>
-<span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w"></span>
-<span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">bootstrap</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">configRef</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bootstrap.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="w">          </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EKSConfigTemplate</span><span class="w"></span>
-<span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart-md-0</span><span class="w"></span>
-<span class="w">      </span><span class="nt">clusterName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart</span><span class="w"></span>
-<span class="w">      </span><span class="nt">infrastructureRef</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="w">        </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSMachineTemplate</span><span class="w"></span>
-<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart-md-0</span><span class="w"></span>
-<span class="w">      </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.24.0</span><span class="w"></span>
-<span class="nn">---</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSMachineTemplate</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart-md-0</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">iamInstanceProfile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nodes.cluster-api-provider-aws.sigs.k8s.io</span><span class="w"></span>
-<span class="w">      </span><span class="nt">instanceType</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">INSTANCE_TYPE</span><span class="p p-Indicator">}</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sshKeyName</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">SSH_KEYNAME</span><span class="p p-Indicator">}</span><span class="w"></span>
-<span class="nn">---</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bootstrap.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EKSConfigTemplate</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart-md-0</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1"># YAML</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cluster.x-k8s.io/v1beta1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Cluster</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">clusterNetwork</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">pods</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">cidrBlocks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">192.168.0.0/16</span>
+<span class="w">  </span><span class="nt">controlPlaneRef</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">controlplane.cluster.x-k8s.io/v1beta2</span>
+<span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedControlPlane</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart-control-plane</span>
+<span class="w">  </span><span class="nt">infrastructureRef</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span>
+<span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedCluster</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedCluster</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart</span>
+<span class="nt">spec</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">controlplane.cluster.x-k8s.io/v1beta2</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedControlPlane</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart-control-plane</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">region</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">REGION</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">sshKeyName</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">SSH_KEYNAME</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.24.0</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cluster.x-k8s.io/v1beta1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MachineDeployment</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart-md-0</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">clusterName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart</span>
+<span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">  </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">spec</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">bootstrap</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">configRef</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bootstrap.cluster.x-k8s.io/v1beta2</span>
+<span class="w">          </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EKSConfigTemplate</span>
+<span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart-md-0</span>
+<span class="w">      </span><span class="nt">clusterName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart</span>
+<span class="w">      </span><span class="nt">infrastructureRef</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span>
+<span class="w">        </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSMachineTemplate</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart-md-0</span>
+<span class="w">      </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.24.0</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSMachineTemplate</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart-md-0</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">spec</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">iamInstanceProfile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nodes.cluster-api-provider-aws.sigs.k8s.io</span>
+<span class="w">      </span><span class="nt">instanceType</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">INSTANCE_TYPE</span><span class="p p-Indicator">}</span>
+<span class="w">      </span><span class="nt">sshKeyName</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">SSH_KEYNAME</span><span class="p p-Indicator">}</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bootstrap.cluster.x-k8s.io/v1beta2</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EKSConfigTemplate</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">capi-quickstart-md-0</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
 </code></pre></div>
 <h3 id="awsmanagedmachinepool">AWSManagedMachinePool<a class="headerlink" href="#awsmanagedmachinepool" title="Permanent link">&para;</a></h3>
 <p>Initialize the environment for AWSManagedMachinePool as stated <a href="https://cluster-api-aws.sigs.k8s.io/topics/machinepools.html#awsmanagedmachinepool">here</a></p>
 <p>Before deploying an EKS cluster, make sure that the MachinePool feature gate is enabled. To do so, run this command:</p>
-<div class="highlight"><pre><span></span><code>kubectl describe deployment capa-controller-manager -n capa-system
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>describe<span class="w"> </span>deployment<span class="w"> </span>capa-controller-manager<span class="w"> </span>-n<span class="w"> </span>capa-system
 </code></pre></div>
 <p>In the output, in the feature gates section of the deployment, MachinePool must be set to true.</p>
-<div class="highlight"><pre><span></span><code>&gt; kubectl describe deployment capa-controller-manager -n capa-system
+<div class="highlight"><pre><span></span><code>&gt;<span class="w"> </span>kubectl<span class="w"> </span>describe<span class="w"> </span>deployment<span class="w"> </span>capa-controller-manager<span class="w"> </span>-n<span class="w"> </span>capa-system
 ..........
 ..........
 --featuregates<span class="o">=</span><span class="nv">EKS</span><span class="o">=</span>true,EKSEnableIAM<span class="o">=</span>false,EKSAllowAddRoles<span class="o">=</span>false,EKSFargate<span class="o">=</span>true,MachinePool<span class="o">=</span>true,EventBridgeInstanceState<span class="o">=</span>false,
@@ -925,78 +956,78 @@ deploying an EKS cluster with 'machine deployment' component from the cluster AP
 ..........
 </code></pre></div>
 <p>This manifest file helps in deploying an EKS cluster with 'AWSManagedMachinePool' component from the cluster API (CAPI). This file has been generated by the following command</p>
-<div class="highlight"><pre><span></span><code>clusterctl generate cluster awsmanaged-cluster --kubernetes-version v1.22.0 --flavor eks-managedmachinepool &gt; manifest.yaml
+<div class="highlight"><pre><span></span><code>clusterctl<span class="w"> </span>generate<span class="w"> </span>cluster<span class="w"> </span>awsmanaged-cluster<span class="w"> </span>--kubernetes-version<span class="w"> </span>v1.22.0<span class="w"> </span>--flavor<span class="w"> </span>eks-managedmachinepool<span class="w"> </span>&gt;<span class="w"> </span>manifest.yaml
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1"># YAML</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cluster.x-k8s.io/v1beta1</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Cluster</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">clusterNetwork</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">pods</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">cidrBlocks</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">192.168.0.0/16</span><span class="w"></span>
-<span class="w">  </span><span class="nt">controlPlaneRef</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">controlplane.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedControlPlane</span><span class="w"></span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-control-plane</span><span class="w"></span>
-<span class="w">  </span><span class="nt">infrastructureRef</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedCluster</span><span class="w"></span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span><span class="w"></span>
-<span class="nn">---</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedCluster</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w"></span>
-<span class="nn">---</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">controlplane.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedControlPlane</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-control-plane</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">region</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">REGION</span><span class="p p-Indicator">}</span><span class="w"></span>
-<span class="w">  </span><span class="nt">sshKeyName</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">SSH_KEYNAME</span><span class="p p-Indicator">}</span><span class="w"></span>
-<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.22.0</span><span class="w"></span>
-<span class="nn">---</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cluster.x-k8s.io/v1beta1</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MachinePool</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-pool-0</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">clusterName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span><span class="w"></span>
-<span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
-<span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">bootstrap</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">dataSecretName</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">clusterName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span><span class="w"></span>
-<span class="w">      </span><span class="nt">infrastructureRef</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="w">        </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedMachinePool</span><span class="w"></span>
-<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-pool-0</span><span class="w"></span>
-<span class="nn">---</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedMachinePool</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-pool-0</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1"># YAML</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cluster.x-k8s.io/v1beta1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Cluster</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">clusterNetwork</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">pods</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">cidrBlocks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">192.168.0.0/16</span>
+<span class="w">  </span><span class="nt">controlPlaneRef</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">controlplane.cluster.x-k8s.io/v1beta2</span>
+<span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedControlPlane</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-control-plane</span>
+<span class="w">  </span><span class="nt">infrastructureRef</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span>
+<span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedCluster</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedCluster</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">controlplane.cluster.x-k8s.io/v1beta2</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedControlPlane</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-control-plane</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">region</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">REGION</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">sshKeyName</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">SSH_KEYNAME</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.22.0</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cluster.x-k8s.io/v1beta1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MachinePool</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-pool-0</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">clusterName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span>
+<span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">  </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">spec</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">bootstrap</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">dataSecretName</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="w">      </span><span class="nt">clusterName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span>
+<span class="w">      </span><span class="nt">infrastructureRef</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span>
+<span class="w">        </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedMachinePool</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-pool-0</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedMachinePool</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-pool-0</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
 </code></pre></div>
 <h3 id="awsmachinepool">AWSMachinePool<a class="headerlink" href="#awsmachinepool" title="Permanent link">&para;</a></h3>
 <p>An AWSMachinePool corresponds to an AWS AutoScaling Groups, which provides the cloud provider specific resource for orchestrating a group of EC2 machines.</p>
 <p>Initialize the environment for AWSMachinePool as stated <a href="https://cluster-api-aws.sigs.k8s.io/topics/machinepools.html#awsmachinepool">here</a></p>
 <p>Before deploying an EKS cluster, make sure that the AWSMachinePool feature gate is enabled. To do so, run this command:</p>
-<div class="highlight"><pre><span></span><code>kubectl describe deployment capa-controller-manager -n capa-system
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>describe<span class="w"> </span>deployment<span class="w"> </span>capa-controller-manager<span class="w"> </span>-n<span class="w"> </span>capa-system
 </code></pre></div>
 <p>In the output, in the feature gates section of the deployment, MachinePool must be set to true.</p>
-<div class="highlight"><pre><span></span><code>&gt; kubectl describe deployment capa-controller-manager -n capa-system
+<div class="highlight"><pre><span></span><code>&gt;<span class="w"> </span>kubectl<span class="w"> </span>describe<span class="w"> </span>deployment<span class="w"> </span>capa-controller-manager<span class="w"> </span>-n<span class="w"> </span>capa-system
 ..........
 ..........
 --featuregates<span class="o">=</span><span class="nv">EKS</span><span class="o">=</span>true,EKSEnableIAM<span class="o">=</span>false,EKSAllowAddRoles<span class="o">=</span>false,EKSFargate<span class="o">=</span>true,MachinePool<span class="o">=</span>true,EventBridgeInstanceState<span class="o">=</span>false,
@@ -1005,184 +1036,183 @@ deploying an EKS cluster with 'machine deployment' component from the cluster AP
 ..........
 </code></pre></div>
 <p>This manifest file helps in deploying an EKS cluster with 'AWSManagedMachinePool' component from the cluster API (CAPI). This file has been generated by the following command</p>
-<div class="highlight"><pre><span></span><code>clusterctl generate cluster awsmanaged-cluster --kubernetes-version v1.22.0 --flavor eks-machinepool &gt; manifest.yaml
+<div class="highlight"><pre><span></span><code>clusterctl<span class="w"> </span>generate<span class="w"> </span>cluster<span class="w"> </span>awsmanaged-cluster<span class="w"> </span>--kubernetes-version<span class="w"> </span>v1.22.0<span class="w"> </span>--flavor<span class="w"> </span>eks-machinepool<span class="w"> </span>&gt;<span class="w"> </span>manifest.yaml
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1"># YAML</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cluster.x-k8s.io/v1beta1</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Cluster</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">clusterNetwork</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">pods</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">cidrBlocks</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">192.168.0.0/16</span><span class="w"></span>
-<span class="w">  </span><span class="nt">controlPlaneRef</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">controlplane.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedControlPlane</span><span class="w"></span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-control-plane</span><span class="w"></span>
-<span class="w">  </span><span class="nt">infrastructureRef</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedCluster</span><span class="w"></span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span><span class="w"></span>
-<span class="nn">---</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedCluster</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w"></span>
-<span class="nn">---</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">controlplane.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedControlPlane</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-control-plane</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">region</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">REGION</span><span class="p p-Indicator">}</span><span class="w"></span>
-<span class="w">  </span><span class="nt">sshKeyName</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">SSH_KEYNAME</span><span class="p p-Indicator">}</span><span class="w"></span>
-<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.22.0</span><span class="w"></span>
-<span class="nn">---</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cluster.x-k8s.io/v1beta1</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MachinePool</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-mp-0</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">clusterName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span><span class="w"></span>
-<span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
-<span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">bootstrap</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">configRef</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bootstrap.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="w">          </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EKSConfig</span><span class="w"></span>
-<span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-mp-0</span><span class="w"></span>
-<span class="w">      </span><span class="nt">clusterName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span><span class="w"></span>
-<span class="w">      </span><span class="nt">infrastructureRef</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="w">        </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSMachinePool</span><span class="w"></span>
-<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-mp-0</span><span class="w"></span>
-<span class="w">      </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.22.0</span><span class="w"></span>
-<span class="nn">---</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSMachinePool</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-mp-0</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">awsLaunchTemplate</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">iamInstanceProfile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nodes.cluster-api-provider-aws.sigs.k8s.io</span><span class="w"></span>
-<span class="w">    </span><span class="nt">instanceType</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">INSTANCE_TYPE</span><span class="p p-Indicator">}</span><span class="w"></span>
-<span class="w">    </span><span class="nt">sshKeyName</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">SSH_KEYNAME</span><span class="p p-Indicator">}</span><span class="w"></span>
-<span class="w">  </span><span class="nt">maxSize</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span><span class="w"></span>
-<span class="w">  </span><span class="nt">minSize</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
-<span class="nn">---</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bootstrap.cluster.x-k8s.io/v1beta2</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EKSConfig</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-mp-0</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1"># YAML</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cluster.x-k8s.io/v1beta1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Cluster</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">clusterNetwork</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">pods</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">cidrBlocks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">192.168.0.0/16</span>
+<span class="w">  </span><span class="nt">controlPlaneRef</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">controlplane.cluster.x-k8s.io/v1beta2</span>
+<span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedControlPlane</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-control-plane</span>
+<span class="w">  </span><span class="nt">infrastructureRef</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span>
+<span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedCluster</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedCluster</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">controlplane.cluster.x-k8s.io/v1beta2</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSManagedControlPlane</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-control-plane</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">region</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">REGION</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">sshKeyName</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">SSH_KEYNAME</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.22.0</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cluster.x-k8s.io/v1beta1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MachinePool</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-mp-0</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">clusterName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span>
+<span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">  </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">spec</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">bootstrap</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">configRef</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bootstrap.cluster.x-k8s.io/v1beta2</span>
+<span class="w">          </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EKSConfig</span>
+<span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-mp-0</span>
+<span class="w">      </span><span class="nt">clusterName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster</span>
+<span class="w">      </span><span class="nt">infrastructureRef</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span>
+<span class="w">        </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSMachinePool</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-mp-0</span>
+<span class="w">      </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.22.0</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infrastructure.cluster.x-k8s.io/v1beta2</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWSMachinePool</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-mp-0</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">awsLaunchTemplate</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">iamInstanceProfile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nodes.cluster-api-provider-aws.sigs.k8s.io</span>
+<span class="w">    </span><span class="nt">instanceType</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">INSTANCE_TYPE</span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="nt">sshKeyName</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">SSH_KEYNAME</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">maxSize</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
+<span class="w">  </span><span class="nt">minSize</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bootstrap.cluster.x-k8s.io/v1beta2</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EKSConfig</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">awsmanaged-cluster-mp-0</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="nt">spec</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
 </code></pre></div>
-<h2 id="gen2-cluster-creation-using-arlon">gen2 cluster creation using Arlon<a class="headerlink" href="#gen2-cluster-creation-using-arlon" title="Permanent link">&para;</a></h2>
+<h2 id="prepare-manifest">Prepare Manifest<a class="headerlink" href="#prepare-manifest" title="Permanent link">&para;</a></h2>
 <p>This manifest file needs to be pushed to the workspace repository before the manifest directory is prepped and then validated.</p>
 <p>Before a manifest directory can be used as a cluster template, it must first be "prepared" or "prepped"
 by Arlon. The "prep" phase makes minor changes to the directory and manifest to help Arlon deploy
 multiple copies of the cluster without naming conflicts.</p>
 <h2 id="manifest-directory-preparation">manifest directory preparation<a class="headerlink" href="#manifest-directory-preparation" title="Permanent link">&para;</a></h2>
 <p>To prepare a git directory to serve as cluster template, use the <code>clustertemplate preparegit</code> command:</p>
-<div class="highlight"><pre><span></span><code>arlon clustertemplate preparegit --repo-url &lt;repoUrl&gt; --repo-path &lt;pathToDirectory&gt; <span class="o">[</span>--repo-revision revision<span class="o">]</span>
-            <span class="c1"># OR</span>
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>clustertemplate<span class="w"> </span>preparegit<span class="w"> </span>--repo-url<span class="w"> </span>&lt;repoUrl&gt;<span class="w"> </span>--repo-path<span class="w"> </span>&lt;pathToDirectory&gt;<span class="w"> </span><span class="o">[</span>--repo-revision<span class="w"> </span>revision<span class="o">]</span>
+<span class="w">            </span><span class="c1"># OR</span>
 <span class="c1"># using repository aliases</span>
-  <span class="c1"># using the default alias</span>
-arlon clustertemplate preparegit --repo-path &lt;pathToDirectory&gt; <span class="o">[</span>--repo-revision revision<span class="o">]</span>
-  <span class="c1"># using the prod alias</span>
-arlon clustertemplate preparegit --repo-alias prod --repo-path &lt;pathToDirectory&gt; <span class="o">[</span>--repo-revision revision<span class="o">]</span>
+<span class="w">  </span><span class="c1"># using the default alias</span>
+arlon<span class="w"> </span>clustertemplate<span class="w"> </span>preparegit<span class="w"> </span>--repo-path<span class="w"> </span>&lt;pathToDirectory&gt;<span class="w"> </span><span class="o">[</span>--repo-revision<span class="w"> </span>revision<span class="o">]</span>
+<span class="w">  </span><span class="c1"># using the prod alias</span>
+arlon<span class="w"> </span>clustertemplate<span class="w"> </span>preparegit<span class="w"> </span>--repo-alias<span class="w"> </span>prod<span class="w"> </span>--repo-path<span class="w"> </span>&lt;pathToDirectory&gt;<span class="w"> </span><span class="o">[</span>--repo-revision<span class="w"> </span>revision<span class="o">]</span>
 </code></pre></div>
 <h2 id="manifest-directory-validation">manifest directory validation<a class="headerlink" href="#manifest-directory-validation" title="Permanent link">&para;</a></h2>
 <p>Post the successful preparation of the cluster template manifest directory using <code>clustertemplate preparegit</code>, the cluster template manifest directory needs to be validated before the cluster template is created.</p>
 <p>To determine if a git directory is eligible to serve as cluster template, run the <code>clustertemplate validategit</code> command:</p>
-<div class="highlight"><pre><span></span><code>arlon clustertemplate validategit --repo-url &lt;repoUrl&gt; --repo-path &lt;pathToDirectory&gt; <span class="o">[</span>--repo-revision revision<span class="o">]</span>
-            <span class="c1"># OR</span>
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>clustertemplate<span class="w"> </span>validategit<span class="w"> </span>--repo-url<span class="w"> </span>&lt;repoUrl&gt;<span class="w"> </span>--repo-path<span class="w"> </span>&lt;pathToDirectory&gt;<span class="w"> </span><span class="o">[</span>--repo-revision<span class="w"> </span>revision<span class="o">]</span>
+<span class="w">            </span><span class="c1"># OR</span>
 <span class="c1"># using repository aliases</span>
-  <span class="c1"># using the default alias</span>
-arlon clustertemplate validategit --repo-path &lt;pathToDirectory&gt; <span class="o">[</span>--repo-revision revision<span class="o">]</span>
-  <span class="c1"># using the prod alias</span>
-arlon clustertemplate validategit --repo-alias prod --repo-path &lt;pathToDirectory&gt; <span class="o">[</span>--repo-revision revision<span class="o">]</span>
+<span class="w">  </span><span class="c1"># using the default alias</span>
+arlon<span class="w"> </span>clustertemplate<span class="w"> </span>validategit<span class="w"> </span>--repo-path<span class="w"> </span>&lt;pathToDirectory&gt;<span class="w"> </span><span class="o">[</span>--repo-revision<span class="w"> </span>revision<span class="o">]</span>
+<span class="w">  </span><span class="c1"># using the prod alias</span>
+arlon<span class="w"> </span>clustertemplate<span class="w"> </span>validategit<span class="w"> </span>--repo-alias<span class="w"> </span>prod<span class="w"> </span>--repo-path<span class="w"> </span>&lt;pathToDirectory&gt;<span class="w"> </span><span class="o">[</span>--repo-revision<span class="w"> </span>revision<span class="o">]</span>
 </code></pre></div>
-<h2 id="gen2-cluster-creation">gen2 cluster creation<a class="headerlink" href="#gen2-cluster-creation" title="Permanent link">&para;</a></h2>
-<p><strong>Note: Cluster templates only support dynamic profiles.</strong></p>
-<p>To create a gen2 workload cluster from the cluster template:</p>
-<div class="highlight"><pre><span></span><code>arlon cluster create --cluster-name &lt;clusterName&gt; --repo-url &lt;repoUrl&gt; --repo-path &lt;pathToDirectory&gt; <span class="o">[</span>--output-yaml<span class="o">]</span> <span class="o">[</span>--profile &lt;profileName&gt;<span class="o">]</span> <span class="o">[</span>--repo-revision &lt;repoRevision&gt;<span class="o">]</span>
-            <span class="c1"># OR</span>
+<h2 id="create-cluster">Create Cluster<a class="headerlink" href="#create-cluster" title="Permanent link">&para;</a></h2>
+<p>To create a workload cluster from the Cluster Template:</p>
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>cluster<span class="w"> </span>create<span class="w"> </span>--cluster-name<span class="w"> </span>&lt;clusterName&gt;<span class="w"> </span>--repo-url<span class="w"> </span>&lt;repoUrl&gt;<span class="w"> </span>--repo-path<span class="w"> </span>&lt;pathToDirectory&gt;<span class="w"> </span><span class="o">[</span>--output-yaml<span class="o">]</span><span class="w"> </span><span class="o">[</span>--profile<span class="w"> </span>&lt;profileName&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>--repo-revision<span class="w"> </span>&lt;repoRevision&gt;<span class="o">]</span>
+<span class="w">            </span><span class="c1"># OR</span>
 <span class="c1"># using repository aliases</span>
-  <span class="c1"># using the default alias</span>
-arlon cluster create --cluster-name &lt;clusterName&gt; --repo-path &lt;pathToDirectory&gt; <span class="o">[</span>--output-yaml<span class="o">]</span> <span class="o">[</span>--profile &lt;profileName&gt;<span class="o">]</span> <span class="o">[</span>--repo-revision &lt;repoRevision&gt;<span class="o">]</span>
-  <span class="c1"># using the prod alias</span>
-arlon cluster create --cluster-name &lt;clusterName&gt; --repo-alias prod --repo-path &lt;pathToDirectory&gt; <span class="o">[</span>--output-yaml<span class="o">]</span> <span class="o">[</span>--profile &lt;profileName&gt;<span class="o">]</span> <span class="o">[</span>--repo-revision &lt;repoRevision&gt;<span class="o">]</span>
+<span class="w">  </span><span class="c1"># using the default alias</span>
+arlon<span class="w"> </span>cluster<span class="w"> </span>create<span class="w"> </span>--cluster-name<span class="w"> </span>&lt;clusterName&gt;<span class="w"> </span>--repo-path<span class="w"> </span>&lt;pathToDirectory&gt;<span class="w"> </span><span class="o">[</span>--output-yaml<span class="o">]</span><span class="w"> </span><span class="o">[</span>--profile<span class="w"> </span>&lt;profileName&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>--repo-revision<span class="w"> </span>&lt;repoRevision&gt;<span class="o">]</span>
+<span class="w">  </span><span class="c1"># using the prod alias</span>
+arlon<span class="w"> </span>cluster<span class="w"> </span>create<span class="w"> </span>--cluster-name<span class="w"> </span>&lt;clusterName&gt;<span class="w"> </span>--repo-alias<span class="w"> </span>prod<span class="w"> </span>--repo-path<span class="w"> </span>&lt;pathToDirectory&gt;<span class="w"> </span><span class="o">[</span>--output-yaml<span class="o">]</span><span class="w"> </span><span class="o">[</span>--profile<span class="w"> </span>&lt;profileName&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>--repo-revision<span class="w"> </span>&lt;repoRevision&gt;<span class="o">]</span>
 </code></pre></div>
-<h2 id="gen2-cluster-creation-with-overrides">gen2 cluster creation with overrides<a class="headerlink" href="#gen2-cluster-creation-with-overrides" title="Permanent link">&para;</a></h2>
+<h2 id="create-cluster-with-overrides">Create Cluster with Overrides<a class="headerlink" href="#create-cluster-with-overrides" title="Permanent link">&para;</a></h2>
 <p>We call the concept of constructing various clusters with patches from the same base manifest as cluster overrides.
-The cluster overrides feature is built on top of the existing cluster template design. So, A user can create a cluster from the base manifest using the same command as in the above step(gen2 cluster creation).
+The cluster overrides feature is built on top of the existing cluster template design. So, a user can create a cluster from the base manifest using the same command specified in the section above.
 Now, to create a cluster with overrides in the base manifest, a user should have the corresponding patch files in a single yaml file in local. Here is an example of a patch file where we want to override replicas count to 2 and change the sshkeyname:</p>
 <div class="highlight"><pre><span></span><code>---
-apiVersion: cluster.x-k8s.io/v1beta1
-kind: MachineDeployment
+apiVersion:<span class="w"> </span>cluster.x-k8s.io/v1beta1
+kind:<span class="w"> </span>MachineDeployment
 metadata:
-  name: capi-quickstart-eks-md-0
+<span class="w">  </span>name:<span class="w"> </span>capi-quickstart-eks-md-0
 spec:
-  replicas: <span class="m">2</span>
+<span class="w">  </span>replicas:<span class="w"> </span><span class="m">2</span>
 ---
-apiVersion: controlplane.cluster.x-k8s.io/v1beta1
-kind: AWSManagedControlPlane
+apiVersion:<span class="w"> </span>controlplane.cluster.x-k8s.io/v1beta1
+kind:<span class="w"> </span>AWSManagedControlPlane
 metadata:
-  name: capi-quickstart-eks-control-plane
+<span class="w">  </span>name:<span class="w"> </span>capi-quickstart-eks-control-plane
 spec:
-  sshKeyName: random
+<span class="w">  </span>sshKeyName:<span class="w"> </span>random
 ---
 
-  <span class="sb">```</span>
+<span class="w">  </span><span class="sb">```</span>
 
-Note: The metadata field <span class="k">in</span> the patch file should be same as of the metadata field <span class="k">in</span> the resources file.
+Note:<span class="w"> </span>The<span class="w"> </span>metadata<span class="w"> </span>field<span class="w"> </span><span class="k">in</span><span class="w"> </span>the<span class="w"> </span>patch<span class="w"> </span>file<span class="w"> </span>should<span class="w"> </span>be<span class="w"> </span>same<span class="w"> </span>as<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>metadata<span class="w"> </span>field<span class="w"> </span><span class="k">in</span><span class="w"> </span>the<span class="w"> </span>resources<span class="w"> </span>file.
 
-Refer to this <span class="o">[</span>document<span class="o">](</span>https://blog.scottlowe.org/2019/11/12/using-kustomize-with-cluster-api-manifests/<span class="o">)</span> to know more about patch files
+Refer<span class="w"> </span>to<span class="w"> </span>this<span class="w"> </span><span class="o">[</span>document<span class="o">](</span>https://blog.scottlowe.org/2019/11/12/using-kustomize-with-cluster-api-manifests/<span class="o">)</span><span class="w"> </span>to<span class="w"> </span>know<span class="w"> </span>more<span class="w"> </span>about<span class="w"> </span>patch<span class="w"> </span>files
 
-Command to create a gen2 workload cluster form the cluster template manifest with overrides to the manifest is:
+Command<span class="w"> </span>to<span class="w"> </span>create<span class="w"> </span>a<span class="w"> </span>workload<span class="w"> </span>cluster<span class="w"> </span>from<span class="w"> </span>the<span class="w"> </span>Cluster<span class="w"> </span>Template<span class="w"> </span>manifest<span class="w"> </span>with<span class="w"> </span>overrides<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>manifest<span class="w"> </span>is:
 
 <span class="sb">```</span>shell
-arlon cluster create &lt;cluster-name&gt; --repo-url &lt;repo url where cluster template is present&gt; --repo-path &lt;repo path to the cluster template&gt; --overrides-path &lt;path to the patch file&gt; --patch-repo-url &lt;repo url where patch file should be stored&gt; --patch-repo-path &lt;repo path to store the patch files&gt;
+arlon<span class="w"> </span>cluster<span class="w"> </span>create<span class="w"> </span>&lt;cluster-name&gt;<span class="w"> </span>--repo-url<span class="w"> </span>&lt;repo<span class="w"> </span>url<span class="w"> </span>where<span class="w"> </span>cluster<span class="w"> </span>template<span class="w"> </span>is<span class="w"> </span>present&gt;<span class="w"> </span>--repo-path<span class="w"> </span>&lt;repo<span class="w"> </span>path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>cluster<span class="w"> </span>template&gt;<span class="w"> </span>--overrides-path<span class="w"> </span>&lt;path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>patch<span class="w"> </span>file&gt;<span class="w"> </span>--patch-repo-url<span class="w"> </span>&lt;repo<span class="w"> </span>url<span class="w"> </span>where<span class="w"> </span>patch<span class="w"> </span>file<span class="w"> </span>should<span class="w"> </span>be<span class="w"> </span>stored&gt;<span class="w"> </span>--patch-repo-path<span class="w"> </span>&lt;repo<span class="w"> </span>path<span class="w"> </span>to<span class="w"> </span>store<span class="w"> </span>the<span class="w"> </span>patch<span class="w"> </span>files&gt;
 <span class="sb">````</span>
 
-Runnning the above <span class="nb">command</span> will create a cluster named folder <span class="k">in</span> patch repo path of patch repo url which contains the patch files, kustomization.yaml and configurations.yaml which are used to create the cluster app.
+Runnning<span class="w"> </span>the<span class="w"> </span>above<span class="w"> </span><span class="nb">command</span><span class="w"> </span>will<span class="w"> </span>create<span class="w"> </span>a<span class="w"> </span>folder<span class="w"> </span>with<span class="w"> </span>the<span class="w"> </span>specified<span class="w"> </span>cluster<span class="w"> </span>name<span class="w"> </span><span class="k">in</span><span class="w"> </span>patch<span class="w"> </span>repo<span class="w"> </span>path<span class="w"> </span>of<span class="w"> </span>patch<span class="w"> </span>repo<span class="w"> </span>url<span class="w"> </span>which<span class="w"> </span>contains<span class="w"> </span>the<span class="w"> </span>patch<span class="w"> </span>files,<span class="w"> </span>kustomization.yaml<span class="w"> </span>and<span class="w"> </span>configurations.yaml<span class="w"> </span>which<span class="w"> </span>are<span class="w"> </span>used<span class="w"> </span>to<span class="w"> </span>create<span class="w"> </span>the<span class="w"> </span>cluster.
 
-Note that the patch file repo url can be different or same from the cluster template repo url acoording to the requirement of the user. A user can use a different repo url <span class="k">for</span> string patch files <span class="k">for</span> the cluster.
+Note<span class="w"> </span>that<span class="w"> </span>the<span class="w"> </span>patch<span class="w"> </span>file<span class="w"> </span>repo<span class="w"> </span>url<span class="w"> </span>can<span class="w"> </span>be<span class="w"> </span>different<span class="w"> </span>or<span class="w"> </span>same<span class="w"> </span>from<span class="w"> </span>the<span class="w"> </span>cluster<span class="w"> </span>template<span class="w"> </span>repo<span class="w"> </span>url<span class="w"> </span>acoording<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>requirement<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>user.<span class="w"> </span>A<span class="w"> </span>user<span class="w"> </span>can<span class="w"> </span>use<span class="w"> </span>a<span class="w"> </span>different<span class="w"> </span>repo<span class="w"> </span>url<span class="w"> </span><span class="k">for</span><span class="w"> </span>string<span class="w"> </span>patch<span class="w"> </span>files<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>cluster.
 
-<span class="c1">## gen2 cluster update</span>
+<span class="c1">## Update Cluster</span>
 
-To update the profiles of a gen2 workload cluster:
+To<span class="w"> </span>update<span class="w"> </span>the<span class="w"> </span>profiles<span class="w"> </span>of<span class="w"> </span>a<span class="w"> </span>workload<span class="w"> </span>cluster:
 
 <span class="sb">```</span>shell
 <span class="c1"># To add a new profile to the existing cluster</span>
-arlon cluster ngupdate &lt;clustername&gt; --profile &lt;profilename&gt;
+arlon<span class="w"> </span>cluster<span class="w"> </span>ngupdate<span class="w"> </span>&lt;clustername&gt;<span class="w"> </span>--profile<span class="w"> </span>&lt;profilename&gt;
 <span class="c1"># To delete an existing profile from the existing cluster</span>
-arlon cluster ngupdate &lt;clustername&gt; --delete-profile
+arlon<span class="w"> </span>cluster<span class="w"> </span>ngupdate<span class="w"> </span>&lt;clustername&gt;<span class="w"> </span>--delete-profile
 </code></pre></div>
-<p>A gen2 cluster can be created without any profile app associated with the cluster. So, the above commands can be used to add a new profile
+<p>A cluster can be created without any profile associated with the cluster. So, the above commands can be used to add a new profile
 to the existing cluster which will create profile app in argocd along with bundle apps associated with the profile.</p>
 <p>An existing profile can be deleted from the cluster as well using the above command. Executing this command will delete the profile app and
 all the bundles associated with the profile in argocd.</p>
-<h2 id="gen2-cluster-deletion">gen2 cluster deletion<a class="headerlink" href="#gen2-cluster-deletion" title="Permanent link">&para;</a></h2>
-<p>To destroy a gen2 workload cluster:</p>
-<div class="highlight"><pre><span></span><code>arlon cluster delete &lt;clusterName&gt;
+<h2 id="delete-cluster">Delete Cluster<a class="headerlink" href="#delete-cluster" title="Permanent link">&para;</a></h2>
+<p>To destroy a workload cluster:</p>
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>cluster<span class="w"> </span>delete<span class="w"> </span>&lt;clusterName&gt;
 </code></pre></div>
 <p>Arlon creates between 2 and 3 ArgoCD application resources to compose a gen2 cluster (the 3rd application, called "profile app", is used when
 an optional profile is specified at cluster creation time). When you destroy a gen2 cluster, Arlon will find all related ArgoCD applications
 and clean them up.</p>
 <p>If the cluster which which is being deleted is a cluster created using patch files, the controller first cleans the git repo where the respective patch files of the cluster are present and then it destroys all the related ArgoCD applications and clean them up.</p>
 <h2 id="enabling-cluster-autoscaler-in-the-workload-cluster">Enabling Cluster Autoscaler in the workload cluster<a class="headerlink" href="#enabling-cluster-autoscaler-in-the-workload-cluster" title="Permanent link">&para;</a></h2>
-<p>To create a gen2 cluster with autoscaler, we need:</p>
+<p>To create a cluster with autoscaler, we need:</p>
 <ul>
 <li>bundle pointing to the bundle/capi-cluster-autoscaler in the arlon repository.</li>
 <li>dynamic profile that contains the above bundle.</li>
@@ -1193,32 +1223,32 @@ and clean them up.</p>
 <p>Register a dynamic bundle pointing to the bundles/capi-cluster-autoscaler in the Arlon repo.</p>
 <p>To enable the cluster-autoscaler bundle, add one more parameter during cluster creation: <code>srcType</code>. This is the ArgoCD-defined application source type (Helm, Kustomize, Directory). In addition to this, the <code>repo-revision</code> parameter should also be set to a stable arlon release branch ( in this case v0.10 ).</p>
 <p>This example creates a bundle pointing to the bundles/capi-cluster-autoscaler in Arlon repo</p>
-<div class="highlight"><pre><span></span><code>arlon bundle create cas-bundle --tags cas,devel,test --desc <span class="s2">&quot;CAS Bundle&quot;</span> --repo-url https://github.com/arlonproj/arlon.git --repo-path bundles/capi-cluster-autoscaler --srctype helm --repo-revision v0.10
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>bundle<span class="w"> </span>create<span class="w"> </span>cas-bundle<span class="w"> </span>--tags<span class="w"> </span>cas,devel,test<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;CAS Bundle&quot;</span><span class="w"> </span>--repo-url<span class="w"> </span>https://github.com/arlonproj/arlon.git<span class="w"> </span>--repo-path<span class="w"> </span>bundles/capi-cluster-autoscaler<span class="w"> </span>--srctype<span class="w"> </span>helm<span class="w"> </span>--repo-revision<span class="w"> </span>v0.10
 </code></pre></div>
 <h3 id="profile-creation">Profile creation<a class="headerlink" href="#profile-creation" title="Permanent link">&para;</a></h3>
 <p>Create a profile that contains this capi-cluster-autoscaler bundle.</p>
-<div class="highlight"><pre><span></span><code>arlon profile create dynamic-cas --repo-url &lt;repoUrl&gt; --repo-base-path profiles --bundles cas-bundle --desc <span class="s2">&quot;dynamic cas profile&quot;</span> --tags examples
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>profile<span class="w"> </span>create<span class="w"> </span>dynamic-cas<span class="w"> </span>--repo-url<span class="w"> </span>&lt;repoUrl&gt;<span class="w"> </span>--repo-base-path<span class="w"> </span>profiles<span class="w"> </span>--bundles<span class="w"> </span>cas-bundle<span class="w"> </span>--desc<span class="w"> </span><span class="s2">&quot;dynamic cas profile&quot;</span><span class="w"> </span>--tags<span class="w"> </span>examples
 </code></pre></div>
 <h3 id="manifest-directory-preparation_1">manifest directory preparation<a class="headerlink" href="#manifest-directory-preparation_1" title="Permanent link">&para;</a></h3>
 <p>Two additional properties <code>cas-max</code> and <code>cas-min</code> are used to set 2 annotations for Max/Min nodes on MachineDeployment required by the cluster autoscaler for CAPI as a part of the manifest directory preparation. These are the annotations required by the MachineDeployment for autoscaling. </p>
 <p>Note: These are the default values for the <code>cas-min</code> and <code>cas-max</code> properties</p>
-<div class="highlight"><pre><span></span><code> annotations:
-     cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: <span class="s1">&#39;1&#39;</span>
-     cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: <span class="s1">&#39;9&#39;</span>
+<div class="highlight"><pre><span></span><code><span class="w"> </span>annotations:
+<span class="w">     </span>cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size:<span class="w"> </span><span class="s1">&#39;1&#39;</span>
+<span class="w">     </span>cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size:<span class="w"> </span><span class="s1">&#39;9&#39;</span>
 </code></pre></div>
 <p>These annotations are added during the preparegit step. If these annotations are already present in the manifest file, then they will not be added again as a part of <code>preparegit</code></p>
 <p>Preparing the git directory to serve as the cluster template:</p>
-<div class="highlight"><pre><span></span><code>arlon clustertemplate preparegit --repo-path &lt;pathToDirectory&gt; --cas-min <span class="m">1</span> --cas-max <span class="m">9</span> --repo-url &lt;repoUrl&gt; 
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>clustertemplate<span class="w"> </span>preparegit<span class="w"> </span>--repo-path<span class="w"> </span>&lt;pathToDirectory&gt;<span class="w"> </span>--cas-min<span class="w"> </span><span class="m">1</span><span class="w"> </span>--cas-max<span class="w"> </span><span class="m">9</span><span class="w"> </span>--repo-url<span class="w"> </span>&lt;repoUrl&gt;<span class="w"> </span>
 </code></pre></div>
 <h3 id="manifest-directory-validation_1">manifest directory validation<a class="headerlink" href="#manifest-directory-validation_1" title="Permanent link">&para;</a></h3>
 <p>To determine if a git directory is eligible to serve as cluster template, run the <code>clustertemplate validategit</code> command:</p>
-<div class="highlight"><pre><span></span><code>arlon clustertemplate validategit --repo-path &lt;pathToDirectory&gt; --repo-url &lt;repoUrl&gt; 
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>clustertemplate<span class="w"> </span>validategit<span class="w"> </span>--repo-path<span class="w"> </span>&lt;pathToDirectory&gt;<span class="w"> </span>--repo-url<span class="w"> </span>&lt;repoUrl&gt;<span class="w"> </span>
 </code></pre></div>
-<h3 id="gen2-cluster-creation-with-autoscaling-enabled">gen2 cluster creation with autoscaling enabled<a class="headerlink" href="#gen2-cluster-creation-with-autoscaling-enabled" title="Permanent link">&para;</a></h3>
+<h3 id="cluster-creation-with-autoscaling-enabled">Cluster creation with autoscaling enabled<a class="headerlink" href="#cluster-creation-with-autoscaling-enabled" title="Permanent link">&para;</a></h3>
 <p>To add CAS support for gen2 clusters, the cluster create sub-command of the arlon CLI has a <code>autoscaler</code> flag which deploys the capi-cluster-autoscaler helm chart on the management cluster.</p>
 <p>To create a gen2 workload with a cluster-autoscaler pod running, from the cluster template, run this command:</p>
 <p>Note: Use the dynamic profile that was created in the previous steps</p>
-<div class="highlight"><pre><span></span><code>arlon cluster create --cluster-name &lt;clusterName&gt; --repo-url &lt;repoUrl&gt; --repo-path &lt;pathToDirectory&gt; --profile dynamic-cas --autoscaler
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>cluster<span class="w"> </span>create<span class="w"> </span>--cluster-name<span class="w"> </span>&lt;clusterName&gt;<span class="w"> </span>--repo-url<span class="w"> </span>&lt;repoUrl&gt;<span class="w"> </span>--repo-path<span class="w"> </span>&lt;pathToDirectory&gt;<span class="w"> </span>--profile<span class="w"> </span>dynamic-cas<span class="w"> </span>--autoscaler
 </code></pre></div>
 <h2 id="known-issues-and-limitations">Known issues and limitations<a class="headerlink" href="#known-issues-and-limitations" title="Permanent link">&para;</a></h2>
 <p>Gen2 clusters are powerful because the cluster template can be arbitrarily complex and feature rich. Since they are fairly
@@ -1245,19 +1275,19 @@ new and still evolving, gen2 clusters have several known limitations relative to
 <p>For more details on gen2 clusters, refer to the <a href="../clustertemplate/">design document</a>.</p>
 <h1 id="arlon-cli-version-information">Arlon CLI Version information<a class="headerlink" href="#arlon-cli-version-information" title="Permanent link">&para;</a></h1>
 <p>The Arlon CLI has a version command which shows the current version of the CLI as shown below.</p>
-<div class="highlight"><pre><span></span><code>arlon version 
-Arlon CLI Version: <span class="m">0</span>.10.0
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>version<span class="w"> </span>
+Arlon<span class="w"> </span>CLI<span class="w"> </span>Version:<span class="w"> </span><span class="m">0</span>.10.0
 </code></pre></div>
 <p>The CLI can be downloaded from <a href="https://github.com/arlonproj/arlon/releases">GitHub releases</a> with the latest release of the CLI found <a href="https://github.com/arlonproj/arlon/releases/latest">here</a>.
 The official releases follow a semver versioning scheme. All patches to a minor version are non-breaking changes. For instance, the transition from <code>v0.9.9</code> to <code>v0.9.10</code> will not introduce any breaking changes.
 However, a change in either minor or the major versions doesn't guarantee this.</p>
 <p>To check if there are patches available for the current minor version of the CLI, Arlon has a <code>version check</code> command. If upgrade patch for a CLI minor version is available, the command will request to download the newer version.
 For example:
-<div class="highlight"><pre><span></span><code>arlon version check
-Arlon CLI version <span class="m">0</span>.10.0 is outdated. New patch <span class="m">0</span>.10.1 available
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>version<span class="w"> </span>check
+Arlon<span class="w"> </span>CLI<span class="w"> </span>version<span class="w"> </span><span class="m">0</span>.10.0<span class="w"> </span>is<span class="w"> </span>outdated.<span class="w"> </span>New<span class="w"> </span>patch<span class="w"> </span><span class="m">0</span>.10.1<span class="w"> </span>available
 </code></pre></div>
 Otherwise, the CLI reports that it is up-to date.
-<div class="highlight"><pre><span></span><code>arlon version check
+<div class="highlight"><pre><span></span><code>arlon<span class="w"> </span>version<span class="w"> </span>check
 <span class="s2">&quot;Arlon CLI version 0.10.0 is up-to-date</span>
 </code></pre></div></p>
 
@@ -1282,7 +1312,7 @@ Otherwise, the CLI reports that it is up-to date.
   
     <nav
       class="md-footer__inner md-grid"
-      aria-label="Footer"
+      aria-label=""
     >
       
         <a
@@ -1349,16 +1379,15 @@ Otherwise, the CLI reports that it is up-to date.
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.51d95adb.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@8.8.4/dist/mermaid.min.js"></script>
       
         <script src="../assets/pymdownx-extras/extra-loader-52693605.js"></script>
       
-    
     
   </body>
 </html>

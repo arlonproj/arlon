@@ -8,20 +8,25 @@
       
       
       
+      
+        <link rel="prev" href="../clustertemplate/">
+      
+      
+        <link rel="next" href="../design/">
+      
       <link rel="icon" href="../images/favicon-32x32.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.6">
     
     
       
-        <title>Application Profiles (new in v0.10.0) - Arlon - GitOps-based Fleet Management for Kubernetes</title>
+        <title>Application Profile - Arlon - GitOps-based Fleet Management for Kubernetes</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.975780f9.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.558e4712.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
-        
       
       
 
@@ -43,7 +48,7 @@
     
       <link rel="stylesheet" href="../stylesheets/extra.css">
     
-      <link rel="stylesheet" href="../assets/pymdownx-extras/extra-34c51d7bc1.css">
+      <link rel="stylesheet" href="../assets/pymdownx-extras/extra-3531de4046.css">
     
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -94,7 +99,7 @@
 <header class="md-header" data-md-component="header">
   <nav
     class="md-header__inner md-grid"
-    aria-label="Header"
+    aria-label=""
   >
     <a
       href=".."
@@ -119,7 +124,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Application Profiles (new in v0.10.0)
+              Application Profile
             
           </span>
         </div>
@@ -188,7 +193,7 @@
           <div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
@@ -292,8 +297,78 @@
   
     <li class="md-nav__item">
       <a href="../clustertemplate/" class="md-nav__link">
-        Cluster template
+        Cluster Template
       </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Application Profile
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Application Profile
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#arlon-application-aka-arlon-app" class="md-nav__link">
+    Arlon Application (a.k.a. "Arlon App")
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appprofile" class="md-nav__link">
+    AppProfile
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#targeting-appprofiles-to-workload-clusters" class="md-nav__link">
+    Targeting AppProfiles to Workload Clusters
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -369,18 +444,19 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
       
       
-      
-        <label class="md-nav__link" for="__nav_8">
+        <label class="md-nav__link" for="__nav_9" tabindex="0" aria-expanded="false">
           Developer Guide
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Developer Guide" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
           Developer Guide
         </label>
@@ -510,10 +586,9 @@
   
                   
 
-  <a href="https://github.com/arlonproj/arlon/edit/main/docs/appprofiles.md" title="Edit this page" class="md-content__button md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
-  </a>
+  
+  
+
 
 
 <h1 id="application-profiles-new-in-v0100">Application Profiles (new in v0.10.0)<a class="headerlink" href="#application-profiles-new-in-v0100" title="Permanent link">&para;</a></h1>
@@ -553,32 +628,32 @@ save to a file and edit to your liking before applying to
 the management cluster to actually create the app.
 (Without the <code>--output-yaml</code> flag, the command will apply the resource for you).</p>
 <p>Here's an example of an initial Arlon Application manifest:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">argoproj.io/v1alpha1</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ApplicationSet</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">arlon-type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">application</span><span class="w"></span>
-<span class="w">    </span><span class="nt">managed-by</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arlon</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">myconfigmap</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">argocd</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">generators</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">list</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w"></span>
-<span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{{cluster_name}}-app-myconfigmap&#39;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">destination</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="w">        </span><span class="nt">server</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{{cluster_server}}&#39;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">project</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="w">      </span><span class="nt">source</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apps/my-cfgmap-1</span><span class="w"></span>
-<span class="w">        </span><span class="nt">repoURL</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/bcle/fleet-infra.git</span><span class="w"></span>
-<span class="w">        </span><span class="nt">targetRevision</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HEAD</span><span class="w"></span>
-<span class="w">      </span><span class="nt">syncPolicy</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">automated</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="nt">prune</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">argoproj.io/v1alpha1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ApplicationSet</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">arlon-type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">application</span>
+<span class="w">    </span><span class="nt">managed-by</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arlon</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">myconfigmap</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">argocd</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">generators</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">list</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
+<span class="w">  </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{{cluster_name}}-app-myconfigmap&#39;</span>
+<span class="w">    </span><span class="nt">spec</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">destination</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="w">        </span><span class="nt">server</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{{cluster_server}}&#39;</span>
+<span class="w">      </span><span class="nt">project</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="w">      </span><span class="nt">source</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apps/my-cfgmap-1</span>
+<span class="w">        </span><span class="nt">repoURL</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/bcle/fleet-infra.git</span>
+<span class="w">        </span><span class="nt">targetRevision</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HEAD</span>
+<span class="w">      </span><span class="nt">syncPolicy</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">automated</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">prune</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 <p>The List generator that the AppProfile controller maintains supplies two variables for template substitution:</p>
 <ul>
@@ -595,14 +670,14 @@ to ensure that any actual ArgoCD Application resources deployed from the Applica
 is that it's simple to use and also displays additional information about the app, such as which AppProfiles
 are currently associated with the app.</p>
 <p>Example:</p>
-<div class="highlight"><pre><span></span><code>$ arlon app list
-NAME         REPO                                     PATH              REVISION  APP_PROFILES
-myconfigmap  https://github.com/bcle/fleet-infra.git  apps/my-cfgmap-1  HEAD      <span class="o">[</span>marketing<span class="o">]</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arlon<span class="w"> </span>app<span class="w"> </span>list
+NAME<span class="w">         </span>REPO<span class="w">                                     </span>PATH<span class="w">              </span>REVISION<span class="w">  </span>APP_PROFILES
+myconfigmap<span class="w">  </span>https://github.com/bcle/fleet-infra.git<span class="w">  </span>apps/my-cfgmap-1<span class="w">  </span>HEAD<span class="w">      </span><span class="o">[</span>marketing<span class="o">]</span>
 </code></pre></div>
 <p>The second way is to use pure kubectl to list ApplicationSets with the Arlon specific label:</p>
-<div class="highlight"><pre><span></span><code>$ kubectl -n argocd get applicationset -l arlon-type<span class="o">=</span>application
-NAME          AGE
-myconfigmap   21d
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>-n<span class="w"> </span>argocd<span class="w"> </span>get<span class="w"> </span>applicationset<span class="w"> </span>-l<span class="w"> </span>arlon-type<span class="o">=</span>application
+NAME<span class="w">          </span>AGE
+myconfigmap<span class="w">   </span>21d
 </code></pre></div>
 <p>Similarly, an Arlon app can be deleted in two ways:</p>
 <ul>
@@ -625,20 +700,20 @@ will update the resource's <code>status</code> section as follows:</p>
   lists the invalid names.</li>
 </ul>
 <p>Here is an example of an AppProfile manifest that includes 3 apps, one of which does not exist:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">core.arlon.io/v1</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AppProfile</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">marketing</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arlon</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">appNames</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">myconfigmap</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wordpress</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nonexistent-app</span><span class="w"></span>
-<span class="nt">status</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">health</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">degraded</span><span class="w"></span>
-<span class="w">  </span><span class="nt">invalidAppNames</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nonexistent-app</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">core.arlon.io/v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AppProfile</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">marketing</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arlon</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">appNames</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">myconfigmap</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wordpress</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nonexistent-app</span>
+<span class="nt">status</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">health</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">degraded</span>
+<span class="w">  </span><span class="nt">invalidAppNames</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nonexistent-app</span>
 </code></pre></div>
 <blockquote>
 <p>Note: AppProfile resources reside in the <code>arlon</code> namespace.
@@ -647,17 +722,17 @@ This is in contrast to Arlon App resources, which reside in the <code>argocd</co
 <p>Since AppProfiles are defined by their own custom resource and are fairly straightforward, their lifecycle
 can be managed entirely using <code>kubectl</code>. That said, Arlon provides the <code>arlon appprofile list</code> to display
 useful information about current AppProfiles. Example:</p>
-<div class="highlight"><pre><span></span><code>$ arlon appprofile list
-NAME         APPS                     HEALTH   INVALID_APPS
-engineering  <span class="o">[</span>wordpress<span class="o">]</span>              healthy  <span class="o">[]</span>
-marketing    <span class="o">[</span>myconfigmap wordpress<span class="o">]</span>  degraded <span class="o">[</span>nonexistent-app<span class="o">]</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arlon<span class="w"> </span>appprofile<span class="w"> </span>list
+NAME<span class="w">         </span>APPS<span class="w">                     </span>HEALTH<span class="w">   </span>INVALID_APPS
+engineering<span class="w">  </span><span class="o">[</span>wordpress<span class="o">]</span><span class="w">              </span>healthy<span class="w">  </span><span class="o">[]</span>
+marketing<span class="w">    </span><span class="o">[</span>myconfigmap<span class="w"> </span>wordpress<span class="o">]</span><span class="w">  </span>degraded<span class="w"> </span><span class="o">[</span>nonexistent-app<span class="o">]</span>
 </code></pre></div>
 <p>As the example illustrates, it is totally legal for two or more AppProfiles to include the same app(s).
 When those AppProfiles are targeted to a workload cluster, the cluster receives the union of these app sets.</p>
 <h2 id="targeting-appprofiles-to-workload-clusters">Targeting AppProfiles to Workload Clusters<a class="headerlink" href="#targeting-appprofiles-to-workload-clusters" title="Permanent link">&para;</a></h2>
 <p>Apps are actually deployed to workload clusters by annotating the desired cluster(s) with <code>arlon.io/profiles=&lt;comma separated list of AppProfiles&gt;</code>. This is supported only on Arlon Gen2 clusters, which themselves are represented as ArgoCD Application resources.</p>
 <p>Example: suppose we have a Gen2 workload cluster named <strong>clust1</strong>.  Since the cluster is represented as an ArgoCD Application resource, targeting the <code>engineering</code> and <code>marketing</code> app profiles to it is achieved with:</p>
-<div class="highlight"><pre><span></span><code>kubectl -n argocd annotate --overwrite application clust1 arlon.io/profiles<span class="o">=</span>engineering,marketing
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>-n<span class="w"> </span>argocd<span class="w"> </span>annotate<span class="w"> </span>--overwrite<span class="w"> </span>application<span class="w"> </span>clust1<span class="w"> </span>arlon.io/profiles<span class="o">=</span>engineering,marketing
 </code></pre></div>
 <p>The set of app profiles for a cluster can always be updated that way, in real time. Behind the scenes, Arlon's AppProfile controller
 updates the <code>spec.generators</code> section of each affected app to target the cluster. The set of apps targeting a cluster is the union
@@ -669,7 +744,7 @@ In the running example, these two ArgoCD application resources will be generated
 <li>clust1-app-myconfigmap</li>
 </ul>
 <p>To detach all profiles from a cluster, simply remove the annotation:</p>
-<div class="highlight"><pre><span></span><code>kubectl -n argocd annotate application clust1 arlon.io/profiles-
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>-n<span class="w"> </span>argocd<span class="w"> </span>annotate<span class="w"> </span>application<span class="w"> </span>clust1<span class="w"> </span>arlon.io/profiles-
 </code></pre></div>
 <p>The last command will automatically destroy any ArgoCD application resources generated for that cluster (assuming they originate from Arlon apps).</p>
 <blockquote>
@@ -697,6 +772,50 @@ types of <a href="https://argo-cd.readthedocs.io/en/stable/operator-manual/appli
 
 <footer class="md-footer">
   
+    <nav
+      class="md-footer__inner md-grid"
+      aria-label=""
+    >
+      
+        <a
+          href="../clustertemplate/"
+          class="md-footer__link md-footer__link--prev"
+          rel="prev"
+        >
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Cluster Template
+            </div>
+          </div>
+        </a>
+      
+      
+        <a
+          href="../design/"
+          class="md-footer__link md-footer__link--next"
+          rel="next"
+        >
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Design
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-footer-copyright">
@@ -722,16 +841,15 @@ types of <a href="https://argo-cd.readthedocs.io/en/stable/operator-manual/appli
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.51d95adb.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@8.8.4/dist/mermaid.min.js"></script>
       
         <script src="../assets/pymdownx-extras/extra-loader-52693605.js"></script>
       
-    
     
   </body>
 </html>
