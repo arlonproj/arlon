@@ -1243,6 +1243,23 @@ new and still evolving, gen2 clusters have several known limitations relative to
 </ul>
 <h2 id="for-more-information">For more information<a class="headerlink" href="#for-more-information" title="Permanent link">&para;</a></h2>
 <p>For more details on gen2 clusters, refer to the <a href="../clustertemplate/">design document</a>.</p>
+<h1 id="arlon-cli-version-information">Arlon CLI Version information<a class="headerlink" href="#arlon-cli-version-information" title="Permanent link">&para;</a></h1>
+<p>The Arlon CLI has a version command which shows the current version of the CLI as shown below.</p>
+<div class="highlight"><pre><span></span><code>arlon version 
+Arlon CLI Version: <span class="m">0</span>.10.0
+</code></pre></div>
+<p>The CLI can be downloaded from <a href="https://github.com/arlonproj/arlon/releases">GitHub releases</a> with the latest release of the CLI found <a href="https://github.com/arlonproj/arlon/releases/latest">here</a>.
+The official releases follow a semver versioning scheme. All patches to a minor version are non-breaking changes. For instance, the transition from <code>v0.9.9</code> to <code>v0.9.10</code> will not introduce any breaking changes.
+However, a change in either minor or the major versions doesn't guarantee this.</p>
+<p>To check if there are patches available for the current minor version of the CLI, Arlon has a <code>version check</code> command. If upgrade patch for a CLI minor version is available, the command will request to download the newer version.
+For example:
+<div class="highlight"><pre><span></span><code>arlon version check
+Arlon CLI version <span class="m">0</span>.10.0 is outdated. New patch <span class="m">0</span>.10.1 available
+</code></pre></div>
+Otherwise, the CLI reports that it is up-to date.
+<div class="highlight"><pre><span></span><code>arlon version check
+<span class="s2">&quot;Arlon CLI version 0.10.0 is up-to-date</span>
+</code></pre></div></p>
 
 
 

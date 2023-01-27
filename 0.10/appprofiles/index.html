@@ -544,14 +544,14 @@ ApplicationSets managed by Arlon to represent apps are distinguished from
 other ApplicationSets via the <code>arlon-type=application</code> label.
 The ApplicationSet's Generators list must contain a single generator of <a href="https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-List/">List</a>
 type. The Arlon AppProfile controller will modify this list in real-time
-to deploy to application to the right workload clusters (or no cluster at all).</p>
+to deploy the application to the right workload clusters (or no cluster at all).</p>
 <p>While it is possible for you create and edit an ApplicationSet resource manifest
 satisfying the requirements to be an Arlon App from scratch, Arlon makes
 this easier with the <code>arlon app create --output-yaml</code> command, which outputs an
 initial compliant manifest that you can
 save to a file and edit to your liking before applying to
 the management cluster to actually create the app.
-(Without the <code>`--output-yaml</code> flag, the command will apply the resource for you).</p>
+(Without the <code>--output-yaml</code> flag, the command will apply the resource for you).</p>
 <p>Here's an example of an initial Arlon Application manifest:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">argoproj.io/v1alpha1</span><span class="w"></span>
 <span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ApplicationSet</span><span class="w"></span>
@@ -599,8 +599,8 @@ are currently associated with the app.</p>
 NAME         REPO                                     PATH              REVISION  APP_PROFILES
 myconfigmap  https://github.com/bcle/fleet-infra.git  apps/my-cfgmap-1  HEAD      <span class="o">[</span>marketing<span class="o">]</span>
 </code></pre></div>
-<p>The second way is to use pure kubectl to list ApplicationSets with a particular label:</p>
-<div class="highlight"><pre><span></span><code>$ kubectl -n argocd get applicationset
+<p>The second way is to use pure kubectl to list ApplicationSets with the Arlon specific label:</p>
+<div class="highlight"><pre><span></span><code>$ kubectl -n argocd get applicationset -l arlon-type<span class="o">=</span>application
 NAME          AGE
 myconfigmap   21d
 </code></pre></div>
