@@ -69,7 +69,7 @@ If errors are encountered along the way, `status.state` is set to `retrying` and
 
 ### Teardown
 
-During teardown, the controller deletes the Kustomization directory in git if an override was used, then deletes the cluster application resource first and waits for it to disappear completely. It then deletes the arlon application resource. This solves most of the CAPI/CAPA race conditions causing stuck resources.
+During teardown, the controller deletes the Kustomization directory in git if an override was used, then deletes the cluster application resource first and waits for it to disappear completely. It then deletes the arlon application resource (which owns the namespace resource). This solves most of the CAPI/CAPA race conditions causing stuck resources.
 
 ### AppProfiles integration
 
