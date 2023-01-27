@@ -33,6 +33,7 @@ import (
 	grpcstatus "google.golang.org/grpc/status"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"sigs.k8s.io/cluster-api/util/patch"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -273,6 +274,27 @@ func (r *ClusterReconciler) reconcileDelete(
 	// Check if cluster app exists
 	clusterApp, err := appIf.Get(ctx, &argoapp.ApplicationQuery{Name: &cr.Name})
 	if err == nil {
+		// Delete override if necessary
+		if cr.Spec.Override != nil && cr.Status.OverrideSuccessful {
+			kubeClient, err := kubernetes.NewForConfig(r.Config)
+			if err != nil {
+				msg := fmt.Sprintf("failed to get kubeclient: %s", err)
+				return r.UpdateState(ctx, log, cr, "error-deleting-override",
+					msg, retryDelayAsResult)
+			}
+			err = cluster.DeleteOverridesDir(clusterApp, kubeClient, r.ArgoCdNs,
+				clusterApp.Name)
+			if err != nil {
+				msg := fmt.Sprintf("failed to delete overrides directory: %s", err)
+				return r.UpdateState(ctx, log, cr, "error-deleting-override",
+					msg, retryDelayAsResult)
+			}
+			// Flip this flag to indicate override no longer needs deletion
+			cr.Status.OverrideSuccessful = false
+			return r.UpdateState(ctx, log, cr, "override-deleted",
+				"override deleted successfully", ctrl.Result{})
+		}
+
 		if !clusterApp.DeletionTimestamp.IsZero() {
 			log.Info("cluster app deletion already pending -- will check again later")
 			return retryDelayAsResult, nil
