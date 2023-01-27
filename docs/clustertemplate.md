@@ -1,21 +1,15 @@
-# Next-gen Cluster Provisioning using Cluster templates
+# Cluster Templates
 
-This document describes a new way of provisioning workload clusters in Arlon.
-The most significant change is the *Cluster Template* construct, which replaces the older ClusterSpec from gen1 clusters.
-To distinguish them from the older gen1 clusters, the ones deployed from a cluster template are called next-gen clusters or gen2 clusters.
-
-## Goals
-
+The Cluster Template object is designed with the following goals:
 - Allow users to deploy arbitrarily complex clusters using the full Cluster API feature set.
 - Fully declarative and gitops compatible: a cluster deployment should be composed of one or more self-sufficient manifests that the user can choose to either apply directly (via kubectl) or store in git for later-stage deployment by a gitops tool (mainly ArgoCD).
-- Support Linked Mode update: an update to the the cluster template should
-automatically propagate to all workload clusters deployed from it.
+- Support Linked Mode update: an update to the the cluster template should automatically propagate to all workload clusters deployed from it.
 
-## Profile support
+A Cluster Template serves as a base for creating new workload clusters. The workload clusters are all exact copies of the cluster template, meaning that they acquire all unmodified resources of the cluster template, except for:
 
-- While profiles are also being re-architected, the first implementation of next-gen clusters fully integrates with current-generation profiles, which are expressed as Profile custom resources and compiled into a set of intermediate files in a git repository.
-- Profiles are optional, and a next-gen cluster can be created without a profile.
-One can be attached later.
+- resource names, which are prefixed during the cluster creation process to make them unique to avoid conflicts
+- the namespace, which is set to a new namespace unique to the workload cluster
+
 
 ## Architecture diagram
 
@@ -23,14 +17,8 @@ This example shows a cluster template named `capi-quickstart` used to deploy two
 
 ![architecture](./images/arlon_gen2.png)
 
-## Cluster Template
 
-A cluster template serves as a base for creating new workload clusters. The workload clusters are all exact copies of the cluster template, meaning that they acquire all unmodified resources of the cluster template, except for:
-
-- resource names, which are prefixed during the cluster creation process to make them unique to avoid conflicts
-- the namespace, which is set to a new namespace unique to the workload cluster
-
-### Preparation
+### Template Creation Workflow
 
 - To create a cluster template, a user first creates a single YAML file containing the desired Cluster API cluster and all related resources (e.g. MachineDeployments, etc...), using whatever tool the user chooses (e.g. `clusterctl generate cluster`). The user is responsible for the correctness of the file and resources within. Arlon will not check for errors. For example, the specified Kubernetes version must be supported by the Cluster API providers currently installed in the management cluster. If it isn't, resulting clusters will fail and enter a perpetual OutOfSync state.
 - The user then commits and pushes the manifest file to a dedicated directory in a git repository.
