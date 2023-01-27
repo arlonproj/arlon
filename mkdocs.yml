@@ -42,7 +42,8 @@ markdown_extensions:
 nav:
     - Overview: 'README.md'
     - Concepts: 'concepts.md'
-    - Cluster template: 'clustertemplate.md'
+    - Cluster Template: 'clustertemplate.md'
+    - Application Profile: 'appprofiles.md'
     - Design: 'design.md'    
     - Architecture: 'architecture.md'
     - Installation: 'installation.md'
