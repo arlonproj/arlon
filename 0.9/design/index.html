@@ -471,8 +471,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../baseclusters/" class="md-nav__link">
-        Base clusters
+      <a href="../clustertemplate/" class="md-nav__link">
+        Cluster template
       </a>
     </li>
   
@@ -862,20 +862,20 @@ It is composed of</p>
   bundle because most if not all CNI providers can be installed as manifests)  </li>
 </ul>
 <h4 id="gen2">gen2<a class="headerlink" href="#gen2" title="Permanent link">&para;</a></h4>
-<p>for gen2 clusters, the Cluster Specification is called the base cluster, which is described in detail <a href="https://github.com/arlonproj/arlon/blob/main/docs/baseclusters.md">here</a>.</p>
-<p>A base cluster manifest consists of:</p>
+<p>for gen2 clusters, the Cluster Specification is called the cluster template, which is described in detail <a href="https://github.com/arlonproj/arlon/blob/main/docs/baseclusters.md">here</a>.</p>
+<p>A cluster template consists of:</p>
 <ul>
 <li>A predefined list of Cluster API objects: Cluster, Machines, Machine Deployments, etc. to be deployed in the current namespace</li>
 <li>The specific infrastructure provider to be used (e.g aws).ß</li>
 <li>Kubernetes version</li>
-<li>Cluster templates/ flavors that need to be used for creating the cluster manifest (e.g eks, eks-managedmachinepool)</li>
+<li>Cluster templates/ flavors that need to be used for creating the cluster template (e.g eks, eks-managedmachinepool)</li>
 </ul>
 <h3 id="cluster-preparation">Cluster Preparation<a class="headerlink" href="#cluster-preparation" title="Permanent link">&para;</a></h3>
 <p>Once these cluster specifications are created successfully, the next step is to prepare the cluster for deployment.</p>
 <h4 id="gen1_1">gen1<a class="headerlink" href="#gen1_1" title="Permanent link">&para;</a></h4>
 <p>Once the clusterspec is created for a gen-1 cluster, there is no need to prepare a workspace repository to create a new cluster.</p>
 <h4 id="gen2_1">gen2<a class="headerlink" href="#gen2_1" title="Permanent link">&para;</a></h4>
-<p>Once the base cluster manifest is created, the next step is to preare the workspace repository directory in which this base cluster manifest is present. This is explained in detail <a href="https://github.com/arlonproj/arlon/blob/main/docs/baseclusters.md#preparation">here</a></p>
+<p>Once the cluster manifest is created, the next step is to preare the workspace repository directory in which this cluster manifest is present. This is explained in detail <a href="https://github.com/arlonproj/arlon/blob/main/docs/baseclusters.md#preparation">here</a></p>
 <h3 id="cluster-creation">Cluster Creation<a class="headerlink" href="#cluster-creation" title="Permanent link">&para;</a></h3>
 <p>Now, all the prerequisites for creating a cluster are completed and the cluster can be created/deployed.</p>
 <h4 id="cluster-chart">Cluster Chart<a class="headerlink" href="#cluster-chart" title="Permanent link">&para;</a></h4>
@@ -894,7 +894,7 @@ It is composed of</p>
 <h4 id="gen1_2">gen1<a class="headerlink" href="#gen1_2" title="Permanent link">&para;</a></h4>
 <p>Cluster deployment is explained <a href="https://github.com/arlonproj/arlon/blob/main/docs/tutorial.md#clusters-gen1">here</a></p>
 <h4 id="gen2_2">gen2<a class="headerlink" href="#gen2_2" title="Permanent link">&para;</a></h4>
-<p>Base cluster creation is explained <a href="https://github.com/arlonproj/arlon/blob/main/docs/baseclusters.md#creation">here</a></p>
+<p>cluster template creation is explained <a href="https://github.com/arlonproj/arlon/blob/main/docs/baseclusters.md#creation">here</a></p>
 
 
 
@@ -940,7 +940,7 @@ It is composed of</p>
       
       
         <a
-          href="../baseclusters/"
+          href="../clustertemplate/"
           class="md-footer__link md-footer__link--next"
           rel="next"
         >
@@ -949,7 +949,7 @@ It is composed of</p>
               <span class="md-footer__direction">
                 Next
               </span>
-              Base clusters
+              Cluster template
             </div>
           </div>
           <div class="md-footer__button md-icon">

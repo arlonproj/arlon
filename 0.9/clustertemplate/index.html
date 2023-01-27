@@ -13,7 +13,7 @@
     
     
       
-        <title>Base clusters - Arlon - GitOps-based Fleet Management for Kubernetes</title>
+        <title>Cluster template - Arlon - GitOps-based Fleet Management for Kubernetes</title>
       
     
     
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#next-gen-cluster-provisioning-using-base-clusters" class="md-skip">
+        <a href="#next-gen-cluster-provisioning-using-cluster-manifest" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Base clusters
+              Cluster template
             
           </span>
         </div>
@@ -312,12 +312,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Base clusters
+          Cluster template
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Base clusters
+        Cluster template
       </a>
       
         
@@ -357,11 +357,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#base-cluster" class="md-nav__link">
-    Base Cluster
+  <a href="#cluster-manifest" class="md-nav__link">
+    Cluster Manifest
   </a>
   
-    <nav class="md-nav" aria-label="Base Cluster">
+    <nav class="md-nav" aria-label="Cluster Manifest">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -649,11 +649,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#base-cluster" class="md-nav__link">
-    Base Cluster
+  <a href="#cluster-manifest" class="md-nav__link">
+    Cluster Manifest
   </a>
   
-    <nav class="md-nav" aria-label="Base Cluster">
+    <nav class="md-nav" aria-label="Cluster Manifest">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -764,24 +764,24 @@
   
                   
 
-  <a href="https://github.com/arlonproj/arlon/edit/v0.9/docs/baseclusters.md" title="Edit this page" class="md-content__button md-icon">
+  <a href="https://github.com/arlonproj/arlon/edit/v0.9/docs/clustertemplate.md" title="Edit this page" class="md-content__button md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
   </a>
 
 
-<h1 id="next-gen-cluster-provisioning-using-base-clusters">Next-gen Cluster Provisioning using Base Clusters<a class="headerlink" href="#next-gen-cluster-provisioning-using-base-clusters" title="Permanent link">&para;</a></h1>
+<h1 id="next-gen-cluster-provisioning-using-cluster-manifest">Next-gen Cluster Provisioning using Cluster Manifest<a class="headerlink" href="#next-gen-cluster-provisioning-using-cluster-manifest" title="Permanent link">&para;</a></h1>
 <p>This proposal describes a new way of provisioning workload clusters in Arlon.
-The most significant change is the <em>Base Cluster</em> construct, which replaces the current ClusterSpec.
+The most significant change is the <em>Cluster Manifest</em> construct, which replaces the current ClusterSpec.
 To distinguish them from current generation
-clusters, the ones deployed from a base cluster are called next-gen clusters.</p>
+clusters, the ones deployed from a cluster manifest are called next-gen clusters.</p>
 <h2 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Allow users to deploy arbitrarily complex clusters using the full Cluster API feature set.</li>
 <li>Fully declarative and gitops compatible: a cluster deployment should be composed of one or more
 self-sufficient manifests that the user can choose to either apply directly (via kubectl) or store in
 git for later-stage deployment by a gitops tool (mainly ArgoCD).</li>
-<li>Support Linked Mode update: an update to the the base cluster should
+<li>Support Linked Mode update: an update to the the cluster manifest should
 automatically propagate to all workload clusters deployed from it.</li>
 </ul>
 <h2 id="profile-support">Profile support<a class="headerlink" href="#profile-support" title="Permanent link">&para;</a></h2>
@@ -793,21 +793,21 @@ and compiled into a set of intermediate files in a git repository.</li>
 One can be attached later.</li>
 </ul>
 <h2 id="architecture-diagram">Architecture diagram<a class="headerlink" href="#architecture-diagram" title="Permanent link">&para;</a></h2>
-<p>This example shows a base cluster named <code>capi-quickstart</code> used to deploy two workload
+<p>This example shows a cluster manifest named <code>capi-quickstart</code> used to deploy two workload
 clusters <code>cluster-a</code> and <code>cluster-b</code>. Additionally, <code>cluster-a</code> is given profile <code>xxx</code>,
 while <code>cluster-b</code> is given profile <code>yyy</code>.</p>
 <p><img alt="architecture" src="../images/arlon_gen2.png" /></p>
-<h2 id="base-cluster">Base Cluster<a class="headerlink" href="#base-cluster" title="Permanent link">&para;</a></h2>
-<p>A base cluster serves as a base for creating new workload clusters. The workload clusters
-are all exact copies of the base cluster, meaning that they acquire all unmodified resources of the
-base cluster, except for:</p>
+<h2 id="cluster-manifest">Cluster Manifest<a class="headerlink" href="#cluster-manifest" title="Permanent link">&para;</a></h2>
+<p>A cluster manifest serves as a base for creating new workload clusters. The workload clusters
+are all exact copies of the cluster manifest, meaning that they acquire all unmodified resources of the
+cluster manifest, except for:</p>
 <ul>
 <li>resource names, which are prefixed during the cluster creation process to make them unique to avoid conflicts</li>
 <li>the namespace, which is set to a new namespace unique to the workload cluster</li>
 </ul>
 <h3 id="preparation">Preparation<a class="headerlink" href="#preparation" title="Permanent link">&para;</a></h3>
 <ul>
-<li>To create a base cluster, a user first creates a single YAML file containing the desired Cluster API
+<li>To create a cluster manifest, a user first creates a single YAML file containing the desired Cluster API
 cluster and all related resources (e.g. MachineDeployments, etc...), using whatever tool the user
 chooses (e.g. <code>clusterctl generate cluster</code>). The user is responsible for the correctness of the file
 and resources within. Arlon will not check for errors. For example, the specified Kubernetes version
@@ -819,13 +819,13 @@ cluster creation. The directory should be unique to the file, and not contain an
 <li>If not already registered, the git repository should also be registered in ArgoCD with
 the proper credentials for read/write access.</li>
 </ul>
-<p>To check whether the git directory is a compliant Arlon base cluster,
+<p>To check whether the git directory is a compliant Arlon cluster manifest,
 the user runs:</p>
 <div class="highlight"><pre><span></span><code>arlon basecluster validategit --repo-url &lt;repoUrl&gt; --repo-path &lt;pathToDirectory&gt; <span class="o">[</span>--repo-revision revision<span class="o">]</span>  
 </code></pre></div>
 <p><em>Note: if --repo-revision is not specified, it defaults to main.</em></p>
 <p>The command produces an error the first time because the git directory has not yet been "prepped".
-To "prep" the directory to become a compliant Arlon base cluster, the user runs:</p>
+To "prep" the directory to become a compliant Arlon cluster manifest, the user runs:</p>
 <div class="highlight"><pre><span></span><code>arlon basecluster preparegit --repo-url &lt;repoUrl&gt; --repo-path &lt;pathToDirectory&gt; <span class="o">[</span>--repo-revision revision<span class="o">]</span>  
 </code></pre></div>
 <p>This pushes a commit to the repo with these changes:</p>
@@ -839,7 +839,7 @@ namespace of all resources.</li>
 <p>If prep is successful, another invocation of <code>arlon basecluster validategit</code> should succeed as well.</p>
 <h2 id="workload-clusters">Workload clusters<a class="headerlink" href="#workload-clusters" title="Permanent link">&para;</a></h2>
 <h3 id="creation">Creation<a class="headerlink" href="#creation" title="Permanent link">&para;</a></h3>
-<p>Use <code>arlon cluster create</code> to create a next-gen workload cluster from a base cluster
+<p>Use <code>arlon cluster create</code> to create a next-gen workload cluster from a cluster manifest
 (<em>this is different from</em> <code>arlon cluster deploy</code> <em>for creating current-generation clusters</em>).
 The command creates between 2 and 3 (depending on whether a profile is used)
 ArgoCD application resources that together
@@ -854,22 +854,22 @@ make up the cluster and its contents. The general usage is:</p>
 <p>The <code>--profile</code> flag is optional; a cluster can be created with no profile.</p>
 <h3 id="composition">Composition<a class="headerlink" href="#composition" title="Permanent link">&para;</a></h3>
 <p>A workload cluster is composed of 2 to 3 ArgoCD application resources, which are named
-based on the name of the base cluster and the workload cluster. For illustration purposes,
-the following discussion assumes that the base cluster is named <code>capi-quickstart</code>, the
+based on the name of the cluster manifest and the workload cluster. For illustration purposes,
+the following discussion assumes that the cluster manifest is named <code>capi-quickstart</code>, the
 workload cluster is named <code>cluster-a</code>, and the optional profile is named <code>xxx</code>.</p>
 <h4 id="cluster-app">Cluster app<a class="headerlink" href="#cluster-app" title="Permanent link">&para;</a></h4>
 <p>The <code>cluster-a</code> application is the <em>cluster app</em> for the cluster.
-It is responsible for deploying the base cluster resources, meaning the Cluster API manifests.
+It is responsible for deploying the cluster manifest resources, meaning the Cluster API manifests.
 It is named directly from the workload cluster name.</p>
-<p>The application's spec uses a ApplicationSourceKustomize that points to the base cluster's git
+<p>The application's spec uses a ApplicationSourceKustomize that points to the cluster manifest's git
 directory. The spec ensures that all deployed resources are configured to:</p>
 <ul>
 <li>Reside in the <code>cluster-a</code> namespace, which is deployed by the <em>arlon app</em> (see below).
 This achieved by setting <code>app.Spec.Destination.Namespace</code> to the workload cluster's name
   (<em>this only works if the resources do not specify an explicit namespace; this requirement is
-taken care of by the "prep" step on the base cluster</em>).</li>
+taken care of by the "prep" step on the cluster manifest</em>).</li>
 <li>Be named <code>cluster-a-capi-quickstart</code>, meaning the workload cluster name followed by the
-base cluster name. This is achieved by setting <code>app.Spec.Source.Kustomize.NamePrefix</code> to
+cluster manifest name. This is achieved by setting <code>app.Spec.Source.Kustomize.NamePrefix</code> to
 the workload cluster name plus a hyphen.</li>
 </ul>
 <h4 id="arlon-app">Arlon app<a class="headerlink" href="#arlon-app" title="Permanent link">&para;</a></h4>
@@ -917,27 +917,27 @@ cluster and cleans up all related applications.</li>
 <li>A more manual way: <code>kubectl delete application -l arlon-cluster=&lt;clusterName&gt;</code></li>
 </ul>
 <h2 id="update-semantics">Update Semantics<a class="headerlink" href="#update-semantics" title="Permanent link">&para;</a></h2>
-<p>A base cluster lives in git and is shared by all workload clusters created from it.
+<p>A cluster manifest lives in git and is shared by all workload clusters created from it.
 This is sometimes referred to as <em>Linked Mode</em>.
 Any git update to the cluster can affect the associated workload clusters, therefore
 such updates must be planned and managed with care; there is a real risk of such an
 update breaking existing clusters.</p>
 <ul>
 <li>By default, a workload's cluster <em>cluster app</em> is configured with auto-sync, meaning ArgoCD will
-immediately apply any changes in the base cluster to the deployed Cluster API cluster resources.</li>
-<li>In general, a base cluster <strong>does not need to be "prepped" again</strong> after a modification to its main
+immediately apply any changes in the cluster manifest to the deployed Cluster API cluster resources.</li>
+<li>In general, a cluster manifest <strong>does not need to be "prepped" again</strong> after a modification to its main
 manifest file (the one containing the Cluster API resources). So the user is free to edit the manifest
 directly, commit/push the changes, and expect to see immediate changes to already-deployed clusters
-created from that base cluster.</li>
+created from that cluster manifest.</li>
 </ul>
 <h3 id="unsupported-changes">Unsupported changes<a class="headerlink" href="#unsupported-changes" title="Permanent link">&para;</a></h3>
 <p>The controllers for Cluster API and its providers disallow changes to some fields belonging
 to already-deployed resources.</p>
 <ul>
-<li>For example, changing the base cluster name (<code>medata.Name</code> of the <code>Cluster</code> resource) will have disastrous consequences on already-deployed
+<li>For example, changing the cluster manifest name (<code>medata.Name</code> of the <code>Cluster</code> resource) will have disastrous consequences on already-deployed
 clusters, causing many resources to enter the OutOfSync state and never recover because ArgoCD
 fails to apply the changes (they are rejected by the controllers). Consequently, a user should never
-change the name of a base cluster.</li>
+change the name of a cluster manifest.</li>
 <li>Besides the cluster name, other fields cannot change (this has been observed anecdotally, we don't
 yet have an exhaustive list).</li>
 <li>Changing the Kubernetes version of the control plane or data plane <em>is</em> supported, so long as the new version
