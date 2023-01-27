@@ -1,7 +1,7 @@
 package ctrlruntimeclient
 
 import (
-	appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
+	appset "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"

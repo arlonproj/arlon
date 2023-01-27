@@ -3,11 +3,16 @@ package appprofile
 import (
 	"context"
 	"fmt"
+	"io"
+	"strings"
+	"testing"
+
 	argoclient "github.com/argoproj/argo-cd/v2/pkg/apiclient"
 	applicationpkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	clusterpkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/cluster"
 	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
-	appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
+
+	argoapp "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	arlonapp "github.com/arlonproj/arlon/pkg/app"
 	sets "github.com/deckarep/golang-set/v2"
@@ -15,13 +20,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
-	"io"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/json"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-	"strings"
-	"testing"
 )
 
 type mockArgoClient struct {
@@ -55,7 +57,7 @@ func (mac *mockArgoClient) NewApplicationClient() (io.Closer, applicationpkg.App
 var (
 	gClusterList        *v1alpha1.ClusterList
 	gApplicationList    *v1alpha1.ApplicationList
-	gApplicationSetList *appset.ApplicationSetList
+	gApplicationSetList *argoapp.ApplicationSetList
 	gProfileList        *arlonv1.AppProfileList
 )
 
@@ -122,8 +124,8 @@ func init() {
 	}
 
 	// ApplicationSets representing Arlon apps
-	gApplicationSetList = &appset.ApplicationSetList{
-		Items: []appset.ApplicationSet{
+	gApplicationSetList = &argoapp.ApplicationSetList{
+		Items: []argoapp.ApplicationSet{
 			{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "wordpress",
@@ -131,10 +133,10 @@ func init() {
 						"arlon-type": "application",
 					},
 				},
-				Spec: appset.ApplicationSetSpec{
-					Generators: []appset.ApplicationSetGenerator{
+				Spec: argoapp.ApplicationSetSpec{
+					Generators: []argoapp.ApplicationSetGenerator{
 						{
-							List: &appset.ListGenerator{},
+							List: &argoapp.ListGenerator{},
 						},
 					},
 				},
@@ -146,10 +148,10 @@ func init() {
 						"arlon-type": "application",
 					},
 				},
-				Spec: appset.ApplicationSetSpec{
-					Generators: []appset.ApplicationSetGenerator{
+				Spec: argoapp.ApplicationSetSpec{
+					Generators: []argoapp.ApplicationSetGenerator{
 						{
-							List: &appset.ListGenerator{},
+							List: &argoapp.ListGenerator{},
 						},
 					},
 				},
@@ -161,10 +163,10 @@ func init() {
 						"arlon-type": "application",
 					},
 				},
-				Spec: appset.ApplicationSetSpec{
-					Generators: []appset.ApplicationSetGenerator{
+				Spec: argoapp.ApplicationSetSpec{
+					Generators: []argoapp.ApplicationSetGenerator{
 						{
-							List: &appset.ListGenerator{},
+							List: &argoapp.ListGenerator{},
 						},
 					},
 				},
@@ -176,10 +178,10 @@ func init() {
 						"arlon-type": "application",
 					},
 				},
-				Spec: appset.ApplicationSetSpec{
-					Generators: []appset.ApplicationSetGenerator{
+				Spec: argoapp.ApplicationSetSpec{
+					Generators: []argoapp.ApplicationSetGenerator{
 						{
-							List: &appset.ListGenerator{},
+							List: &argoapp.ListGenerator{},
 						},
 					},
 				},
@@ -191,10 +193,10 @@ func init() {
 						"arlon-type": "application",
 					},
 				},
-				Spec: appset.ApplicationSetSpec{
-					Generators: []appset.ApplicationSetGenerator{
+				Spec: argoapp.ApplicationSetSpec{
+					Generators: []argoapp.ApplicationSetGenerator{
 						{
-							List: &appset.ListGenerator{},
+							List: &argoapp.ListGenerator{},
 						},
 					},
 				},
@@ -274,7 +276,7 @@ type mockCtrlRuntClient struct {
 
 func (mcrc *mockCtrlRuntClient) List(ctx context.Context,
 	list client.ObjectList, opts ...client.ListOption) error {
-	if appSetListPtr, ok := list.(*appset.ApplicationSetList); ok {
+	if appSetListPtr, ok := list.(*argoapp.ApplicationSetList); ok {
 		*appSetListPtr = *gApplicationSetList
 	} else {
 		profileListPtr := list.(*arlonv1.AppProfileList)
@@ -289,7 +291,7 @@ type mockStatusWriter struct {
 
 func (mcrc *mockCtrlRuntClient) Update(ctx context.Context,
 	obj client.Object, opts ...client.UpdateOption) error {
-	pAppSet, ok := obj.(*appset.ApplicationSet)
+	pAppSet, ok := obj.(*argoapp.ApplicationSet)
 	if !ok {
 		return fmt.Errorf("can't update any object type other than ApplicationSet")
 	}
@@ -336,7 +338,7 @@ func lookupArgoCluster(name string) *v1alpha1.Cluster {
 	return nil
 }
 
-func lookupApplicationSet(name string) *appset.ApplicationSet {
+func lookupApplicationSet(name string) *argoapp.ApplicationSet {
 	for i, aps := range gApplicationSetList.Items {
 		if aps.Name == name {
 			return &gApplicationSetList.Items[i]

@@ -3,8 +3,8 @@ package app
 import (
 	"context"
 	"fmt"
+
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
-	appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
 	"github.com/arlonproj/arlon/pkg/ctrlruntimeclient"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -16,12 +16,12 @@ import (
 
 const ProfilesAnnotationKey = "arlon.io/profiles"
 
-func List(config *restclient.Config, ns string) (apslist []appset.ApplicationSet, err error) {
+func List(config *restclient.Config, ns string) (apslist []argoappv1.ApplicationSet, err error) {
 	cli, err := ctrlruntimeclient.NewClient(config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get controller runtime client: %s", err)
 	}
-	var asl appset.ApplicationSetList
+	var asl argoappv1.ApplicationSetList
 	req, err := labels.NewRequirement("arlon-type", selection.In, []string{"application"})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create requirement: %s", err)
@@ -49,11 +49,11 @@ func Create(
 	srcTargetRevision string,
 	autoSync bool,
 	autoPrune bool,
-) appset.ApplicationSet {
-	aps := appset.ApplicationSet{
+) argoappv1.ApplicationSet {
+	aps := argoappv1.ApplicationSet{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "ApplicationSet", // can't use argoapp.ApplicationSetKind because "set" is not capitalized in that version ???
-			APIVersion: appset.GroupVersion.Group + "/" + appset.GroupVersion.Version,
+			APIVersion: argoappv1.SchemeGroupVersion.Group + "/" + argoappv1.SchemeGroupVersion.Version,
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
@@ -63,16 +63,16 @@ func Create(
 				"managed-by": "arlon",
 			},
 		},
-		Spec: appset.ApplicationSetSpec{
-			Generators: []appset.ApplicationSetGenerator{
+		Spec: argoappv1.ApplicationSetSpec{
+			Generators: []argoappv1.ApplicationSetGenerator{
 				{
-					List: &appset.ListGenerator{
+					List: &argoappv1.ListGenerator{
 						Elements: []apiextensionsv1.JSON{},
 					},
 				},
 			},
-			Template: appset.ApplicationSetTemplate{
-				ApplicationSetTemplateMeta: appset.ApplicationSetTemplateMeta{
+			Template: argoappv1.ApplicationSetTemplate{
+				ApplicationSetTemplateMeta: argoappv1.ApplicationSetTemplateMeta{
 					Name: fmt.Sprintf("{{cluster_name}}-app-%s", name),
 				},
 				Spec: argoappv1.ApplicationSpec{
@@ -106,7 +106,7 @@ func Delete(config *restclient.Config, ns string, name string) error {
 	if err != nil {
 		return fmt.Errorf("failed to get controller runtime client: %s", err)
 	}
-	var app appset.ApplicationSet
+	var app argoappv1.ApplicationSet
 	err = cli.Get(context.Background(), client.ObjectKey{
 		Name:      name,
 		Namespace: ns,

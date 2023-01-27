@@ -9,9 +9,9 @@ before:
 builds:
   - id: 'cli'
     ldflags:
-      - -X github.com/arlonproj/arlon/cmd/install.capiCoreProvider=cluster-api:v1.1.5
-      - -X github.com/arlonproj/arlon/cmd/initialize.argocdGitTag=release-2.4
-      - -X github.com/arlonproj/arlon/cmd/version.cliVersion=0.10.0
+      - -X github.com/arlonproj/arlon/cmd/install.capiCoreProvider=cluster-api:v1.3.2
+      - -X github.com/arlonproj/arlon/cmd/initialize.argocdGitTag=release-2.5
+      - -X github.com/arlonproj/arlon/cmd/version.cliVersion=0.11.0
       - -w
       - -s
     env:
