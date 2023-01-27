@@ -42,8 +42,7 @@ an RBAC ruleset, an add-on, an application, etc.
 
 - [Concepts](./docs/concepts.md)
 - [Installation](./docs/installation.md)
-- [Tutorial(gen1)](./docs/tutorial.md)
-- [Tutorial(gen2)](./docs/gen2_Tutorial.md)
+- [Tutorial](./docs/gen2_Tutorial.md)
 - [Architecture](./docs/architecture.md)
 
 ## License

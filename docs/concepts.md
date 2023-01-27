@@ -20,7 +20,7 @@ The new way of provisioning workload clusters in Arlon since v0.9 is gen2 cluste
 The most significant change in gen2 clusters is the *Cluster Template* construct, which replaces the older cluster spec from gen1 clusters.
 To distinguish them from the older gen1 clusters, the ones deployed from a cluster template are called next-gen clusters or gen2 clusters.
 
-## Cluster Template (gen2 cluster)
+## Cluster Template 
 
 A cluster template is a base cluster manifest that can be "cloned" to produce
 one or more identical or similar workload clusters.
@@ -31,17 +31,6 @@ You then instruct Arlon to "prep" the directory to promote it to cluster templat
 To know more about cluster template for Arlon gen2 clusters including the difference
 with cluster spec and the process to create gen2 clusters; read the document [cluster template](./clustertemplate.md)
 
-## Cluster spec (gen1 clusters : deprecated since 0.10)
-
-A cluster spec contains desired settings when creating a new cluster.
-They currently include:
-
-- API Provider: the cluster orchestration technology. Supported values are `CAPI` (Cluster API) and `xplane` (Crossplane)
-- Cloud Provider: the infrastructure cloud provider. The currently supported values is `aws`, with `gcp` and `azure` support coming later.
-- Type: the cluster type. Some API providers support more than one type. On `aws` cloud, Cluster API supports `kubeadm` and `eks`, whereas Crossplane only supports `eks`.
-- The (worker) node instance type
-- The initial (worker) node count
-- The Kubernetes version
 
 ## Application (App)
 
@@ -72,8 +61,3 @@ AppProfiles is deployed to the cluster.
 For more details about annotating/targeting clusters,
 refer to [AppProfiles article](./appprofiles.md)
 
-## Gen1 Profiles
-
-Apps and AppProfiles are a newer version ("gen2") of Arlon profiles.
-There is an older version called "gen1", which is composed of the concepts
-of Bundles and Profiles. For more details, see [Bundles and Profiles](./gen1_profiles.md)
