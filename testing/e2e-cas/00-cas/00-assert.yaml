@@ -1,0 +1,101 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 3600
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  namespace: cas-e2e-cluster
+status:
+  controlPlaneReady: true
+  infrastructureReady: true
+  phase: Provisioned
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  namespace: cas-e2e-cluster
+status:
+  phase: Running
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta2
+kind: AWSManagedControlPlane
+metadata:
+  namespace: cas-e2e-cluster
+status:
+  ready: true
+---
+apiVersion: core.arlon.io/v1
+kind: CallHomeConfig
+metadata:
+  namespace: cas-e2e-cluster
+  name: cluster-autoscaler
+status:
+  state: complete
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  labels:
+    arlon-cluster: cas-e2e-cluster
+    arlon-type: cluster-app
+  name: cas-e2e-cluster
+  namespace: argocd
+status:
+  health:
+    status: Healthy
+  operationState:
+    phase: Succeeded
+  sync:
+    status: Synced
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  labels:
+    arlon-cluster: cas-e2e-cluster
+    arlon-type: arlon-app
+  name: cas-e2e-cluster-arlon
+  namespace: argocd
+status:
+  health:
+    status: Healthy
+  operationState:
+    phase: Succeeded
+  sync:
+    status: Synced
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  labels:
+    arlon-cluster: cas-e2e-cluster
+    arlon-profile: dynamic-cas
+    arlon-type: profile-app
+  name: cas-e2e-cluster-profile-dynamic-cas
+  namespace: argocd
+status:
+  health:
+    status: Healthy
+  operationState:
+    phase: Succeeded
+  sync:
+    status: Synced
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  labels:
+    app.kubernetes.io/instance: cas-e2e-cluster-profile-dynamic-cas
+  name: cas-e2e-cluster-cas-bundle
+  namespace: argocd
+status:
+  health:
+    status: Healthy
+  operationState:
+    phase: Succeeded
+  sync:
+    status: Synced

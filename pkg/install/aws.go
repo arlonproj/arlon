@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/argoproj/argo-cd/v2/util/cli"
-	"sigs.k8s.io/cluster-api-provider-aws/cmd/clusterawsadm/cmd"
-	credentials2 "sigs.k8s.io/cluster-api-provider-aws/cmd/clusterawsadm/credentials"
+	"sigs.k8s.io/cluster-api-provider-aws/v2/cmd/clusterawsadm/cmd"
+	credentials2 "sigs.k8s.io/cluster-api-provider-aws/v2/cmd/clusterawsadm/credentials"
 )
 
 const (

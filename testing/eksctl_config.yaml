@@ -1,0 +1,32 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: ${clusterName}
+  region: ${AWS_REGION}
+  version: "1.23"
+
+nodeGroups:
+  - name: nodegroup-${dateSuffix}
+    instanceType: t2.large
+    desiredCapacity: 2
+    ssh: # use existing EC2 key
+      publicKeyName: ${AWS_SSH_KEY_NAME}
+    iam:
+      withAddonPolicies:
+        externalDNS: true
+        ebs: true
+        fsx: true
+        efs: true
+vpc:
+  nat:
+    gateway: HighlyAvailable
+  clusterEndpoints:
+    publicAccess:  true
+    privateAccess: true
+
+addons:
+  - name: vpc-cni
+  - name: coredns
+  - name: kube-proxy
+  - name: aws-ebs-csi-driver

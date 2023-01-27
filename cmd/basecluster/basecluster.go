@@ -4,10 +4,10 @@ import "github.com/spf13/cobra"
 
 func NewCommand() *cobra.Command {
 	command := &cobra.Command{
-		Use:               "basecluster",
+		Use:               "clustertemplate",
 		Short:             "Manage cluster templates",
 		Long:              "Manage cluster templates",
-		Aliases:           []string{"clustertemplate"},
+		Aliases:           []string{"basecluster", "clustertemplates", "baseclusters"},
 		DisableAutoGenTag: true,
 		Run: func(c *cobra.Command, args []string) {
 			c.Usage()

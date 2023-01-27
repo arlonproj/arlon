@@ -3,11 +3,16 @@ package appprofile
 import (
 	"context"
 	"fmt"
+
 	argoclient "github.com/argoproj/argo-cd/v2/pkg/apiclient"
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	clusterpkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/cluster"
 	argoappapi "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
-	appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
+
+	//appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
+	"strings"
+	"sync"
+
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
 	arlonapp "github.com/arlonproj/arlon/pkg/app"
 	arlonclusters "github.com/arlonproj/arlon/pkg/cluster"
@@ -20,8 +25,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/json"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"strings"
-	"sync"
 )
 
 var (
@@ -86,7 +89,7 @@ func ReconcileEverything(
 	}
 
 	// Get applications (applicationsets managed by Arlon)
-	var appList appset.ApplicationSetList
+	var appList argoappapi.ApplicationSetList
 	rqmt, err := labels.NewRequirement("arlon-type", selection.In, []string{"application"})
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("failed to create requirement: %s", err)

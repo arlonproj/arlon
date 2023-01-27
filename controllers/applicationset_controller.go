@@ -19,9 +19,10 @@ package controllers
 import (
 	"context"
 	"fmt"
+
 	"github.com/argoproj/argo-cd/v2/pkg/apiclient"
 	argoclient "github.com/argoproj/argo-cd/v2/pkg/apiclient"
-	appset "github.com/argoproj/argo-cd/v2/pkg/apis/applicationset/v1alpha1"
+	appset "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	"github.com/arlonproj/arlon/pkg/appprofile"
 	"github.com/go-logr/logr"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"

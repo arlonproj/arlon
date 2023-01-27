@@ -32,7 +32,7 @@ $(LOCALBIN):
 CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 
 ## Tool Versions
-CONTROLLER_TOOLS_VERSION ?= v0.10.0
+CONTROLLER_TOOLS_VERSION ?= v0.11.1
 
 # Setting SHELL to bash allows bash commands to be executed by recipes.
 # This is a requirement for 'setup-envtest.sh' in the test target.
@@ -179,5 +179,12 @@ test-e2e-appprofiles:
 	./testing/e2e_setup.sh
 	kubectl kuttl test --start-kind=false ./testing/e2e-appprofiles/ --test 00-deploy
 
+test-e2e-cas:
+	./testing/e2e_cas_test_scripts/e2e_cas_setup.sh
+	kubectl kuttl test --start-kind=false ./testing/e2e-cas/ --test 00-cas
+
 e2e-teardown:
 	./testing/e2e_setup_teardown.sh
+
+e2e-teardown-cas:
+	./testing/e2e_cas_test_scripts/e2e_cas_teardown.sh
