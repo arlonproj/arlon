@@ -39,7 +39,7 @@ func NewCommand() *cobra.Command {
 		Short:             "Verify if arlon cli can run",
 		Long:              "Verify if required kubectl,argocd,git access is present before profiles and bundles are created",
 		DisableAutoGenTag: true,
-		Example:           "arlonctl verify",
+		Example:           "arlon verify",
 		RunE: func(c *cobra.Command, args []string) error {
 			err := verify(clientConfig)
 			if err != nil {
