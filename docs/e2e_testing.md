@@ -50,4 +50,23 @@
 
 - Currently, we are running the arlon e2e tests on an ubuntu VM using Github Actions.
 
-- To invoke the arlon e2e tests, we are adding a new build target `make test-e2e` This command will execute the [e2e test job](https://github.com/arlonproj/arlon/blob/main/.github/workflows/e2e.yaml) using Github Actions.
+- To invoke the arlon e2e tests, we have a `make` target `make test-e2e` which will be executed by the [e2e test workflow](https://github.com/arlonproj/arlon/blob/main/.github/workflows/e2e.yaml) on Github Actions.
+
+### Running Arlon Tests Locally
+
+- To run the arlon e2e tests locally on your developer setup (Linux or MacOS), export the following environment variables that are required to download CAPA and to setup the git server.
+    - GIT_USER - Dummy github username used by gitea helm chart for setting up test user
+    - GIT_PASSWORD - Dummy github password fo this test user
+    - GIT_EMAIL - Dummy email value for the test user
+    - AWS_ACCESS_KEY_ID - AWS access key
+    - AWS_SECRET_ACCESS_KEY - AWS secret access key
+    - AWS_REGION - AWS region in which you want to run these tests
+    - AWS_SSH_KEY_NAME -  refers to the AWS SSH key name in the region specified by `AWS_REGION`
+    - AWS_CONTROL_PLANE_MACHINE_TYPE is the instance type of the control plane machines( e.g. t2.medium, t3.large)
+    - AWS_NODE_MACHINE_TYPE is the instance type of the worker node machines( e.g. t2.medium, t3.large)
+
+- After exporting these variables, run the make target `make test-e2e` from the repository root.
+
+- This will run the arlon e2e tests and clean up all the resources created by these tests post the completion of this test. Incase, the teardown is not triggered via this target, manually run this make target: `make e2e-teardown`, which runs the teardown script
+
+- The cleanup of AWS resources is a little unreliable and it is advised to clean all the AWS resources (EC2 Instances, VPC, NAT gateways) manually just to avoid incurring further costs.
