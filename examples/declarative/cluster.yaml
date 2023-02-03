@@ -81,7 +81,7 @@ spec:
       namePrefix: example-1-
     repoURL: https://github.com/arlonproj/arlon.git
     path: examples/clustertemplates/eks-managed-mpool
-    targetRevision: v0.10
+    targetRevision: private/Rohitrajak1807/439
   syncPolicy:
     automated:
       prune: true
