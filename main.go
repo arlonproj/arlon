@@ -20,6 +20,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/arlonproj/arlon/cmd/clustercontroller"
 	"os"
 
 	"go.uber.org/zap/zapcore"
@@ -31,6 +32,8 @@ import (
 
 	apppkg "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	"github.com/argoproj/argo-cd/v2/util/io"
+	"github.com/spf13/cobra"
+
 	"github.com/arlonproj/arlon/cmd/basecluster"
 	"github.com/arlonproj/arlon/cmd/bundle"
 	"github.com/arlonproj/arlon/cmd/callhomecontroller"
@@ -44,7 +47,6 @@ import (
 	"github.com/arlonproj/arlon/cmd/verify"
 	"github.com/arlonproj/arlon/cmd/version"
 	"github.com/arlonproj/arlon/pkg/argocd"
-	"github.com/spf13/cobra"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -71,6 +73,7 @@ func main() {
 	command.AddCommand(controller.NewCommand())
 	command.AddCommand(callhomecontroller.NewCommand())
 	command.AddCommand(appprofilecontroller.NewCommand())
+	command.AddCommand(clustercontroller.NewCommand())
 	command.AddCommand(list_clusters.NewCommand())
 	command.AddCommand(bundle.NewCommand())
 	command.AddCommand(profile.NewCommand())

@@ -3,7 +3,6 @@ package cluster
 import (
 	"context"
 	"fmt"
-
 	argoapp "github.com/argoproj/argo-cd/v2/pkg/apiclient/application"
 	argoappv1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	arlonv1 "github.com/arlonproj/arlon/api/v1"
@@ -37,6 +36,8 @@ func Create(
 	if err != nil {
 		return nil, fmt.Errorf("failed to get kube client: %s", err)
 	}
+	// FIXME: the following check is wrong for a gen2 cluster, whose name
+	//        is actually ${clusterName}-arlon
 	_, err = appIf.Get(context.Background(),
 		&argoapp.ApplicationQuery{Name: &clusterName})
 	if err == nil {
@@ -109,7 +110,7 @@ func CreatePatchDir(
 	basePath string,
 	patchRepoRevision string,
 	baseRepoRevision string,
-	overridesPath string,
+	patchContent []byte,
 	baseRepoUrl string,
 	baseRepoPath string) error {
 	kubeClient, err := kubernetes.NewForConfig(config)
@@ -120,9 +121,8 @@ func CreatePatchDir(
 	if err != nil {
 		return fmt.Errorf("failed to get repo credentials: %s", err)
 	}
-
-	err = DeployPatchToGit(creds, argocdNs, clusterName,
-		repoURL, patchRepoRevision, baseRepoRevision, basePath, overridesPath, baseRepoUrl, baseRepoPath)
+	err = DeployPatchToGit(creds, clusterName,
+		repoURL, patchRepoRevision, baseRepoRevision, basePath, patchContent, baseRepoUrl, baseRepoPath)
 	if err != nil {
 		return fmt.Errorf("failed to deploy git tree: %s", err)
 	}

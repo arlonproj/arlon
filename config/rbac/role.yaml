@@ -86,6 +86,32 @@ rules:
 - apiGroups:
   - core.arlon.io
   resources:
+  - clusters
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.arlon.io
+  resources:
+  - clusters/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.arlon.io
+  resources:
+  - clusters/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - core.arlon.io
+  resources:
   - profiles
   verbs:
   - create
