@@ -70,7 +70,7 @@ func createClusterCommand() *cobra.Command {
 					return fmt.Errorf("arlon cluster already exists")
 				}
 				patchContent, err := os.ReadFile(overridesPath)
-				if err == nil {
+				if err != nil {
 					return fmt.Errorf("failed to read patch file: %s", err)
 				}
 				err = cluster.CreatePatchDir(config, clusterName, patchRepoUrl, argocdNs,
