@@ -15,7 +15,7 @@ on:
       - v0.10
 
 jobs:
-  build_and_unit_test:
+  lint:
     environment: Build
     runs-on: ubuntu-latest
     steps:
@@ -29,6 +29,12 @@ jobs:
           cache: true
       - name: Print the version of golang
         run: go version
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v3.4.0
+  build_and_unit_test:
+    environment: Build
+    runs-on: ubuntu-latest
+    steps:
       - name: Run unit tests with code coverage
         run: make test
       - name: Build
