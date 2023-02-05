@@ -31,6 +31,8 @@ jobs:
         run: go version
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v3.4.0
+        with:
+          args: --timeout=5m
   build_and_unit_test:
     environment: Build
     runs-on: ubuntu-latest
