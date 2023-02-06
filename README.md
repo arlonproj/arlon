@@ -3,7 +3,10 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fplatform9%2Farlon.svg?type=small)](https://app.fossa.com/projects/git%2Bgithub.com%2Fplatform9%2Farlon?ref=badge_small)
 [![Go Report Card](https://goreportcard.com/badge/github.com/arlonproj/arlon)](https://goreportcard.com/report/github.com/arlonproj/arlon)
 [![Documentation Status](https://readthedocs.org/projects/arlon/badge/?version=latest)](https://arlon.readthedocs.io/en/latest/?badge=latest)
+[![Trivy Code Scan](https://github.com/arlonproj/arlon/actions/workflows/trivy.yml/badge.svg)](https://github.com/arlonproj/arlon/actions/workflows/trivy.yml)
 [![CI](https://github.com/arlonproj/arlon/actions/workflows/ci.yml/badge.svg)](https://github.com/arlonproj/arlon/actions/workflows/ci.yml)
+
+
 # Introduction
 
 # ![logo](./docs/images/logo_arlon.svg)
