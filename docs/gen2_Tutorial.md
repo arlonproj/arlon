@@ -411,6 +411,8 @@ Runnning the above command will create a folder with the specified cluster name 
 
 Note that the patch file repo url can be different or same from the cluster template repo url acoording to the requirement of the user. A user can use a different repo url for string patch files for the cluster.
 
+To know more about the cluster overrides design, refer to the [design document](gen2_overrides_proposal_3.md).
+
 ## Update Cluster
 
 To update the profiles of a workload cluster:
