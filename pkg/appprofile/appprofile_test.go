@@ -457,7 +457,7 @@ func TestAppProfileReconcileEverything(t *testing.T) {
 }
 
 func reconcile(t *testing.T, mcr *mockCtrlRuntClient, mac *mockArgoClient, log logr.Logger) {
-	_, err := ReconcileEverything(nil, mcr, mac, log)
+	_, err := ReconcileEverything(context.TODO(), mcr, mac, log)
 	if err != nil {
 		t.Fatalf("reconcile error: %s", err)
 	}

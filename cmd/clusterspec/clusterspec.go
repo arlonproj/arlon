@@ -9,7 +9,7 @@ func NewCommand() *cobra.Command {
 		Long:              "Manage cluster specifications",
 		DisableAutoGenTag: true,
 		Run: func(c *cobra.Command, args []string) {
-			c.Usage()
+			_ = c.Usage()
 		},
 	}
 	command.AddCommand(listClusterspecsCommand())

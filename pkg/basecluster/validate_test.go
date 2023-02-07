@@ -90,6 +90,7 @@ func readDir(dirPath string) (fileInfos []os.FileInfo, err error) {
 		if err != nil {
 			err = fmt.Errorf("failed to get fileinfo for %s",
 				dirEntry.Name())
+			return nil, err
 		}
 		fileInfos = append(fileInfos, fileInfo)
 	}

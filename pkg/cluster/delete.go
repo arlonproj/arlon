@@ -99,6 +99,9 @@ func DeleteOverridesDir(app *v1alpha1.Application, kubeClient *kubernetes.Client
 		return fmt.Errorf("failed to clone repo: %s", err)
 	}
 	wt, err := repo.Worktree()
+	if err != nil {
+		return fmt.Errorf("failed to get working tree, %w", err)
+	}
 	fileInfo, err := wt.Filesystem.Lstat(repoPath)
 	if err != nil {
 		return fmt.Errorf("Failed to find the directory to delete: %s", err)

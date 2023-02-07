@@ -427,6 +427,9 @@ func beginArlonInstall(ctx context.Context, client k8sclient.Client, kubeClient 
 		condition := getDeploymentCondition(depl.Status, apps.DeploymentAvailable)
 		return condition != nil && condition.Reason == reasonMinimumReplicasAvailable, nil
 	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -740,7 +743,7 @@ func checkExamples(repoUrl, gitUser, password string, baseClusterPaths []string,
 	if err != nil {
 		return false, fmt.Errorf("failed to get worktree status: %w", err)
 	}
-	for file, _ := range status {
+	for file := range status {
 		_, _ = wt.Add(file)
 	}
 	commitOpts := &gogit.CommitOptions{Author: &object.Signature{

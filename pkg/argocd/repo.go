@@ -32,6 +32,9 @@ func CloneRepo(
 		Password: creds.Password,
 	}
 	tmpDir, err = os.MkdirTemp("", "arlon-")
+	if err != nil {
+		return nil, "", nil, err
+	}
 	branchRef := plumbing.NewBranchReferenceName(repoBranch)
 	repo, err = gogit.PlainCloneContext(context.Background(), tmpDir, false, &gogit.CloneOptions{
 		URL:           repoUrl,

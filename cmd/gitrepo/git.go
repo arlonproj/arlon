@@ -8,7 +8,7 @@ func NewCommand() *cobra.Command {
 		Short: "manage git configurations",
 		Long:  "manage git configurations",
 		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Usage()
+			_ = cmd.Usage()
 		},
 	}
 	cmd.AddCommand(register(), unregister())
