@@ -18,7 +18,7 @@ require (
 	k8s.io/api v0.25.6
 	k8s.io/apimachinery v0.25.6
 	k8s.io/client-go v0.25.6
-	sigs.k8s.io/cluster-api v1.3.2 //v1.1.x will upgrade k8s APIs to v0.23.x
+	sigs.k8s.io/cluster-api v1.3.3 //v1.1.x will upgrade k8s APIs to v0.23.x
 	sigs.k8s.io/controller-runtime v0.13.1 //v1.13 will upgrade k8s APIs to v0.25.x
 )
 
