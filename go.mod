@@ -3,7 +3,7 @@ module github.com/arlonproj/arlon
 go 1.19
 
 require (
-	github.com/argoproj/argo-cd/v2 v2.5.8
+	github.com/argoproj/argo-cd/v2 v2.6.2
 	github.com/aws/aws-sdk-go v1.44.188
 	github.com/deckarep/golang-set v1.8.0
 	github.com/deckarep/golang-set/v2 v2.1.0
@@ -24,7 +24,7 @@ require (
 
 require (
 	github.com/Azure/go-autorest/autorest/to v0.4.0
-	github.com/argoproj/pkg v0.13.6
+	github.com/argoproj/pkg v0.13.7-0.20221221191914-44694015343d
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/fatih/color v1.14.1
 	github.com/ghodss/yaml v1.0.0
@@ -47,10 +47,12 @@ require (
 	github.com/emicklei/go-restful/v3 v3.10.1 // indirect
 	github.com/google/gnostic v0.6.9 // indirect
 	github.com/google/go-github/v45 v45.2.0 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	go.opentelemetry.io/otel/metric v0.34.0 // indirect
@@ -87,8 +89,8 @@ require (
 	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 // indirect
 	github.com/antonmedv/expr v1.10.5 // indirect
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect
-	github.com/argoproj/gitops-engine v0.7.1-0.20221004132320-98ccd3d43fd9 // indirect
-	github.com/argoproj/notifications-engine v0.3.1-0.20220812180936-4d8552b0775f // indirect
+	github.com/argoproj/gitops-engine v0.7.1-0.20221208230615-917f5a0f16d5 // indirect
+	github.com/argoproj/notifications-engine v0.3.1-0.20221203221941-490d98afd1d6 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/aws/amazon-vpc-cni-k8s v1.12.1 // indirect
 	github.com/awslabs/goformation/v4 v4.19.5 // indirect
@@ -201,7 +203,6 @@ require (
 	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/r3labs/diff v1.1.0 // indirect
 	github.com/rivo/uniseg v0.4.3 // indirect
-	github.com/robfig/cron v1.2.0 // indirect
 	github.com/rs/cors v1.8.3 // indirect
 	github.com/russross/blackfriday v1.6.0 // indirect
 	github.com/sanathkr/go-yaml v0.0.0-20170819195128-ed9d249f429b // indirect
