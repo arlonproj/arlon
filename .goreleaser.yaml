@@ -9,7 +9,7 @@ before:
 builds:
   - id: 'cli'
     ldflags:
-      - -X github.com/arlonproj/arlon/cmd/install.capiCoreProvider=cluster-api:v1.3.2
+      - -X github.com/arlonproj/arlon/cmd/install.capiCoreProvider=cluster-api:v1.3.3
       - -X github.com/arlonproj/arlon/cmd/initialize.argocdGitTag=release-2.5
       - -X github.com/arlonproj/arlon/cmd/version.cliVersion=0.11.0
       - -w
