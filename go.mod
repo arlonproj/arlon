@@ -15,11 +15,11 @@ require (
 	github.com/otiai10/copy v1.9.0
 	github.com/spf13/cobra v1.6.1
 	google.golang.org/grpc v1.53.0
-	k8s.io/api v0.25.6
-	k8s.io/apimachinery v0.25.6
-	k8s.io/client-go v0.25.6
+	k8s.io/api v0.26.1
+	k8s.io/apimachinery v0.26.1
+	k8s.io/client-go v0.26.1
 	sigs.k8s.io/cluster-api v1.3.3 //v1.1.x will upgrade k8s APIs to v0.23.x
-	sigs.k8s.io/controller-runtime v0.13.1 //v1.13 will upgrade k8s APIs to v0.25.x
+	sigs.k8s.io/controller-runtime v0.14.4 //v1.13 will upgrade k8s APIs to v0.25.x
 )
 
 require (
@@ -31,7 +31,7 @@ require (
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/zap v1.24.0
 	gotest.tools/v3 v3.4.0
-	k8s.io/apiextensions-apiserver v0.25.6
+	k8s.io/apiextensions-apiserver v0.26.1
 	k8s.io/cli-runtime v0.25.6
 	sigs.k8s.io/cluster-api-provider-aws/v2 v2.0.2
 	sigs.k8s.io/kustomize/kyaml v0.13.9
@@ -260,7 +260,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apiserver v0.25.6 // indirect
 	k8s.io/cluster-bootstrap v0.25.6 // indirect
-	k8s.io/component-base v0.25.6 // indirect
+	k8s.io/component-base v0.26.1 // indirect
 	k8s.io/component-helpers v0.25.6 // indirect
 	k8s.io/klog/v2 v2.90.0 // indirect
 	k8s.io/kube-aggregator v0.25.6 // indirect
