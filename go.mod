@@ -34,7 +34,7 @@ require (
 	k8s.io/apiextensions-apiserver v0.25.6
 	k8s.io/cli-runtime v0.25.6
 	sigs.k8s.io/cluster-api-provider-aws/v2 v2.0.2
-	sigs.k8s.io/kustomize/kyaml v0.13.9
+	sigs.k8s.io/kustomize/kyaml v0.14.1
 )
 
 require (
