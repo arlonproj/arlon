@@ -1,89 +1,12 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
+apiVersion: core.arlon.io/v1
+kind: Cluster
 metadata:
-  finalizers:
-  - resources-finalizer.argocd.argoproj.io/foreground
-  labels:
-    arlon-cluster: example-1
-    arlon-type: arlon-app
-    managed-by: arlon
-  name: example-1-arlon
-  namespace: argocd
-spec:
-  destination:
-    namespace: default
-    server: https://kubernetes.default.svc
-  project: ""
-  source:
-    helm:
-      parameters:
-      - name: global.clusterName
-        value: example-1
-      - name: global.kubeconfigSecretKeyName
-        value: value
-      - name: global.innerClusterNameWithDashSuffix
-        value: mycluster-
-    path: pkg/cluster/manifests
-    repoURL: https://github.com/arlonproj/arlon.git
-    targetRevision: v0.9.0
-  syncPolicy:
-    automated:
-      prune: true
-    syncOptions:
-    - Prune=true
-status:
-  health: {}
-  summary: {}
-  sync:
-    comparedTo:
-      destination: {}
-      source:
-        repoURL: ""
-    status: ""
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
+  name: example-1
+  namespace: arlon
   annotations:
     arlon.io/profiles: frontend,backend
-    arlon.io/basecluster-name: mycluster
-    arlon.io/basecluster-repo-path: examples/clustertemplates/eks-managed-mpool
-    arlon.io/basecluster-repo-revision: v0.10
-    arlon.io/basecluster-repo-url: https://github.com/arlonproj/arlon.git
-  finalizers:
-  - resources-finalizer.argocd.argoproj.io/foreground
-  labels:
-    arlon-cluster: example-1
-    arlon-type: cluster-app
-    managed-by: arlon
-  name: example-1
-  namespace: argocd
 spec:
-  destination:
-    namespace: example-1
-    server: https://kubernetes.default.svc
-  ignoreDifferences:
-  - group: cluster.x-k8s.io
-    jsonPointers:
-    - /spec/replicas
-    kind: MachineDeployment
-  - group: controlplane.cluster.x-k8s.io
-    jsonPointers:
-    - /spec/version
-    kind: AWSManagedControlPlane
-  - group: infrastructure.cluster.x-k8s.io
-    jsonPointers:
-    - /spec
-    kind: AWSMachineTemplate
-  project: ""
-  source:
-    kustomize:
-      namePrefix: example-1-
-    repoURL: https://github.com/arlonproj/arlon.git
+  clusterTemplate:
+    url: https://github.com/arlonproj/arlon.git
     path: examples/clustertemplates/eks-managed-mpool
-    targetRevision: main
-  syncPolicy:
-    automated:
-      prune: true
-    syncOptions:
-    - Prune=true
+    revision: v0.10
