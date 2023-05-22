@@ -28,7 +28,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/fatih/color v1.14.1
 	github.com/ghodss/yaml v1.0.0
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.3
 	go.uber.org/zap v1.24.0
 	gotest.tools/v3 v3.4.0
 	k8s.io/apiextensions-apiserver v0.25.6
