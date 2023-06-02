@@ -58,10 +58,31 @@ kind: ConfigMap
 ```
 
 - Generate an account token: `argocd account generate-token --account arlon`
-- Make a temporary copy of this [config-file](https://github.com/arlonproj/arlon/blob/main/testing/argocd-config-for-controller.template.yaml) in `/tmp/config` then
-  edit it to replace the value of `auth-token` with the token from
-  the previous step. Save changes. This file will be used to configure the Arlon
-  controller's ArgoCD credentials during the next steps.
+- Copy this [config file template](https://github.com/arlonproj/arlon/blob/main/testing/argocd-config-for-controller.template.yaml) to `/tmp/config`.
+  (The file name is important. Do not name it anything other than 'config').
+- Edit the file to add this line to the end:
+  - `  auth-token: ${ACCOUNT_TOKEN}` ()
+  - Note 1: replace ${ACCOUNT_TOKEN} with the token generated 2 steps above
+  - Note 2: the spacing & indentation is important, ensure `auth-token:` is aligned with `name:` from the preceding line
+
+The final file should look something like:
+```
+contexts:
+- name: argocd-server.argocd.svc.cluster.local
+  server: argocd-server.argocd.svc.cluster.local
+  user: argocd-server.argocd.svc.cluster.local
+current-context: argocd-server.argocd.svc.cluster.local
+servers:
+- grpc-web-root-path: ""
+  insecure: true
+  server: argocd-server.argocd.svc.cluster.local
+users:
+- name: argocd-server.argocd.svc.cluster.local
+  auth-token: XXXXXXXX
+```
+
+It will be used to create the secret containing the Arlon
+controller's ArgoCD credentials during the next steps.
 
 ## Arlon controller
 
