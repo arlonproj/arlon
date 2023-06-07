@@ -65,6 +65,10 @@ spec:
   ignoreDifferences:
   - group: cluster.x-k8s.io
     jsonPointers:
+      - /spec/template/spec/infrastructureRef/apiVersion
+    kind: MachinePool
+  - group: cluster.x-k8s.io
+    jsonPointers:
     - /spec/replicas
     kind: MachineDeployment
   - group: controlplane.cluster.x-k8s.io
