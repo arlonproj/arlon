@@ -46,6 +46,7 @@ kind: AWSManagedMachinePool
 metadata:
   name: mycluster-pool-0
 spec:
+  capacityType: spot
   scaling:
     maxSize: 5
     minSize: 0
