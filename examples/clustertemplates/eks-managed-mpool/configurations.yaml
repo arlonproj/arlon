@@ -38,6 +38,8 @@ nameReference:
   fieldSpecs:
   - path: spec/controlPlaneRef/name
     kind: Cluster
+  - path: spec/infrastructureRef/name
+    kind: Cluster
 - kind: AWSManagedCluster
   group: infrastructure.cluster.x-k8s.io
   version: v1beta2
