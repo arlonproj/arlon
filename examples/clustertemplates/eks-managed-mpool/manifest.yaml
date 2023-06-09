@@ -21,7 +21,7 @@ kind: AWSManagedControlPlane
 metadata:
   name: mycluster-control-plane
 spec:
-  region: us-west-1
+  region: us-east-2
   version: v1.22.0
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
