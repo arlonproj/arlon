@@ -60,9 +60,9 @@ spec:
         server: '{{cluster_server}}'
       project: default
       source:
-        path: bitnami/redis
-        repoURL: https://github.com/bitnami/charts
-        targetRevision: main
+        chart: redis
+        repoURL: https://charts.pascaliske.dev
+        targetRevision: 1.1.3
       syncPolicy:
         automated:
           prune: true
