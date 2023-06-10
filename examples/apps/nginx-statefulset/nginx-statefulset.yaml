@@ -43,6 +43,7 @@ spec:
         name: www
       spec:
         accessModes: [ "ReadWriteOnce" ]
+        minReadySeconds: 10
         resources:
           requests:
             storage: 1Gi
