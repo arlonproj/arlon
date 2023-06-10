@@ -6,7 +6,6 @@ metadata:
 spec:
   appNames:
   - guestbook
-  - nonexistent-1
 ---
 apiVersion: core.arlon.io/v1
 kind: AppProfile
@@ -16,4 +15,4 @@ metadata:
 spec:
   appNames:
   - redis
-  - nonexistent-2
+  - nginx
