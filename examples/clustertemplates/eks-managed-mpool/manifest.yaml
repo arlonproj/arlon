@@ -21,7 +21,7 @@ kind: AWSManagedControlPlane
 metadata:
   name: mycluster-control-plane
 spec:
-  region: us-west-2
+  region: us-east-2
   version: v1.22.0
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
@@ -46,7 +46,6 @@ kind: AWSManagedMachinePool
 metadata:
   name: mycluster-pool-0
 spec:
-  instanceType: t3a.medium
   capacityType: spot
   scaling:
     maxSize: 5
