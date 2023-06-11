@@ -22,7 +22,7 @@ metadata:
   name: mycluster-control-plane
 spec:
   region: us-east-2
-  version: v1.22.0
+  version: v1.23.0
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachinePool
