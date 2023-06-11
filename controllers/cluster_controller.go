@@ -173,7 +173,9 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			return r.UpdateState(ctx, log, &cl, "retrying",
 				"failed to get grpc status from argocd API", retryDelayAsResult)
 		}
-		if grpcStatus.Code() != grpccodes.NotFound {
+		sts := grpcStatus.Code()
+		// Newer versions of ArgoCD return PermissionDenied when object doesn't exist
+		if sts != grpccodes.NotFound && sts != grpccodes.PermissionDenied {
 			return r.UpdateState(ctx, log, &cl, "retrying",
 				fmt.Sprintf("unexpected grpc status: %d", grpcStatus.Code()),
 				retryDelayAsResult)
@@ -205,7 +207,9 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			return r.UpdateState(ctx, log, &cl, "retrying",
 				"failed to get grpc status from argocd API", retryDelayAsResult)
 		}
-		if grpcStatus.Code() != grpccodes.NotFound {
+		sts := grpcStatus.Code()
+		// Newer versions of ArgoCD return PermissionDenied when object doesn't exist
+		if sts != grpccodes.NotFound && sts != grpccodes.PermissionDenied {
 			return r.UpdateState(ctx, log, &cl, "retrying",
 				fmt.Sprintf("unexpected grpc status: %d", grpcStatus.Code()),
 				retryDelayAsResult)
@@ -325,7 +329,9 @@ func (r *ClusterReconciler) reconcileDelete(
 		return r.UpdateState(ctx, log, cr, "delete-retrying",
 			"failed to get grpc status from argocd API", retryDelayAsResult)
 	}
-	if grpcStatus.Code() != grpccodes.NotFound {
+	sts := grpcStatus.Code()
+	// Newer versions of ArgoCD return PermissionDenied when object doesn't exist
+	if sts != grpccodes.NotFound && sts != grpccodes.PermissionDenied {
 		return r.UpdateState(ctx, log, cr, "delete-retrying",
 			fmt.Sprintf("unexpected grpc status: %d", grpcStatus.Code()),
 			retryDelayAsResult)
@@ -358,7 +364,9 @@ func (r *ClusterReconciler) reconcileDelete(
 		return r.UpdateState(ctx, log, cr, "delete-retrying",
 			"failed to get grpc status from argocd API", retryDelayAsResult)
 	}
-	if grpcStatus.Code() != grpccodes.NotFound {
+	sts = grpcStatus.Code()
+	// Newer versions of ArgoCD return PermissionDenied when object doesn't exist
+	if sts != grpccodes.NotFound && sts != grpccodes.PermissionDenied {
 		return r.UpdateState(ctx, log, cr, "delete-retrying",
 			fmt.Sprintf("unexpected grpc status: %d", grpcStatus.Code()),
 			retryDelayAsResult)

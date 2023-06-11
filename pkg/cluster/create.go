@@ -47,7 +47,10 @@ func Create(
 	if !ok {
 		return nil, fmt.Errorf("failed to get grpc status from error")
 	}
-	if grpcStatus.Code() != grpccodes.NotFound {
+
+	sts := grpcStatus.Code()
+	// Newer versions of ArgoCD return PermissionDenied when object doesn't exist
+	if sts != grpccodes.NotFound && sts != grpccodes.PermissionDenied {
 		return nil, fmt.Errorf("unexpected cluster application error code: %d",
 			grpcStatus.Code())
 	}
