@@ -47,6 +47,7 @@ metadata:
   name: mycluster-pool-0
 spec:
   capacityType: spot
+  instanceType: t3a.medium
   scaling:
     maxSize: 5
     minSize: 0
