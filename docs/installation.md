@@ -59,7 +59,7 @@ kind: ConfigMap
 
 - Generate an account token: `argocd account generate-token --account arlon`
 - Copy this [config file template](https://github.com/arlonproj/arlon/blob/main/testing/argocd-config-for-controller.template.yaml) to `/tmp/config`.
-  (The file name is important. Do not name it anything other than 'config').
+  (Note: The destination file name is important: it must be `config`).
 - Edit the file to add this line to the end:
   - `  auth-token: ${ACCOUNT_TOKEN}` ()
   - Note 1: replace ${ACCOUNT_TOKEN} with the token generated 2 steps above
@@ -82,14 +82,14 @@ users:
 ```
 
 It will be used to create the secret containing the Arlon
-controller's ArgoCD credentials during the next steps.
+controller's ArgoCD credentials during the next step.
 
 ## Arlon controller
 
 - Create the arlon namespace: `kubectl create ns arlon`
 - Create the ArgoCD credentials secret from the temporary config file:
   `kubectl -n arlon create secret generic argocd-creds --from-file /tmp/config`
-- Delete the temporary config file
+- Delete `/tmp/config`
 - Clone the arlon git repo and cd to its top directory
 - Create the CRDs: `kubectl apply -f config/crd/bases/`
 - Deploy the controller: `kubectl apply -f deploy/manifests/`
