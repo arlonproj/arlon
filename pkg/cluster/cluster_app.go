@@ -86,7 +86,15 @@ func constructClusterApp(
 		Kind:         "AWSManagedControlPlane",
 		JSONPointers: []string{"/spec/version"},
 	})
-
+	// Newer versions of CAPI change the api version of MachinePool's infrastructureRef
+	// to AWSManagedMachinePool from v1beta2 to v1beta1 even though the resource's
+	// true version is infrastructure.cluster.x-k8s.io/v1beta2. Don't know why.
+	// Ignore it until then to make argocd happy.
+	ignoreDiffs = append(ignoreDiffs, argoappv1.ResourceIgnoreDifferences{
+		Group:        "cluster.x-k8s.io",
+		Kind:         "MachinePool",
+		JSONPointers: []string{"/spec/template/spec/infrastructureRef/apiVersion"},
+	})
 	ignoreDiffs = append(ignoreDiffs, argoappv1.ResourceIgnoreDifferences{
 		Group:        "infrastructure.cluster.x-k8s.io",
 		Kind:         "AWSMachineTemplate",
