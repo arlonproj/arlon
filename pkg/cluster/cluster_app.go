@@ -81,11 +81,15 @@ func constructClusterApp(
 	// appear to update it with a value that is less precise than the requested
 	// one, for e.g. the spec might specify v1.18.16, and get updated with v1.18,
 	// causing ArgoCD to report the resource as OutOfSync
-	ignoreDiffs = append(ignoreDiffs, argoappv1.ResourceIgnoreDifferences{
-		Group:        "controlplane.cluster.x-k8s.io",
-		Kind:         "AWSManagedControlPlane",
-		JSONPointers: []string{"/spec/version"},
-	})
+	// May 2023 Update: appears to be fixed in latest CAPA version, leaving
+	// as comment for historical context.
+	/*
+		ignoreDiffs = append(ignoreDiffs, argoappv1.ResourceIgnoreDifferences{
+			Group:        "controlplane.cluster.x-k8s.io",
+			Kind:         "AWSManagedControlPlane",
+			JSONPointers: []string{"/spec/version"},
+		})
+	*/
 	// Newer versions of CAPI change the api version of MachinePool's infrastructureRef
 	// to AWSManagedMachinePool from v1beta2 to v1beta1 even though the resource's
 	// true version is infrastructure.cluster.x-k8s.io/v1beta2. Don't know why.
