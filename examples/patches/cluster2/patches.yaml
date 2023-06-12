@@ -1,6 +1,0 @@
-apiVersion: controlplane.cluster.x-k8s.io/v1beta2
-kind: AWSManagedControlPlane
-metadata:
-  name: mycluster-control-plane
-spec:
-  region: us-west-1
