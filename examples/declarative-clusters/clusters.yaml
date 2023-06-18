@@ -1,0 +1,62 @@
+apiVersion: core.arlon.io/v1
+kind: Cluster
+metadata:
+  annotations:
+    arlon.io/profiles: blue,red
+  name: cluster1
+  namespace: arlon
+spec:
+  clusterTemplate:
+    url: https://github.com/arlonproj/arlon.git
+    path: examples/clustertemplates/eks-managed-mpool
+    revision: private/leb/fixes
+---
+apiVersion: core.arlon.io/v1
+kind: Cluster
+metadata:
+  annotations:
+    arlon.io/profiles: blue,red
+  name: cluster2
+  namespace: arlon
+spec:
+  clusterTemplate:
+    url: https://github.com/arlonproj/arlon.git
+    path: examples/clustertemplates/eks-managed-mpool
+    revision: private/leb/fixes
+  override:
+    patch: |
+      apiVersion: controlplane.cluster.x-k8s.io/v1beta2
+      kind: AWSManagedControlPlane
+      metadata:
+        name: mycluster-control-plane
+      spec:
+        region: us-west-1
+    repo:
+      path: examples/patches
+      revision: private/leb/fixes
+      url: https://github.com/arlonproj/arlon.git
+---
+apiVersion: core.arlon.io/v1
+kind: Cluster
+metadata:
+  annotations:
+    arlon.io/profiles: blue,red
+  name: cluster3
+  namespace: arlon
+spec:
+  clusterTemplate:
+    url: https://github.com/arlonproj/arlon.git
+    path: examples/clustertemplates/eks-managed-mpool
+    revision: private/leb/fixes
+  override:
+    patch: |
+      apiVersion: controlplane.cluster.x-k8s.io/v1beta2
+      kind: AWSManagedControlPlane
+      metadata:
+        name: mycluster-control-plane
+      spec:
+        region: us-west-2
+    repo:
+      path: examples/patches
+      revision: private/leb/fixes
+      url: https://github.com/arlonproj/arlon.git

@@ -1,0 +1,18 @@
+apiVersion: core.arlon.io/v1
+kind: AppProfile
+metadata:
+  name: blue
+  namespace: arlon
+spec:
+  appNames:
+  - guestbook
+---
+apiVersion: core.arlon.io/v1
+kind: AppProfile
+metadata:
+  name: red
+  namespace: arlon
+spec:
+  appNames:
+  - redis
+  - nginx

@@ -1,0 +1,103 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  labels:
+    arlon-type: application
+  name: guestbook
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements: []
+        template:
+          metadata: {}
+          spec:
+            destination: {}
+            project: ""
+            source:
+              repoURL: ""
+  template:
+    metadata:
+      name: '{{cluster_name}}-app-guestbook'
+    spec:
+      destination:
+        namespace: default
+        server: '{{cluster_server}}'
+      project: default
+      source:
+        path: guestbook
+        repoURL: https://github.com/argoproj/argocd-example-apps
+        targetRevision: HEAD
+      syncPolicy:
+        automated:
+          prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  labels:
+    arlon-type: application
+    managed-by: arlon
+  name: redis
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements: []
+        template:
+          metadata: {}
+          spec:
+            destination: {}
+            project: ""
+            source:
+              repoURL: ""
+  template:
+    metadata:
+      name: '{{cluster_name}}-app-redis'
+    spec:
+      destination:
+        namespace: default
+        server: '{{cluster_server}}'
+      project: default
+      source:
+        chart: redis
+        repoURL: https://charts.pascaliske.dev
+        targetRevision: 1.1.3
+      syncPolicy:
+        automated:
+          prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  labels:
+    arlon-type: application
+    managed-by: arlon
+  name: nginx
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements: []
+        template:
+          metadata: {}
+          spec:
+            destination: {}
+            project: ""
+            source:
+              repoURL: ""
+  template:
+    metadata:
+      name: '{{cluster_name}}-app-nginx'
+    spec:
+      destination:
+        namespace: default
+        server: '{{cluster_server}}'
+      project: default
+      source:
+        repoURL: https://github.com/arlonproj/arlon.git
+        targetRevision: private/leb/fixes
+        path: examples/apps/nginx-statefulset
+      syncPolicy:
+        automated:
+          prune: true
