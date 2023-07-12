@@ -42,7 +42,7 @@ require (
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.0 // indirect
-	github.com/cloudflare/circl v1.3.1 // indirect
+	github.com/cloudflare/circl v1.3.3 // indirect
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
 	github.com/emicklei/go-restful/v3 v3.10.1 // indirect
 	github.com/google/gnostic v0.6.9 // indirect
