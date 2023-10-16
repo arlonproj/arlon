@@ -26,7 +26,7 @@ require (
 	github.com/Azure/go-autorest/autorest/to v0.4.0
 	github.com/argoproj/pkg v0.13.6
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/fatih/color v1.14.1
+	github.com/fatih/color v1.15.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.26.0
