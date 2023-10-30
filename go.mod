@@ -11,7 +11,7 @@ require (
 	github.com/go-git/go-git/v5 v5.9.0
 	github.com/go-logr/logr v1.2.4
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.28.0
+	github.com/onsi/gomega v1.29.0
 	github.com/otiai10/copy v1.14.0
 	github.com/spf13/cobra v1.7.0
 	google.golang.org/grpc v1.58.3
@@ -144,7 +144,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/btree v1.1.2 // indirect
 	github.com/google/cel-go v0.13.0 // indirect
-	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/go-github/v41 v41.0.0 // indirect
 	github.com/google/go-jsonnet v0.19.1 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
