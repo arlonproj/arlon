@@ -6,7 +6,7 @@ require (
 	github.com/argoproj/argo-cd/v2 v2.5.8
 	github.com/aws/aws-sdk-go v1.49.21
 	github.com/deckarep/golang-set v1.8.0
-	github.com/deckarep/golang-set/v2 v2.3.1
+	github.com/deckarep/golang-set/v2 v2.6.0
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-git/go-git/v5 v5.9.0
 	github.com/go-logr/logr v1.3.0
