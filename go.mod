@@ -14,7 +14,7 @@ require (
 	github.com/onsi/gomega v1.30.0
 	github.com/otiai10/copy v1.14.0
 	github.com/spf13/cobra v1.8.0
-	google.golang.org/grpc v1.61.0
+	google.golang.org/grpc v1.61.1
 	k8s.io/api v0.25.6
 	k8s.io/apimachinery v0.25.6
 	k8s.io/client-go v0.25.6
