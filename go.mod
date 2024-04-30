@@ -8,7 +8,7 @@ require (
 	github.com/deckarep/golang-set v1.8.0
 	github.com/deckarep/golang-set/v2 v2.6.0
 	github.com/go-git/go-billy/v5 v5.5.0
-	github.com/go-git/go-git/v5 v5.9.0
+	github.com/go-git/go-git/v5 v5.12.0
 	github.com/go-logr/logr v1.4.1
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.30.0
@@ -28,7 +28,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/fatih/color v1.16.0
 	github.com/ghodss/yaml v1.0.0
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	go.uber.org/zap v1.27.0
 	gotest.tools/v3 v3.5.1
 	k8s.io/apiextensions-apiserver v0.25.6
@@ -53,7 +53,7 @@ require (
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
-	github.com/skeema/knownhosts v1.2.0 // indirect
+	github.com/skeema/knownhosts v1.2.2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	go.opentelemetry.io/otel/metric v1.20.0 // indirect
@@ -83,10 +83,9 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/PagerDuty/go-pagerduty v1.6.0 // indirect
-	github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371 // indirect
+	github.com/ProtonMail/go-crypto v1.0.0 // indirect
 	github.com/RocketChat/Rocket.Chat.Go.SDK v0.0.0-20221121042443-a3fd332d56d9 // indirect
 	github.com/TomOnTime/utfutil v0.0.0-20210710122150-437f72b26edf // indirect
-	github.com/acomagu/bufpipe v1.0.4 // indirect
 	github.com/alicebob/gopher-json v0.0.0-20200520072559-a9ecdc9d1d3a // indirect
 	github.com/alicebob/miniredis/v2 v2.30.0 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 // indirect
@@ -211,7 +210,7 @@ require (
 	github.com/russross/blackfriday v1.6.0 // indirect
 	github.com/sanathkr/go-yaml v0.0.0-20170819195128-ed9d249f429b // indirect
 	github.com/sanathkr/yaml v0.0.0-20170819201035-0056894fa522 // indirect
-	github.com/sergi/go-diff v1.3.1 // indirect
+	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966 // indirect
